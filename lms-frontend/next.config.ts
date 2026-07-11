@@ -8,6 +8,8 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.join(__dirname, "../../"),
   },
+  // Prevent Prisma from being bundled incorrectly on Vercel
+  serverExternalPackages: ["@prisma/client", "prisma"],
 };
 
 const withMDX = createMDX({
