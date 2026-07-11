@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
+
+export const dynamic = 'force-dynamic';
 const DEFAULT_USER_ID = "student_1";
 
 export async function GET(request: Request) {

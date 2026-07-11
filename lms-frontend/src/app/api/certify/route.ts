@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '../../../lib/prisma';
 import * as crypto from 'crypto';
+
+export const dynamic = 'force-dynamic';
 const DEFAULT_USER_ID = "student_1";
 const CERT_SECRET = process.env.CERT_SECRET || 'asa-industrial-authority-secret-2026';
 

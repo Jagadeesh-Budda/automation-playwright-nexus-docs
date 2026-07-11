@@ -3,6 +3,8 @@ import { prisma } from '../../../lib/prisma';
 import { ShieldCheck, Award, CheckCircle, Activity } from 'lucide-react';
 import DownloadVerificationReport from '../../../components/DownloadVerificationReport';
 
+export const dynamic = 'force-dynamic';
+
 export default async function CredentialVerificationPage({ params }: { params: { certId: string } }) {
   const { certId } = params;
 
