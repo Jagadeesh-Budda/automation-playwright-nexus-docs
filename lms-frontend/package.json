@@ -4,12 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "node generate_search_index.js && next dev --turbo",
-    "build": "node generate_search_index.js && next build",
+    "build": "prisma generate && node generate_search_index.js && next build",
     "start": "next start",
     "lint": "eslint",
     "clean": "npx rimraf .next",
     "audit": "node src/data/audit.js",
-    "test:load": "k6 run tests/load/k6_load_test.js"
+    "test:load": "k6 run tests/load/k6_load_test.js",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",
