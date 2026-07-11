@@ -1,0 +1,138 @@
+[
+  {
+    "title": "Forgetting await",
+    "wrong": "`page.goto('https://playwright.dev');`",
+    "correct": "`await page.goto('https://playwright.dev');`",
+    "why": "Browser actions are asynchronous. Without `await`, the test will finish before the page even loads!",
+    "sourceLessons": [
+      "10-first-test"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/10-first-test/page.mdx",
+        "heading": "Common Mistakes",
+        "lineRange": "106-110"
+      }
+    ]
+  },
+  {
+    "title": "String vs Regex in Title Assertion",
+    "wrong": "`await expect(page).toHaveTitle('Playwright');`",
+    "correct": "`await expect(page).toHaveTitle(/Playwright/);`",
+    "why": "If the actual title is \"Fast and reliable end-to-end testing for modern web apps | Playwright\", the exact string check will fail. The regex `/Playwright/` checks if it *contains* the word.",
+    "sourceLessons": [
+      "10-first-test"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/10-first-test/page.mdx",
+        "heading": "Common Mistakes",
+        "lineRange": "112-116"
+      }
+    ]
+  },
+  {
+    "title": "Skipping Browser Installation",
+    "wrong": "Running `npx playwright test` immediately after cloning a repo without installing browsers.",
+    "correct": "Run `npx playwright install` first.",
+    "why": "Playwright downloads its own custom browser binaries. Without them, it cannot launch the browsers.",
+    "sourceLessons": [
+      "10-first-test"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/10-first-test/page.mdx",
+        "heading": "Common Mistakes",
+        "lineRange": "118-122"
+      }
+    ]
+  },
+  {
+    "title": "Forgetting `--project`",
+    "wrong": "`npx playwright test --headed` (Opens 3 browsers at once!)",
+    "correct": "`npx playwright test --headed --project=chromium`",
+    "why": "If you don't specify a project, Playwright runs the test across all configured browsers (Chromium, Firefox, WebKit) simultaneously, which can be visually overwhelming when debugging in headed mode.",
+    "sourceLessons": [
+      "13-running-reading"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/13-running-reading/page.mdx",
+        "heading": "Common Mistakes",
+        "lineRange": "70-74"
+      }
+    ]
+  },
+  {
+    "title": "Stale Reports",
+    "wrong": "Relying on an old `playwright-report` folder without re-running tests.",
+    "correct": "The report updates automatically, but always verify the timestamp in the report header.",
+    "why": "**Mistake 2: Stale Reports**  \n**Wrong:** Relying on an old `playwright-report` folder without re-running tests.  \n**Correct:** The report updates automatically, but always verify the timestamp in the report header.",
+    "sourceLessons": [
+      "13-running-reading"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/13-running-reading/page.mdx",
+        "heading": "Common Mistakes",
+        "lineRange": "76-79"
+      }
+    ]
+  },
+  {
+    "title": "Hardcoding URLs in Tests",
+    "wrong": "`await page.goto('https://demo.playwright.dev/todomvc/');` inside the test.",
+    "correct": "Use `baseURL` in `playwright.config.ts`.",
+    "why": "If the URL changes (e.g., testing against staging vs prod), you would have to update hundreds of tests manually.",
+    "sourceLessons": [
+      "35-reference-solution"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(03-competent)/35-reference-solution/page.mdx",
+        "heading": "Common Mistakes",
+        "lineRange": "160-164"
+      }
+    ]
+  },
+  {
+    "title": "Locators Inside the Spec File",
+    "wrong": "`await page.getByPlaceholder('What needs to be done?').fill('Task');`",
+    "correct": "Abstract this into `todoPage.addTodo('Task');`",
+    "why": "Tests should read like business requirements, completely decoupled from the underlying DOM selectors.",
+    "sourceLessons": [
+      "35-reference-solution"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(03-competent)/35-reference-solution/page.mdx",
+        "heading": "Common Mistakes",
+        "lineRange": "166-170"
+      }
+    ]
+  },
+  {
+    "title": "Skipping Fixtures",
+    "wrong": "Manually instantiating `const todoPage = new TodoPage(page);` in a `beforeEach` hook.",
+    "correct": "Use `test.extend` to inject the POM directly into the test arguments.",
+    "why": "Fixtures are the modern Playwright way. They support automatic cleanup, lazy loading, and parallel execution isolation natively.",
+    "sourceLessons": [
+      "35-reference-solution"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(03-competent)/35-reference-solution/page.mdx",
+        "heading": "Common Mistakes",
+        "lineRange": "172-176"
+      }
+    ]
+  }
+]

@@ -1,0 +1,452 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T10:36:32.990Z",
+  "lessons": [
+    {
+      "id": "110-industry-banking",
+      "title": "20.1: 🏦 Banking Specialist Project",
+      "group": "🚀 MODULE 20: INDUSTRY TRACKS",
+      "isPro": false,
+      "meta": {
+        "time": "90-120 mins",
+        "type": "Portfolio",
+        "outcome": "Demonstrate Banking automation: role fixtures, MFA interception, PDF download, Shadow DOM."
+      },
+      "slug": "110-industry-banking",
+      "url": "courses/playwright/110-industry-banking",
+      "tasks": [
+        {
+          "id": "banking_portfolio",
+          "title": "Banking Framework: Role Fixtures + MFA Interception + PDF Download",
+          "hint": "test.extend() with tellerPage/managerPage + route.fulfill() for SMS gateway + waitForEvent('download')",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "test.extend("
+            },
+            {
+              "type": "contains",
+              "value": "route.fulfill("
+            },
+            {
+              "type": "contains",
+              "value": "waitForEvent('download')"
+            },
+            {
+              "type": "contains",
+              "value": "async ({ page"
+            },
+            {
+              "type": "contains",
+              "value": "await expect("
+            },
+            {
+              "type": "not_contains",
+              "value": "waitForTimeout("
+            },
+            {
+              "type": "not_contains",
+              "value": "page.pause()"
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "test.extend("
+            },
+            {
+              "type": "contains",
+              "value": "route.fulfill("
+            },
+            {
+              "type": "contains",
+              "value": "waitForEvent('download')"
+            },
+            {
+              "type": "contains",
+              "value": "async ({ page"
+            },
+            {
+              "type": "contains",
+              "value": "await expect("
+            },
+            {
+              "type": "not_contains",
+              "value": "waitForTimeout("
+            },
+            {
+              "type": "not_contains",
+              "value": "page.pause()"
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        }
+      ],
+      "objectives": [
+        {
+          "id": "obj-1",
+          "text": "Understand the core architectural patterns"
+        },
+        {
+          "id": "obj-2",
+          "text": "Identify and avoid common anti-patterns"
+        },
+        {
+          "id": "obj-3",
+          "text": "Implement production-grade automation scripts"
+        }
+      ],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is strict state isolation an important architectural pattern for Banking E2E tests?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which data anti-pattern is an absolute compliance violation in Banking E2E testing?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "learningPaths": [
+        "enterprise",
+        "regulated"
+      ],
+      "category": "industry-specific",
+      "optional": true,
+      "industryTags": [
+        "Healthcare",
+        "Pharma",
+        "Regulated Systems"
+      ],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Regulated Industry Automation"
+    },
+    {
+      "id": "111-industry-ecommerce",
+      "title": "20.2: 🛒 Commerce Specialist Project",
+      "group": "🚀 MODULE 20: INDUSTRY TRACKS",
+      "isPro": false,
+      "meta": {
+        "time": "90-120 mins",
+        "type": "Portfolio",
+        "outcome": "Demonstrate E-Commerce automation: API interception, storage state, parameterized tests."
+      },
+      "slug": "111-industry-ecommerce",
+      "url": "courses/playwright/111-industry-ecommerce",
+      "tasks": [
+        {
+          "id": "ecommerce_portfolio",
+          "title": "Commerce Framework: Inventory Interception + Auth State + Parameterized Tests",
+          "hint": "page.route() to mock inventory + storageState for auth + for...of parameterized tests + await expect()",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "page.route("
+            },
+            {
+              "type": "contains",
+              "value": "route.fulfill("
+            },
+            {
+              "type": "contains",
+              "value": "storageState"
+            },
+            {
+              "type": "contains",
+              "value": "for ("
+            },
+            {
+              "type": "contains",
+              "value": "await expect("
+            },
+            {
+              "type": "not_contains",
+              "value": "waitForTimeout("
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "page.route("
+            },
+            {
+              "type": "contains",
+              "value": "route.fulfill("
+            },
+            {
+              "type": "contains",
+              "value": "storageState"
+            },
+            {
+              "type": "contains",
+              "value": "for ("
+            },
+            {
+              "type": "contains",
+              "value": "await expect("
+            },
+            {
+              "type": "not_contains",
+              "value": "waitForTimeout("
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        }
+      ],
+      "objectives": [
+        {
+          "id": "obj-1",
+          "text": "Understand the core architectural patterns"
+        },
+        {
+          "id": "obj-2",
+          "text": "Identify and avoid common anti-patterns"
+        },
+        {
+          "id": "obj-3",
+          "text": "Implement production-grade automation scripts"
+        }
+      ],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is parallel cart execution an important architectural pattern for E-commerce E2E tests?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which state anti-pattern destroys parallel checkout flows in E-commerce testing?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "learningPaths": [
+        "enterprise",
+        "regulated"
+      ],
+      "category": "industry-specific",
+      "optional": true,
+      "industryTags": [
+        "Healthcare",
+        "Pharma",
+        "Regulated Systems"
+      ],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Regulated Industry Automation"
+    },
+    {
+      "id": "112-industry-healthcare",
+      "title": "20.3: 🏥 Pharma Specialist Project",
+      "group": "🚀 MODULE 20: INDUSTRY TRACKS",
+      "isPro": false,
+      "meta": {
+        "time": "90-120 mins",
+        "type": "Portfolio",
+        "outcome": "Demonstrate GxP automation: GraphQL interception, canvas signature, multi-role fixtures."
+      },
+      "slug": "112-industry-healthcare",
+      "url": "courses/playwright/112-industry-healthcare",
+      "tasks": [
+        {
+          "id": "healthcare_portfolio",
+          "title": "GxP Framework: GraphQL Interception + Canvas Signature + Role Fixtures",
+          "hint": "page.route() for GraphQL + page.mouse.move()/down() for canvas + test.extend() for role fixtures",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "page.route("
+            },
+            {
+              "type": "contains",
+              "value": "page.mouse"
+            },
+            {
+              "type": "contains",
+              "value": "test.extend("
+            },
+            {
+              "type": "contains",
+              "value": "route.fulfill("
+            },
+            {
+              "type": "contains",
+              "value": "await expect("
+            },
+            {
+              "type": "not_contains",
+              "value": "waitForTimeout("
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "page.route("
+            },
+            {
+              "type": "contains",
+              "value": "page.mouse"
+            },
+            {
+              "type": "contains",
+              "value": "test.extend("
+            },
+            {
+              "type": "contains",
+              "value": "route.fulfill("
+            },
+            {
+              "type": "contains",
+              "value": "await expect("
+            },
+            {
+              "type": "not_contains",
+              "value": "waitForTimeout("
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        }
+      ],
+      "objectives": [
+        {
+          "id": "obj-1",
+          "text": "Understand the core architectural patterns"
+        },
+        {
+          "id": "obj-2",
+          "text": "Identify and avoid common anti-patterns"
+        },
+        {
+          "id": "obj-3",
+          "text": "Implement production-grade automation scripts"
+        }
+      ],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is data anonymization an important architectural pattern for Healthcare E2E tests?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which session anti-pattern exposes patient data across parallel workers in Healthcare testing?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "learningPaths": [
+        "enterprise",
+        "regulated"
+      ],
+      "category": "industry-specific",
+      "optional": true,
+      "industryTags": [
+        "Healthcare",
+        "Pharma",
+        "Regulated Systems"
+      ],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Regulated Industry Automation"
+    }
+  ]
+}

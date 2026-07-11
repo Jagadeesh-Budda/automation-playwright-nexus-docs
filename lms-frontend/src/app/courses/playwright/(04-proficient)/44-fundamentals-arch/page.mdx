@@ -1,0 +1,168 @@
+﻿# 8.5: Industrial Folder Design
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Understand the Enterprise Folder Mapping
+
+## Why Folder Structure Matters
+
+A bad folder structure makes a test suite feel like a junk drawer — everything is mixed together, nothing is reusable, and new engineers can't find anything. A good folder structure makes the suite feel like a well-organized factory.
+
+The ASA standard uses a **4-layer architecture** that maps directly to how a software application is built.
+
+## The 4-Layer Architecture
+
+```
+project-root/
+├── tests/              ← LAYER 1: Test Specs (the "What")
+│   ├── admin/
+│   │   ├── login.spec.ts
+│   │   └── document-upload.spec.ts
+│   └── e-sign/
+│       └── signature-flow.spec.ts
+│
+├── pages/              ← LAYER 2: Page Objects (the "How")
+│   ├── LoginPage.ts
+│   ├── DocumentPage.ts
+│   └── ESignPage.ts
+│
+├── components/         ← LAYER 3: Reusable UI Components
+│   ├── Header.ts
+│   ├── Modal.ts
+│   └── DataTable.ts
+│
+├── entities/           ← LAYER 4: Data Models & Types
+│   ├── User.ts
+│   ├── Document.ts
+│   └── Signature.ts
+│
+├── fixtures/           ← Test infrastructure (base test, hooks)
+│   └── baseTest.ts
+│
+├── utils/              ← Shared utility functions
+│   ├── dateHelper.ts
+│   └── fileHelper.ts
+│
+├── data/               ← Test data (JSON, CSV, factories)
+│   └── testUsers.json
+│
+├── .env                ← Secret config (never commit!)
+├── playwright.config.ts
+└── package.json
+```
+
+## Layer-by-Layer Explanation
+
+### Layer 1: `tests/` — Test Specs (The "What")
+These files contain **only** the test logic. They describe what you are testing in plain business language. They should be readable by a non-engineer.
+
+<CodeExplainer preset="admin-login-spec" />
+
+### Layer 2: `pages/` — Page Objects (The "How")
+These files contain all the **selectors and interactions** for a specific page. When the UI changes, you only update this file — not 50 different test files.
+
+<CodeExplainer preset="login-page-ts" />
+
+### Layer 3: `components/` — Reusable UI Components
+These model **shared UI elements** that appear on multiple pages (headers, modals, navigation, data tables).
+
+<CodeExplainer preset="modal-ts" />
+
+### Layer 4: `entities/` — Data Models & Types
+These are TypeScript interfaces that define the **shape of your data**.
+
+<CodeExplainer preset="user-ts" />
+
+## The Golden Rule
+
+| In `tests/` | Never... |
+|------------|----------|
+| Write selectors (`page.locator('#btn')`) directly | ✅ Use Page Objects instead |
+| Hardcode URLs | ✅ Use `process.env.BASE_URL` |
+| Import directly from `pages/` without a fixture | ✅ Use `baseTest` fixtures |
+
+> [!TIP]
+> If you find yourself copying and pasting a locator into two different spec files, it belongs in a Page Object. Always refactor before the duplication spreads.
+
+<CodeEditor
+  moduleId="44-fundamentals-arch"
+  taskIndex={0}
+  placeholder="// Task: Write where Page Objects should be stored in the 4-layer architecture&#10;// Answer: In the /pages directory (Layer 2)"
+/>
+---
+
+## Common Mistakes
+
+- **Hardcoding Waits**: Using `page.waitForTimeout()` instead of waiting for an element's state.
+- **Overly Broad Locators**: Using generic CSS selectors like `.button` that might break if multiple buttons are added. Always prefer user-facing attributes like `getByRole`.
+- **Ignoring Errors**: Catching errors in try/catch blocks without failing the test or logging the reason.
+
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="44-fundamentals-arch"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="fundamentals-arch" />
+
+
+
+export const astRules = [
+  {
+    type: "ast_forbidden_callee",
+    value: "page.waitForTimeout",
+    message: "Use auto-retrying assertions or web-first locators instead of hardcoded waits."
+  }
+];

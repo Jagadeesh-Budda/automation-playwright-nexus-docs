@@ -1,0 +1,1890 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T10:36:32.990Z",
+  "lessons": [
+    {
+      "id": "52-locators-code",
+      "title": "10.1: Advanced Locator Composition",
+      "url": "courses/playwright/52-locators-code",
+      "group": "🗝️ MODULE 10: ADVANCED LOCATORS",
+      "level": 8,
+      "weight": 15,
+      "meta": {
+        "time": "25 mins",
+        "type": "Code",
+        "outcome": "Isolate elements using complex filtering logic"
+      },
+      "objectives": [
+        {
+          "id": "filter_mastery",
+          "title": "Use .filter() and .hasText() like a pro"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "write_filter",
+          "title": "Complex Filter",
+          "hint": "Use locator().filter()",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "filter"
+            },
+            {
+              "type": "contains",
+              "value": "hasText"
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "filter"
+            },
+            {
+              "type": "contains",
+              "value": "hasText"
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "filter_mastery",
+          "weight": 100
+        }
+      ],
+      "spec": {
+        "method": ".filter()",
+        "attribute": "hasText / has"
+      },
+      "quizPool": {
+        "Easy": [
+          {
+            "objective": "advanced_filtering",
+            "type": "scenario",
+            "difficulty": "easy",
+            "q": "How can you dynamically narrow down this massive list of buttons to find the exact target?",
+            "options": [
+              "To format the text output of the locator.",
+              "To narrow down a broad locator (like matching 10 rows) into a more specific subset (like the 1 row that contains specific text), without relying on brittle index numbers.",
+              "To remove elements from the DOM.",
+              "To filter out invisible elements automatically."
+            ],
+            "a": "To narrow down a broad locator (like matching 10 rows) into a more specific subset (like the 1 row that contains specific text), without relying on brittle index numbers.",
+            "explanation": "Filtering allows you to start with a broad, semantic query (`getByRole('listitem')`) and mathematically narrow it down by state or child content (`filter({ hasText: 'Apples' })`) to achieve strict uniqueness.",
+            "scenario": "Your locator `page.getByRole('button')` finds 10 buttons. You only want the one that sits inside the '.checkout-modal' container and contains the text 'Pay'."
+          },
+          {
+            "objective": "advanced_filtering",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You have a list of 5 product cards. You want to click the 'Add to Cart' button specifically inside the card titled 'Laptop'.",
+            "q": "Which code snippet correctly demonstrates robust locator chaining?",
+            "options": [
+              "page.getByText('Laptop').getByRole('button', { name: 'Add to Cart' }).click()",
+              "page.locator('.card').filter({ hasText: 'Laptop' }).getByRole('button', { name: 'Add to Cart' }).click()",
+              "page.locator('.card:nth-child(2) > button').click()",
+              "page.getByRole('button', { name: 'Add to Cart' }).filter({ hasText: 'Laptop' }).click()"
+            ],
+            "a": "page.locator('.card').filter({ hasText: 'Laptop' }).getByRole('button', { name: 'Add to Cart' }).click()",
+            "explanation": "Chaining works from the outside in. First, you grab all product cards. Second, you filter them down to the specific card containing the text 'Laptop'. Finally, you scope inside that specific card to find the 'Add to Cart' button. This architecture survives re-ordering of the cards."
+          },
+          {
+            "objective": "advanced_filtering",
+            "type": "multi-select",
+            "difficulty": "easy",
+            "scenario": "Your locator `page.getByRole('button', { name: 'Delete' })` throws a Strict Mode error because there are 3 Delete buttons on the page.",
+            "q": "Which of the following methods are technically valid ways to bypass the error and force Playwright to interact with a specific element in the array? (Select all that apply)",
+            "options": [
+              "locator.first()",
+              "locator.last()",
+              "locator.nth(1)",
+              "locator.filter()",
+              "locator.random()"
+            ],
+            "a": [
+              "locator.first()",
+              "locator.last()",
+              "locator.nth(1)",
+              "locator.filter()"
+            ],
+            "explanation": "Playwright provides structural index methods (`first`, `last`, `nth`) to break strict mode ties. It also provides semantic narrowing via `filter`. There is no `random()` method."
+          },
+          {
+            "objective": "advanced_filtering",
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "const row = page.locator('tr').filter({ hasText: 'Alice' });\nawait row.click();",
+            "q": "If the table contains two rows, one with text 'Alice' and one with text 'AliceSmith', what will happen when `row.click()` executes?",
+            "options": [
+              "It clicks the first row.",
+              "It clicks both rows simultaneously.",
+              "It throws a Strict Mode violation (`resolved to 2 elements`) because `hasText` performs a substring match by default, meaning both 'Alice' and 'AliceSmith' pass the filter.",
+              "It fails because `tr` is an invalid locator."
+            ],
+            "a": "It throws a Strict Mode violation (`resolved to 2 elements`) because `hasText` performs a substring match by default, meaning both 'Alice' and 'AliceSmith' pass the filter.",
+            "explanation": "The `hasText` filter is a substring match. To enforce exact matching, you must pass a regular expression anchored with bounds (e.g., `hasText: /^Alice$/`), or use a stricter selector."
+          },
+          {
+            "objective": "advanced_filtering",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You need to find a button that possesses TWO specific attributes: It must have the role 'button', and it must contain the title attribute 'Submit'.",
+            "q": "How can you combine locators to enforce multiple conditions simultaneously?",
+            "options": [
+              "page.getByRole('button').or(page.getByTitle('Submit'))",
+              "page.getByRole('button').and(page.getByTitle('Submit'))",
+              "page.getByRole('button').concat(page.getByTitle('Submit'))",
+              "page.locator('button || title=Submit')"
+            ],
+            "a": "page.getByRole('button').and(page.getByTitle('Submit'))",
+            "explanation": "The `.and()` method intersects two locators. It returns only the DOM nodes that mathematically satisfy the conditions of both the left-hand and right-hand locators."
+          }
+        ],
+        "Medium": [
+          {
+            "objective": "advanced_filtering",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "await page.locator('button').nth(3).click();",
+            "q": "Why is using `.nth(3)` considered an architectural anti-pattern and highly discouraged in modern UI automation?",
+            "options": [
+              "It is extremely brittle. If a new button is added anywhere in the DOM before the target button, the index shifts, and the test will click the wrong element without throwing an error.",
+              "It is deprecated.",
+              "It requires zero-based indexing, so it clicks the 4th button, confusing developers.",
+              "It disables auto-waiting."
+            ],
+            "a": "It is extremely brittle. If a new button is added anywhere in the DOM before the target button, the index shifts, and the test will click the wrong element without throwing an error.",
+            "explanation": "Index-based locators (`first`, `last`, `nth`) rely purely on the physical DOM rendering order. They possess no semantic meaning. Using them guarantees test rot as the application evolves. SDETs must always strive to use semantic `filter({ hasText: ... })` instead."
+          },
+          {
+            "objective": "advanced_filtering",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "A dashboard has 10 widget containers. Only one of the widgets contains a `<canvas>` element used for rendering a chart.",
+            "q": "How do you construct a locator that specifically targets the widget container that has a canvas inside it?",
+            "options": [
+              "page.locator('.widget > canvas')",
+              "page.locator('canvas').closest('.widget')",
+              "page.locator('.widget').filter({ has: page.locator('canvas') })",
+              "page.locator('.widget').contains('canvas')"
+            ],
+            "a": "page.locator('.widget').filter({ has: page.locator('canvas') })",
+            "explanation": "The `filter({ has: Locator })` method is incredibly powerful. It allows you to query a parent element based on the existence of a specific inner descendant. Unlike `.widget > canvas` (which returns the canvas), `filter({ has })` returns the parent `.widget`."
+          },
+          {
+            "objective": "advanced_filtering",
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "An application has two drastically different UI layouts for Mobile and Desktop. On Desktop, the save button is `getByRole('button', { name: 'Save' })`. On Mobile, the text is hidden, and it is just an icon: `getByLabel('Save Icon')`.",
+            "q": "How can you write a single robust locator that automatically works across both viewports? (Select all that apply)",
+            "options": [
+              "Use the `.or()` method: `const save = page.getByRole('button', { name: 'Save' }).or(page.getByLabel('Save Icon'));`",
+              "Use an IF statement: `if (isMobile) ... else ...`",
+              "You must write two separate test files.",
+              "Use XPath with an OR operator: `//button[text()='Save'] | //*[@aria-label='Save Icon']`"
+            ],
+            "a": [
+              "Use the `.or()` method: `const save = page.getByRole('button', { name: 'Save' }).or(page.getByLabel('Save Icon'));`",
+              "Use an IF statement: `if (isMobile) ... else ...`",
+              "Use XPath with an OR operator: `//button[text()='Save'] | //*[@aria-label='Save Icon']`"
+            ],
+            "explanation": "The `.or()` method mathematically unions two locators. Playwright will concurrently search for both. If it finds either one, it proceeds. This elegantly solves A/B testing and responsive design locators without requiring complex control flow logic."
+          },
+          {
+            "objective": "advanced_filtering",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "const rows = page.locator('table tr');\nconst activeRows = rows.filter({ hasNot: page.locator('.deleted') });\nawait expect(activeRows).toHaveCount(5);",
+            "q": "What exact query logic does the `hasNot` parameter execute?",
+            "options": [
+              "It deletes elements from the DOM.",
+              "It performs an inverse inner-query. It yields only the parent `tr` elements that mathematically do *not* contain a descendant element matching `.deleted`.",
+              "It throws an error if `.deleted` exists.",
+              "It returns a boolean array."
+            ],
+            "a": "It performs an inverse inner-query. It yields only the parent `tr` elements that mathematically do *not* contain a descendant element matching `.deleted`.",
+            "explanation": "`hasNot` allows SDETs to filter out specific state representations (like rows marked with a specific class or containing a specific warning icon), providing a pristine subset of locators to act upon."
+          },
+          {
+            "objective": "advanced_filtering",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You have a deeply nested shadow DOM structure. You need to target a button inside it.",
+            "q": "How does Playwright's locator engine natively handle traversing into closed Shadow DOMs?",
+            "options": [
+              "You must use a special `/deep/` CSS combinator.",
+              "Playwright automatically pierces standard open shadow DOMs seamlessly without any special syntax. Standard CSS and text locators penetrate the shadow boundary transparently.",
+              "You must execute custom JavaScript using `evaluate`.",
+              "Shadow DOMs cannot be automated."
+            ],
+            "a": "Playwright automatically pierces standard open shadow DOMs seamlessly without any special syntax. Standard CSS and text locators penetrate the shadow boundary transparently.",
+            "explanation": "This is a massive architectural advantage over standard Selenium. Playwright's selector engine inherently pierces shadow boundaries. A simple `page.locator('button')` will find a button buried 5 layers deep inside web components."
+          }
+        ],
+        "Hard": [
+          {
+            "objective": "advanced_filtering",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "const list = page.locator('ul');\nconst items = list.locator('li');\nconst item = items.filter({ hasText: 'Secret' });\nawait item.click();",
+            "q": "A junior engineer looks at this code and warns that executing three separate locator definitions will cause three separate, slow trips across the CDP network to the browser. Are they correct?",
+            "options": [
+              "Yes, chaining locators is mathematically slower than writing one massive CSS selector.",
+              "No. Playwright locators are purely lazy, synchronous string builders in Node.js. Zero network traffic occurs during the first three lines. A single compiled query is sent to the browser only when the `.click()` action is invoked.",
+              "Yes, `filter()` is executed in the browser.",
+              "No, because the network uses WebSockets."
+            ],
+            "a": "No. Playwright locators are purely lazy, synchronous string builders in Node.js. Zero network traffic occurs during the first three lines. A single compiled query is sent to the browser only when the `.click()` action is invoked.",
+            "explanation": "This is a profound misunderstanding of Playwright's engine. A `Locator` is not a live DOM node pointer. It is an immutable recipe. Chaining `.locator().filter()` simply concatenates the query string in Node memory. The browser is never contacted until an actionable command (`click`, `expect`) pulls the trigger."
+          },
+          {
+            "objective": "advanced_filtering",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You need to locate an element that contains the exact text `\"Hello World\"` (including the quotes).",
+            "q": "How do you properly escape the quotes when passing it to a Playwright CSS text selector?",
+            "options": [
+              "page.locator(`text=\"Hello World\"`)",
+              "page.locator(`text=\\\"Hello World\\\"`)",
+              "page.locator(`\"\"Hello World\"\"`)",
+              "page.locator('text=\"\\\\\"Hello World\\\\\"\"')"
+            ],
+            "a": "page.locator('text=\"\\\\\"Hello World\\\\\"\"')",
+            "explanation": "Playwright's engine uses quotes to define string boundaries. If the target string physically contains quotes, they must be escaped using a double backslash `\\\"` so the underlying CSS engine parses them as literal characters, not syntax boundaries. This is notoriously tricky."
+          },
+          {
+            "objective": "advanced_filtering",
+            "type": "multi-select",
+            "difficulty": "hard",
+            "scenario": "An architect is debugging why `locator.filter({ hasText: /^Completed$/ })` is returning zero elements, even though `<div class=\"status\">Completed</div>` is clearly visible on the page.",
+            "q": "Which of the following DOM layout scenarios will cause the regex strictly anchored `hasText` to fail? (Select all that apply)",
+            "options": [
+              "The HTML contains hidden whitespace: `<div class=\"status\">\\n  Completed\\n</div>`",
+              "The text is generated via CSS `::before` pseudo-elements.",
+              "The element is inside an iframe.",
+              "The text is visually broken into a child element: `<div><span class=\"bold\">Complete</span>d</div>`."
+            ],
+            "a": [
+              "The HTML contains hidden whitespace: `<div class=\"status\">\\n  Completed\\n</div>`",
+              "The text is visually broken into a child element: `<div><span class=\"bold\">Complete</span>d</div>`."
+            ],
+            "explanation": "Anchored regular expressions (`/^...$/`) are mathematically unforgiving. If the DOM injects a newline (`\\n`) or spaces around the text block, or if the text is fragmented across child nodes (which disrupts the exact `textContent` string boundaries), the regex will fail to match. Playwright's default `getByText` normalizes whitespace, but regex does not."
+          },
+          {
+            "objective": "advanced_filtering",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "const btn = page.locator('button', { hasText: 'Submit', has: page.locator('svg') });",
+            "q": "What is the architectural difference between passing `{ hasText, has }` as options directly into `page.locator()` versus chaining `.filter()` methods afterward?",
+            "options": [
+              "There is no functional difference. It is purely syntactic sugar; the Playwright engine compiles them into the exact same internal AST (Abstract Syntax Tree) query.",
+              "Options passed into `locator()` execute asynchronously, while `filter()` is synchronous.",
+              "`filter()` cannot accept the `has` parameter.",
+              "Options are deprecated."
+            ],
+            "a": "There is no functional difference. It is purely syntactic sugar; the Playwright engine compiles them into the exact same internal AST (Abstract Syntax Tree) query.",
+            "explanation": "Playwright provides multiple APIs to construct the same query. Passing options directly into the second argument of `locator()` is functionally identical to appending `.filter()`. Both resolve to an internal selector string that combines the base CSS with pseudo-classes like `:has-text()`."
+          },
+          {
+            "objective": "advanced_filtering",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You are scraping a legacy application. The developer used raw `<span>` tags for everything. You have 50 identical spans. You need to click the span that physically follows the span containing 'Username'.",
+            "q": "How can you utilize Playwright's Layout Selectors to find an element based purely on its geometric position relative to another element?",
+            "options": [
+              "page.locator('span:right-of(:text(\"Username\"))')",
+              "page.locator('span').filter({ near: page.getByText('Username') })",
+              "Layout selectors (like `:right-of`, `:below`) are built into Playwright's custom CSS engine and evaluate the mathematical bounding box (X/Y coordinates) of elements on the screen.",
+              "Layout selectors require injecting jQuery."
+            ],
+            "a": "Layout selectors (like `:right-of`, `:below`) are built into Playwright's custom CSS engine and evaluate the mathematical bounding box (X/Y coordinates) of elements on the screen.",
+            "explanation": "When the DOM lacks semantics and structure, Playwright provides a powerful fallback: Layout Selectors. They query the rendering tree's geometry. `page.locator('input:right-of(:text(\"Username\"))').first()` will literally find the input box visually to the right of the text on the monitor."
+          }
+        ]
+      },
+      "icon": "🔍",
+      "slug": "52-locators-code",
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "enterprise",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET"
+    },
+    {
+      "id": "53-locators-exec",
+      "title": "10.2: Dynamic Tables & Lists",
+      "url": "courses/playwright/53-locators-exec",
+      "group": "🗝️ MODULE 10: ADVANCED LOCATORS",
+      "level": 8,
+      "weight": 50,
+      "meta": {
+        "time": "40 mins",
+        "type": "Execution",
+        "outcome": "Automate complex data grid interactions"
+      },
+      "objectives": [
+        {
+          "id": "table_automation",
+          "title": "Interact with specific cells in dynamic tables"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "table_click",
+          "title": "Find & Click Row",
+          "hint": "Requires: filter, find, click",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "filter"
+            },
+            {
+              "type": "contains",
+              "value": "click"
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "table_automation",
+          "weight": 100
+        }
+      ],
+      "spec": {
+        "target": "Data Grids",
+        "pattern": "Dynamic Locating"
+      },
+      "quizPool": {
+        "Easy": [
+          {
+            "objective": "dynamic_tables",
+            "type": "mcq",
+            "difficulty": "easy",
+            "q": "Why is it fundamentally unsafe to use CSS class selectors like `.row-3` or `.odd-row` to target items in a dynamic data grid?",
+            "options": [
+              "Because classes cannot be clicked.",
+              "Because dynamic data grids constantly re-sort, paginate, and filter rows. A row that is `.row-3` today might be `.row-8` tomorrow. Locators must bind to the unique data contained in the row, not its temporary physical position.",
+              "Because Playwright cannot read classes.",
+              "Because tables use tables, not divs."
+            ],
+            "a": "Because dynamic data grids constantly re-sort, paginate, and filter rows. A row that is `.row-3` today might be `.row-8` tomorrow. Locators must bind to the unique data contained in the row, not its temporary physical position.",
+            "explanation": "Dynamic tables are the most common source of test flake. If you rely on positional classes or indices, any database update will break the test. Locators must dynamically search the table for the unique identifier (like an Order ID) to find the correct row."
+          },
+          {
+            "objective": "dynamic_tables",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You have an unordered list `<ul>` of users. You need to count how many users are currently displayed on the screen.",
+            "q": "Which Playwright method safely retrieves the total number of matched DOM elements without throwing a Strict Mode error?",
+            "options": [
+              "await page.locator('li').count()",
+              "await page.locator('li').length",
+              "await page.locator('li').size()",
+              "await page.locator('li').all()"
+            ],
+            "a": "await page.locator('li').count()",
+            "explanation": "The `.count()` method returns the integer number of elements that match the locator. It explicitly bypasses strict mode (which normally throws an error if multiple elements match) because counting multiple elements is its designated mathematical purpose."
+          },
+          {
+            "objective": "dynamic_tables",
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "const rows = page.locator('tbody tr');\nawait expect(rows).toHaveCount(10);",
+            "q": "What is the specific architectural benefit of using `toHaveCount()` instead of `expect(await rows.count()).toBe(10)`?",
+            "options": [
+              "They are identical.",
+              "`toHaveCount()` is a Web-First Assertion. It automatically polls and retries. If the table takes 2 seconds to fetch data and render the 10 rows, `toHaveCount` waits patiently. The manual `.count()` method evaluates instantly to 0 and fails the test permanently.",
+              "`toHaveCount()` ignores invisible elements.",
+              "`toHaveCount()` is faster."
+            ],
+            "a": "`toHaveCount()` is a Web-First Assertion. It automatically polls and retries. If the table takes 2 seconds to fetch data and render the 10 rows, `toHaveCount` waits patiently. The manual `.count()` method evaluates instantly to 0 and fails the test permanently.",
+            "explanation": "This is a critical distinction. `await locator.count()` evaluates the DOM state exactly at that millisecond. `expect(locator).toHaveCount()` utilizes Playwright's auto-retrying architecture, gracefully surviving network latency."
+          },
+          {
+            "objective": "dynamic_tables",
+            "type": "multi-select",
+            "difficulty": "easy",
+            "scenario": "You need to iterate over every single row in a table to extract its text and save it to a database.",
+            "q": "Which of the following Playwright API methods are designed to unpack a Locator array into an iterable JavaScript array? (Select all that apply)",
+            "options": [
+              "locator.all()",
+              "locator.allTextContents()",
+              "locator.map()",
+              "locator.forEach()"
+            ],
+            "a": [
+              "locator.all()",
+              "locator.allTextContents()"
+            ],
+            "explanation": "`locator.all()` returns a JavaScript array of individual `Locator` objects that you can iterate over with a `for...of` loop. `locator.allTextContents()` directly returns an array of strings."
+          },
+          {
+            "objective": "dynamic_tables",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "A table row contains an Order ID '12345' and a 'Cancel Order' button.",
+            "q": "How do you correctly locate the Cancel button inside the specific row for order 12345?",
+            "options": [
+              "page.getByRole('row').filter({ hasText: '12345' }).getByRole('button', { name: 'Cancel' })",
+              "page.getByRole('button', { name: 'Cancel' }).filter({ hasText: '12345' })",
+              "page.locator('tr:has(12345) > button')",
+              "page.getByText('12345').click()"
+            ],
+            "a": "page.getByRole('row').filter({ hasText: '12345' }).getByRole('button', { name: 'Cancel' })",
+            "explanation": "The architecture of scoping: Start broad (`row`), narrow down by unique data (`filter hasText`), then scope the action *inside* that specific row (`getByRole`). This guarantees you click the correct cancel button regardless of where the row moves."
+          }
+        ],
+        "Medium": [
+          {
+            "objective": "dynamic_tables",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "const rows = await page.locator('tr').all();\nfor (const row of rows) {\n  const text = await row.innerText();\n  console.log(text);\n}",
+            "q": "Why is this traditional `for...of` iteration architecture dangerous when dealing with modern, highly dynamic Single Page Applications?",
+            "options": [
+              "It uses too much memory.",
+              "It is susceptible to 'Stale Element' / 'Target Closed' errors. If the React application re-renders the table while the loop is halfway through executing, the array of Locators becomes orphaned from the live DOM, crashing the test.",
+              "You cannot use `await` inside a loop.",
+              "The `innerText()` method is deprecated."
+            ],
+            "a": "It is susceptible to 'Stale Element' / 'Target Closed' errors. If the React application re-renders the table while the loop is halfway through executing, the array of Locators becomes orphaned from the live DOM, crashing the test.",
+            "explanation": "`locator.all()` breaks Playwright's lazy-evaluation safety net. It resolves the locators to physical DOM nodes at the moment it is called. If the DOM shifts during the 500ms the loop takes to execute, those physical pointers are destroyed."
+          },
+          {
+            "objective": "dynamic_tables",
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "Instead of a traditional `<table>`, an application uses a modern CSS Grid 'div-based table'. The row acts as a container, but it lacks semantic HTML tags.",
+            "q": "How can you architecturally target the 'rows' using User-Facing strategies? (Select all that apply)",
+            "options": [
+              "It is impossible; you must use CSS classes.",
+              "If the developers added ARIA roles (`role=\"row\"`), you can safely use `getByRole('row')`.",
+              "You can use `getByTestId('grid-row')` if the developers injected test IDs.",
+              "You can rely on `page.locator('tr')` because Playwright automatically maps grids to tables."
+            ],
+            "a": [
+              "If the developers added ARIA roles (`role=\"row\"`), you can safely use `getByRole('row')`.",
+              "You can use `getByTestId('grid-row')` if the developers injected test IDs."
+            ],
+            "explanation": "Modern web development often drops semantic `<table>` tags for layout flexibility. If the developer properly added `role=\"row\"`, Playwright's `getByRole` works flawlessly. If not, you are forced to fall back to `data-testid` or CSS classes."
+          },
+          {
+            "objective": "dynamic_tables",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You need to extract the entire text content of a 50-row table and check if the string 'Error State' exists anywhere within it.",
+            "q": "What is the most performant, non-flaky Playwright method to evaluate large blocks of DOM text?",
+            "options": [
+              "Iterate over every row using a `for` loop and call `innerText()` 50 times.",
+              "Use `await expect(page.locator('tbody')).toContainText('Error State')`.",
+              "Use `page.evaluate()` to write a custom JavaScript scraper.",
+              "Export the table to CSV."
+            ],
+            "a": "Use `await expect(page.locator('tbody')).toContainText('Error State')`.",
+            "explanation": "The `toContainText()` assertion evaluates the concatenated `textContent` of the entire locator node (including all its children). It is a single, optimized operation that auto-retries, making it exponentially faster and safer than looping."
+          },
+          {
+            "objective": "dynamic_tables",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "const specificRow = page.locator('tr', { has: page.locator('td', { hasText: 'Alice' }) });",
+            "q": "What architectural problem does this nested `has` structure mathematically solve compared to a simple `page.locator('tr').filter({ hasText: 'Alice' })`?",
+            "options": [
+              "There is no difference.",
+              "It solves the Substring Bleed problem. If the table has a row where the *User's Name* is 'Bob' but their *Address* is 'Alice Springs', the simple filter would accidentally match it. By restricting the text search specifically to the `td` cell, you guarantee precision.",
+              "It forces Playwright to search faster.",
+              "It ignores hidden rows."
+            ],
+            "a": "It solves the Substring Bleed problem. If the table has a row where the *User's Name* is 'Bob' but their *Address* is 'Alice Springs', the simple filter would accidentally match it. By restricting the text search specifically to the `td` cell, you guarantee precision.",
+            "explanation": "Massive data grids often have overlapping data (names, cities, status codes). Searching the entire row for text is dangerous. Explicitly defining that the text must exist *inside a specific child column* guarantees absolute accuracy."
+          },
+          {
+            "objective": "dynamic_tables",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "A table uses an infinite-scroll architecture. Only 20 rows are rendered in the DOM at a time. The target row ('Order 999') is currently unloaded.",
+            "q": "If you write `await page.getByRole('row').filter({ hasText: '999' }).click()`, what will happen?",
+            "options": [
+              "Playwright will automatically scroll the table until the row appears.",
+              "Playwright will query the database.",
+              "The test will hang and eventually fail with a TimeoutError because the element is not physically in the DOM, and Playwright's auto-wait cannot force the application to fetch new data.",
+              "The test will pass."
+            ],
+            "a": "The test will hang and eventually fail with a TimeoutError because the element is not physically in the DOM, and Playwright's auto-wait cannot force the application to fetch new data.",
+            "explanation": "Playwright can only interact with what the browser has rendered. Infinite scroll (virtualized lists) intentionally destroy and unload DOM nodes to save RAM. If a node is virtualized out, Playwright is completely blind to it. You must architect a loop that physically scrolls the container (`mouse.wheel` or JS) and polls the DOM until the row renders."
+          }
+        ],
+        "Hard": [
+          {
+            "objective": "dynamic_tables",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "const prices = await page.locator('.price-column').allInnerTexts();\nconst isSorted = prices.every((val, i, arr) => !i || val >= arr[i - 1]);\nexpect(isSorted).toBe(true);",
+            "q": "This test verifies that a table column is sorted numerically. What is the fundamental architectural flaw in using `allInnerTexts()` for complex assertions on dynamic grids?",
+            "options": [
+              "`allInnerTexts()` does not work on grids.",
+              "It is highly susceptible to race conditions. If the frontend is still fetching data or animating the sort when `allInnerTexts()` fires, it will instantly capture a partially sorted array and fail the test. It bypasses Playwright's auto-retry mechanism.",
+              "The `every()` function is deprecated.",
+              "`allInnerTexts()` returns integers, not strings."
+            ],
+            "a": "It is highly susceptible to race conditions. If the frontend is still fetching data or animating the sort when `allInnerTexts()` fires, it will instantly capture a partially sorted array and fail the test. It bypasses Playwright's auto-retry mechanism.",
+            "explanation": "Methods that extract data out of the Locator engine into raw JavaScript arrays (`allInnerTexts`, `count`) strip away Playwright's magical auto-retrying logic. The correct enterprise pattern is to wrap the extraction logic inside a custom `expect.poll()` block so the entire sorting verification can be retried until it passes."
+          },
+          {
+            "objective": "dynamic_tables",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You are testing a highly complex enterprise grid (e.g., AG Grid). The developers have implemented DOM Virtualization. To save memory, row elements are physically destroyed and recreated as the user scrolls. You need to verify a specific row exists.",
+            "q": "Why is standard locator chaining structurally prone to Stale Element crashes when interacting with heavily virtualized DOMs?",
+            "options": [
+              "Standard locators cannot handle shadow DOMs.",
+              "If the framework destroys the DOM node *after* Playwright finds it but *before* the action executes, Playwright throws an error. While Playwright auto-retries the action, complex virtual DOMs can enter cyclic render loops where the element is never stable long enough for the CDP to strike.",
+              "Virtualized tables do not use HTML.",
+              "Playwright cannot scroll virtual tables."
+            ],
+            "a": "If the framework destroys the DOM node *after* Playwright finds it but *before* the action executes, Playwright throws an error. While Playwright auto-retries the action, complex virtual DOMs can enter cyclic render loops where the element is never stable long enough for the CDP to strike.",
+            "explanation": "DOM virtualization is the final boss of UI automation. Because the nodes are ephemeral, relying on standard UI traversal is incredibly flaky. Enterprise architects often solve this by intercepting the underlying API response and asserting against the JSON data directly, bypassing the fragile virtualized DOM entirely."
+          },
+          {
+            "objective": "dynamic_tables",
+            "type": "multi-select",
+            "difficulty": "hard",
+            "scenario": "You are scraping a table and need to execute a complex mathematical formula on every cell in a column. To maximize performance, you decide to execute the logic entirely within the browser.",
+            "q": "Which Playwright APIs allow you to inject Node.js functions directly into the Browser context to evaluate multiple elements simultaneously? (Select all that apply)",
+            "options": [
+              "page.evaluate()",
+              "locator.evaluateAll()",
+              "page.$eval()",
+              "locator.map()"
+            ],
+            "a": [
+              "locator.evaluateAll()",
+              "page.$eval()"
+            ],
+            "explanation": "`evaluateAll` takes an array of HTML elements matching the locator and passes them directly to a JavaScript function executing inside the browser. This eliminates the latency of passing hundreds of text strings back across the Node.js boundary."
+          },
+          {
+            "objective": "dynamic_tables",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "const userRow = page.locator(`tr:has-text(\"${userName}\")`);\nawait userRow.click();",
+            "q": "A security auditor reviews your code. They point out an architectural vulnerability regarding the `userName` variable. What happens if `userName` contains the string `\")` (a quote and a parenthesis)?",
+            "options": [
+              "Nothing, Playwright automatically sanitizes inputs.",
+              "It creates a CSS Injection Vulnerability. The unbalanced quote breaks the Playwright selector engine parsing, crashing the script with a syntax error, or potentially allowing arbitrary pseudo-class execution.",
+              "The browser will crash.",
+              "The test will pass."
+            ],
+            "a": "It creates a CSS Injection Vulnerability. The unbalanced quote breaks the Playwright selector engine parsing, crashing the script with a syntax error, or potentially allowing arbitrary pseudo-class execution.",
+            "explanation": "Constructing dynamic CSS selector strings using template literals is dangerous when the data comes from external sources. If the string contains CSS control characters (`\\\"`, `'`, `:`), the engine throws fatal parsing errors. Always use the object-based `filter({ hasText: userName })` API, which natively sanitizes variables."
+          },
+          {
+            "objective": "dynamic_tables",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You need to assert that the 5th column in a table contains the status 'Active'. The table does not use CSS classes, only `<td>` tags.",
+            "q": "How can you strictly assert the text of the Nth column without using the brittle `.nth(4)` syntax?",
+            "options": [
+              "You must use `.nth(4)`.",
+              "You must write an XPath.",
+              "You can map the table headers to an array, find the index of the 'Status' header dynamically, and use that integer to target the column. This self-healing architecture survives columns being re-ordered by developers.",
+              "Use `getByRole('cell', { name: 'Active' })`."
+            ],
+            "a": "You can map the table headers to an array, find the index of the 'Status' header dynamically, and use that integer to target the column. This self-healing architecture survives columns being re-ordered by developers.",
+            "explanation": "Hardcoding indices (`nth(4)`) breaks the moment a new column is added. Enterprise grid automation requires building a 'Header Map'—querying the `<th>` elements first to discover the mathematical offset of the desired column, then using that dynamic index to query the `<td>` layer. This is resilient to UI shifts."
+          }
+        ]
+      },
+      "icon": "📋",
+      "slug": "53-locators-exec",
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "enterprise",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET"
+    },
+    {
+      "id": "54-locators-arch",
+      "title": "10.3: Component-Based Locators",
+      "url": "courses/playwright/54-locators-arch",
+      "group": "🗝️ MODULE 10: ADVANCED LOCATORS",
+      "level": 8,
+      "weight": 15,
+      "meta": {
+        "time": "20 mins",
+        "type": "Architecture",
+        "outcome": "Encapsulate UI regions into reusable components"
+      },
+      "objectives": [
+        {
+          "id": "component_locators",
+          "title": "Isolate locators using the Component pattern"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "task-1",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "component_locators",
+          "weight": 100
+        }
+      ],
+      "spec": {
+        "pattern": "Composition",
+        "file": "Component.ts"
+      },
+      "quizPool": {
+        "Easy": [
+          {
+            "objective": "component_locators",
+            "type": "scenario",
+            "difficulty": "easy",
+            "q": "How does the Component-Based Locator pattern isolate this change so you only have to update your test code in one single place?",
+            "options": [
+              "Writing all locators in a single global JSON file.",
+              "Instead of passing the `page` object around and searching the entire document, you pass a specific parent `Locator` (like a `headerLocator` or `cardLocator`) into your class, and all child interactions are strictly scoped within that parent's boundaries.",
+              "Using React Component names in CSS selectors.",
+              "Mocking API components."
+            ],
+            "a": "Instead of passing the `page` object around and searching the entire document, you pass a specific parent `Locator` (like a `headerLocator` or `cardLocator`) into your class, and all child interactions are strictly scoped within that parent's boundaries.",
+            "explanation": "Component-Based Locators mirror frontend frameworks like React. A 'Header' component only knows about the buttons inside the header. By building Page Objects that accept a parent `Locator` rather than the `page`, you guarantee strict encapsulation and eliminate global Strict Mode violations.",
+            "scenario": "The engineering team replaces a standard HTML button with a complex React `DropdownButton` component across 50 pages."
+          },
+          {
+            "objective": "component_locators",
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "export class DatePicker {\n  private readonly root: Locator;\n  private readonly nextMonthBtn: Locator;\n\n  constructor(root: Locator) {\n    this.root = root;\n    this.nextMonthBtn = this.root.getByRole('button', { name: 'Next Month' });\n  }\n}",
+            "q": "If a page has 3 DatePickers on it, why does this class architecture naturally prevent Strict Mode violations when you click `nextMonthBtn`?",
+            "options": [
+              "It uses random delays.",
+              "Because the `nextMonthBtn` search is restricted exclusively to the DOM tree inside the `root` locator passed into the constructor. It will only ever find the 1 button belonging to this specific DatePicker instance.",
+              "Because classes disable Strict Mode.",
+              "Because it uses private variables."
+            ],
+            "a": "Because the `nextMonthBtn` search is restricted exclusively to the DOM tree inside the `root` locator passed into the constructor. It will only ever find the 1 button belonging to this specific DatePicker instance.",
+            "explanation": "This is encapsulation. By scoping all internal locators to `this.root`, the component becomes completely isolated. You can have 100 DatePickers on the screen, but as long as the `root` locator uniquely identifies one of them, the internal locators will never clash."
+          },
+          {
+            "objective": "component_locators",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You are building a `Header` component class. You need to ensure the class can be reused across different pages (Dashboard, Settings, Profile).",
+            "q": "How should you instantiate the `Header` component inside your test or BaseTest fixture?",
+            "options": [
+              "const header = new Header(page);",
+              "const header = new Header(page.locator('header.main-nav'));",
+              "const header = Header.getInstance();",
+              "You should not instantiate it; you should use global variables."
+            ],
+            "a": "const header = new Header(page.locator('header.main-nav'));",
+            "explanation": "The correct pattern is to identify the root DOM boundary of the component (`header.main-nav`) and pass that specific bounded Locator into the constructor. The class then operates solely inside that boundary."
+          },
+          {
+            "objective": "component_locators",
+            "type": "multi-select",
+            "difficulty": "easy",
+            "scenario": "You are reviewing a Pull Request that introduces a new Page Object Model architecture.",
+            "q": "Which of the following constructor signatures demonstrate proper Playwright Component encapsulation? (Select all that apply)",
+            "options": [
+              "constructor(page: Page) { this.submit = page.locator('#submit'); }",
+              "constructor(rootLocator: Locator) { this.submit = rootLocator.locator('#submit'); }",
+              "constructor(parent: Locator) { this.submit = parent.getByRole('button'); }",
+              "constructor(browser: Browser) { this.submit = browser.locator('#submit'); }"
+            ],
+            "a": [
+              "constructor(rootLocator: Locator) { this.submit = rootLocator.locator('#submit'); }",
+              "constructor(parent: Locator) { this.submit = parent.getByRole('button'); }"
+            ],
+            "explanation": "Passing the full `Page` object makes it a classic Page Object, which searches the entire document. Passing a `Locator` object makes it a true encapsulated Component Object, restricting all searches to a specific subset of the DOM."
+          },
+          {
+            "objective": "component_locators",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "Your frontend developers have built a highly reusable `<Modal>` React component that is used for 'Delete Confirmations', 'User Profiles', and 'Settings'.",
+            "q": "Why is mapping a Playwright Component Class to this React Component highly advantageous?",
+            "options": [
+              "It forces the developers to write the tests.",
+              "It creates a 1:1 mapping between the frontend architecture and the automation architecture. When the developers update the React Modal's internal structure, you only have to update the Playwright Modal class once, and all 50 tests using it are instantly fixed.",
+              "It bypasses CORS.",
+              "It makes the tests run synchronously."
+            ],
+            "a": "It creates a 1:1 mapping between the frontend architecture and the automation architecture. When the developers update the React Modal's internal structure, you only have to update the Playwright Modal class once, and all 50 tests using it are instantly fixed.",
+            "explanation": "The holy grail of UI automation is aligning the test framework's Page Object Model with the frontend's Component framework. Reusability reduces maintenance burden exponentially."
+          }
+        ],
+        "Medium": [
+          {
+            "objective": "component_locators",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "export class TableRow {\n  constructor(private root: Locator) {}\n  async delete() {\n    await this.root.getByRole('button', { name: 'Delete' }).click();\n  }\n}",
+            "q": "If you want to delete the row belonging to 'Alice', how do you dynamically instantiate this component from your test script?",
+            "options": [
+              "const row = new TableRow(page.getByRole('row').filter({ hasText: 'Alice' }));\nawait row.delete();",
+              "const row = new TableRow('Alice');\nawait row.delete();",
+              "const row = new TableRow(page);\nawait row.delete('Alice');",
+              "You must use a `for` loop."
+            ],
+            "a": "const row = new TableRow(page.getByRole('row').filter({ hasText: 'Alice' }));\nawait row.delete();",
+            "explanation": "This demonstrates the immense power of passing dynamic Locators into components. You use `.filter()` in the test script to resolve a highly specific, dynamic DOM node, and then wrap that node in your component logic to gain access to encapsulated actions."
+          },
+          {
+            "objective": "component_locators",
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "An architect decides to combine Fixtures and Component-Based Locators.",
+            "q": "What are the structural benefits of defining `headerComponent` as a Playwright fixture? (Select all that apply)",
+            "options": [
+              "The test file never has to call `new HeaderComponent(page.locator(...))`, eliminating massive boilerplate.",
+              "Playwright automatically manages the dependency graph. If the test needs the header, Playwright instantiates the locator boundary and passes the fully formed class into the test signature.",
+              "It converts the HTML header into a shadow DOM.",
+              "It prevents the header from being re-rendered."
+            ],
+            "a": [
+              "The test file never has to call `new HeaderComponent(page.locator(...))`, eliminating massive boilerplate.",
+              "Playwright automatically manages the dependency graph. If the test needs the header, Playwright instantiates the locator boundary and passes the fully formed class into the test signature."
+            ],
+            "explanation": "Combining the Component pattern with Dependency Injection (Fixtures) creates enterprise nirvana. The `baseTest.ts` defines the boundaries (`use(new Header(page.locator('header')))`). The test files just ask for `{ headerComponent }` and start interacting immediately."
+          },
+          {
+            "objective": "component_locators",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "A `ProductCard` component contains an 'Add to Cart' button. When clicked, a global 'Toast Notification' appears in the top-right corner of the screen.",
+            "q": "According to strict Component architecture, should the `ProductCard` class contain the locator for the Toast Notification?",
+            "options": [
+              "Yes, because the click originated from the card.",
+              "No. The Toast physically renders outside the DOM boundary of the Product Card. The card class should perform the click, and the test file should subsequently interact with a separate `ToastComponent`.",
+              "Yes, it should use `page.locator()` internally to reach outside its bounds.",
+              "No, Toasts cannot be automated."
+            ],
+            "a": "No. The Toast physically renders outside the DOM boundary of the Product Card. The card class should perform the click, and the test file should subsequently interact with a separate `ToastComponent`.",
+            "explanation": "Strict encapsulation means a component must *never* cheat and look outside its `root` locator boundary. If a button triggers a global modal or toast, the component's job is done. The test orchestration layer must hand control to the new component representing the global UI element."
+          },
+          {
+            "objective": "component_locators",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "export class Dashboard {\n  public header: HeaderComponent;\n  public sidebar: SidebarComponent;\n\n  constructor(page: Page) {\n    this.header = new HeaderComponent(page.locator('header'));\n    this.sidebar = new SidebarComponent(page.locator('aside'));\n  }\n}",
+            "q": "What structural pattern is the `Dashboard` class utilizing here?",
+            "options": [
+              "Multiple Inheritance.",
+              "Component Composition (or Nested Page Objects). The Dashboard acts as a high-level router that instantiates and owns child components, cleanly partitioning the page's complex geometry.",
+              "Fixture Overloading.",
+              "A Circular Dependency."
+            ],
+            "a": "Component Composition (or Nested Page Objects). The Dashboard acts as a high-level router that instantiates and owns child components, cleanly partitioning the page's complex geometry.",
+            "explanation": "Rather than a `Dashboard` class having 500 locators spanning the entire screen, it is composed of smaller, isolated sub-components. Tests can call `dashboard.header.logout()`, resulting in incredibly readable and modular code."
+          },
+          {
+            "objective": "component_locators",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You need to assert that the Header component is visible.",
+            "q": "How do you expose the root boundary locator to the test script so it can perform Web-First Assertions on the entire component?",
+            "options": [
+              "You must write a custom `isVisible()` method inside the class that returns a boolean.",
+              "You expose the `root` locator as a public property: `public readonly root: Locator;` so the test can call `await expect(header.root).toBeVisible();`.",
+              "You pass the `expect` library into the constructor.",
+              "Components cannot be asserted on."
+            ],
+            "a": "You expose the `root` locator as a public property: `public readonly root: Locator;` so the test can call `await expect(header.root).toBeVisible();`.",
+            "explanation": "Components should rarely contain `expect()` assertions internally (business logic belongs in the test). By making the `root` locator publicly accessible, you allow the test layer to perform native, auto-retrying assertions on the component's container."
+          }
+        ],
+        "Hard": [
+          {
+            "objective": "component_locators",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "export class Dropdown {\n  constructor(private triggerBtn: Locator) {}\n\n  async selectOption(option: string) {\n    await this.triggerBtn.click();\n    const menu = this.triggerBtn.page().getByRole('listbox');\n    await menu.getByRole('option', { name: option }).click();\n  }\n}",
+            "q": "This dropdown component is initialized with the button that triggers it. When clicked, the actual dropdown menu is rendered as a 'portal' at the very bottom of the `<body>` tag, entirely outside the trigger button's DOM tree. How does this code architecturally handle that?",
+            "options": [
+              "It uses XPath to search upwards.",
+              "It escapes its own encapsulation boundary using the `.page()` method on the Locator. This grants the component temporary access to the global DOM to find the portaled `listbox`, while still keeping the trigger logic encapsulated.",
+              "It fails because `triggerBtn.page()` is invalid syntax.",
+              "It relies on the test script to pass the menu."
+            ],
+            "a": "It escapes its own encapsulation boundary using the `.page()` method on the Locator. This grants the component temporary access to the global DOM to find the portaled `listbox`, while still keeping the trigger logic encapsulated.",
+            "explanation": "React Portals (used heavily for modals, tooltips, and dropdowns) break strict DOM encapsulation by rendering elements at the end of the document. Every Playwright `Locator` has a hidden `.page()` method, allowing a component to elegantly break out of its container when interacting with mathematically detached portaled content."
+          },
+          {
+            "objective": "component_locators",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "An enterprise application uses an array of dynamic widgets. You build a `WidgetComponent`. You want to verify that *all* rendered widgets display the text 'Active'.",
+            "q": "How can you architect an iterable collection of components?",
+            "options": [
+              "Use `locator.all()`, map the returned DOM pointers into a new array of `WidgetComponent` instances, and iterate over them. (e.g., `const widgets = (await root.all()).map(l => new WidgetComponent(l));`)",
+              "You must hardcode the indices: `new WidgetComponent(root.nth(0))`.",
+              "Playwright automatically converts arrays to components.",
+              "Components cannot be iterated."
+            ],
+            "a": "Use `locator.all()`, map the returned DOM pointers into a new array of `WidgetComponent` instances, and iterate over them. (e.g., `const widgets = (await root.all()).map(l => new WidgetComponent(l));`)",
+            "explanation": "This is an advanced mapping pattern. You use `locator.all()` to resolve the physical array of nodes, map each node directly into the constructor of your Component class, and you are left with an array of fully functional, strongly-typed `WidgetComponent` objects."
+          },
+          {
+            "objective": "component_locators",
+            "type": "multi-select",
+            "difficulty": "hard",
+            "scenario": "A developer argues that passing `page: Page` into every Page Object is simpler than the Component pattern. They provide this code: `class Header { loginBtn = this.page.locator('.login') }`.",
+            "q": "What are the severe architectural risks of this legacy Selenium pattern in a modern SPA? (Select all that apply)",
+            "options": [
+              "If the DOM has a `.login` button in the header AND a `.login` button in the footer, `this.page.locator('.login')` will throw a Strict Mode violation.",
+              "The class cannot be reused if the application renders two headers (e.g., a sticky nav and a static nav), because the global search will constantly collide.",
+              "It requires more RAM.",
+              "It bypasses auto-waiting."
+            ],
+            "a": [
+              "If the DOM has a `.login` button in the header AND a `.login` button in the footer, `this.page.locator('.login')` will throw a Strict Mode violation.",
+              "The class cannot be reused if the application renders two headers (e.g., a sticky nav and a static nav), because the global search will constantly collide."
+            ],
+            "explanation": "Global searches are inherently brittle. By locking the search space to the whole document, the Page Object becomes incapable of handling duplicate UI elements. The Component pattern (`this.root.locator('.login')`) mathematically guarantees immunity to external DOM changes."
+          },
+          {
+            "objective": "component_locators",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "class FormComponent {\n  async fillData(data: Record<string, string>) {\n    for (const [key, value] of Object.entries(data)) {\n      await this.root.getByLabel(key).fill(value);\n    }\n  }\n}",
+            "q": "This component accepts a generic JSON object and dynamically fills the form by mapping JSON keys to accessibility labels. What is the enterprise value of this data-driven architecture?",
+            "options": [
+              "It makes the form submission synchronous.",
+              "It completely decouples test data from component interaction logic. The component dynamically builds its own locators at runtime, meaning you can add 5 new fields to the UI without ever updating the `FormComponent` class.",
+              "It prevents strict mode.",
+              "It intercepts backend API requests."
+            ],
+            "a": "It completely decouples test data from component interaction logic. The component dynamically builds its own locators at runtime, meaning you can add 5 new fields to the UI without ever updating the `FormComponent` class.",
+            "explanation": "Data-driven component boundaries are extremely powerful. Instead of hardcoding `this.emailInput = root.locator(...)` for 20 fields, the component dynamically traverses the provided JSON map, creating robust `getByLabel` locators on the fly. This architecture requires near-zero maintenance."
+          },
+          {
+            "objective": "component_locators",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You are building a custom fixture `authWidget`. The widget is heavily encapsulated in an iframe.",
+            "q": "How do you instantiate the Component class so that all internal locators seamlessly pierce the iframe boundary without the class itself needing to know it's in an iframe?",
+            "options": [
+              "new AuthWidget(page.frameLocator('#auth-frame').locator('.widget-container'))",
+              "You must rewrite the class to accept a `Frame` object instead of a `Locator`.",
+              "Use `evaluate` to disable iframe security.",
+              "Iframes cannot be encapsulated."
+            ],
+            "a": "new AuthWidget(page.frameLocator('#auth-frame').locator('.widget-container'))",
+            "explanation": "Playwright's architecture treats `frameLocators` identically to standard locators. By resolving the iframe boundary outside the component and passing the resulting nested locator into the constructor, the `AuthWidget` class remains purely ignorant of the iframe, meaning it can be reused even if the developer removes the iframe tomorrow."
+          }
+        ]
+      },
+      "icon": "🧩",
+      "slug": "54-locators-arch",
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "enterprise",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET"
+    },
+    {
+      "id": "55-iframes-dialogs",
+      "title": "10.4: iframes & Native Dialogs",
+      "url": "courses/playwright/55-iframes-dialogs",
+      "group": "🗝️ MODULE 10: ADVANCED LOCATORS",
+      "level": 8,
+      "weight": 15,
+      "meta": {
+        "time": "25 mins",
+        "type": "Code",
+        "outcome": "Master iframe locators and native browser dialog handling"
+      },
+      "objectives": [
+        {
+          "id": "iframe_mastery",
+          "title": "Use frameLocator() and page.on('dialog')"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "iframe_interaction",
+          "title": "Debugging: Cross-Origin Frames",
+          "hint": "Use frameLocator to target elements inside the iframe",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "frameLocator"
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        },
+        {
+          "id": "iframe_interaction",
+          "title": "Debugging: Cross-Origin Frames",
+          "hint": "Use frameLocator to target elements inside the iframe",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "frameLocator"
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "iframe_mastery",
+          "weight": 100
+        }
+      ],
+      "spec": {
+        "tool": "frameLocator",
+        "pattern": "Dialog Handler"
+      },
+      "quizPool": {
+        "Easy": [
+          {
+            "objective": "iframes_native_dialogs",
+            "type": "mcq",
+            "difficulty": "easy",
+            "q": "Why will `page.locator('#submit-btn').click()` instantly fail if the button is physically located inside an `<iframe>`?",
+            "options": [
+              "Because iframes do not support CSS selectors.",
+              "Because iframes are mathematically treated as entirely separate HTML documents. The standard `page` locator engine cannot piece the boundary and cannot 'see' inside the iframe.",
+              "Because iframes load asynchronously.",
+              "Because iframes disable JavaScript."
+            ],
+            "a": "Because iframes are mathematically treated as entirely separate HTML documents. The standard `page` locator engine cannot piece the boundary and cannot 'see' inside the iframe.",
+            "explanation": "An iframe is literally a window to a different website embedded on the page. Just like you cannot query an element on a separate browser tab, Playwright's default `page` engine stops at the iframe tag. You must explicitly tell Playwright to switch execution context into the frame."
+          },
+          {
+            "objective": "iframes_native_dialogs",
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "const frame = page.frameLocator('.payment-iframe');\nawait frame.getByRole('button', { name: 'Pay' }).click();",
+            "q": "What is the primary architectural purpose of the `frameLocator()` method in Playwright?",
+            "options": [
+              "To extract the source URL of the iframe.",
+              "To create a strict contextual boundary. It returns a `FrameLocator` object that acts exactly like a `Page` object, but restricts all subsequent chained locator queries exclusively to the DOM tree inside that specific iframe.",
+              "To delete the iframe from the DOM.",
+              "To pause execution until the iframe loads."
+            ],
+            "a": "To create a strict contextual boundary. It returns a `FrameLocator` object that acts exactly like a `Page` object, but restricts all subsequent chained locator queries exclusively to the DOM tree inside that specific iframe.",
+            "explanation": "The `frameLocator` is the modern equivalent of Selenium's `switchTo().frame()`. It seamlessly bridges the document gap, allowing you to chain standard user-facing locators directly into the encapsulated iframe environment."
+          },
+          {
+            "objective": "iframes_native_dialogs",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "A user clicks a 'Delete' button. The browser pops up a native OS-level JavaScript alert: `Are you sure? [OK] [Cancel]`.",
+            "q": "How does Playwright handle these native JavaScript dialogs (`alert`, `confirm`, `prompt`) by default?",
+            "options": [
+              "It hangs infinitely waiting for the user to click.",
+              "It takes a screenshot and fails.",
+              "It automatically and instantly dismisses them (clicks Cancel/Close) so the headless test doesn't hang.",
+              "It clicks OK automatically."
+            ],
+            "a": "It automatically and instantly dismisses them (clicks Cancel/Close) so the headless test doesn't hang.",
+            "explanation": "Unlike HTML modals, native dialogs freeze the entire browser's JavaScript execution loop. If Playwright didn't intervene, headless CI tests would freeze forever. Therefore, Playwright silently auto-dismisses all native dialogs by default."
+          },
+          {
+            "objective": "iframes_native_dialogs",
+            "type": "multi-select",
+            "difficulty": "easy",
+            "scenario": "You need to automate a cross-domain iframe (e.g., a Stripe payment widget).",
+            "q": "Which of the following Playwright assertions are perfectly valid when chained off a `FrameLocator`? (Select all that apply)",
+            "options": [
+              "expect(frameLocator.getByText('Success')).toBeVisible()",
+              "expect(frameLocator.locator('.error')).toHaveCount(1)",
+              "expect(frameLocator).toHaveURL('https://stripe.com')",
+              "expect(frameLocator.getByRole('button')).toBeEnabled()"
+            ],
+            "a": [
+              "expect(frameLocator.getByText('Success')).toBeVisible()",
+              "expect(frameLocator.locator('.error')).toHaveCount(1)",
+              "expect(frameLocator.getByRole('button')).toBeEnabled()"
+            ],
+            "explanation": "You can perform any standard Web-First Assertion on the *elements* inside a FrameLocator. However, `toHaveURL` is a property of the `Page` object, not a `FrameLocator`. You cannot assert the URL of a locator."
+          },
+          {
+            "objective": "iframes_native_dialogs",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You want Playwright to click 'OK' (Accept) instead of 'Cancel' (Dismiss) when a native `confirm()` dialog appears.",
+            "q": "How do you achieve this?",
+            "options": [
+              "await page.click('text=OK')",
+              "page.on('dialog', dialog => dialog.accept());",
+              "page.setAutoAccept(true);",
+              "page.locator('.alert-ok').click()"
+            ],
+            "a": "page.on('dialog', dialog => dialog.accept());",
+            "explanation": "Native dialogs are not HTML. You cannot use locators (`page.click`) to interact with them. You must attach an event listener to the `page` object. When the browser fires the `dialog` event, your listener intercepts it and calls `dialog.accept()`."
+          }
+        ],
+        "Medium": [
+          {
+            "objective": "iframes_native_dialogs",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "page.on('dialog', async dialog => {\n  expect(dialog.message()).toBe('Are you sure?');\n  await dialog.accept();\n});\nawait page.click('#delete');",
+            "q": "Why is it architecturally critical that the `page.on('dialog')` event listener is defined *before* the `page.click()` action?",
+            "options": [
+              "It is not critical; it can be defined after.",
+              "Because event listeners must be active in the Node.js memory space *before* the browser triggers the event. If the click happens first, the dialog appears, Playwright auto-dismisses it by default, and the subsequent listener is never triggered.",
+              "Because the click action is synchronous.",
+              "Because dialogs are iframes."
+            ],
+            "a": "Because event listeners must be active in the Node.js memory space *before* the browser triggers the event. If the click happens first, the dialog appears, Playwright auto-dismisses it by default, and the subsequent listener is never triggered.",
+            "explanation": "This is the fundamental rule of Event-Driven Architecture in Playwright. You must always mount your 'traps' (listeners) before you pull the 'trigger' (the click). If you pull the trigger first, the event fires into the void before Node.js is listening."
+          },
+          {
+            "objective": "iframes_native_dialogs",
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "A legacy Selenium suite used `driver.switchTo().frame(\"frame1\")` followed by `driver.switchTo().defaultContent()` to return to the main page.",
+            "q": "How does Playwright's `FrameLocator` pattern mathematically eliminate the need for `defaultContent()`? (Select all that apply)",
+            "options": [
+              "Playwright automatically switches back to the main page after every single command.",
+              "A `FrameLocator` does not mutate the global state of the `Page` object. It simply returns a locally scoped pointer. The original `page` object remains anchored to the main document.",
+              "Playwright does not support switching out of iframes.",
+              "Because you can seamlessly mix commands: `await frame.click(); await page.click();` without any context-switching overhead."
+            ],
+            "a": [
+              "A `FrameLocator` does not mutate the global state of the `Page` object. It simply returns a locally scoped pointer. The original `page` object remains anchored to the main document.",
+              "Because you can seamlessly mix commands: `await frame.click(); await page.click();` without any context-switching overhead."
+            ],
+            "explanation": "Selenium's `switchTo` changed the global state of the driver, making it incredibly fragile (if a test failed mid-frame, the next test was broken). Playwright's `frameLocator` is stateless. The `page` variable always points to the main DOM, and the `frame` variable points to the child DOM. You can use both concurrently."
+          },
+          {
+            "objective": "iframes_native_dialogs",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You need to interact with a deep architecture: An iframe (A) that contains another iframe (B), which contains the target button.",
+            "q": "How do you traverse deeply nested iframes in Playwright?",
+            "options": [
+              "You must use `page.evaluate()`.",
+              "You cannot access nested iframes.",
+              "You chain `frameLocator()` calls: `page.frameLocator('#frame-A').frameLocator('#frame-B').getByRole('button')`.",
+              "You use standard CSS: `page.locator('#frame-A > #frame-B > button')`."
+            ],
+            "a": "You chain `frameLocator()` calls: `page.frameLocator('#frame-A').frameLocator('#frame-B').getByRole('button')`.",
+            "explanation": "`frameLocators` are fully chainable. By chaining them, you mathematically drill down through the separate HTML document contexts, securely penetrating nested Cross-Origin resource boundaries."
+          },
+          {
+            "objective": "iframes_native_dialogs",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "page.once('dialog', dialog => dialog.accept('John Doe'));\nawait page.click('#prompt-btn');",
+            "q": "What specific type of native dialog is this code handling, and what does the `'John Doe'` argument do?",
+            "options": [
+              "An `alert` dialog. It changes the title to John Doe.",
+              "A `confirm` dialog. It clicks the John Doe button.",
+              "A `prompt` dialog. It injects the string 'John Doe' into the native text input field of the dialog before accepting it.",
+              "An HTML modal. It fills the input field."
+            ],
+            "a": "A `prompt` dialog. It injects the string 'John Doe' into the native text input field of the dialog before accepting it.",
+            "explanation": "A native `prompt()` pauses the browser and asks the user to type text. `dialog.accept(text)` programmatically fulfills that requirement, injecting the string perfectly into the browser's native engine."
+          },
+          {
+            "objective": "iframes_native_dialogs",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You have a single `page.on('dialog', ...)` listener defined in a `beforeEach` hook to accept all dialogs. However, in one specific test, a dialog appears and you want to explicitly verify its text and dismiss it.",
+            "q": "Why is using `page.once('dialog', ...)` inside that specific test dangerous if `page.on('dialog')` is already active globally?",
+            "options": [
+              "`page.once` is deprecated.",
+              "Playwright will crash with an 'Event Loop' error.",
+              "It creates an Event Listener Race Condition. Both listeners will trigger simultaneously. If the global listener executes `dialog.accept()` first, the specific listener will crash with `Error: Dialog has already been handled` when it attempts to `dialog.dismiss()`.",
+              "The global listener is automatically disabled."
+            ],
+            "a": "It creates an Event Listener Race Condition. Both listeners will trigger simultaneously. If the global listener executes `dialog.accept()` first, the specific listener will crash with `Error: Dialog has already been handled` when it attempts to `dialog.dismiss()`.",
+            "explanation": "Event listeners in Node.js are additive. You cannot have multiple listeners attempting to resolve the same Dialog object. You must either not use a global listener, or dynamically remove it using `page.off('dialog')` before attaching the local one."
+          }
+        ],
+        "Hard": [
+          {
+            "objective": "iframes_native_dialogs",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "const frameElement = await page.locator('iframe.dynamic-widget').elementHandle();\nconst frame = await frameElement.contentFrame();\nawait frame.click('#btn');",
+            "q": "A developer wrote this code. Why is an enterprise architect going to instantly reject this Pull Request in favor of `page.frameLocator('.dynamic-widget')`?",
+            "options": [
+              "`contentFrame()` does not exist.",
+              "Because `elementHandle()` and `contentFrame()` eagerly resolve to raw DOM pointers. If the iframe is re-rendered by React before the click occurs, the pointer becomes stale, resulting in `Target Closed` crashes. `frameLocator` is purely lazy and immune to DOM shifts.",
+              "Because `elementHandle` is too fast.",
+              "`frameLocator` is required by ESLint."
+            ],
+            "a": "Because `elementHandle()` and `contentFrame()` eagerly resolve to raw DOM pointers. If the iframe is re-rendered by React before the click occurs, the pointer becomes stale, resulting in `Target Closed` crashes. `frameLocator` is purely lazy and immune to DOM shifts.",
+            "explanation": "This is the classic transition from v1 to v2 Playwright APIs. The `contentFrame()` method is obsolete and incredibly fragile. It violates the core architectural principle of Playwright: never hold a physical reference to a DOM node. Always use lazy string recipes (`Locators`)."
+          },
+          {
+            "objective": "iframes_native_dialogs",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You are testing a highly secure banking application. It loads a cross-origin `<iframe>` from `secure.bank.com` to handle PIN entry. Your main test is on `store.com`.",
+            "q": "Will `page.frameLocator('iframe').getByPlaceholder('PIN').fill('1234')` work natively, or will it be blocked by Cross-Origin Resource Sharing (CORS) / Site Isolation?",
+            "options": [
+              "It will fail because Chromium blocks cross-origin iframe access by default.",
+              "It will fail unless you pass `--disable-web-security`.",
+              "It works natively out of the box. Playwright's architecture injects its CDP (Chrome DevTools Protocol) scripts directly into every single frame context internally, completely bypassing browser-level CORS security restrictions.",
+              "It works, but only in Firefox."
+            ],
+            "a": "It works natively out of the box. Playwright's architecture injects its CDP (Chrome DevTools Protocol) scripts directly into every single frame context internally, completely bypassing browser-level CORS security restrictions.",
+            "explanation": "This is a massive architectural advantage over traditional testing tools. Playwright operates at the CDP level, underneath the browser's security model. It possesses 'God Mode' access to all frames, regardless of origin, meaning cross-domain iframe testing is seamless and requires zero configuration hacks."
+          },
+          {
+            "objective": "iframes_native_dialogs",
+            "type": "multi-select",
+            "difficulty": "hard",
+            "scenario": "You need to assert that an iframe itself (not its content) is visible on the page, and then assert that a button inside the iframe is also visible.",
+            "q": "How do you architecturally separate the container from its contents in Playwright assertions? (Select all that apply)",
+            "options": [
+              "To assert the container: `await expect(page.locator('iframe')).toBeVisible()`",
+              "To assert the content: `await expect(page.frameLocator('iframe').getByRole('button')).toBeVisible()`",
+              "To assert the container: `await expect(page.frameLocator('iframe')).toBeVisible()`",
+              "You cannot assert iframes are visible."
+            ],
+            "a": [
+              "To assert the container: `await expect(page.locator('iframe')).toBeVisible()`",
+              "To assert the content: `await expect(page.frameLocator('iframe').getByRole('button')).toBeVisible()`"
+            ],
+            "explanation": "A `FrameLocator` is not an HTML element; it is an abstract boundary. You cannot call `.toBeVisible()` on a `FrameLocator` because it doesn't physically exist in the visual rendering tree. To assert the iframe's box model, you must use a standard `locator('iframe')`. To assert the inside, you use `frameLocator()`."
+          },
+          {
+            "objective": "iframes_native_dialogs",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "const [dialog] = await Promise.all([\n  page.waitForEvent('dialog'),\n  page.evaluate(() => setTimeout(() => alert('Hello'), 1000))\n]);\nawait dialog.accept();",
+            "q": "This code explicitly waits for a dialog to appear instead of using a passive `page.on` listener. What enterprise concurrency pattern is being used here?",
+            "options": [
+              "A Race Condition.",
+              "The Promise.all Trigger Pattern. It concurrently attaches a one-time awaitable listener (`waitForEvent`) and executes the asynchronous action that causes the dialog. This mathematically prevents the test from hanging and explicitly links the dialog to the action that caused it.",
+              "A Deadlock.",
+              "Synchronous blocking."
+            ],
+            "a": "The Promise.all Trigger Pattern. It concurrently attaches a one-time awaitable listener (`waitForEvent`) and executes the asynchronous action that causes the dialog. This mathematically prevents the test from hanging and explicitly links the dialog to the action that caused it.",
+            "explanation": "Using `page.on` is passive and global. Using `waitForEvent` inside a `Promise.all` is active and localized. It is the enterprise standard for handling popups, dialogs, and new windows because it strictly ties the resulting event to the exact action that triggered it, eliminating flaky race conditions."
+          },
+          {
+            "objective": "iframes_native_dialogs",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You have a generic `page.on('dialog', d => d.accept())` listener in your test. Later in the code, the page navigates to a new URL, and that new URL triggers an alert. The test suddenly hangs forever.",
+            "q": "Why did the global listener fail to handle the dialog after navigation?",
+            "options": [
+              "Dialogs on new pages require a new context.",
+              "It didn't fail. Navigations inherently destroy the JavaScript execution context. Depending on how the application routes, if the dialog fires during the chaotic teardown/rebuild phase of a hard navigation, the listener might be orphaned or suspended.",
+              "The `accept` method timed out.",
+              "Playwright disables listeners after `page.goto`."
+            ],
+            "a": "It didn't fail. Navigations inherently destroy the JavaScript execution context. Depending on how the application routes, if the dialog fires during the chaotic teardown/rebuild phase of a hard navigation, the listener might be orphaned or suspended.",
+            "explanation": "Hard navigations (not SPA routing) wipe the DOM and the JS heap. If an `unload` event or a rapid redirect fires an `alert()`, the Playwright Node.js process might be out-of-sync with the exact millisecond the browser locked the thread. This is why auto-dismissal is a complex engine feature, and why manual listeners around navigations are dangerously flaky."
+          }
+        ]
+      },
+      "icon": "🖼️",
+      "slug": "55-iframes-dialogs",
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "enterprise",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET"
+    },
+    {
+      "id": "56-file-handling",
+      "title": "10.5: File Upload & Download",
+      "url": "courses/playwright/56-file-handling",
+      "group": "🗝️ MODULE 10: ADVANCED LOCATORS",
+      "level": 8,
+      "weight": 15,
+      "meta": {
+        "time": "20 mins",
+        "type": "Code",
+        "outcome": "Automate file uploads and downloads including validation"
+      },
+      "objectives": [
+        {
+          "id": "file_ops",
+          "title": "Master setInputFiles(), download handling, and file validation"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Practice",
+          "hint": "Complete the practice task",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "file_ops",
+          "weight": 100
+        }
+      ],
+      "spec": {
+        "method": "setInputFiles",
+        "pattern": "Upload/Download"
+      },
+      "quizPool": {
+        "Easy": [
+          {
+            "objective": "file_upload_download",
+            "type": "scenario",
+            "difficulty": "easy",
+            "q": "How do you bypass the OS dialog and upload the file natively using Playwright?",
+            "options": [
+              "Use `page.keyboard.type('path/to/file.pdf')`.",
+              "Use the `locator.setInputFiles('path/to/file.pdf')` method directly on the `<input type=\"file\">` element.",
+              "Drag and drop the file via the mouse API.",
+              "Upload the file to an AWS S3 bucket and pass the URL."
+            ],
+            "a": "Use the `locator.setInputFiles('path/to/file.pdf')` method directly on the `<input type=\"file\">` element.",
+            "explanation": "Native file inputs (`<input type=\"file\">`) intercept operating system file dialogs. Playwright bypasses the OS dialog completely. `setInputFiles` mathematically injects the file buffer directly into the browser's memory, simulating an instant, flawless upload.",
+            "scenario": "You are testing an avatar upload feature. Clicking the 'Upload' button opens the native OS Windows file dialog, which Playwright cannot interact with."
+          },
+          {
+            "objective": "file_upload_download",
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "await page.locator('input[type=\"file\"]').setInputFiles([]);",
+            "q": "What is the specific architectural purpose of passing an empty array `[]` to `setInputFiles`?",
+            "options": [
+              "It crashes the test.",
+              "It clears the file input. If a file was previously selected, passing an empty array instantly removes it from the input element's internal buffer.",
+              "It uploads a zero-byte file.",
+              "It opens the OS file picker."
+            ],
+            "a": "It clears the file input. If a file was previously selected, passing an empty array instantly removes it from the input element's internal buffer.",
+            "explanation": "Just like `fill('')` clears a text box, passing an empty array is the API standard for clearing the internal file `FileList` array of a native HTML input."
+          },
+          {
+            "objective": "file_upload_download",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You click a 'Download Invoice' button, and a PDF file begins downloading to your local machine.",
+            "q": "How do you mathematically instruct Playwright to wait for the download to finish and capture the resulting file object?",
+            "options": [
+              "Wait 10 seconds, then check the `C:/Downloads` folder.",
+              "Use `const download = await page.waitForEvent('download');`",
+              "Use `await page.click('button', { download: true });`",
+              "Use `const pdf = await page.getByRole('button').download();`"
+            ],
+            "a": "Use `const download = await page.waitForEvent('download');`",
+            "explanation": "Downloads in modern browsers are asynchronous streams. You must listen for the specific `download` event emitted by the `Page` object. This event yields a `Download` object that provides access to the file's path, filename, and completion status."
+          },
+          {
+            "objective": "file_upload_download",
+            "type": "multi-select",
+            "difficulty": "easy",
+            "scenario": "You have successfully captured a `Download` object.",
+            "q": "Which of the following actions can you perform on this object? (Select all that apply)",
+            "options": [
+              "await download.path() // Get the temporary path on disk.",
+              "await download.saveAs('/reports/invoice.pdf') // Save a permanent copy.",
+              "await download.cancel() // Abort the download mid-stream.",
+              "await download.click() // Open the file in the browser."
+            ],
+            "a": [
+              "await download.path() // Get the temporary path on disk.",
+              "await download.saveAs('/reports/invoice.pdf') // Save a permanent copy.",
+              "await download.cancel() // Abort the download mid-stream."
+            ],
+            "explanation": "The `Download` object is incredibly powerful. Because Playwright saves downloads to a volatile temporary folder (which is deleted when the browser closes), `saveAs` is the standard method for persisting the file to a permanent location for validation."
+          },
+          {
+            "objective": "file_upload_download",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "A form requires you to upload 3 photos simultaneously.",
+            "q": "How do you upload multiple files using `setInputFiles`?",
+            "options": [
+              "Call `setInputFiles` three separate times.",
+              "You must zip the files.",
+              "Pass an array of file paths: `await input.setInputFiles(['img1.jpg', 'img2.jpg', 'img3.jpg'])`.",
+              "Multiple files cannot be uploaded via automation."
+            ],
+            "a": "Pass an array of file paths: `await input.setInputFiles(['img1.jpg', 'img2.jpg', 'img3.jpg'])`.",
+            "explanation": "If the HTML input has the `multiple` attribute, Playwright accepts an array of strings. It injects all files into the `FileList` object simultaneously."
+          }
+        ],
+        "Medium": [
+          {
+            "objective": "file_upload_download",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "const [download] = await Promise.all([\n  page.waitForEvent('download'),\n  page.getByText('Download Report').click()\n]);",
+            "q": "Why is the `Promise.all` Trigger Pattern absolutely mandatory for handling downloads, rather than writing them sequentially on separate lines?",
+            "options": [
+              "It improves speed.",
+              "If you write them sequentially, the click action fires the download event. If the download is fast (e.g., a small CSV), the event fires and resolves *before* Node.js reaches the next line to execute `waitForEvent`. The test will then hang infinitely waiting for an event that already happened.",
+              "It is just a stylistic preference.",
+              "It prevents the file from saving to disk."
+            ],
+            "a": "If you write them sequentially, the click action fires the download event. If the download is fast (e.g., a small CSV), the event fires and resolves *before* Node.js reaches the next line to execute `waitForEvent`. The test will then hang infinitely waiting for an event that already happened.",
+            "explanation": "This is the most critical concurrency concept in Node.js automation. You must attach the listener (`waitForEvent`) *at the exact same millisecond* you trigger the action. `Promise.all` guarantees both promises are evaluated concurrently, eliminating the race condition."
+          },
+          {
+            "objective": "file_upload_download",
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "You are testing an application that does not use a native `<input type=\"file\">`. Instead, it uses a custom Javascript widget. When you click it, the OS File Explorer native dialog pops up.",
+            "q": "Because Playwright cannot interact with the Windows/Mac OS native UI, how do you handle this? (Select all that apply)",
+            "options": [
+              "Use `const [fileChooser] = await Promise.all([page.waitForEvent('filechooser'), page.click('.custom-upload-btn')]);`",
+              "You must use a third-party library like RobotJS.",
+              "Once the `fileChooser` is intercepted, use `await fileChooser.setFiles('path/to/file.jpg');`.",
+              "Playwright cannot automate this scenario."
+            ],
+            "a": [
+              "Use `const [fileChooser] = await Promise.all([page.waitForEvent('filechooser'), page.click('.custom-upload-btn')]);`",
+              "Once the `fileChooser` is intercepted, use `await fileChooser.setFiles('path/to/file.jpg');`."
+            ],
+            "explanation": "This is Playwright's genius architecture. It intercepts the browser's request to the Operating System to open the file dialog. It captures that request as a `filechooser` event, suppressing the OS popup completely, and allows you to programmatically inject the files via `fileChooser.setFiles()`."
+          },
+          {
+            "objective": "file_upload_download",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You are running tests in headless CI. You trigger a download and try to read it using `await download.path()`. The test crashes randomly.",
+            "q": "What environmental configuration is necessary to ensure downloads work reliably in CI?",
+            "options": [
+              "You must configure a custom `downloadsPath` in your Playwright config.",
+              "You must install Chrome instead of using the Playwright binaries.",
+              "Downloads are enabled by default. The issue is likely that the test finishes and closes the browser context before the download stream has finished saving the bytes to disk.",
+              "You must run in headed mode."
+            ],
+            "a": "Downloads are enabled by default. The issue is likely that the test finishes and closes the browser context before the download stream has finished saving the bytes to disk.",
+            "explanation": "By default, Playwright accepts all downloads and streams them to a temporary directory. `await download.path()` inherently waits for the file to finish writing. However, if you don't await the path, or if you close the `page` context immediately after the trigger, the temporary files are instantly deleted."
+          },
+          {
+            "objective": "file_upload_download",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "await page.locator('input[type=\"file\"]').setInputFiles({\n  name: 'file.txt',\n  mimeType: 'text/plain',\n  buffer: Buffer.from('this is test data')\n});",
+            "q": "What architectural capability does this specific object payload unlock?",
+            "options": [
+              "It bypasses virus scanning.",
+              "It allows you to upload a file entirely from memory without it ever existing on the physical hard drive. This is crucial for generating dynamic, on-the-fly test data.",
+              "It encrypts the file.",
+              "It uploads the file synchronously."
+            ],
+            "a": "It allows you to upload a file entirely from memory without it ever existing on the physical hard drive. This is crucial for generating dynamic, on-the-fly test data.",
+            "explanation": "In enterprise CI, managing hundreds of static dummy files (PDFs, images) is a nightmare. Playwright allows you to pass a Buffer object. You can dynamically generate a 5MB text file or CSV in Node.js memory and upload it instantly without touching the file system."
+          },
+          {
+            "objective": "file_upload_download",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You click 'Download CSV', but the application does not trigger a native browser download. Instead, it opens a new tab containing the raw comma-separated text.",
+            "q": "Because the `download` event is never fired, how must you architecturally capture this data?",
+            "options": [
+              "It is impossible.",
+              "Use the `waitForEvent('popup')` pattern to capture the new `Page` object, wait for it to load, and then use `await newPage.content()` or `locator.innerText()` to extract the raw text.",
+              "Use `page.on('request')`.",
+              "Use `setInputFiles()`."
+            ],
+            "a": "Use the `waitForEvent('popup')` pattern to capture the new `Page` object, wait for it to load, and then use `await newPage.content()` or `locator.innerText()` to extract the raw text.",
+            "explanation": "Not all 'downloads' are downloads. If the server responds with an inline disposition (e.g., `Content-Disposition: inline`) or simply returns text, the browser renders it rather than downloading it. You must switch paradigms and treat the 'download' as a new window interaction."
+          }
+        ],
+        "Hard": [
+          {
+            "objective": "file_upload_download",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "const response = await page.waitForResponse(res => res.url().includes('/api/upload') && res.status() === 200);\nexpect(response.ok()).toBeTruthy();",
+            "q": "A Junior SDET is using `setInputFiles()`, but the test is flaky because sometimes the next assertion fires before the server has processed the file. How does this code snippet provide absolute, architectural stability to the upload flow?",
+            "options": [
+              "It checks if the server is online.",
+              "It synchronizes the frontend test execution with the backend network layer. By explicitly waiting for the `200 OK` API response from the upload endpoint, the test absolutely guarantees the file is fully uploaded and processed before proceeding to the next UI interaction.",
+              "It pauses the test for 200 milliseconds.",
+              "It intercepts the payload and modifies it."
+            ],
+            "a": "It synchronizes the frontend test execution with the backend network layer. By explicitly waiting for the `200 OK` API response from the upload endpoint, the test absolutely guarantees the file is fully uploaded and processed before proceeding to the next UI interaction.",
+            "explanation": "UI testing is an illusion. Just because the progress bar says 100% does not mean the backend database has committed the file. Enterprise architects always bind critical UI flows (uploads, payments) to the underlying Network API responses to eliminate race conditions."
+          },
+          {
+            "objective": "file_upload_download",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "Your application uploads massive 500MB video files. Using `setInputFiles()` works, but it takes 60 seconds per test, drastically slowing down your CI pipeline.",
+            "q": "What is the most robust, enterprise-grade architectural solution to test the UI's handling of a 500MB upload without actually spending 60 seconds uploading 500MB?",
+            "options": [
+              "Increase the test timeout to 5 minutes.",
+              "Compress the video to a zip file.",
+              "Use `page.route()` to intercept the `POST /upload` API call. You can use `setInputFiles` with a tiny 1KB dummy file, intercept the network request, and instantly mock a `200 OK` success response. This allows you to test the UI success state in 10 milliseconds.",
+              "Disable file uploads in the test environment."
+            ],
+            "a": "Use `page.route()` to intercept the `POST /upload` API call. You can use `setInputFiles` with a tiny 1KB dummy file, intercept the network request, and instantly mock a `200 OK` success response. This allows you to test the UI success state in 10 milliseconds.",
+            "explanation": "E2E tests should not be load tests. If you are testing the UI logic (does the success modal appear?), you do not need to push half a gigabyte through the CI network. Mocking the API boundary allows you to surgically verify frontend logic at lightning speed."
+          },
+          {
+            "objective": "file_upload_download",
+            "type": "multi-select",
+            "difficulty": "hard",
+            "scenario": "You have captured a `Download` object. You want to verify that the downloaded PDF file actually contains the string `Invoice #999`.",
+            "q": "What is the correct architectural sequence of Node.js operations required to achieve this? (Select all that apply)",
+            "options": [
+              "Use `await download.saveAs('temp.pdf')` to persist the file.",
+              "Use Playwright's `expect(download).toHaveText('Invoice #999')`.",
+              "Use Node's native `fs.readFileSync('temp.pdf')` or a dedicated PDF parsing library (like `pdf-parse`) to extract the text buffer.",
+              "Write a standard JS string assertion: `expect(extractedText).toContain('Invoice #999')`."
+            ],
+            "a": [
+              "Use `await download.saveAs('temp.pdf')` to persist the file.",
+              "Use Node's native `fs.readFileSync('temp.pdf')` or a dedicated PDF parsing library (like `pdf-parse`) to extract the text buffer.",
+              "Write a standard JS string assertion: `expect(extractedText).toContain('Invoice #999')`."
+            ],
+            "explanation": "Playwright is a browser automation tool, not a file parser. It cannot read the internal binary contents of PDFs or Excel files. You must bridge Playwright with the Node.js ecosystem. Save the file, use a specialized Node library to parse the binary, and then assert on the output."
+          },
+          {
+            "objective": "file_upload_download",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "const downloadPromise = page.waitForEvent('download');\nawait page.locator('a.download-link').click();\nconst download = await downloadPromise;\nconst stream = await download.createReadStream();",
+            "q": "What is the extreme performance advantage of using `createReadStream()` instead of `saveAs()` when analyzing massive files (e.g., a 2GB CSV)?",
+            "options": [
+              "There is no difference.",
+              "It allows Node.js to stream the bytes directly from the browser's memory into your assertion logic in chunks. You do not have to wait for the 2GB file to finish writing to disk, and you do not crash Node's V8 memory heap.",
+              "It automatically unzips the file.",
+              "It bypasses network security."
+            ],
+            "a": "It allows Node.js to stream the bytes directly from the browser's memory into your assertion logic in chunks. You do not have to wait for the 2GB file to finish writing to disk, and you do not crash Node's V8 memory heap.",
+            "explanation": "Enterprise applications deal with massive data. If you use `saveAs` and `readFileSync` on a 2GB file, Node.js will throw an Out Of Memory (OOM) error. Utilizing Node's native Stream API via `createReadStream` is the pinnacle of performance optimization."
+          },
+          {
+            "objective": "file_upload_download",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "A developer created a custom drag-and-drop zone (`<div class=\"dropzone\">`) that does NOT contain an `<input type=\"file\">`. `setInputFiles` and `filechooser` interception both fail.",
+            "q": "How must you architecturally force a file upload into this custom drag-and-drop zone?",
+            "options": [
+              "It is impossible.",
+              "You must use `page.evaluate()` to construct a synthetic `DataTransfer` object, attach your file buffer to it, and programmatically dispatch a `drop` Event directly onto the `.dropzone` DOM element.",
+              "Use `page.mouse.move()`.",
+              "Use `page.keyboard.press('Enter')`."
+            ],
+            "a": "You must use `page.evaluate()` to construct a synthetic `DataTransfer` object, attach your file buffer to it, and programmatically dispatch a `drop` Event directly onto the `.dropzone` DOM element.",
+            "explanation": "When developers bypass standard HTML APIs, standard automation APIs fail. To simulate a native OS drag-and-drop without OS access, you must drop into the browser console (`evaluate`), forge the internal Javascript payload (`DataTransfer`), and trigger the event manually. This is a very advanced workaround."
+          }
+        ]
+      },
+      "icon": "📎",
+      "slug": "56-file-handling",
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "enterprise",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET"
+    },
+    {
+      "id": "57-multi-tab",
+      "title": "10.6: Multi-Tab & Multi-Window",
+      "url": "courses/playwright/57-multi-tab",
+      "group": "🗝️ MODULE 10: ADVANCED LOCATORS",
+      "level": 8,
+      "weight": 15,
+      "meta": {
+        "time": "20 mins",
+        "type": "Code",
+        "outcome": "Handle popups, new tabs, and multi-window workflows"
+      },
+      "objectives": [
+        {
+          "id": "multi_tab",
+          "title": "Use popup events and multiple browser contexts"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "task-1",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "multi_tab",
+          "weight": 100
+        }
+      ],
+      "spec": {
+        "method": "waitForEvent('popup')",
+        "pattern": "Multi-Page"
+      },
+      "quizPool": {
+        "Easy": [
+          {
+            "objective": "multi_tab_window",
+            "type": "mcq",
+            "difficulty": "easy",
+            "q": "In Playwright, what is the architectural relationship between a 'Browser Context' and a 'Page'?",
+            "options": [
+              "They are the same thing.",
+              "A Browser Context is an isolated incognito session (containing its own cookies and cache). A Page is a single tab or window inside that Context. One Context can contain multiple Pages.",
+              "A Page contains multiple Contexts.",
+              "A Context is the physical browser binary."
+            ],
+            "a": "A Browser Context is an isolated incognito session (containing its own cookies and cache). A Page is a single tab or window inside that Context. One Context can contain multiple Pages.",
+            "explanation": "Understanding this hierarchy is vital. When a user clicks a link that opens a new tab, that new tab is instantiated as a new `Page` object, but it shares the exact same `Context` (meaning it shares login cookies) as the original tab."
+          },
+          {
+            "objective": "multi_tab_window",
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "await page.getByText('Open Dashboard').click(); // Opens in new tab",
+            "q": "If you immediately run `await page.locator('.dashboard-header').click()` after this line, what will happen?",
+            "options": [
+              "It clicks the header on the new tab.",
+              "It crashes. The `page` variable is strictly bound to the original tab. Even though a new tab opened visually, Playwright does not automatically switch focus. It will search for `.dashboard-header` on the original tab and fail.",
+              "Playwright automatically switches `page` to the most recently opened tab.",
+              "It clicks both tabs."
+            ],
+            "a": "It crashes. The `page` variable is strictly bound to the original tab. Even though a new tab opened visually, Playwright does not automatically switch focus. It will search for `.dashboard-header` on the original tab and fail.",
+            "explanation": "Unlike human users, Playwright does not have a concept of 'active window focus'. Variables are immutable pointers. `page` points to Tab A. If Tab B opens, you must capture Tab B into a new variable (`const newPage`) to interact with it."
+          },
+          {
+            "objective": "multi_tab_window",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "A link has the attribute `target=\"_blank\"`, which forces the browser to open it in a new tab.",
+            "q": "What is the standard Playwright syntax to explicitly wait for and capture this new tab?",
+            "options": [
+              "const newPage = await page.waitForNavigation();",
+              "const [newPage] = await Promise.all([context.waitForEvent('page'), page.click('a[target=\"_blank\"]')]);",
+              "const newPage = await context.newPage();",
+              "await page.switchTo().window();"
+            ],
+            "a": "const [newPage] = await Promise.all([context.waitForEvent('page'), page.click('a[target=\"_blank\"]')]);",
+            "explanation": "This is the classic Promise.all Trigger Pattern. You listen for the `page` event (which fires whenever a new tab/window is created) at the exact same time you click the link. The event yields the brand new `Page` object."
+          },
+          {
+            "objective": "multi_tab_window",
+            "type": "multi-select",
+            "difficulty": "easy",
+            "scenario": "You have successfully captured `newPage` from a popup.",
+            "q": "Which of the following statements are true regarding the two tabs? (Select all that apply)",
+            "options": [
+              "You can interact with both concurrently: `await Promise.all([page.click('#btnA'), newPage.click('#btnB')])`.",
+              "You must close the original page before interacting with the new page.",
+              "They share the exact same cookies and `localStorage` because they belong to the same Browser Context.",
+              "You must call `switchTo()` whenever you want to change which page you are automating."
+            ],
+            "a": [
+              "You can interact with both concurrently: `await Promise.all([page.click('#btnA'), newPage.click('#btnB')])`.",
+              "They share the exact same cookies and `localStorage` because they belong to the same Browser Context."
+            ],
+            "explanation": "Because `page` and `newPage` are just independent Node.js object references, you can interact with them simultaneously. There is no `switchTo` overhead. This makes automating complex multi-window workflows incredibly fast."
+          },
+          {
+            "objective": "multi_tab_window",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "Your test is finished interacting with `newPage`.",
+            "q": "What is the best practice for handling the extra tab?",
+            "options": [
+              "Leave it open; Playwright handles it.",
+              "Call `await newPage.close();` to free up system memory and keep the context clean.",
+              "Call `await context.close();`.",
+              "Call `await page.goBack();`."
+            ],
+            "a": "Call `await newPage.close();` to free up system memory and keep the context clean.",
+            "explanation": "While the entire context is destroyed at the end of the test, it is a best practice to close popup tabs immediately after verifying them to prevent memory leaks and rogue background network requests during the rest of the test."
+          }
+        ],
+        "Medium": [
+          {
+            "objective": "multi_tab_window",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "const popupPromise = page.waitForEvent('popup');\nawait page.click('#open-chat');\nconst popup = await popupPromise;\nawait popup.waitForLoadState();",
+            "q": "What is the specific difference between `waitForEvent('popup')` and `waitForEvent('page')`?",
+            "options": [
+              "There is no difference; they are aliases for the exact same underlying Context event. Playwright intercepts window creation via `window.open` or `target=\"_blank\"`.",
+              "`popup` only fires for modal dialogs.",
+              "`page` only fires when you manually call `context.newPage()`.",
+              "`popup` captures iframes."
+            ],
+            "a": "There is no difference; they are aliases for the exact same underlying Context event. Playwright intercepts window creation via `window.open` or `target=\"_blank\"`.",
+            "explanation": "Both events yield the exact same `Page` object. `popup` is tied specifically to the `Page` object emitting it (a child spawned from a parent), whereas `page` is emitted by the `BrowserContext`. Conceptually, they achieve the exact same goal in tab interception."
+          },
+          {
+            "objective": "multi_tab_window",
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "You are writing a test that opens 3 different tabs. You lose track of your variables.",
+            "q": "How can you dynamically query the `BrowserContext` to find a specific tab based on its current URL? (Select all that apply)",
+            "options": [
+              "const pages = context.pages();",
+              "const targetPage = pages.find(p => p.url().includes('dashboard'));",
+              "const targetPage = await context.waitForEvent('url');",
+              "const pages = await page.allTabs();"
+            ],
+            "a": [
+              "const pages = context.pages();",
+              "const targetPage = pages.find(p => p.url().includes('dashboard'));"
+            ],
+            "explanation": "`context.pages()` returns an array of all currently active `Page` objects within that session. You can iterate over this array and use standard JS `find` to dynamically locate a tab based on its URL or title, allowing self-healing multi-tab navigation."
+          },
+          {
+            "objective": "multi_tab_window",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "A test requires you to log in as an 'Admin' and a 'User' simultaneously to test a live chat feature.",
+            "q": "Because a single Browser Context shares cookies, if you log into Tab A as Admin, Tab B will also be Admin. How do you architecturally solve this in Playwright?",
+            "options": [
+              "Use Incognito mode on the OS.",
+              "Clear the cookies in Tab B.",
+              "Instantiate two entirely separate `BrowserContext` objects. Create `adminPage` in Context A, and `userPage` in Context B. They will have mathematically isolated cookie jars.",
+              "It is impossible in a single test."
+            ],
+            "a": "Instantiate two entirely separate `BrowserContext` objects. Create `adminPage` in Context A, and `userPage` in Context B. They will have mathematically isolated cookie jars.",
+            "explanation": "This is a superpower of Playwright. You can spawn multiple `BrowserContext` instances within the exact same test file. This allows you to simulate multiple distinct users interacting with each other in real-time, all coordinated from a single Node.js script."
+          },
+          {
+            "objective": "multi_tab_window",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "const [newPage] = await Promise.all([\n  context.waitForEvent('page'),\n  page.click('#external-link')\n]);\nawait expect(newPage).toHaveTitle(/Welcome/);",
+            "q": "If the `#external-link` opens a heavy, slow-loading React application, do you need to manually add `await newPage.waitForLoadState('networkidle')` before the assertion?",
+            "options": [
+              "Yes, otherwise the assertion will execute instantly on a blank page.",
+              "Yes, because new tabs do not inherit auto-waiting.",
+              "No. Playwright's Web-First Assertions (`toHaveTitle`, `toBeVisible`) automatically poll the DOM. Even if the new tab is blank for 3 seconds, `toHaveTitle` will continuously retry until the title matches or the 5-second timeout is reached.",
+              "No, because `waitForEvent` automatically waits for network idle."
+            ],
+            "a": "No. Playwright's Web-First Assertions (`toHaveTitle`, `toBeVisible`) automatically poll the DOM. Even if the new tab is blank for 3 seconds, `toHaveTitle` will continuously retry until the title matches or the 5-second timeout is reached.",
+            "explanation": "Playwright's architecture allows you to delete thousands of lines of `waitFor` logic. Once you capture the `newPage` pointer, you immediately write assertions against it. The assertion engine handles all the latency and rendering delays natively."
+          },
+          {
+            "objective": "multi_tab_window",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "A legacy test suite tests an email workflow: It triggers a password reset, opens a new tab to a temporary email service (like Mailinator), extracts the code, closes the tab, and pastes it into the original tab.",
+            "q": "While possible in Playwright, why do Enterprise Architects heavily discourage this multi-tab UI approach?",
+            "options": [
+              "Because Playwright cannot interact with Mailinator.",
+              "Because UI-driven email testing is inherently flaky and slow. The architectural best practice is to trigger the reset via the UI, but retrieve the email code synchronously via a Backend API call to a service like Mailosaur, completely bypassing the need for a second tab.",
+              "Because tabs crash the CI server.",
+              "Because it causes Strict Mode violations."
+            ],
+            "a": "Because UI-driven email testing is inherently flaky and slow. The architectural best practice is to trigger the reset via the UI, but retrieve the email code synchronously via a Backend API call to a service like Mailosaur, completely bypassing the need for a second tab.",
+            "explanation": "Just because you *can* automate multiple tabs doesn't mean you *should*. The most robust UI tests minimize UI surface area. Querying APIs for external dependencies (emails, SMS) is exponentially faster and more reliable than driving a third-party UI."
+          }
+        ],
+        "Hard": [
+          {
+            "objective": "multi_tab_window",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "page.on('popup', async popup => {\n  await popup.waitForLoadState();\n  console.log(await popup.title());\n});",
+            "q": "A developer writes this global listener to automatically log the title of any popup that opens during a massive E2E flow. What severe architectural race condition does this create?",
+            "options": [
+              "The `popup` object cannot be logged.",
+              "Unawaited floating Promises. The callback function is `async`, but `page.on` is a synchronous event emitter. Playwright fires the event, but Node.js does not `await` the callback. The test might finish and close the browser while `popup.waitForLoadState()` is still pending, causing fatal `Target Closed` exceptions.",
+              "It blocks the main thread.",
+              "It triggers strict mode."
+            ],
+            "a": "Unawaited floating Promises. The callback function is `async`, but `page.on` is a synchronous event emitter. Playwright fires the event, but Node.js does not `await` the callback. The test might finish and close the browser while `popup.waitForLoadState()` is still pending, causing fatal `Target Closed` exceptions.",
+            "explanation": "This is a critical Node.js concept. `EventEmitter.on()` does not return a Promise. If you do asynchronous work inside an event listener without a top-level await orchestrating it, you leak floating promises. This is a primary source of \"random\" CI crashes at the end of tests."
+          },
+          {
+            "objective": "multi_tab_window",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You click a button. The application uses JavaScript `window.open('/invoice', '_blank')` to open a popup, but it also heavily manipulates the DOM in the *original* tab simultaneously.",
+            "q": "How do you architect a `Promise.all` that safely captures the popup AND ensures the original tab's DOM manipulation has completed?",
+            "options": [
+              "You cannot do both.",
+              "const [popup] = await Promise.all([ page.waitForEvent('popup'), page.waitForResponse('/api/invoice-generated'), page.click('#generate') ]);",
+              "Use a `for` loop.",
+              "Use `page.waitForTimeout(5000)`."
+            ],
+            "a": "const [popup] = await Promise.all([ page.waitForEvent('popup'), page.waitForResponse('/api/invoice-generated'), page.click('#generate') ]);",
+            "explanation": "`Promise.all` can orchestrate unlimited concurrent listeners. By attaching a listener for the popup *and* a listener for the background API request on the main page, you create an absolute, deterministic synchronization point that guarantees both the foreground and background architectures have settled."
+          },
+          {
+            "objective": "multi_tab_window",
+            "type": "multi-select",
+            "difficulty": "hard",
+            "scenario": "You need to verify an OAuth authentication flow (e.g., 'Log in with Google'). Clicking the button opens a popup to `accounts.google.com`. After login, the popup automatically closes, and the main page logs in.",
+            "q": "What makes this architectural flow dangerous to automate using standard `popup` listeners? (Select all that apply)",
+            "options": [
+              "Playwright cannot automate Google.",
+              "The popup might close itself before your Playwright code finishes interacting with it, resulting in `Target Closed` exceptions during `.fill()` commands.",
+              "Cross-origin popups are strictly blocked by the CDP.",
+              "You must race against the external application's redirect timers."
+            ],
+            "a": [
+              "The popup might close itself before your Playwright code finishes interacting with it, resulting in `Target Closed` exceptions during `.fill()` commands.",
+              "You must race against the external application's redirect timers."
+            ],
+            "explanation": "Automating 3rd-party OAuth popups is notoriously unstable because you do not control the external state machine. Google might redirect in 50ms or 500ms. If you are mid-assertion when the popup closes, the test crashes. The enterprise solution is often to mock the OAuth response via API."
+          },
+          {
+            "objective": "multi_tab_window",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "const newPage = await context.newPage();\nawait newPage.route('**/*', route => route.abort());",
+            "q": "You spawn a new tab manually and apply a strict network interception route to it. Does this interception apply to the original `page` object?",
+            "options": [
+              "Yes, because routes are applied at the BrowserContext level.",
+              "No. Routing applied to a specific `Page` object is strictly encapsulated to that page. The original page continues to process network requests normally. This allows you to simulate an offline state in Tab B while Tab A remains online.",
+              "Yes, because they share the same event loop.",
+              "No, routes only work on the first tab."
+            ],
+            "a": "No. Routing applied to a specific `Page` object is strictly encapsulated to that page. The original page continues to process network requests normally. This allows you to simulate an offline state in Tab B while Tab A remains online.",
+            "explanation": "This demonstrates the mathematical isolation of `Page` objects. Even within the same Context, `page.route()` provides surgical, tab-specific network modification. (Note: `context.route()` exists if you want global interception)."
+          },
+          {
+            "objective": "multi_tab_window",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You are building a custom fixture that automatically intercepts any new tab opened during a test, injects a custom authentication token into its `localStorage`, and returns it.",
+            "q": "Because `localStorage` is origin-specific, why must you wait for the new page to perform its initial navigation *before* injecting the token?",
+            "options": [
+              "Because tokens are encrypted.",
+              "When `waitForEvent('page')` fires, the new `Page` object is instantly yielded at the `about:blank` URL. If you execute `page.evaluate()` to set `localStorage` immediately, you are setting it on `about:blank`. You must wait for the page to navigate to the target domain before injecting domain-specific storage.",
+              "Because `localStorage` is disabled in `about:blank`.",
+              "You cannot inject tokens into new tabs."
+            ],
+            "a": "When `waitForEvent('page')` fires, the new `Page` object is instantly yielded at the `about:blank` URL. If you execute `page.evaluate()` to set `localStorage` immediately, you are setting it on `about:blank`. You must wait for the page to navigate to the target domain before injecting domain-specific storage.",
+            "explanation": "This is a profound execution pipeline detail. The `page` event fires the millisecond the tab spawns, before the HTTP GET request is even sent. To manipulate the target application's state, you must await `waitForLoadState` or an explicit navigation, ensuring the JS context is anchored to the correct origin."
+          }
+        ]
+      },
+      "icon": "📑",
+      "slug": "57-multi-tab",
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "enterprise",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET"
+    }
+  ]
+}

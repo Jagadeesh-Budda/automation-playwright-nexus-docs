@@ -1,0 +1,259 @@
+﻿# 17.1: Parameterization vs. Permutation
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Understand combinatorial testing
+
+## What is Parameterized Testing?
+
+Instead of writing 10 identical tests with different data, you write **one test** and drive it with a data table. This follows the DRY principle and makes your test suite much easier to maintain.
+
+## Method 1: `test.each` — The Playwright Way
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test.describe('Document Upload Validation', () => {
+  
+  // Define your test cases as an array
+  const validDocTypes = [
+    { type: 'Protocol', department: 'Clinical', expectedStatus: 'Draft' },
+    { type: 'SOP', department: 'Regulatory', expectedStatus: 'Draft' },
+    { type: 'Report', department: 'QA', expectedStatus: 'Draft' },
+    { type: 'Specification', department: 'R&D', expectedStatus: 'Draft' },
+  ];
+
+  for (const { type, department, expectedStatus } of validDocTypes) {
+    test(`can upload ${type} in ${department} department`, async ({ documentPage }) => {
+      await documentPage.navigate();
+      
+      const docId = await documentPage.createDocument({
+        title: `Test ${type}`,
+        type,
+        department,
+        version: '1.0'
+      });
+      
+      const status = await documentPage.getStatusBadge(docId).textContent();
+      expect(status?.trim()).toBe(expectedStatus);
+    });
+  }
+});
+```
+
+## Method 2: Data-Driven Validation Tests
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Test all invalid input combinations
+const invalidInputs = [
+  { title: '', expected: 'Title is required' },
+  { title: 'A', expected: 'Title must be at least 5 characters' },
+  { title: 'x'.repeat(256), expected: 'Title exceeds maximum length' },
+  { title: '<script>alert("xss")</script>', expected: 'Invalid characters detected' },
+];
+
+for (const { title, expected } of invalidInputs) {
+  test(`title validation: "${title.slice(0, 20)}..."`, async ({ documentPage }) => {
+    await documentPage.navigate();
+    await documentPage.openNewDocumentForm();
+    await documentPage.titleInput.fill(title);
+    await documentPage.submitButton.click();
+    
+    await expect(documentPage.titleError).toContainText(expected);
+  });
+}
+```
+
+## Method 3: JSON File-Based Test Data
+
+For large datasets, store them in JSON files:
+
+```json
+// data/document-test-cases.json
+[
+  {
+    "scenario": "SOP with single approver",
+    "document": { "type": "SOP", "department": "Operations" },
+    "expectedApprovers": 1
+  },
+  {
+    "scenario": "Regulatory Protocol with two approvers",
+    "document": { "type": "Protocol", "department": "Regulatory" },
+    "expectedApprovers": 2
+  },
+  {
+    "scenario": "Clinical Report with QA sign-off",
+    "document": { "type": "Report", "department": "Clinical" },
+    "expectedApprovers": 2
+  }
+]
+```
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+import testCases from '../../data/document-test-cases.json';
+
+for (const { scenario, document, expectedApprovers } of testCases) {
+  test(scenario, async ({ documentPage }) => {
+    await documentPage.navigate();
+    const docId = await documentPage.createDocument(document);
+    
+    const approverCount = await documentPage.getRequiredApproverCount(docId);
+    expect(approverCount).toBe(expectedApprovers);
+  });
+}
+```
+
+## Method 4: Boundary Value Analysis
+
+A classic testing technique — test the edges of valid ranges:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+const versionBoundaries = [
+  { version: '0.1', valid: true, description: 'minimum valid version' },
+  { version: '1.0', valid: true, description: 'normal version' },
+  { version: '99.9', valid: true, description: 'high version number' },
+  { version: '0.0', valid: false, description: 'version too low' },
+  { version: '100.0', valid: false, description: 'version exceeds maximum' },
+  { version: 'abc', valid: false, description: 'non-numeric version' },
+  { version: '', valid: false, description: 'empty version' },
+];
+
+for (const { version, valid, description } of versionBoundaries) {
+  test(`version boundary: ${description} (${version})`, async ({ documentPage }) => {
+    await documentPage.navigate();
+    await documentPage.openNewDocumentForm();
+    await documentPage.versionInput.fill(version);
+    await documentPage.titleInput.fill('Test Document');
+    await documentPage.submitButton.click();
+    
+    if (valid) {
+      await expect(documentPage.successMessage).toBeVisible();
+    } else {
+      await expect(documentPage.versionError).toBeVisible();
+    }
+  });
+}
+```
+
+## Test Tags for Organization
+
+Tag your parameterized tests so you can filter them:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test(`can upload ${type}`, { tag: ['@smoke', '@upload'] }, async ({ documentPage }) => {
+  // ...
+});
+
+// Run only tagged tests
+// npx playwright test --grep "@smoke"
+```
+
+<CodeEditor
+  moduleId="82-data-logic"
+  taskIndex={0}
+  placeholder="// Task: Write a parameterized test that runs the SAME test logic for 3 different document types.&#10;// Requirements:&#10;//   1. Define an array of document types: Protocol, SOP, Report&#10;//   2. Loop through them and create a separate test for each&#10;//   3. Each test should create a document of that type and verify its status is 'Draft'&#10;//&#10;// Hint: Use a for...of loop OUTSIDE the test() call"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+const docTypes = ['Protocol', 'SOP', 'Report'];
+
+for (const type of docTypes) {
+  test(`can upload ${type}`, async ({ documentPage }) => {
+    const id = await documentPage.createDocument({ title: `Test`, type });
+    await expect(documentPage.getStatusBadge(id)).toContainText('Draft');
+  });
+}
+```
+
+</details>
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="82-data-logic"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="data-logic" />
+

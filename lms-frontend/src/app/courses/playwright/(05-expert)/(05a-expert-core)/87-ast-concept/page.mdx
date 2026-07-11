@@ -1,0 +1,255 @@
+﻿# 18.1: The Abstract Syntax Tree (AST)
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Visualize code as a tree structure
+
+## What Happens When Your Code is Parsed?
+
+Before any JavaScript/TypeScript code runs, the Node.js engine parses it into an **Abstract Syntax Tree (AST)** — a tree data structure that represents the logical structure of your code.
+
+```typescript
+// Your source code
+await page.click('#submit-btn');
+
+// Gets parsed into this AST structure:
+{
+  "type": "ExpressionStatement",
+  "expression": {
+    "type": "AwaitExpression",
+    "argument": {
+      "type": "CallExpression",
+      "callee": {
+        "type": "MemberExpression",
+        "object": { "type": "Identifier", "name": "page" },
+        "property": { "type": "Identifier", "name": "click" }
+      },
+      "arguments": [
+        { "type": "Literal", "value": "#submit-btn" }
+      ]
+    }
+  }
+}
+```
+
+The AST Auditor **walks this tree** looking for patterns that violate the quality gates.
+
+## The Parser: `acorn`
+
+The ASA framework uses the `acorn` library to parse JavaScript:
+
+```typescript
+import { parse } from 'acorn';
+
+const code = `// ❌ Anti-pattern\nawait page.waitForTimeout(3000);`;
+const ast = parse(code, {
+  ecmaVersion: 2022,
+  sourceType: 'module',
+  locations: true, // Generate node.loc details for line numbers
+});
+
+// The AST is now a plain JavaScript object you can inspect
+console.log(JSON.stringify(ast, null, 2));
+```
+
+For TypeScript files, we use `@typescript-eslint/typescript-estree`:
+
+```typescript
+import { parse } from '@typescript-eslint/typescript-estree';
+
+const ast = parse(`// ❌ Anti-pattern\nawait page.waitForTimeout(3000);`, {
+  jsx: false,
+  tokens: true,
+  range: true,
+});
+```
+
+## Walking the AST
+
+To find patterns, we "walk" the tree using a recursive function:
+
+```typescript
+function walk(node: any, visitor: (node: any) => void, parent?: any) {
+  if (!node || typeof node !== 'object') return;
+  
+  if (parent) {
+    node.parent = parent;
+  }
+  
+  visitor(node);
+  
+  // Recursively walk all child nodes
+  for (const key of Object.keys(node)) {
+    if (key !== 'parent') {  // Avoid circular references
+      if (Array.isArray(node[key])) {
+        node[key].forEach((child: any) => walk(child, visitor, node));
+      } else {
+        walk(node[key], visitor, node);
+      }
+    }
+  }
+}
+```
+
+## Gate 1 Implementation: Detecting `waitForTimeout`
+
+```typescript
+function checkForHardcodedSleeps(ast: any): string[] {
+  const violations: string[] = [];
+  
+  walk(ast, (node) => {
+    // Looking for: page.waitForTimeout(...)
+    if (
+      node.type === 'CallExpression' &&
+      node.callee?.type === 'MemberExpression' &&
+      node.callee.property?.name === 'waitForTimeout'
+    ) {
+      violations.push(
+        `Line ${node.loc.start.line}: Hardcoded sleep detected: ${node.callee.property.name}()`
+      );
+    }
+  });
+  
+  return violations;
+}
+```
+
+## Gate 3 Implementation: Detecting Missing `await`
+
+```typescript
+function checkForMissingAwait(ast: any): string[] {
+  const violations: string[] = [];
+  const pageActions = new Set([
+    'click', 'fill', 'goto', 'press', 'selectOption', 'setChecked',
+    'check', 'uncheck', 'hover', 'focus', 'setInputFiles',
+    'waitForSelector', 'waitForLoadState', 'waitForResponse', 'waitForNavigation'
+  ]);
+  
+  walk(ast, (node) => {
+    // Looking for page actions (click, fill, etc.) called on page/this.page that are not awaited
+    if (node.type === 'CallExpression' && node.callee?.type === 'MemberExpression') {
+      const methodName = node.callee.property?.name;
+      if (pageActions.has(methodName)) {
+        const obj = node.callee.object;
+        const isPageObj = 
+          (obj.type === 'Identifier' && obj.name === 'page') ||
+          (obj.type === 'MemberExpression' && obj.object?.type === 'ThisExpression' && obj.property?.name === 'page') ||
+          (obj.type === 'CallExpression' && obj.callee?.type === 'MemberExpression' && obj.callee.property?.name === 'locator');
+          
+        if (isPageObj) {
+          // Walk up parent chain to check for AwaitExpression
+          let current = node.parent;
+          let isAwaited = false;
+          while (current) {
+            if (current.type === 'AwaitExpression') {
+              isAwaited = true;
+              break;
+            }
+            if (current.type.endsWith('Statement') || current.type.endsWith('Declaration') || current.type.includes('Function')) {
+              break;
+            }
+            current = current.parent;
+          }
+          
+          if (!isAwaited) {
+            violations.push(
+              `Line ${node.loc?.start?.line ?? 0}: Missing 'await' before page action '${methodName}'`
+            );
+          }
+        }
+      }
+    }
+  });
+  
+  return violations;
+}
+```
+
+## The Full Audit Pipeline
+
+```typescript
+// utils/ast-auditor.ts
+async function auditFile(filePath: string): Promise<AuditResult> {
+  const code = fs.readFileSync(filePath, 'utf-8');
+  const ast = parse(code, { ecmaVersion: 2022, sourceType: 'module', locations: true });
+  
+  const violations = [
+    ...checkForHardcodedSleeps(ast),     // Gate 1
+    ...checkForHardcodedCredentials(ast), // Gate 2
+    ...checkForMissingAwait(ast),         // Gate 3
+    ...checkForLocatorsInSpecs(ast, filePath), // Gate 4
+    ...checkForMissingDescribeBlock(ast), // Gate 5
+  ];
+  
+  return {
+    file: filePath,
+    violations,
+    passed: violations.length === 0,
+  };
+}
+```
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** Your team wants to ban the use of `page.$eval()` which is an older, deprecated API.
+
+**Your Task:** Write an AST auditor function `checkForEval` that detects usages of `page.$eval` and returns a list of violations.
+
+**Constraints:**
+- ❌ You may NOT use `page.waitForTimeout`
+- ✅ You MUST use `walk` to traverse the tree
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="87-ast-concept"
+  taskIndex={0}
+  placeholder={`// Challenge: Ban $eval\nfunction checkForEval(ast) {\n  const violations = [];\n  // Write the walker here\n  return violations;\n}`}
+/>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| AST Parsing | Converts raw code strings into structural tree objects |
+| Acorn / ESTree | The underlying parsers used by Node and ESLint |
+| Tree Walking | A recursive pattern to visit every node in an AST |
+
+> [!TIP]
+> **Next Step:** Proceed to the AST Linter module to build on these concepts.
+
+<CodeEditor
+  moduleId="87-ast-concept"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```
+// AwaitExpression > CallExpression > MemberExpression
+```
+
+</details>
+
+<Quiz moduleId="ast-concept" />
+

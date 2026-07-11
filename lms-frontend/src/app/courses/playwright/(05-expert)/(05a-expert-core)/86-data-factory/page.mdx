@@ -1,0 +1,258 @@
+﻿# 17.5: The Test Factory Pattern
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Implement data-provider abstractions
+
+## What is a Data Factory?
+
+A **Data Factory** is a class that generates **valid, realistic, and consistent** test data on demand. It's the single source of truth for all test data in your framework.
+
+Benefits:
+- One place to update when the API schema changes
+- Realistic data that doesn't cause validation failures
+- Supports both minimal (required fields only) and full (all fields) data generation
+
+## The Complete Data Factory
+
+```typescript
+// utils/DataFactory.ts
+import { randomUUID } from 'crypto';
+import { APIRequestContext } from '@playwright/test';
+import type { User, Document, SignatureOptions } from '../entities';
+
+type Factory<T> = (overrides?: Partial<T>) => T;
+
+export const UserFactory: Factory<User> = (overrides = {}) => ({
+  id: randomUUID(),
+  email: `test-${Date.now()}@example.com`,
+  name: 'Test User',
+  role: 'viewer',
+  department: 'QA',
+  isActive: true,
+  createdAt: new Date(),
+  ...overrides,
+});
+
+export const DocumentFactory: Factory<Partial<Document>> = (overrides = {}) => ({
+  title: `Test Document ${Date.now()}`,
+  version: '1.0',
+  type: 'Protocol',
+  department: 'QA',
+  status: 'Draft',
+  ...overrides,
+});
+
+export const SignatureFactory: Factory<SignatureOptions> = (overrides = {}) => ({
+  reason: 'Reviewed and approved per SOP guidelines',
+  password: process.env.DEFAULT_TEST_PASS || 'TestPassword123!',
+  comment: 'Automated test signature',
+  ...overrides,
+});
+```
+
+## The API Data Factory (Creates Records in DB)
+
+```typescript
+// utils/ApiDataFactory.ts
+import { APIRequestContext, expect } from '@playwright/test';
+import { DocumentFactory, UserFactory } from './DataFactory';
+
+export class ApiDataFactory {
+  private createdIds: { type: string; id: string }[] = [];
+
+  constructor(
+    private readonly request: APIRequestContext,
+    private readonly token: string,
+    private readonly baseURL: string
+  ) {}
+
+  private get headers() {
+    return { Authorization: `Bearer ${this.token}` };
+  }
+
+  // Create a document with optional overrides
+  async document(overrides?: Partial<any>) {
+    let payload = DocumentFactory(overrides);
+    let response = await this.request.post(`${this.baseURL}/api/documents`, {
+      data: payload,
+      headers: this.headers,
+    });
+    expect(response.status()).toBe(201);
+    let doc = await response.json();
+    this.createdIds.push({ type: 'document', id: doc.id });
+    return doc;
+  }
+
+  // Shortcut: create an already-approved document
+  async approvedDocument(overrides?: Partial<any>) {
+    const doc = await this.document({ ...overrides, type: 'SOP' });
+    await this.request.post(`${this.baseURL}/api/documents/${doc.id}/submit`, { headers: this.headers });
+    await this.request.post(`${this.baseURL}/api/documents/${doc.id}/approve`, {
+      data: { reason: 'Factory approval' },
+      headers: this.headers,
+    });
+    const updated = await this.request.get(`${this.baseURL}/api/documents/${doc.id}`, { headers: this.headers });
+    return updated.json();
+  }
+
+  // Create a user
+  async user(overrides?: Partial<any>) {
+    const payload = UserFactory(overrides);
+    const response = await this.request.post(`${this.baseURL}/api/users`, {
+      data: payload,
+      headers: this.headers,
+    });
+    const user = await response.json();
+    this.createdIds.push({ type: 'user', id: user.id });
+    return user;
+  }
+
+  // Clean up ALL created entities
+  async cleanup() {
+    for (const { type, id } of this.createdIds.reverse()) {
+      const url = `${this.baseURL}/api/${type}s/${id}`;
+      await this.request.delete(url, { headers: this.headers }).catch(() => {});
+    }
+    this.createdIds = [];
+  }
+}
+```
+
+## Using the Factory in Tests
+
+```typescript
+import { test, expect, APIRequestContext } from '@playwright/test';
+import { ApiDataFactory } from '../../utils/ApiDataFactory';
+
+test.describe('Document Operations', () => {
+  let factory: ApiDataFactory;
+  let apiRequestContext: APIRequestContext;
+
+  test.beforeAll(async ({ playwright }) => {
+    // request is a test-scoped fixture; instantiate context manually in beforeAll
+    apiRequestContext = await playwright.request.newContext();
+    
+    const loginRes = await apiRequestContext.post(`${process.env.BASE_URL}/api/auth/login`, {
+      data: { email: process.env.ADMIN_USER, password: process.env.ADMIN_PASS }
+    });
+    const { token } = await loginRes.json();
+    
+    factory = new ApiDataFactory(apiRequestContext, token, process.env.BASE_URL!);
+  });
+
+  test.afterAll(async () => {
+    await factory.cleanup(); // Deletes ALL records created during this describe block
+    await apiRequestContext.dispose();
+  });
+
+  test('can view an approved document', async ({ page }) => {
+    // ✅ No setup code in the test — factory handles it
+    const doc = await factory.approvedDocument({ title: 'View Test Doc' });
+    
+    await page.goto(`/documents/${doc.id}`);
+    await expect(page.getByRole('heading')).toContainText('View Test Doc');
+    await expect(page.getByRole('status')).toContainText('Approved');
+  });
+
+  test('search returns relevant documents', async ({ page }) => {
+    // Create 3 documents with unique searchable titles
+    await factory.document({ title: 'Alpha Protocol v1' });
+    await factory.document({ title: 'Beta Protocol v2' });
+    await factory.document({ title: 'Gamma SOP v1' });
+    
+    await page.goto('/documents');
+    await page.getByRole('searchbox').fill('Protocol');
+    
+    // Should find 2 (not Gamma SOP)
+    await expect(page.getByRole('row').filter({ hasText: 'Protocol' })).toHaveCount(2);
+  });
+});
+```
+
+<CodeEditor
+  moduleId="86-data-factory"
+  taskIndex={0}
+  placeholder="// Task: Write a DocumentFactory function using the Factory pattern.&#10;// Requirements:&#10;//   1. Return a document object with default values for: title, version, type, department, status&#10;//   2. Generate a UNIQUE title using Date.now()&#10;//   3. Accept an optional 'overrides' parameter that merges over the defaults&#10;//   4. Export the function&#10;//&#10;// Usage: DocumentFactory({ type: 'SOP' }) should override only the type"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+export const DocumentFactory = (overrides = {}) => ({
+  title: `Test Document ${Date.now()}`,
+  version: '1.0',
+  type: 'Protocol',
+  department: 'QA',
+  status: 'Draft',
+  ...overrides,
+});
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="86-data-factory"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<Quiz moduleId="data-factory" />
+

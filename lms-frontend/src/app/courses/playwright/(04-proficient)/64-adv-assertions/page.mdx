@@ -1,0 +1,456 @@
+﻿# 14.2: Custom Expect Assertions
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Implement expect.extend() correctly
+
+## The Assertion Philosophy
+
+Great assertions are:
+1. **Specific** — they check exactly what matters, nothing more
+2. **Readable** — the failing message is self-explanatory
+3. **Async** — they use `await expect()` so Playwright can retry
+
+## Page-Level Assertions
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// URL assertions
+await expect(page).toHaveURL('https://dms.example.com/dashboard');
+await expect(page).toHaveURL(/dashboard/);     // Regex match
+await expect(page).not.toHaveURL(/login/);    // Negative assertion
+
+// Page title
+await expect(page).toHaveTitle('DMS Dashboard');
+await expect(page).toHaveTitle(/Dashboard/i);
+
+// Wait for a specific navigation
+await expect(page).toHaveURL('/documents', { timeout: 10_000 });
+```
+
+## Element Visibility & State
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Visibility
+await expect(locator).toBeVisible();
+await expect(locator).toBeHidden();
+await expect(locator).not.toBeVisible();
+
+// Existence in DOM (even if hidden)
+await expect(locator).toBeAttached();
+await expect(locator).not.toBeAttached();
+
+// Interactability
+await expect(locator).toBeEnabled();
+await expect(locator).toBeDisabled();
+await expect(locator).toBeEditable();
+
+// Focus
+await expect(locator).toBeFocused();
+
+// Checked state (checkboxes, radio buttons)
+await expect(page.getByRole('checkbox', { name: 'Accept Terms' })).toBeChecked();
+await expect(page.getByRole('checkbox')).not.toBeChecked();
+```
+
+## ⚠️ Negation Semantics: A Critical Distinction
+
+These two assertions look similar but behave **differently**:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Option A: Asserts the element IS in the DOM but hidden
+await expect(locator).toBeHidden();
+
+// Option B: Asserts the element is NOT visible (could be hidden OR not in DOM at all)
+await expect(locator).not.toBeVisible();
+```
+
+| Assertion | Element in DOM but hidden | Element NOT in DOM |
+|-----------|:------------------------:|:------------------:|
+| `toBeHidden()` | ✅ Passes | ✅ Passes |
+| `not.toBeVisible()` | ✅ Passes | ✅ Passes |
+| `not.toBeAttached()` | ❌ Fails | ✅ Passes |
+
+**Rule of thumb:** Use `not.toBeAttached()` when you need to verify an element was completely removed from the DOM (e.g., after deletion).
+
+## Text Content Assertions
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Exact text match
+await expect(locator).toHaveText('Document uploaded successfully');
+
+// Contains text (partial match)
+await expect(locator).toContainText('uploaded');
+
+// Case-insensitive regex
+await expect(locator).toHaveText(/success/i);
+
+// Array of texts (for lists)
+await expect(page.getByRole('listitem')).toHaveText([
+  'Protocol v1.0',
+  'Report Q3',
+  'SOP-042',
+]);
+// Checks the list has exactly these 3 items in this order
+
+// Contains subset (for partial list matching)
+await expect(page.getByRole('listitem')).toContainText(['Protocol', 'Report']);
+```
+
+## Attribute Assertions
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Specific attribute value
+await expect(locator).toHaveAttribute('aria-expanded', 'true');
+await expect(locator).toHaveAttribute('data-status', 'approved');
+
+// Attribute exists (any value)
+await expect(locator).toHaveAttribute('disabled');
+
+// Class assertions
+await expect(locator).toHaveClass('active');
+await expect(locator).toHaveClass(/btn-/);  // Regex
+
+// CSS properties
+await expect(locator).toHaveCSS('display', 'flex');
+await expect(locator).toHaveCSS('color', 'rgb(0, 128, 0)');
+```
+
+## Count & Value Assertions
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Count
+await expect(page.getByRole('row')).toHaveCount(10);
+await expect(page.getByRole('alert')).toHaveCount(0);  // No alerts!
+
+// Input values
+await expect(page.getByLabel('Email')).toHaveValue('admin@example.com');
+await expect(page.getByLabel('Version')).toHaveValue('3.1');
+
+// Select/dropdown
+await expect(page.getByLabel('Status')).toHaveValue('Approved');
+```
+
+## Soft Assertions: Collect All Failures
+
+Regular assertions stop the test immediately on failure. **Soft assertions** collect all failures and report them at the end — perfect for data-heavy verification pages.
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('validate document details page', async ({ page }) => {
+  await page.goto('/documents/DOC-001');
+  
+  // These don't stop the test even if they fail
+  await expect.soft(page.getByRole('heading')).toContainText('Clinical Trial');
+  await expect.soft(page.getByTestId('status')).toHaveText('Approved');
+  await expect.soft(page.getByTestId('version')).toHaveText('3.1');
+  await expect.soft(page.getByTestId('department')).toHaveText('Regulatory');
+  
+  // This DOES stop the test if any soft assertions above failed
+  expect(test.info().errors).toHaveLength(0);
+});
+```
+
+> [!WARNING]
+> Soft assertions still mark the test as **failed** — they just don't abort it early. All failures are collected and reported at the end.
+
+## Custom Error Messages
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+await expect(documentRow, 'Document DOC-001 should be visible in the table')
+  .toBeVisible();
+
+await expect(statusBadge, `Status should be 'Approved' after reviewer action`)
+  .toContainText('Approved');
+```
+
+## Custom Matchers with `expect.extend()`
+
+Build **domain-specific assertions** that speak the language of your application:
+
+```typescript
+// fixtures/custom-matchers.ts
+import { expect as baseExpect, Locator } from '@playwright/test';
+
+export const expect = baseExpect.extend({
+  async toBeApproved(locator: Locator) {
+    let assertionName = 'toBeApproved';
+    let pass: boolean;
+    let actual: string;
+
+    try {
+      await baseExpect(locator.getByTestId('status')).toHaveText('Approved', { timeout: 5000 });
+      pass = true;
+      actual = 'Approved';
+    } catch {
+      pass = false;
+      actual = await locator.getByTestId('status').textContent() ?? 'null';
+    }
+
+    return {
+      message: () => `Expected document status to be "Approved", but got "${actual}"`,
+      pass,
+      name: assertionName,
+      expected: 'Approved',
+      actual,
+    };
+  },
+
+  async toHaveSignatureCount(locator: Locator, expected: number) {
+    const assertionName = 'toHaveSignatureCount';
+    const signatures = locator.getByTestId('signature-entry');
+    let count = await signatures.count();
+    const pass = count === expected;
+
+    return {
+      message: () => `Expected ${expected} signatures, but found ${count}`,
+      pass,
+      name: assertionName,
+      expected,
+      actual: count,
+    };
+  },
+});
+```
+
+Usage in tests:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+import { expect } from '../fixtures/custom-matchers';
+
+test('document is fully signed', async ({ documentPage }) => {
+  const docRow = documentPage.getRowByDocId('DOC-001');
+  
+  await expect(docRow).toBeApproved();
+  await expect(docRow).toHaveSignatureCount(3);
+});
+```
+
+## `expect.poll()` — Retry Arbitrary Functions
+
+Use `expect.poll()` when you need to retry a **non-locator value** until it satisfies a condition:
+
+```typescript
+// Poll an API endpoint until the document status changes
+await expect.poll(async () => {
+  const response = await request.get(`/api/documents/DOC-001`);
+  const data = await response.json();
+  return data.status;
+}, {
+  message: 'Document should be approved within 30 seconds',
+  timeout: 30_000,
+  intervals: [1_000, 2_000, 5_000],  // Retry at 1s, 2s, then every 5s
+}).toBe('approved');
+```
+
+### When to use `expect.poll()` vs `expect.toPass()`
+
+| Feature | `expect.poll()` | `expect.toPass()` |
+|---------|:--------------:|:------------------:|
+| Retries a single value | ✅ | ❌ |
+| Retries a block of code | ❌ | ✅ |
+| Returns a value to assert | ✅ | ❌ |
+| Supports multiple assertions | ❌ | ✅ |
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// expect.poll() — single value
+await expect.poll(async () => {
+  return await page.getByRole('row').count();
+}).toBeGreaterThan(5);
+
+// expect.toPass() — multiple assertions in a block
+await expect(async () => {
+  const count = await page.getByRole('row').count();
+  expect(count).toBeGreaterThan(5);
+  
+  const firstRow = page.getByRole('row').first();
+  await expect(firstRow).toContainText('DOC-');
+}).toPass({ timeout: 10_000, intervals: [1000, 2000, 3000] });
+```
+
+## Snapshot Testing for Data
+
+Beyond visual screenshots, Playwright supports **text and object snapshot** comparisons:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('API response matches expected structure', async ({ request }) => {
+  const response = await request.get('/api/documents/DOC-001');
+  const data = await response.json();
+  
+  // Compare against a saved snapshot file
+  expect(JSON.stringify(data, null, 2)).toMatchSnapshot('document-response.json');
+});
+
+test('document list HTML structure is stable', async ({ page }) => {
+  await page.goto('/documents');
+  const tableHtml = await page.getByRole('table').innerHTML();
+  
+  expect(tableHtml).toMatchSnapshot('document-table.html');
+});
+```
+
+First run creates the snapshot file. Subsequent runs compare against it. Update snapshots with `--update-snapshots`.
+
+## Assertion Best Practices
+
+### ✅ Assert state, not implementation
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ✅ Good — asserts what the user sees
+await expect(page.getByRole('alert')).toContainText('Document saved');
+
+// ❌ Bad — asserts internal implementation details
+await expect(page.locator('.toast-container .alert-success')).toHaveClass('fade-in');
+```
+
+### ✅ One assertion per concern
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ✅ Good — each assertion checks one thing
+await expect(statusBadge).toContainText('Approved');
+await expect(signatureCount).toHaveText('3 of 3');
+
+// ❌ Bad — brittle compound assertion
+await expect(documentRow).toHaveText(/Approved.*3 of 3.*Regulatory/);
+```
+
+### ✅ Use custom messages for complex flows
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ✅ Good — tells you exactly which step failed in a multi-step test
+await expect(statusBadge, 'Status should update to Approved after step 3').toContainText('Approved');
+```
+
+
+
+> [!NOTE]
+> **Retention Layer:**
+> * **Key Idea:** Soft assertions prevent early termination, allowing subsequent independent checks to run.
+> * **Common Mistake:** Terminating an entire E2E flow because one minor UI element (like a footer link) failed an assertion.
+> * **Enterprise Application:** Validating complex, data-heavy dashboard grids where columns are evaluated independently.
+
+<CodeEditor
+  moduleId="64-adv-assertions"
+  taskIndex={0}
+  placeholder="// Task: Write polling logic that waits for an API to return 'approved' status.&#10;// Requirements:&#10;//   1. Use expect.poll() to repeatedly call the API&#10;//   2. Parse the JSON response and extract the 'status' field&#10;//   3. Assert that it eventually equals 'approved'&#10;//&#10;// Hint: expect.poll() takes an async callback and retries until it passes"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+await expect.poll(async () => {
+  const res = await request.get('/api/docs/DOC-001');
+  return (await res.json()).status;
+}).toBe('approved');
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="64-adv-assertions"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('retry billing api status', async ({ page }) => {
+  // Challenge: Poll an API status endpoint until it returns 'COMPLETED'
+  // Use expect.poll() to poll the status function.
+  
+  const getStatus = async () => {
+    const response = await page.request.get('/api/status');
+    const data = await response.json();
+    return data.status;
+  };
+
+  // Write your expect.poll block here:
+});`}
+/>
+<Quiz moduleId="adv-assertions" />
+
+
+
+export const astRules = [
+  {
+    type: "ast_callee",
+    value: "expect",
+    message: "You must use 'expect' to write web-first assertions."
+  },
+  {
+    type: "ast_forbidden_callee",
+    value: "page.waitForTimeout",
+    message: "Hardcoded waits are forbidden. Rely on auto-retrying assertions."
+  },
+  {
+    type: "ast_forbidden_callee",
+    value: "setTimeout",
+    message: "Native JS timeouts are forbidden. Rely on auto-retrying assertions."
+  }
+];

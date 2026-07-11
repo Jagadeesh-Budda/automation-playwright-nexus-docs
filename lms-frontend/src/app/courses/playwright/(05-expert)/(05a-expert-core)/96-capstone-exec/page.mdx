@@ -1,0 +1,285 @@
+﻿# 23.3: The Golden Flow (E2E)
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Orchestrate API, UI, and E-Signature
+
+## The Complete Test Suite
+
+### `tests/auth/login.spec.ts`
+
+```typescript
+import { test, expect } from '../../fixtures/baseTest';
+
+test.describe('Authentication', () => {
+  test('admin can login and access dashboard', async ({ loginPage }) => {
+    await loginPage.navigate();
+    await loginPage.loginAs('admin');
+    await expect(loginPage.dashboardHeading).toBeVisible();
+    await expect(loginPage.navMenu).toBeVisible();
+  });
+
+  test('reviewer can login and sees review queue', async ({ page, loginPage }) => {
+    await loginPage.navigate();
+    await loginPage.loginAs('reviewer');
+    await expect(page.getByRole('link', { name: 'Review Queue' })).toBeVisible();
+  });
+
+  test('invalid credentials show error', async ({ loginPage }) => {
+    await loginPage.navigate();
+    await loginPage.emailInput.fill('wrong@example.com');
+    await loginPage.passwordInput.fill('wrongpassword');
+    await loginPage.loginButton.click();
+    await expect(loginPage.errorAlert).toContainText('Invalid credentials');
+  });
+
+  test('logout redirects to login page', async ({ loginPage }) => {
+    await loginPage.navigate();
+    await loginPage.loginAs('admin');
+    await loginPage.logout();
+    await expect(loginPage.page).toHaveURL(/\/login/);
+  });
+});
+```
+
+### `tests/documents/workflow.spec.ts`
+
+```typescript
+import { test, expect } from '../../fixtures/baseTest';
+import { DocumentFactory } from '../../utils/DataFactory';
+
+test.describe('Document Review Workflow', () => {
+  let docId: string;
+
+  test.beforeEach(async ({ documentPage }) => {
+    // Create fresh document for each test
+    docId = await documentPage.createDocument(DocumentFactory());
+  });
+
+  test('full workflow: Draft → Pending → Approved', async ({
+    documentPage, reviewPage
+  }) => {
+    // Act: Submit for review
+    await documentPage.navigate();
+    await documentPage.submitForReview(docId);
+    await expect(documentPage.getStatusBadge(docId)).toContainText('Pending Review');
+
+    // Act: Approve
+    await reviewPage.navigateTo(docId);
+    await reviewPage.submitReview({ decision: 'Approve', comment: 'All sections complete' });
+    
+    // Assert
+    await documentPage.navigate();
+    await expect(documentPage.getStatusBadge(docId)).toContainText('Approved');
+  });
+
+  test('rejected documents can be resubmitted', async ({ documentPage, reviewPage }) => {
+    await documentPage.navigate();
+    await documentPage.submitForReview(docId);
+
+    await reviewPage.navigateTo(docId);
+    await reviewPage.submitReview({ decision: 'Reject', comment: 'Missing risk assessment' });
+    
+    await documentPage.navigate();
+    await expect(documentPage.getStatusBadge(docId)).toContainText('Rejected');
+    
+    // The rejected document can be resubmitted for review
+    await documentPage.submitForReview(docId);
+    await expect(documentPage.getStatusBadge(docId)).toContainText('Pending Review');
+  });
+});
+```
+
+### `tests/e-sign/signature-workflow.spec.ts`
+
+```typescript
+import { test, expect } from '../../fixtures/baseTest';
+
+test.describe('E-Sign Complete Workflow', () => {
+  test('reviewer signs and audit trail is created', async ({
+    eSignPage, auditPage
+  }) => {
+    const docId = 'CAPSTONE-TEST-DOC-001';
+    
+    // Sign the document
+    await eSignPage.openDocument(docId);
+    await eSignPage.signDocument({
+      reason: 'Reviewed per ICH E6(R2) guidelines',
+      password: process.env.REVIEWER_PASS!
+    });
+    
+    await expect(eSignPage.signatureConfirmation).toBeVisible();
+    
+    // Verify audit trail
+    await auditPage.navigateTo(docId);
+    const latest = auditPage.getLatestEntry();
+    await expect(latest.action).toContainText('Signed');
+    await expect(latest.reason).toContainText('ICH E6(R2)');
+  });
+});
+```
+
+### `tests/api/documents-api.spec.ts`
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test.describe('Documents API', () => {
+  let token: string;
+  const createdIds: string[] = [];
+  
+  test.beforeAll(async ({ request }) => {
+    let res = await request.post('/api/auth/login', {
+      data: { email: process.env.ADMIN_USER, password: process.env.ADMIN_PASS }
+    });
+    token = (await res.json()).token;
+  });
+
+  test.afterAll(async ({ request }) => {
+    await Promise.allSettled(
+      createdIds.map(id => request.delete(`/api/documents/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      }))
+    );
+  });
+
+  test('POST /api/documents creates document with status Draft', async ({ request }) => {
+    let res = await request.post('/api/documents', {
+      data: { title: 'API Test Doc', type: 'Protocol', department: 'QA' },
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    
+    expect(res.status()).toBe(201);
+    const doc = await res.json();
+    expect(doc.id).toBeDefined();
+    expect(doc.status).toBe('Draft');
+    createdIds.push(doc.id);
+  });
+
+  test('GET /api/documents returns paginated list', async ({ request }) => {
+    const res = await request.get('/api/documents?page=1&limit=10', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    
+    expect(res.status()).toBe(200);
+    const body = await res.json();
+    expect(body.data).toBeInstanceOf(Array);
+    expect(body.pagination.page).toBe(1);
+    expect(body.pagination.limit).toBe(10);
+  });
+});
+```
+
+## Running the Full Suite
+
+```bash
+# Run all Capstone tests
+npx playwright test tests/
+
+# Run with full reporting
+npx playwright test --reporter=html
+
+# View the report
+npx playwright show-report
+```
+
+<CodeEditor
+  moduleId="96-capstone-exec"
+  taskIndex={0}
+  placeholder="// Task: Write the COMPLETE Login and Document Workflow test suites.&#10;//&#10;// Requirements (ALL required — AST will verify each):&#10;//   1. test.describe() block wrapping all tests&#10;//   2. test.beforeEach() for shared setup&#10;//   3. At least one test calling loginAs() asserting dashboard visibility&#10;//   4. At least one test calling submitForReview() asserting status badge&#10;//   5. All assertions use await expect().toContainText()&#10;//   6. Zero waitForTimeout() calls&#10;//&#10;// Write both test suites in this editor."
+/>
+
+<SolutionGate moduleId="96-capstone-exec">
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('full upload workflow', async ({ loginPage, documentPage }) => {
+  await loginPage.navigate();
+  await loginPage.loginAs('admin');
+  await documentPage.navigate();
+  const id = await documentPage.createDocument({ title: 'Capstone Test' });
+  await documentPage.submitForReview(id);
+  await expect(documentPage.getStatusBadge(id)).toContainText('Pending Review');
+});
+```
+
+</SolutionGate>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="96-capstone-exec"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="capstone-exec" />
+

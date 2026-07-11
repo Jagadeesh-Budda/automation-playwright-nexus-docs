@@ -1,0 +1,1106 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T10:36:32.990Z",
+  "lessons": [
+    {
+      "id": "01-js-ts-variables",
+      "title": "0.1: Variables & Data Types",
+      "url": "courses/playwright/01-js-ts-variables",
+      "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION",
+      "level": 0,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Concept",
+        "outcome": "Understand basic JS types."
+      },
+      "objectives": [
+        {
+          "id": "js_vars",
+          "title": "Declare variables and types."
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Fixing an Assignment Error",
+          "hint": "Change const to let for the status variable",
+          "rules": [
+            {
+              "type": "ast_node",
+              "value": "VariableDeclaration",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "let currentTestStatus"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Assertion Bugs",
+          "hint": "Use strict equality === to prevent coercion bugs",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "==="
+            },
+            {
+              "type": "not_contains",
+              "value": "apiStatusCode == 404"
+            },
+            {
+              "type": "not_contains",
+              "value": "errorMessage == false"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_node",
+              "value": "VariableDeclaration",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "let currentTestStatus"
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "js_vars",
+          "weight": 100
+        }
+      ],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "const a = 10;\na = 20;",
+            "q": "What happens when this code executes?",
+            "options": [
+              "a becomes 20",
+              "TypeError: Assignment to constant variable",
+              "SyntaxError",
+              "a becomes undefined"
+            ],
+            "a": "TypeError: Assignment to constant variable",
+            "explanation": "Variables declared with const cannot be reassigned."
+          }
+        ],
+        "Medium": [],
+        "Hard": []
+      },
+      "icon": "🌱",
+      "slug": "01-js-ts-variables",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "02-js-ts-functions",
+      "title": "0.2: Functions & Scope",
+      "url": "courses/playwright/02-js-ts-functions",
+      "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION",
+      "level": 0,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Concept",
+        "outcome": "Understand JS functions."
+      },
+      "objectives": [
+        {
+          "id": "js_funcs",
+          "title": "Create functions and scopes."
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Convert to Arrow Function",
+          "hint": "Use arrow function syntax => instead of function keyword",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "=>"
+            },
+            {
+              "type": "not_contains",
+              "value": "function greetUser"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Write a Callback",
+          "hint": "Pass an inline arrow function to runAutomation",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "runAutomation"
+            },
+            {
+              "type": "contains",
+              "value": "=>"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "=>"
+            },
+            {
+              "type": "not_contains",
+              "value": "function greetUser"
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "function setup() { let token = 'abc'; }\nconsole.log(token);",
+            "q": "A junior SDET writes the following code to share an auth token. Why does the test crash?",
+            "options": [
+              "token is out of scope and cannot be accessed outside the setup function",
+              "You must use var instead of let",
+              "Playwright requires tokens to be async",
+              "console.log is forbidden in tests"
+            ],
+            "a": "token is out of scope and cannot be accessed outside the setup function",
+            "explanation": "Variables declared with `let` inside a function are block-scoped and exist only within that function."
+          },
+          {
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You have an automated test that calculates a shopping cart total. The calculation logic is copied and pasted in 4 different test blocks.",
+            "q": "How should you refactor this to prevent maintenance nightmares?",
+            "options": [
+              "Extract the calculation into a reusable utility function and pass the items as arguments",
+              "Put the calculation in a global var",
+              "Use test.step() inside each test",
+              "Ignore it, copying is faster"
+            ],
+            "a": "Extract the calculation into a reusable utility function and pass the items as arguments",
+            "explanation": "Functions allow you to encapsulate logic, making your test suites DRY (Don't Repeat Yourself)."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "const login = (user) => { \n  return user.name === 'admin'; \n}",
+            "q": "Which ES6 feature is being used here?",
+            "options": [
+              "Arrow function syntax",
+              "Immediately Invoked Function Expression (IIFE)",
+              "Generator function",
+              "Callback hell"
+            ],
+            "a": "Arrow function syntax",
+            "explanation": "Arrow functions provide a concise syntax and bind `this` lexically, which is very common in modern Playwright tests."
+          },
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You pass a callback function to `page.evaluate()` to run script inside the browser, but it throws a ReferenceError saying your test variables are undefined.",
+            "q": "Why does this happen in Playwright?",
+            "options": [
+              "The callback executes in the browser context, which cannot access your Node.js test scope variables automatically",
+              "You forgot the await keyword",
+              "You must use var instead of const",
+              "Playwright doesn't support callbacks"
+            ],
+            "a": "The callback executes in the browser context, which cannot access your Node.js test scope variables automatically",
+            "explanation": "`page.evaluate` serializes the function and sends it to the browser. It does not carry your Node.js scope with it unless you pass variables as an explicit argument."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "const createCounter = () => {\n  let count = 0;\n  return () => { count++; return count; };\n};\nconst counter1 = createCounter();\nconst counter2 = createCounter();\ncounter1();\ncounter1();",
+            "q": "What is the result of calling counter2() now, and what concept does this demonstrate?",
+            "options": [
+              "Returns 1; demonstrates Closures",
+              "Returns 3; demonstrates Global State",
+              "Returns undefined; demonstrates Lexical Scoping",
+              "Throws error; demonstrates Memory Leaks"
+            ],
+            "a": "Returns 1; demonstrates Closures",
+            "explanation": "Closures allow the inner function to remember the environment in which it was created. Each call to `createCounter` creates a new lexical environment, meaning `counter2` has its own isolated `count` starting at 0."
+          }
+        ]
+      },
+      "icon": "🌱",
+      "slug": "02-js-ts-functions",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "03-js-ts-es6",
+      "title": "0.3: Arrays & ES6",
+      "url": "courses/playwright/03-js-ts-es6",
+      "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION",
+      "level": 0,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Concept",
+        "outcome": "Understand Objects and Arrays."
+      },
+      "objectives": [
+        {
+          "id": "js_es6",
+          "title": "Destructuring and Spread."
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Challenge",
+          "hint": "Complete the code implementation",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is utilizing ES6 destructuring an important architectural pattern in Playwright configurations?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which ES6 anti-pattern causes the most memory leaks in long-running test suites?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "icon": "🌱",
+      "slug": "03-js-ts-es6",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "04-js-ts-objects",
+      "title": "0.4: Objects & Literals",
+      "url": "courses/playwright/04-js-ts-objects",
+      "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION",
+      "level": 0,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Code",
+        "outcome": "Understand object literals."
+      },
+      "objectives": [
+        {
+          "id": "00d2_js_ts_objects_obj",
+          "title": "Complete 0.4: Objects & Literals"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Test Data Objects",
+          "hint": "Create loginData and console.log(loginData.password)",
+          "rules": [
+            {
+              "type": "ast_node",
+              "value": "ObjectExpression",
+              "required": true
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_node",
+              "value": "ObjectExpression",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "const user = {\n  name: 'John',\n  role: 'admin'\n};\nconsole.log(user.password);",
+            "q": "What will be printed to the console?",
+            "options": [
+              "undefined",
+              "null",
+              "Throws a ReferenceError",
+              "'' (empty string)"
+            ],
+            "a": "undefined",
+            "explanation": "Accessing a non-existent property on a JavaScript object safely returns `undefined`, it does not throw an error."
+          },
+          {
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You are testing an API that expects a JSON payload containing user details and an address.",
+            "q": "Which data structure is the most appropriate to represent this payload in your test setup?",
+            "options": [
+              "A nested object literal",
+              "A multi-dimensional array",
+              "A comma-separated string",
+              "A Set"
+            ],
+            "a": "A nested object literal",
+            "explanation": "Object literals `{}` directly map to JSON payloads, making them the standard way to build API request bodies in JS/TS."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "const config = { timeout: 5000, headless: true };\nconst { headless } = config;",
+            "q": "What is the syntax used on the second line called?",
+            "options": [
+              "Object Destructuring",
+              "Object Spreading",
+              "Type Casting",
+              "Property Assignment"
+            ],
+            "a": "Object Destructuring",
+            "explanation": "Destructuring allows you to unpack properties directly from objects into distinct variables. This is heavily used in Playwright (e.g., `async ({ page }) => {}`)."
+          },
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You have a base configuration object, but for a specific test suite, you need to override just the `timeout` property while keeping the rest.",
+            "q": "What is the cleanest ES6 way to achieve this?",
+            "options": [
+              "Use the spread operator: const newConfig = { ...baseConfig, timeout: 10000 };",
+              "Write a for-loop to copy all properties over",
+              "Use JSON.parse(JSON.stringify(baseConfig))",
+              "Mutate the baseConfig directly"
+            ],
+            "a": "Use the spread operator: const newConfig = { ...baseConfig, timeout: 10000 };",
+            "explanation": "The spread operator `...` safely copies properties into a new object, allowing you to cleanly override specific keys without mutating the original object."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "const defaultUser = { role: 'guest', metadata: { premium: false } };\nconst testUser = { ...defaultUser };\ntestUser.metadata.premium = true;\nconsole.log(defaultUser.metadata.premium);",
+            "q": "What will the console log print, and why?",
+            "options": [
+              "true; because the spread operator only creates a shallow copy, leaving nested objects referenced.",
+              "false; because the spread operator creates a deep clone.",
+              "undefined; because metadata is stripped out.",
+              "Throws a TypeError."
+            ],
+            "a": "true; because the spread operator only creates a shallow copy, leaving nested objects referenced.",
+            "explanation": "The spread operator only shallow copies. The `metadata` object is still a shared reference. Mutating it in `testUser` mutates it in `defaultUser`, which is a common source of test pollution bugs."
+          }
+        ]
+      },
+      "icon": "🌱",
+      "slug": "04-js-ts-objects",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "05-js-ts-async",
+      "title": "0.5: Async/Await & Promises",
+      "url": "courses/playwright/05-js-ts-async",
+      "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION",
+      "level": 0,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Concept",
+        "outcome": "Understand the event loop."
+      },
+      "objectives": [
+        {
+          "id": "js_async",
+          "title": "Use async and await."
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Fix the Flaky Script",
+          "hint": "Add 'await' to simulateNetworkCall()",
+          "rules": [
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "ast_node",
+              "value": "CallExpression",
+              "required": true
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "ast_node",
+              "value": "CallExpression",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "Your test interacts with a slow loading checkout page. You write `page.click('#submit')`.",
+            "q": "Why is the test failing unpredictably on CI but passing locally?",
+            "options": [
+              "You forgot the 'await' keyword, so the script isn't waiting for the click promise to resolve before moving to assertions",
+              "The CI server needs more RAM",
+              "You must use a callback",
+              "The click function is synchronous in Playwright"
+            ],
+            "a": "You forgot the 'await' keyword, so the script isn't waiting for the click promise to resolve before moving to assertions",
+            "explanation": "Nearly all Playwright actions are asynchronous Promises. Without `await`, Node.js instantly moves to the next line of code, causing race conditions."
+          },
+          {
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "async function getData() {\n  return 'done';\n}\nconst result = getData();",
+            "q": "What is the value of `result`?",
+            "options": [
+              "A Promise object",
+              "'done'",
+              "undefined",
+              "null"
+            ],
+            "a": "A Promise object",
+            "explanation": "Any function marked as `async` always returns a Promise, even if you explicitly return a string. You must `await` the function call to get the string."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "try {\n  await page.locator('.flaky').click({ timeout: 1000 });\n} catch (e) {\n  console.log('Handled!');\n}",
+            "q": "If the locator is not found within 1 second, what happens to the test execution?",
+            "options": [
+              "The test passes and logs 'Handled!'",
+              "The test crashes immediately",
+              "Playwright automatically retries",
+              "The test hangs forever"
+            ],
+            "a": "The test passes and logs 'Handled!'",
+            "explanation": "The `try/catch` block intercepts the Promise rejection. Since the error is caught and not re-thrown, the test runner considers the execution successful."
+          },
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You need to fetch data from three independent APIs to set up your test data. Calling them one by one takes 9 seconds.",
+            "q": "How can you optimize this setup phase?",
+            "options": [
+              "Use Promise.all() to trigger all three requests concurrently",
+              "Use a generic setTimeout to skip waiting",
+              "Combine them into a single synchronous loop",
+              "You cannot optimize it; Promises must run in order"
+            ],
+            "a": "Use Promise.all() to trigger all three requests concurrently",
+            "explanation": "`Promise.all()` allows multiple asynchronous operations to execute in parallel, resolving only when all of them have finished, massively reducing test execution time."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "[1, 2, 3].forEach(async (id) => {\n  await page.goto(`/item/${id}`);\n});\nawait expect(page.locator('.header')).toBeVisible();",
+            "q": "Why is this code a dangerous anti-pattern?",
+            "options": [
+              "Array.forEach does not wait for async callbacks, so the assertion runs immediately before the navigations finish",
+              "Playwright forbids navigating in loops",
+              "The await inside forEach causes a syntax error",
+              "It creates an infinite loop"
+            ],
+            "a": "Array.forEach does not wait for async callbacks, so the assertion runs immediately before the navigations finish",
+            "explanation": "`forEach` is synchronous and ignores promises returned by its callback. To run async operations in sequence, you must use a standard `for...of` loop."
+          }
+        ]
+      },
+      "icon": "🌱",
+      "slug": "05-js-ts-async",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "06-js-ts-dom",
+      "title": "0.6: DOM & HTML Basics",
+      "url": "courses/playwright/06-js-ts-dom",
+      "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION",
+      "level": 0,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Concept",
+        "outcome": "Understand the DOM."
+      },
+      "objectives": [
+        {
+          "id": "js_dom",
+          "title": "HTML and CSS selectors."
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Challenge",
+          "hint": "Complete the code implementation",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You are analyzing a webpage to write locators. You notice an element: `<button id='submit-btn' class='primary-btn active'>Submit</button>`",
+            "q": "Which CSS selector safely targets this button by its unique ID?",
+            "options": [
+              "#submit-btn",
+              ".submit-btn",
+              "button[class='submit']",
+              "div#submit-btn"
+            ],
+            "a": "#submit-btn",
+            "explanation": "The `#` symbol is the CSS selector prefix for matching an HTML element's `id` attribute."
+          },
+          {
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "const buttons = document.querySelectorAll('.btn');",
+            "q": "In the browser DOM API, what does this method return?",
+            "options": [
+              "A NodeList containing all elements with the class 'btn'",
+              "Just the first button",
+              "An array of strings",
+              "A Playwright Locator"
+            ],
+            "a": "A NodeList containing all elements with the class 'btn'",
+            "explanation": "`querySelectorAll` returns a collection of all matching DOM elements, unlike `querySelector` which only returns the first match."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "The application uses deeply nested HTML. You want to target a span inside a div with class 'container', but there are many spans on the page.",
+            "q": "Which CSS combinator selects only the spans that are direct children of the container?",
+            "options": [
+              ".container > span",
+              ".container span",
+              ".container + span",
+              ".container ~ span"
+            ],
+            "a": ".container > span",
+            "explanation": "The `>` symbol is the child combinator, strictly matching elements that are direct children of the parent. A space ' ' matches any descendant."
+          },
+          {
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "You are inspecting a legacy application that doesn't use IDs. You need to identify reliable attributes to build your locators.",
+            "q": "Which of the following HTML attributes are generally safe and resilient choices for test automation? (Select all that apply)",
+            "options": [
+              "data-testid",
+              "aria-label",
+              "class (e.g., 'hover-state-active')",
+              "style (e.g., 'color: red')"
+            ],
+            "a": [
+              "data-testid",
+              "aria-label"
+            ],
+            "explanation": "`data-testid` is specifically designed for testing, and `aria-label` ensures accessibility. Classes and styles are tied to CSS and change constantly, making them brittle."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "const element = document.querySelector('input[name=\"email\"]');\nelement.dispatchEvent(new Event('change'));",
+            "q": "Why might a Playwright engineer need to understand this raw DOM event dispatching?",
+            "options": [
+              "To force a framework like React/Angular to detect a state change if a standard page.fill() fails to trigger the framework's synthetic events",
+              "Because Playwright doesn't have a fill method",
+              "To bypass network cors issues",
+              "To speed up execution time"
+            ],
+            "a": "To force a framework like React/Angular to detect a state change if a standard page.fill() fails to trigger the framework's synthetic events",
+            "explanation": "Sometimes complex SPAs listen to specific DOM events. If Playwright's native actions don't trigger the exact event chain the SPA expects, an SDET can use `page.evaluate` to dispatch raw DOM events."
+          }
+        ]
+      },
+      "icon": "🌱",
+      "slug": "06-js-ts-dom",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "07-js-ts-lite",
+      "title": "0.7: TypeScript Lite",
+      "url": "courses/playwright/07-js-ts-lite",
+      "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION",
+      "level": 0,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Code",
+        "outcome": "Recognize interfaces, types, and classes."
+      },
+      "objectives": [
+        {
+          "id": "00f3_js_ts_lite_obj",
+          "title": "Complete 0.7: TypeScript Lite"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Find the TypeScript Bug",
+          "hint": "Fix the compile error by passing the correct types",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "interface"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "interface"
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You are writing a TypeScript test. You define a variable: `let count = 5;`",
+            "q": "If you try to write `count = 'ten';` on the next line, what happens?",
+            "options": [
+              "TypeScript throws a compiler error because 'count' was implicitly typed as a number",
+              "It successfully changes the type to a string",
+              "Playwright crashes at runtime",
+              "The variable becomes undefined"
+            ],
+            "a": "TypeScript throws a compiler error because 'count' was implicitly typed as a number",
+            "explanation": "TypeScript uses Type Inference. Since you assigned an integer initially, it locked the variable type to `number`."
+          },
+          {
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "function greet(name: string) {\n  return `Hello, ${name}`;\n}",
+            "q": "What does the `: string` syntax achieve?",
+            "options": [
+              "It guarantees that anyone calling this function must pass a string argument, catching bugs before the code runs",
+              "It casts whatever is passed into a string",
+              "It is just a comment for the developer",
+              "It makes the function run synchronously"
+            ],
+            "a": "It guarantees that anyone calling this function must pass a string argument, catching bugs before the code runs",
+            "explanation": "Type annotations act as a strict contract, allowing the TypeScript compiler to reject invalid inputs during development."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You are building a fixture that passes test data to your test blocks. The data object must contain an email, but the phone number is optional.",
+            "q": "How do you define an optional property in a TypeScript Interface?",
+            "options": [
+              "phone?: string",
+              "phone: string | null",
+              "phone!: string",
+              "optional phone: string"
+            ],
+            "a": "phone?: string",
+            "explanation": "The `?` operator marks a property as optional, meaning the object is perfectly valid whether the property exists or is omitted entirely."
+          },
+          {
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "interface UserResponse {\n  id: number;\n  status: 'active' | 'banned';\n}",
+            "q": "What is the technical term for the `'active' | 'banned'` syntax?",
+            "options": [
+              "String Literal Union Type",
+              "Enum",
+              "Tuple",
+              "Any Array"
+            ],
+            "a": "String Literal Union Type",
+            "explanation": "This restricts the string to strictly exact allowed values, providing powerful autocomplete and catching typos instantly."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You are mocking an API response using `page.route()`. You want to type-cast the raw JSON response object to your strict `OrderPayload` interface so you get autocomplete.",
+            "q": "Which syntax allows you to explicitly tell the TypeScript compiler the type of an untyped variable?",
+            "options": [
+              "const data = json as OrderPayload;",
+              "const data = typeof OrderPayload(json);",
+              "const data = convert<OrderPayload>(json);",
+              "const data: OrderPayload;"
+            ],
+            "a": "const data = json as OrderPayload;",
+            "explanation": "The `as` keyword performs Type Assertion, telling the compiler 'trust me, I know this raw JSON fits this interface shape'."
+          }
+        ]
+      },
+      "icon": "🌱",
+      "slug": "07-js-ts-lite",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "08-js-ts-control-flow",
+      "title": "0.8: Control Flow & Error Handling",
+      "url": "courses/playwright/08-js-ts-control-flow",
+      "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION",
+      "level": 0,
+      "weight": 5,
+      "meta": {
+        "time": "20 mins",
+        "type": "Concept",
+        "outcome": "Master if/else, switch, and try/catch blocks."
+      },
+      "objectives": [
+        {
+          "id": "js_control_flow",
+          "title": "Handle conditional logic and errors."
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Challenge",
+          "hint": "Complete the code implementation",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is proper error handling (try/catch) an important architectural pattern in robust test design?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which control-flow anti-pattern leads to silent test failures that report as 'Passed'?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "icon": "🌱",
+      "slug": "08-js-ts-control-flow",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "09-js-ts-modules",
+      "title": "0.9: ES Modules & Imports",
+      "url": "courses/playwright/09-js-ts-modules",
+      "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION",
+      "level": 0,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Concept",
+        "outcome": "Understand import, export, and module scope."
+      },
+      "objectives": [
+        {
+          "id": "js_modules",
+          "title": "Share code between files using ES Modules."
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Challenge",
+          "hint": "Complete the code implementation",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is ES Module isolation an important architectural pattern for test parallelization?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which module-scoping anti-pattern destroys Playwright's parallel worker isolation?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "icon": "🌱",
+      "slug": "09-js-ts-modules",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    }
+  ]
+}

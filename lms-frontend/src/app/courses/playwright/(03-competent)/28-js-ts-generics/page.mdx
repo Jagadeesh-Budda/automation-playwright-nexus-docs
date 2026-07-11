@@ -1,0 +1,303 @@
+﻿
+
+# Pre-5: TypeScript Generics Deep Dive
+
+
+In Module 0.6, you learned Interfaces, Types, and Classes. You can now *read* TypeScript code. But throughout this course, you'll encounter patterns like `Factory<T>`, `test.extend<Fixtures>()`, and `Map<string, string[]>` — code that uses **Generics**.
+
+This module teaches you to *create* generics, not just consume them.
+
+---
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Author generic functions and use built-in utility types.
+
+## 1. The Problem Generics Solve
+
+Imagine you write a function that wraps any value in an array:
+
+```typescript
+function wrapInArray(value: string): string[] {
+  return [value];
+}
+```
+
+This works for strings. But what if you need to wrap a number? Or a User object?
+
+```typescript
+// ❌ Do you duplicate the function for every type?
+function wrapStringInArray(value: string): string[] { return [value]; }
+function wrapNumberInArray(value: number): number[] { return [value]; }
+function wrapUserInArray(value: User): User[] { return [value]; }
+```
+
+This is unmaintainable. You could use `any`, but that destroys type safety:
+
+```typescript
+// ❌ Works, but TypeScript can't help you anymore
+function wrapInArray(value: any): any[] {
+  return [value];
+}
+
+const result = wrapInArray("hello");
+result.push(42); // No error! TypeScript lost track of the type
+```
+
+**Generics** solve this by letting you write ONE function that works for ANY type, while keeping full type safety.
+
+---
+
+## 2. Your First Generic Function
+
+The syntax uses angle brackets `<T>` to declare a **type parameter**. Think of `T` as a variable, but for types instead of values.
+
+```typescript
+function wrapInArray<T>(value: T): T[] {
+  return [value];
+}
+```
+
+When you call this function, TypeScript **infers** `T` from the argument:
+
+```typescript
+const strings = wrapInArray("hello");  // T = string → returns string[]
+const numbers = wrapInArray(42);       // T = number → returns number[]
+const users = wrapInArray({ name: "Alice" }); // T = { name: string } → returns { name: string }[]
+
+// TypeScript now catches errors:
+strings.push(42); // ❌ Error: number is not assignable to string
+```
+
+### The Arrow Function Version
+
+Since we use arrow functions everywhere in this course:
+
+```typescript
+const wrapInArray = <T>(value: T): T[] => [value];
+```
+
+> [!TIP]
+> `T` is just a convention. You could use `<Item>`, `<Data>`, or `<Payload>`. But single letters like `T` (Type), `K` (Key), `V` (Value), and `U` (second type) are standard in the TypeScript community.
+
+---
+
+## 3. Multiple Type Parameters
+
+Sometimes you need two different type parameters. For example, a function that pairs two values:
+
+```typescript
+const makePair = <A, B>(first: A, second: B): [A, B] => {
+  return [first, second];
+};
+
+const pair = makePair("status", 200); // → [string, number]
+```
+
+This is exactly how `Map<K, V>` works internally — it takes a Key type and a Value type.
+
+---
+
+## 4. Generic Constraints
+
+What if your generic function needs to access a property on `T`? You can't just assume `T` has a `.length` property:
+
+```typescript
+// ❌ Error: Property 'length' does not exist on type 'T'
+const getLength = <T>(item: T): number => item.length;
+```
+
+Use `extends` to **constrain** what `T` can be:
+
+```typescript
+// ✅ T must have a 'length' property
+const getLength = <T extends { length: number }>(item: T): number => {
+  return item.length;
+};
+
+getLength("hello");     // ✅ string has length
+getLength([1, 2, 3]);   // ✅ array has length
+getLength(42);          // ❌ Error: number doesn't have length
+```
+
+---
+
+## 5. Generic Interfaces
+
+You can make interfaces generic too. This is how you'll type API responses throughout the course:
+
+```typescript
+interface ApiResponse<T> {
+  data: T;
+  status: number;
+  error?: string;
+}
+
+// Usage:
+const userResponse: ApiResponse<User> = {
+  data: { id: "1", name: "Alice", role: "admin" },
+  status: 200,
+};
+
+const docResponse: ApiResponse<Document[]> = {
+  data: [{ id: "DOC-001", title: "Protocol" }],
+  status: 200,
+};
+```
+
+Notice how `ApiResponse<User>` and `ApiResponse<Document[]>` are completely different types, but they share the same structure. **One interface, infinite type safety.**
+
+---
+
+## 6. Built-in Utility Types
+
+TypeScript ships with powerful generic utility types. You'll see these constantly in Playwright code:
+
+### `Partial<T>` — Make all properties optional
+
+```typescript
+interface User {
+  name: string;
+  email: string;
+  role: string;
+}
+
+// All properties become optional
+type UserUpdate = Partial<User>;
+// Equivalent to: { name?: string; email?: string; role?: string; }
+```
+
+### `Pick<T, K>` — Select specific properties
+
+```typescript
+type UserCredentials = Pick<User, 'email' | 'role'>;
+// Equivalent to: { email: string; role: string; }
+```
+
+### `Omit<T, K>` — Remove specific properties
+
+```typescript
+type UserWithoutRole = Omit<User, 'role'>;
+// Equivalent to: { name: string; email: string; }
+```
+
+### `Record<K, V>` — Create a typed dictionary
+
+```typescript
+type StatusMap = Record<string, number>;
+// Equivalent to: { [key: string]: number }
+
+const httpCodes: StatusMap = {
+  ok: 200,
+  created: 201,
+  forbidden: 403,
+};
+```
+
+### Composing Utility Types
+
+These compose together. This pattern appears in Data Factories throughout the course:
+
+```typescript
+// "Give me some optional fields from User, but only name and email"
+type UserOverrides = Partial<Pick<User, 'name' | 'email'>>;
+```
+
+---
+
+## 7. The Factory Pattern (Why This Matters for Playwright)
+
+Here is the exact pattern you'll use in Module 55 (Data Factory):
+
+```typescript
+type Factory<T> = (overrides?: Partial<T>) => T;
+```
+
+This reads as: *"A Factory is a function that optionally accepts a partial version of T, and returns a full T."*
+
+Let's build one:
+
+```typescript
+interface Document {
+  id: string;
+  title: string;
+  type: string;
+  status: string;
+}
+
+const createDocument: Factory<Document> = (overrides = {}) => ({
+  id: `DOC-${Date.now()}`,
+  title: 'Default Title',
+  type: 'Protocol',
+  status: 'Draft',
+  ...overrides,
+});
+
+// Usage:
+const doc1 = createDocument();                        // All defaults
+const doc2 = createDocument({ title: 'My Protocol' }); // Override just title
+const doc3 = createDocument({ status: 'Approved', type: 'SOP' }); // Override two fields
+```
+
+Every property is type-checked. If you try `createDocument({ status: 123 })`, TypeScript catches it immediately.
+
+---
+
+## 8. Interactive Challenge: Build a Generic API Response Parser
+
+<CodeEditor
+  moduleId="28-js-ts-generics"
+  taskIndex={0}
+  placeholder={`// Your task: Write a generic function called 'parseResponse'
+// that takes a raw JSON object and returns a typed ApiResponse<T>.
+//
+// Requirements:
+//   1. Define an interface ApiResponse<T> with: data (T), status (number), error (optional string)
+//   2. Write a function parseResponse<T> that takes an 'unknown' parameter
+//   3. Cast it to ApiResponse<T> and return it
+//
+// Then call it:
+//   const result = parseResponse<{ name: string }>({ data: { name: "Alice" }, status: 200 });
+//   console.log(result.data.name);
+
+// Write your code below:
+`}
+/>
+
+---
+
+## 9. How This Connects to Playwright
+
+Every major Playwright pattern uses generics. Now you know what they mean:
+
+| Pattern | What The Generic Does |
+|---------|----------------------|
+| `test.extend<MyFixtures>()` | Tells TypeScript which fixtures your tests can destructure |
+| `Factory<Document>` | Creates a type-safe data generator for Documents |
+| `Map<string, string[]>` | A dictionary mapping string keys to arrays of strings |
+| `Partial<User>` | Makes all User properties optional (for overrides) |
+| `APIResponse<Document>` | Types the `.json()` return value of an API call |
+
+---
+
+## Common Mistakes
+
+- **Hardcoding Waits**: Using `page.waitForTimeout()` instead of waiting for an element's state.
+- **Overly Broad Locators**: Using generic CSS selectors like `.button` that might break if multiple buttons are added. Always prefer user-facing attributes like `getByRole`.
+- **Ignoring Errors**: Catching errors in try/catch blocks without failing the test or logging the reason.
+
+
+## Summary
+
+1. **Generics** (`<T>`) let you write functions and interfaces that work with any type while keeping full type safety.
+2. **Constraints** (`<T extends ...>`) limit what types are allowed.
+3. **Utility Types** (`Partial<T>`, `Pick<T, K>`, `Omit<T, K>`, `Record<K, V>`) transform existing types.
+4. The **Factory Pattern** (`(overrides?: Partial<T>) => T`) is the foundation of test data generation in enterprise Playwright.
+
+You are now equipped to both *read* and *write* generic TypeScript — a skill that separates junior automation engineers from senior ones.
+
+**Proceed to Module 0.7: Control Flow & Error Handling.**
+
+
+<Quiz moduleId="28-js-ts-generics" />

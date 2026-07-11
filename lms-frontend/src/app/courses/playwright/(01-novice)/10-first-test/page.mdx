@@ -1,0 +1,209 @@
+﻿
+# 1.1: Your First Test
+
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Complete 1.1: Your First Test
+
+## The Goal
+
+We are going to start from a completely empty folder and end with a running, passing automated test. 
+
+No templates. No magic. Just you and the framework.
+
+## Step 1: Initialize Playwright
+
+In your terminal, create a new folder and move into it:
+
+```bash
+mkdir my-first-tests
+cd my-first-tests
+```
+
+Now, tell NPM to download and set up Playwright:
+
+> **Note:** NPM (Node Package Manager) is the tool that downloads JavaScript libraries from the internet.
+
+```bash
+npm init playwright@latest
+```
+
+Playwright will ask you a few setup questions. For now, press **Enter** to accept the default for everything:
+- Use TypeScript? Yes.
+- Where to put tests? `tests`
+- Add a GitHub Actions workflow? False
+- Install Playwright browsers? Yes
+
+## Step 2: Look at What Was Created
+
+Open the folder in VS Code. You'll see a few new files:
+
+1. **`package.json`**: This keeps track of the fact that your project depends on `@playwright/test`.
+2. **`playwright.config.ts`**: The main settings file (we will ignore this for now).
+3. **`tests/example.spec.ts`**: An example test file created for you.
+
+Go ahead and **delete `tests/example.spec.ts`**. We are going to write our own.
+
+## Step 3: Write Your First Test
+
+Create a new file called `tests/my-first.spec.ts`.
+
+Type (don't copy-paste) the following code:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('my very first test', async ({ page }) => {
+  // 1. Go to the Playwright website
+  await page.goto('https://playwright.dev');
+
+  // 2. Expect the title to contain "Playwright"
+  await expect(page).toHaveTitle(/Playwright/);
+});
+```
+
+### Breaking it down:
+- `import { test, expect }` — We bring in the two most important tools from Playwright. `test` lets us define a test block. `expect` lets us verify things.
+- `async ({ page })` — Playwright gives every test a fresh, isolated `page` object (a browser tab). Because browser actions take time, we must use `async`/`await`.
+- `page.goto()` — Navigates the browser to a URL.
+- `expect().toHaveTitle()` — An assertion. It checks if the page title matches what we want.
+
+## Step 4: Run It!
+
+In your terminal, run:
+
+```bash
+npx playwright test
+```
+
+You should see an output like this:
+
+```
+Running 3 tests using 3 workers
+  3 passed (2.1s)
+```
+
+**Congratulations! You just ran your first automated test.** ✅
+
+Wait, why did it say 3 tests passed when we only wrote one? By default, Playwright runs your test across 3 different browsers (Chromium, Firefox, and WebKit) at the same time.
+
+## Step 5: Read the Report
+
+To see a beautiful HTML breakdown of what just happened, run:
+
+```bash
+npx playwright show-report
+```
+
+A browser window will open showing your test results, how long each step took, and which browsers were used.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Forgetting await**  
+> **Wrong:** `page.goto('https://playwright.dev');`  
+> **Correct:** `await page.goto('https://playwright.dev');`  
+> **Why:** Browser actions are asynchronous. Without `await`, the test will finish before the page even loads!
+
+> [!WARNING]
+> **Mistake 2: String vs Regex in Title Assertion**  
+> **Wrong:** `await expect(page).toHaveTitle('Playwright');`  
+> **Correct:** `await expect(page).toHaveTitle(/Playwright/);`  
+> **Why:** If the actual title is "Fast and reliable end-to-end testing for modern web apps | Playwright", the exact string check will fail. The regex `/Playwright/` checks if it *contains* the word.
+
+> [!WARNING]
+> **Mistake 3: Skipping Browser Installation**  
+> **Wrong:** Running `npx playwright test` immediately after cloning a repo without installing browsers.  
+> **Correct:** Run `npx playwright install` first.  
+> **Why:** Playwright downloads its own custom browser binaries. Without them, it cannot launch the browsers.
+
+---
+
+## Practice Exercise
+
+<CodeEditor
+  moduleId="10-first-test"
+  taskIndex={0}
+  placeholder={`// Write a test that navigates to https://playwright.dev \n// and asserts the page title contains "Playwright"\n`}
+/>
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** We need to verify that the documentation page is working correctly.
+
+**Your Task:** Write a second test in the same file that navigates to `https://playwright.dev/docs/intro` and verifies the heading text says 'Installation'.
+
+**Constraints:**
+- ✅ You MUST use a web-first assertion like `expect(locator).toHaveText()`
+- ✅ Both tests must run successfully
+
+<CodeEditor
+  moduleId="10-first-test"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('has title', async ({ page }) => {
+  await page.goto('https://playwright.dev/');
+  await expect(page).toHaveTitle(/Playwright/);
+});
+
+test('verify docs heading', async ({ page }) => {
+  await page.goto('https://playwright.dev/docs/intro');
+  // We use getByRole('heading') which is the best practice for finding headers
+  await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();
+});
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Initialization | `npm init playwright@latest` sets up the entire framework in seconds |
+| `test` and `expect` | The two foundational tools you will use in every single test |
+| Test Execution | Running `npx playwright test` executes tests in parallel across browsers |
+| HTML Report | Provides a beautiful breakdown of test results and failures |
+
+> [!TIP]
+> **Next Step:** Proceed to the Locators module to learn how to interact with specific elements on the page.
+
+<Quiz moduleId="10-first-test" />
+
+
+export const astRules = [
+  {
+    type: "ast_forbidden_callee",
+    value: "page.waitForTimeout",
+    message: "Use auto-retrying assertions or web-first locators instead of hardcoded waits."
+  }
+];

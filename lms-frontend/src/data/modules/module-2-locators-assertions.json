@@ -1,0 +1,380 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T10:36:32.990Z",
+  "lessons": [
+    {
+      "id": "15-getbyrole",
+      "title": "2.1: getByRole & Friends",
+      "url": "courses/playwright/15-getbyrole",
+      "group": "🔍 MODULE 2: LOCATORS & ASSERTIONS",
+      "level": 2,
+      "weight": 5,
+      "meta": {
+        "time": "20 mins",
+        "type": "Code",
+        "outcome": "Use semantic locators."
+      },
+      "objectives": [
+        {
+          "id": "02a_getbyrole_obj",
+          "title": "Complete 2.1: getByRole & Friends"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Find Elements by Role",
+          "hint": "await page.getByRole('button', { name: 'Submit' }).click();",
+          "rules": [
+            {
+              "type": "ast_callee",
+              "value": "page.getByRole",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_callee",
+              "value": "page.getByRole",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is favoring ARIA roles over CSS selectors an important architectural pattern for test resilience?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which accessibility-selector anti-pattern causes tests to fail in different languages?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "icon": "🔍",
+      "slug": "15-getbyrole",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "16-assertions-deep",
+      "title": "2.2: Assertions Deep Dive",
+      "url": "courses/playwright/16-assertions-deep",
+      "group": "🔍 MODULE 2: LOCATORS & ASSERTIONS",
+      "level": 2,
+      "weight": 5,
+      "meta": {
+        "time": "20 mins",
+        "type": "Code",
+        "outcome": "Master expect matchers."
+      },
+      "objectives": [
+        {
+          "id": "02b_assertions_deep_obj",
+          "title": "Complete 2.2: Assertions Deep Dive"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Challenge",
+          "hint": "Complete the code implementation",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is using web-first assertions an important architectural pattern compared to static boolean checks?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which assertion anti-pattern completely disables Playwright's auto-retrying mechanism?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "icon": "🔍",
+      "slug": "16-assertions-deep",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "17-dynamic-elements",
+      "title": "2.3: Dynamic Elements",
+      "url": "courses/playwright/17-dynamic-elements",
+      "group": "🔍 MODULE 2: LOCATORS & ASSERTIONS",
+      "level": 2,
+      "weight": 5,
+      "meta": {
+        "time": "20 mins",
+        "type": "Code",
+        "outcome": "Work with lists and tables."
+      },
+      "objectives": [
+        {
+          "id": "02c_dynamic_elements_obj",
+          "title": "Complete 2.3: Dynamic Elements"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Challenge",
+          "hint": "Complete the code implementation",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is avoiding hardcoded indices (.nth(0)) an important architectural pattern for dynamic UIs?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which dynamic element anti-pattern guarantees flaky tests during A/B testing?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "icon": "🔍",
+      "slug": "17-dynamic-elements",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "18-strict-mode",
+      "title": "2.4: Strict Mode & Debugging Basics",
+      "url": "courses/playwright/18-strict-mode",
+      "group": "🔍 MODULE 2: LOCATORS & ASSERTIONS",
+      "level": 2,
+      "weight": 5,
+      "meta": {
+        "time": "20 mins",
+        "type": "Code",
+        "outcome": "Fix ambiguous locators."
+      },
+      "objectives": [
+        {
+          "id": "02d_strict_mode_obj",
+          "title": "Complete 2.4: Strict Mode & Debugging Basics"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "02d_strict_mode_obj",
+          "weight": 100
+        }
+      ],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "mcq",
+            "difficulty": "easy",
+            "q": "What does a 'strict mode violation' mean in Playwright?",
+            "options": [
+              "A locator matched more than one element",
+              "A locator matched zero elements",
+              "The code has a TypeScript syntax error",
+              "The element is not visible"
+            ],
+            "a": "A locator matched more than one element",
+            "explanation": "Playwright enforces strict mode by default, throwing an error if a locator resolves to multiple elements instead of one."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "await page.locator('button').click();",
+            "q": "If there are 3 buttons on the page, what will Playwright do when this line executes?",
+            "options": [
+              "It will throw a strict mode violation error because the locator resolved to multiple elements.",
+              "It will automatically click the first button it finds.",
+              "It will click all 3 buttons simultaneously.",
+              "It will wait 30 seconds for 2 of the buttons to disappear."
+            ],
+            "a": "It will throw a strict mode violation error because the locator resolved to multiple elements.",
+            "explanation": "Unlike Selenium or Cypress which default to the 'first' element, Playwright enforces strict mode for actions. If an action locator is ambiguous, it intentionally throws an error to prevent accidental interactions with the wrong element."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "await page.locator('div').filter({ hasText: 'Submit' }).click();",
+            "q": "Why might this specific locator approach still trigger a strict mode violation on a complex web page?",
+            "options": [
+              "Because hasText matches substrings. If the page contains nested divs (e.g. a container div holding the button div), both the parent and child div contain the text, returning multiple elements.",
+              "Because filter() is an asynchronous function that must be awaited.",
+              "Because hasText is case-sensitive and 'Submit' might be lowercase.",
+              "Because you cannot chain .click() directly after .filter()."
+            ],
+            "a": "Because hasText matches substrings. If the page contains nested divs (e.g. a container div holding the button div), both the parent and child div contain the text, returning multiple elements.",
+            "explanation": "Text filters match the entire subtree. If a <div class=\"container\"> wraps a <div class=\"btn\">Submit</div>, Playwright sees that BOTH divs contain the text 'Submit', leading to an ambiguous locator error."
+          }
+        ]
+      },
+      "icon": "🔍",
+      "slug": "18-strict-mode",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    }
+  ]
+}

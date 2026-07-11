@@ -1,0 +1,183 @@
+﻿
+
+# 0.9: ES Modules & Imports
+
+Enterprise automation repositories contain hundreds or thousands of files. You cannot put all your tests, configurations, database helpers, and Page Object Models into a single `page.mdx` file.
+
+You must split your code into multiple files. But how does File A communicate with File B?
+
+The answer is **ES Modules (ECMAScript Modules)**.
+
+---
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Share code between files using ES Modules.
+
+## 1. What is a Module?
+
+In modern JavaScript (and TypeScript), every single file is considered a "Module". 
+
+By default, everything inside a module is **strictly private**. If you create a variable `const url = "app.com"` in `file1.js`, `file2.js` absolutely cannot see it. The variable is locked inside the scope of `file1.js`.
+
+To share code, you must explicitly **Export** it from one file, and explicitly **Import** it into another.
+
+---
+
+## 2. Named Exports
+
+A "Named Export" allows you to export multiple specific functions, variables, or classes from a single file. You simply put the word `export` in front of the declaration.
+
+### The Origin File: `utils.js`
+```javascript
+// We attach 'export' to make these available to other files
+export const TIMEOUT_MS = 30000;
+
+export const calculateRetry = () => {
+  console.log("Calculating...");
+};
+
+// This variable does NOT have 'export'. It is strictly private to utils.js!
+const secretKey = "12345"; 
+```
+
+### The Consumer File: `test.spec.js`
+To use those exported items, we use the `import` keyword followed by curly braces `{}`. **The names inside the curly braces must match exactly.**
+
+```javascript
+// We import the specific items we need from utils.js
+import { TIMEOUT_MS, calculateRetry } from './utils.js';
+
+console.log(TIMEOUT_MS); // 30000
+calculateRetry();
+```
+
+> [!TIP]
+> Notice the `{}`? This is exactly the same syntax as Object Destructuring! We are essentially destructuring the `utils.js` file to pull out exactly what we need.
+
+---
+
+## 3. Default Exports
+
+Sometimes a file only has ONE major thing it wants to export (like a single Class representing a Page Object). For this, we use `export default`.
+
+A file can have many Named Exports, but it can only have **one** Default Export.
+
+### The Origin File: `LoginPage.js`
+```javascript
+class LoginPage {
+  constructor() {
+    this.url = '/login';
+  }
+}
+
+// We declare that LoginPage is the primary, default export of this entire file
+export default LoginPage;
+```
+
+### The Consumer File: `test.spec.js`
+When importing a default export, you do **NOT** use curly braces `{}`. Furthermore, you can name it whatever you want when you import it (though keeping the name identical is best practice).
+
+```javascript
+// No curly braces!
+import LoginPage from './LoginPage.js';
+
+const login = new LoginPage();
+```
+
+---
+
+## 4. The Playwright Import Signature
+
+Every single Playwright test file you ever write will begin with the exact same line of code:
+
+```typescript
+import { test, expect } from '@playwright/test';
+```
+
+Now that you understand ES Modules, you know exactly what this line is doing:
+1. It is looking inside the `node_modules/@playwright/test` library.
+2. It is finding the **Named Exports** called `test` (the test runner function) and `expect` (the assertion library).
+3. It is importing them into your current file so you can use them.
+
+---
+
+## 5. Interactive Challenge: Fix the Import
+
+Below is a simulated scenario where a developer is trying to import a helper function, but they used the wrong syntax. 
+
+**Your Task:** Fix the `import` statement so the code executes successfully. Look closely at how the function was exported!
+
+<CodeEditor
+  moduleId="09-js-ts-modules"
+  taskIndex={0}
+  placeholder={`// --- SIMULATED FILE: math.js ---\n// export const addNumbers = (a, b) => a + b;\n\n// --- CURRENT FILE: test.js ---\n// BUG: The developer imported a NAMED export without curly braces!\nimport addNumbers from './math.js';\n\n// Fix the import statement above to make this work:\nconst result = addNumbers(5, 10);\nconsole.log(result);`}
+/>
+
+---
+
+## Summary
+1. Every file in JS/TS is a **Module**. Variables inside are private by default.
+2. Use **`export const ...`** to share multiple items (Named Exports). Import them using curly braces `{}`.
+3. Use **`export default ...`** to share a single primary item (like a Class). Import without curly braces.
+4. The first line of every Playwright test uses a Named Import to grab the `test` and `expect` tools from the Playwright library.
+
+In the final module of the Bridge Course, we will answer the biggest question: *Where do libraries like Playwright actually come from?* Welcome to Node.js and NPM.
+
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="09-js-ts-modules"
+  taskIndex={1}
+  placeholder={`// Challenge: Refactor and correct the code below
+// 1. Declare variables using let or const (avoid var)
+// 2. Ensure syntax is valid and logic is clean
+
+var status = "active";
+console.log("Status: " + status);`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="09-js-ts-modules" />

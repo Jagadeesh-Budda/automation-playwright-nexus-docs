@@ -1,0 +1,9 @@
+
+=======================================
+         QUIZ VALIDATION REPORT        
+=======================================
+Total Quizzes Found: 0
+Passed Quizzes:      0
+Failed Quizzes:      0
+
+=======================================

@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T10:36:32.990Z",
+  "lessons": [
+    {
+      "id": "116-template-api",
+      "title": "22.1: API Framework Boilerplate",
+      "group": "📦 MODULE 22: ENTERPRISE TEMPLATES",
+      "isPro": false,
+      "meta": {
+        "time": "25 mins"
+      },
+      "slug": "116-template-api",
+      "url": "courses/playwright/116-template-api",
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "reference",
+      "optional": true,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET",
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Practice",
+          "hint": "Complete the practice task",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "117-template-hybrid",
+      "title": "22.2: Hybrid E2E Boilerplate",
+      "group": "📦 MODULE 22: ENTERPRISE TEMPLATES",
+      "isPro": false,
+      "meta": {
+        "time": "25 mins"
+      },
+      "slug": "117-template-hybrid",
+      "url": "courses/playwright/117-template-hybrid",
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "reference",
+      "optional": true,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET",
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Practice",
+          "hint": "Complete the practice task",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "118-template-reporting",
+      "title": "22.3: Observability Boilerplate",
+      "group": "📦 MODULE 22: ENTERPRISE TEMPLATES",
+      "isPro": false,
+      "meta": {
+        "time": "25 mins"
+      },
+      "slug": "118-template-reporting",
+      "url": "courses/playwright/118-template-reporting",
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "reference",
+      "optional": true,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET",
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Practice",
+          "hint": "Complete the practice task",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

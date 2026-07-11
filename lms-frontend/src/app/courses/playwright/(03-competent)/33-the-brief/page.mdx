@@ -1,0 +1,92 @@
+
+# 6.1: The Challenge Brief
+
+import { ChapterHeader } from '@/components/ChapterHeader';
+
+<ChapterHeader
+  objective="Design and implement a complete Playwright framework from scratch using POM and Fixtures."
+  time="45 mins"
+  type="Challenge"
+/>
+
+## Learning Objectives
+- Architect a new Playwright project from an empty directory
+- Abstract DOM interactions into Page Objects
+- Inject Page Objects into tests using custom Fixtures
+- Configure global settings like `baseURL` in the config
+
+## Why This Challenge Matters
+
+In the real world, you are rarely given a perfectly configured automation repository. You will often be asked to parachute into a new project, evaluate the requirements, and build the automation infrastructure from scratch. This challenge simulates that exact high-pressure scenario, forcing you to combine all the isolated concepts (locators, assertions, POM, fixtures) into a single cohesive architecture.
+
+## Your Mission
+
+Congratulations! You have just been hired as the founding QA Engineer at a startup.
+
+They have a simple web application: a Todo list manager.
+**Target URL:** `https://demo.playwright.dev/todomvc/`
+
+Right now, they have zero automated tests. Every time they deploy, the app breaks. The CTO has asked you to build a UI automation framework from the ground up to ensure the core features always work.
+
+## The Rules
+
+You are starting from an **empty folder**. 
+
+We are not going to tell you to "create a pages directory" or "create a baseTest file". You are an engineer now. You must design the architecture yourself based on everything you learned in Modules 1 through 5.
+
+## The Requirements
+
+To successfully complete this challenge, your framework must meet the following criteria:
+
+### 1. Business Flows to Test
+You must write automated tests that verify a user can:
+- Add a new Todo item.
+- Mark a Todo item as completed.
+- Delete a Todo item.
+
+### 2. Technical Constraints
+- **Start Fresh:** You must run the Playwright initialization command yourself in an empty folder.
+- **Configuration:** You must use the `playwright.config.ts` file to set a global `baseURL` and `testDir`. 
+- **Page Objects:** You must abstract the UI interactions into the Page Object Model.
+- **Fixtures:** You must create at least one custom fixture using `test.extend` so your test files have zero setup boilerplate (e.g., `test('add todo', async ({ todoPage }) => { ... })`).
+
+## The Rubric (100 Points)
+
+When you are finished, you will grade yourself using the following rubric. Be honest!
+
+| Criteria | Points | Description |
+| :--- | :--- | :--- |
+| **Execution** | 30 | All tests pass consistently without flaking. |
+| **Fixtures** | 25 | You successfully used `test.extend` to inject your Page Objects. |
+| **Page Objects** | 20 | Locators and actions are encapsulated in classes. `getByRole` is prioritized. |
+| **Readability** | 15 | Test files contain NO locators. They read like business requirements. |
+| **Configuration** | 10 | You successfully utilized `playwright.config.ts` for the `baseURL`. |
+
+> [!WARNING]
+> **Do not click to the next lesson yet!** 
+> 
+> The next lesson contains hints. The lesson after that contains the full reference solution. 
+> 
+> You should struggle with this for **at least 30 minutes** before looking at the hints. The struggle is where the learning happens. Open your terminal, create a new folder, and begin!
+
+---
+
+## Common Mistakes
+
+- **Hardcoding Waits**: Using `page.waitForTimeout()` instead of waiting for an element's state.
+- **Overly Broad Locators**: Using generic CSS selectors like `.button` that might break if multiple buttons are added. Always prefer user-facing attributes like `getByRole`.
+- **Ignoring Errors**: Catching errors in try/catch blocks without failing the test or logging the reason.
+
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Blank Slate Architecture | Building from scratch exposes gaps in your fundamental knowledge |
+| Requirement Translation | Converting business flows into test scripts is the core SDET skill |
+| Framework Integration | Seeing how POM and Fixtures work *together* is the "Aha!" moment of Playwright |
+
+> [!TIP]
+> **Next Step:** Only proceed to the Hints module if you are genuinely stuck for more than 15 minutes.
+
+<Quiz moduleId="33-the-brief" />

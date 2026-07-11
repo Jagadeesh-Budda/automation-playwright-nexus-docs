@@ -1,0 +1,250 @@
+﻿# 14.5: Global Setup & Teardown
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Implement globalSetup logic
+
+## What is Global Setup?
+
+**Global Setup** runs **once** before the entire test suite starts. It's used for expensive, one-time operations like:
+- Logging in and saving authentication state
+- Seeding a database with test data
+- Setting up external services
+- Creating test fixtures (files, folders, users)
+
+**Global Teardown** runs **once** after all tests finish to clean up.
+
+## The Global Setup File
+
+```typescript
+// global-setup.ts
+import { chromium, FullConfig } from '@playwright/test';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+async function globalSetup(config: FullConfig) {
+  console.log('🚀 Running global setup...');
+  
+  const { baseURL } = config.projects[0].use;
+  const browser = await chromium.launch();
+
+  // Create authentication state for each user role
+  await setupAuth(browser, baseURL!, 'admin');
+  await setupAuth(browser, baseURL!, 'reviewer');
+  await setupAuth(browser, baseURL!, 'viewer');
+
+  await browser.close();
+  console.log('✅ Global setup complete');
+}
+
+async function setupAuth(browser: any, baseURL: string, role: string) {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  
+  await page.goto(`${baseURL}/login`);
+  await page.getByLabel('Email').fill(process.env[`${role.toUpperCase()}_USER`]!);
+  await page.getByLabel('Password').fill(process.env[`${role.toUpperCase()}_PASS`]!);
+  await page.getByRole('button', { name: 'Sign In' }).click();
+  
+  // Wait for successful login
+  await page.waitForURL(/dashboard/);
+  
+  // Save the auth state to a file
+  await context.storageState({ path: `.auth/${role}.json` });
+  await context.close();
+  
+  console.log(`  ✓ Auth state saved for: ${role}`);
+}
+
+export default globalSetup;
+```
+
+## The Global Teardown File
+
+```typescript
+// global-teardown.ts
+import { FullConfig } from '@playwright/test';
+import { PrismaClient } from '@prisma/client';
+import * as fs from 'fs';
+
+async function globalTeardown(config: FullConfig) {
+  console.log('🧹 Running global teardown...');
+  
+  // 1. Clean up test data from database
+  const prisma = new PrismaClient();
+  await prisma.document.deleteMany({
+    where: { title: { startsWith: 'Test-' } }
+  });
+  await prisma.$disconnect();
+  
+  // 2. Clean up temp files
+  const tempFiles = fs.readdirSync('./test-fixtures/temp');
+  for (const file of tempFiles) {
+    fs.unlinkSync(`./test-fixtures/temp/${file}`);
+  }
+  
+  console.log('✅ Teardown complete');
+}
+
+export default globalTeardown;
+```
+
+## Registering Setup and Teardown
+
+```typescript
+// playwright.config.ts
+export default defineConfig({
+  globalSetup: './global-setup.ts',
+  globalTeardown: './global-teardown.ts',
+  
+  use: {
+    // Default auth state (most tests use admin)
+    storageState: '.auth/admin.json',
+  },
+  
+  projects: [
+    {
+      name: 'admin-tests',
+      use: { storageState: '.auth/admin.json' },
+    },
+    {
+      name: 'reviewer-tests',
+      use: { storageState: '.auth/reviewer.json' },
+    },
+    {
+      name: 'viewer-tests',
+      use: { storageState: '.auth/viewer.json' },
+    },
+    {
+      // Setup project: runs first, no storageState
+      name: 'setup',
+      testMatch: '**/auth.setup.ts',
+    },
+  ],
+});
+```
+
+## Project Dependencies (Setup Before Tests)
+
+A more modern approach uses **project dependencies**:
+
+```typescript
+// playwright.config.ts
+projects: [
+  // STEP 1: Always run auth setup first
+  {
+    name: 'setup',
+    testMatch: /.*\.setup\.ts/,
+  },
+  
+  // STEP 2: Run tests only after setup is complete
+  {
+    name: 'e2e-tests',
+    dependencies: ['setup'],  // Won't start until 'setup' project is done
+    use: { storageState: '.auth/admin.json' },
+  },
+],
+```
+
+```typescript
+// auth.setup.ts — the setup project's test file
+import { test as setup } from '@playwright/test';
+
+setup('authenticate as admin', async ({ page }) => {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill(process.env.ADMIN_USER!);
+  await page.getByLabel('Password').fill(process.env.ADMIN_PASS!);
+  await page.getByRole('button', { name: 'Sign In' }).click();
+  await page.waitForURL(/dashboard/);
+  
+  await page.context().storageState({ path: '.auth/admin.json' });
+});
+```
+
+<CodeEditor
+  moduleId="67-adv-setup"
+  taskIndex={0}
+  placeholder="// Task: Write a global setup function that authenticates and saves the browser state.&#10;// Requirements:&#10;//   1. Create a new browser context&#10;//   2. Navigate to the login page using baseURL&#10;//   3. Fill credentials and sign in&#10;//   4. Save the storage state to a file like '.auth/{role}.json'&#10;//   5. Close the context to free resources&#10;//&#10;// This saved state file is then used in playwright.config.ts via storageState"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+async function setupAuth(browser, baseURL, role) {
+  const context = await browser.newContext();
+  const page = await context.newPage();
+  await page.goto(`${baseURL}/login`);
+  // fill credentials and click sign in...
+  await context.storageState({ path: `.auth/${role}.json` });
+  await context.close();
+}
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="67-adv-setup"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<Quiz moduleId="adv-setup" />
+

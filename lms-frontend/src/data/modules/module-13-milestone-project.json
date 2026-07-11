@@ -1,0 +1,431 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T10:36:32.990Z",
+  "lessons": [
+    {
+      "id": "108-capstone-project",
+      "title": "13.1: Build the Enterprise Framework",
+      "url": "courses/playwright/108-capstone-project",
+      "group": "🎓 MODULE 13: MILESTONE PROJECT",
+      "level": 8,
+      "weight": 100,
+      "meta": {
+        "time": "5 hours",
+        "type": "Project",
+        "outcome": "Architect a complete Enterprise Playwright Framework from scratch."
+      },
+      "objectives": [
+        {
+          "id": "build_framework",
+          "title": "Construct a 4-Layer Architecture (POM, API, Fixtures, Tests)"
+        },
+        {
+          "id": "cicd",
+          "title": "Integrate Github Actions & Reporting"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "task1",
+          "type": "code",
+          "title": "Build the Enterprise Architecture",
+          "description": "Create your folder structure, Page Objects, and custom fixtures.",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is defining a strict Data Management strategy an important architectural pattern before building a Capstone?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which architectural anti-pattern guarantees a Capstone project will fail to scale past 500 tests?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "icon": "🏗️",
+      "slug": "108-capstone-project",
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "project",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET"
+    },
+    {
+      "id": "109-capstone-verify",
+      "title": "13.2: Certification Claim",
+      "url": "courses/playwright/109-capstone-verify",
+      "group": "🎓 MODULE 13: MILESTONE PROJECT",
+      "level": 8,
+      "weight": 10,
+      "meta": {
+        "time": "20 mins",
+        "type": "Architecture",
+        "outcome": "Verify credentials and explore the career roadmap"
+      },
+      "objectives": [
+        {
+          "id": "career_roadmap",
+          "title": "Understand the path to Automation Architect"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Practice",
+          "hint": "Complete the practice task",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "career_roadmap",
+          "weight": 100
+        }
+      ],
+      "spec": {
+        "outcome": "Official Certification",
+        "path": "Architect"
+      },
+      "quizPool": {
+        "Easy": [
+          {
+            "objective": "capstone_verify",
+            "type": "mcq",
+            "difficulty": "easy",
+            "q": "What does it mean to 'Certify' an E2E framework in an Enterprise environment?",
+            "options": [
+              "Giving the developer a certificate.",
+              "Proving mathematically to the business that the automation suite is stable, catches real regressions, integrates flawlessly into the CI/CD pipeline, and can be trusted as the ultimate gatekeeper for production deployments.",
+              "Running the tests once on localhost.",
+              "Writing documentation."
+            ],
+            "a": "Proving mathematically to the business that the automation suite is stable, catches real regressions, integrates flawlessly into the CI/CD pipeline, and can be trusted as the ultimate gatekeeper for production deployments.",
+            "explanation": "Code is not certified until it is trusted. If the pipeline fails and developers assume 'it's just a flaky test' instead of 'the app is broken', the framework is not certified."
+          },
+          {
+            "objective": "capstone_verify",
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "name: Nightly Run\non:\n  schedule:\n    - cron: '0 0 * * *'",
+            "q": "Why is a 'Nightly Run' often implemented alongside standard PR trigger pipelines?",
+            "options": [
+              "It isn't; tests should only run on PRs.",
+              "To execute the massive, hours-long E2E matrix (testing 5 browsers, 10 languages, and 500 edge cases) that is too computationally expensive to run on every single minor developer commit, ensuring deep coverage without blocking velocity.",
+              "Because servers are cheaper at night.",
+              "To test the dark mode UI."
+            ],
+            "a": "To execute the massive, hours-long E2E matrix (testing 5 browsers, 10 languages, and 500 edge cases) that is too computationally expensive to run on every single minor developer commit, ensuring deep coverage without blocking velocity.",
+            "explanation": "CI strategy is a balance of speed vs depth. A 3-minute smoke suite protects the PR. A 3-hour matrix suite protects the business overnight."
+          },
+          {
+            "objective": "capstone_verify",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "A massive UI redesign is scheduled for next month. The CSS classes and structure of every page will change.",
+            "q": "Because you used the POM architecture, how do you mathematically prepare for this migration?",
+            "options": [
+              "You must delete all tests and start over.",
+              "You only need to update the central Page Object Model locator strings. The 500 declarative `.spec.ts` files containing the business logic (`await loginPage.login()`) will remain 100% untouched.",
+              "Use a regex search on the whole codebase.",
+              "Tell the frontend team not to change the CSS."
+            ],
+            "a": "You only need to update the central Page Object Model locator strings. The 500 declarative `.spec.ts` files containing the business logic (`await loginPage.login()`) will remain 100% untouched.",
+            "explanation": "This is the ultimate payoff of a Capstone architecture. Proper abstraction means UI changes only break the POM interface, leaving the business logic orchestration completely intact."
+          },
+          {
+            "objective": "capstone_verify",
+            "type": "multi-select",
+            "difficulty": "easy",
+            "scenario": "You are presenting the 'Maintenance Strategy' for the new automation framework to the CTO.",
+            "q": "Which practices should you advocate to prevent the framework from rotting over time? (Select all that apply)",
+            "options": [
+              "Enforce strict AST Linting in the CI pipeline to mathematically ban technical debt (like `waitForTimeout`).",
+              "Establish a 'Zero Flakiness' policy. If a test is flaky, it must be immediately skipped/quarantined and fixed; it cannot be allowed to run and generate random red flags in `main`.",
+              "Allow developers to merge failing tests if they promise to fix them later.",
+              "Treat the test code with the exact same architectural rigor (code reviews, interfaces, patterns) as the production application."
+            ],
+            "a": [
+              "Enforce strict AST Linting in the CI pipeline to mathematically ban technical debt (like `waitForTimeout`).",
+              "Establish a 'Zero Flakiness' policy. If a test is flaky, it must be immediately skipped/quarantined and fixed; it cannot be allowed to run and generate random red flags in `main`.",
+              "Treat the test code with the exact same architectural rigor (code reviews, interfaces, patterns) as the production application."
+            ],
+            "explanation": "Test code is production code. It produces the product of 'Quality'. If you let the factory rust, the product will fail."
+          },
+          {
+            "objective": "capstone_verify",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You have a suite of 20 'Smoke Tests' and 500 'Regression Tests'.",
+            "q": "How do you architecturally configure Playwright to only run the Smoke tests on PR creation?",
+            "options": [
+              "Delete the regression tests.",
+              "Use standard string tagging (e.g., `test('@smoke Login', ...)`). Configure the GitHub Actions YAML to execute `npx playwright test --grep @smoke` on the `pull_request` trigger, filtering the AST to execute only the critical core paths.",
+              "Put them in a different repo.",
+              "Run all 500 tests anyway."
+            ],
+            "a": "Use standard string tagging (e.g., `test('@smoke Login', ...)`). Configure the GitHub Actions YAML to execute `npx playwright test --grep @smoke` on the `pull_request` trigger, filtering the AST to execute only the critical core paths.",
+            "explanation": "Tagging is the router of the execution pipeline. It allows you to dynamically slice a massive repository into targeted, situational execution matrices based on CI triggers."
+          }
+        ],
+        "Medium": [
+          {
+            "objective": "capstone_verify",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "import { test } from '@playwright/test';\ntest('Auto-scaling Verification', async ({ page }) => { ... });",
+            "q": "If you are migrating from 1 Jenkins machine to a cloud service like Playwright Sharding across 10 machines, what fundamental architectural rule MUST your tests follow?",
+            "options": [
+              "They must use Python.",
+              "Absolute State Isolation. Because the 10 machines cannot communicate with each other, they cannot share a database row or a global variable. Every single test must be mathematically capable of creating its own data and tearing it down independently.",
+              "They must run sequentially.",
+              "They must use Selenium Grid."
+            ],
+            "a": "Absolute State Isolation. Because the 10 machines cannot communicate with each other, they cannot share a database row or a global variable. Every single test must be mathematically capable of creating its own data and tearing it down independently.",
+            "explanation": "Distributed computing destroys shared state. If Test A on Machine 1 requires Test B on Machine 2 to run first, the architecture is fundamentally broken. E2E tests must be hermetic islands."
+          },
+          {
+            "objective": "capstone_verify",
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "The CTO asks: 'How do we know the tests are actually catching bugs, and not just passing because the locators are too loose?'",
+            "q": "How do you 'Test the Tests' (Mutation Testing)? (Select all that apply)",
+            "options": [
+              "Intentionally break the React application code (e.g., change a button ID, comment out a save function, hide a required div) locally, and verify that the Playwright tests violently fail exactly where they are supposed to.",
+              "Ensure Web-First Assertions (`toBeVisible()`) are used to prove elements actually rendered, rather than just using logic checks (`expect(true).toBe(true)`).",
+              "Ask the QA team.",
+              "Run the tests in Chrome instead of Chromium."
+            ],
+            "a": [
+              "Intentionally break the React application code (e.g., change a button ID, comment out a save function, hide a required div) locally, and verify that the Playwright tests violently fail exactly where they are supposed to.",
+              "Ensure Web-First Assertions (`toBeVisible()`) are used to prove elements actually rendered, rather than just using logic checks (`expect(true).toBe(true)`)."
+            ],
+            "explanation": "A test that cannot fail is worse than no test at all. You must actively sabotage the application to prove the Quality Gate works."
+          },
+          {
+            "objective": "capstone_verify",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You have an array of 5 API tokens. 5 parallel Playwright workers are running.",
+            "q": "How do you architecturally guarantee that Worker 1 and Worker 2 don't accidentally grab the same API token and collide?",
+            "options": [
+              "You cannot.",
+              "Use `testInfo.workerIndex`. Map the array index strictly to the worker thread (e.g., `const token = tokens[testInfo.workerIndex]`). This mathematically guarantees that each parallel execution thread utilizes a completely independent slice of the global data matrix.",
+              "Use a random number generator.",
+              "Use `waitForTimeout` to offset them."
+            ],
+            "a": "Use `testInfo.workerIndex`. Map the array index strictly to the worker thread (e.g., `const token = tokens[testInfo.workerIndex]`). This mathematically guarantees that each parallel execution thread utilizes a completely independent slice of the global data matrix.",
+            "explanation": "Concurrency orchestration requires deterministic mapping. `workerIndex` is the mathematical fingerprint of the thread. Use it to slice data, create unique filenames, and prevent collisions."
+          },
+          {
+            "objective": "capstone_verify",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "test.describe('Payment Flow', () => {\n  test.use({ baseURL: 'https://staging.corp.com' });\n  // ...\n});",
+            "q": "Why is hardcoding the `baseURL` inside the file an architectural failure for a CI/CD-integrated framework?",
+            "options": [
+              "It should be in the POM.",
+              "It destroys environment portability. The CI pipeline must be able to inject the URL dynamically (e.g., testing `dev.corp.com`, `staging.corp.com`, or a dynamic ephemeral PR URL). The `baseURL` must be managed globally in the `playwright.config.ts` via `process.env.URL`.",
+              "It uses HTTPS.",
+              "It breaks the AST."
+            ],
+            "a": "It destroys environment portability. The CI pipeline must be able to inject the URL dynamically (e.g., testing `dev.corp.com`, `staging.corp.com`, or a dynamic ephemeral PR URL). The `baseURL` must be managed globally in the `playwright.config.ts` via `process.env.URL`.",
+            "explanation": "Tests must be agnostic of their environment. The Orchestrator (CI/CD) dictates *where* the test runs. The Test dictates *what* happens. Do not hardcode environment variables."
+          },
+          {
+            "objective": "capstone_verify",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "Your tests generate 5GB of `trace.zip` and video files per CI run, exhausting the GitHub Actions storage limit.",
+            "q": "How do you optimize the artifact retention strategy in `playwright.config.ts`?",
+            "options": [
+              "Delete the framework.",
+              "Set `trace: 'retain-on-failure'` and `video: 'retain-on-failure'`. The orchestrator will mathematically capture everything in RAM, but will only physically write the massive binary files to the disk if the specific AST test node throws an exception, saving 99% of disk space.",
+              "Zip the files twice.",
+              "Take fewer screenshots."
+            ],
+            "a": "Set `trace: 'retain-on-failure'` and `video: 'retain-on-failure'`. The orchestrator will mathematically capture everything in RAM, but will only physically write the massive binary files to the disk if the specific AST test node throws an exception, saving 99% of disk space.",
+            "explanation": "Data is only useful if it's actionable. A video of a passing test is a waste of electrons. Configure the framework to only preserve the autopsy of a failure."
+          }
+        ],
+        "Hard": [
+          {
+            "objective": "capstone_verify",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "import { test } from './custom-fixtures';\ntest('Advanced', async ({ page }) => {\n  const metrics = await page.evaluate(() => JSON.stringify(window.performance.getEntriesByType('resource')));\n  // Parse and analyze metrics...\n});",
+            "q": "This test taps into the browser's native `window.performance` API. Why is this a hallmark of an 'Enterprise Certified' architect?",
+            "options": [
+              "It makes the test look complex.",
+              "They understand that Playwright is not merely a UI interaction tool; it is a conduit for executing arbitrary JavaScript within the V8 engine. They are leveraging the E2E test to perform deep, automated client-side performance profiling (TTFB, asset load times), expanding the QA mandate beyond just functional UI.",
+              "Playwright requires this API.",
+              "It bypasses the network."
+            ],
+            "a": "They understand that Playwright is not merely a UI interaction tool; it is a conduit for executing arbitrary JavaScript within the V8 engine. They are leveraging the E2E test to perform deep, automated client-side performance profiling (TTFB, asset load times), expanding the QA mandate beyond just functional UI.",
+            "explanation": "The Capstone mindset moves beyond 'did the button click'. It asks 'how fast did the button render?'. Playwright provides the execution vector; the Architect provides the imagination."
+          },
+          {
+            "objective": "capstone_verify",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "Your enterprise deploys 50 micro-frontends. Each team has their own Playwright repository.",
+            "q": "How do you architecturally 'Certify' a global standard across 50 disparate teams?",
+            "options": [
+              "Send an email with the rules.",
+              "Create a centralized, internal NPM package (e.g., `@corp/playwright-core`). This package strictly defines the base `playwright.config.ts`, exports the global Fixtures, and contains the required AST ESLint configurations. Every team MUST import and extend this base package, mathematically enforcing enterprise architecture.",
+              "Put all the code in one repo.",
+              "You cannot scale Playwright."
+            ],
+            "a": "Create a centralized, internal NPM package (e.g., `@corp/playwright-core`). This package strictly defines the base `playwright.config.ts`, exports the global Fixtures, and contains the required AST ESLint configurations. Every team MUST import and extend this base package, mathematically enforcing enterprise architecture.",
+            "explanation": "Scale requires centralization. You cannot manage 50 configurations. You abstract the core Playwright engine into a proprietary internal library, allowing teams to focus on business logic while you control the underlying physics."
+          },
+          {
+            "objective": "capstone_verify",
+            "type": "multi-select",
+            "difficulty": "hard",
+            "scenario": "The Lead Developer wants to run the Playwright E2E suite against ephemeral 'Preview Environments' (a unique URL generated for every single Pull Request).",
+            "q": "What specific E2E architectural constraints must be solved to achieve this? (Select all that apply)",
+            "options": [
+              "The `playwright.config.ts` must accept the `baseURL` dynamically via `process.env` so the CI server can inject the unique PR URL.",
+              "The data setup (Fixtures/APIs) must be capable of connecting to, and seeding, a completely blank database, because ephemeral environments often boot up totally empty.",
+              "The tests must be rewritten in Selenium.",
+              "The AST Linter must be disabled."
+            ],
+            "a": [
+              "The `playwright.config.ts` must accept the `baseURL` dynamically via `process.env` so the CI server can inject the unique PR URL.",
+              "The data setup (Fixtures/APIs) must be capable of connecting to, and seeding, a completely blank database, because ephemeral environments often boot up totally empty."
+            ],
+            "explanation": "Preview Environments are the holy grail of CI/CD. They require E2E suites to be entirely portable and entirely self-sufficient. A test that relies on a hardcoded staging database will fail against a dynamic PR environment."
+          },
+          {
+            "objective": "capstone_verify",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "test.afterEach(async ({ page }, testInfo) => {\n  if (testInfo.status !== testInfo.expectedStatus) {\n    await sendSlackAlert(`Test Failed: ${testInfo.title}`);\n  }\n});",
+            "q": "While this looks helpful, why is injecting third-party integrations (like Slack alerts) into the `afterEach` hook a massive architectural mistake?",
+            "options": [
+              "Slack doesn't support Playwright.",
+              "It destroys execution speed and couples the test engine to a chat app. If the Slack API is down, the teardown hangs, failing the test. Integration logic MUST be decoupled and placed in a custom Playwright Reporter (`onTestEnd` hook) which executes strictly outside the critical path of the browser runtime.",
+              "It leaks memory.",
+              "The test title is undefined."
+            ],
+            "a": "It destroys execution speed and couples the test engine to a chat app. If the Slack API is down, the teardown hangs, failing the test. Integration logic MUST be decoupled and placed in a custom Playwright Reporter (`onTestEnd` hook) which executes strictly outside the critical path of the browser runtime.",
+            "explanation": "Separation of Concerns. Tests execute logic. Reporters broadcast results. Never put broadcasting logic inside the execution thread, as it introduces massive external fragility to the core test matrix."
+          },
+          {
+            "objective": "capstone_verify",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You have officially Certified the Capstone framework. It is merged. The pipeline is green.",
+            "q": "What is the true measure of success for this Enterprise E2E Architecture?",
+            "options": [
+              "The number of tests written.",
+              "Developer Trust. When the pipeline turns red, the development team immediately stops and fixes their application code, fully trusting the framework's mathematical precision, rather than assuming 'the test is flaky' and ignoring it.",
+              "The speed of the execution.",
+              "The complexity of the locators."
+            ],
+            "a": "Developer Trust. When the pipeline turns red, the development team immediately stops and fixes their application code, fully trusting the framework's mathematical precision, rather than assuming 'the test is flaky' and ignoring it.",
+            "explanation": "An E2E framework is a sociotechnical system. The technology exists solely to enforce a social contract: Quality. If the technology is flawless (no flakes, clear traces, perfect isolation), the humans will trust it. That is Certification."
+          }
+        ]
+      },
+      "icon": "🎓",
+      "slug": "109-capstone-verify",
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "project",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET"
+    }
+  ]
+}

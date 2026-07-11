@@ -1,0 +1,463 @@
+﻿# 12.5: The Anti-Pattern Catalog
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Identify and fix common anti-patterns in Playwright tests
+
+## Why Anti-Patterns Matter
+
+Anti-patterns are **code patterns that look correct but cause problems**. They're the #1 reason test suites become unmaintainable. In interviews, you'll be asked: "What would you NOT do in a Playwright test?"
+
+This catalog gives you concrete answers.
+
+---
+
+## 🔴 Critical Anti-Patterns (Break Tests)
+
+### 1. Hardcoded Sleeps
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ ANTI-PATTERN: Waits 3 seconds even if the element is ready in 100ms
+await page.click('#submit');
+await page.waitForTimeout(3000);
+await expect(page.locator('.success')).toBeVisible();
+
+// ✅ FIX: Web-first assertion retries automatically
+await page.getByRole('button', { name: 'Submit' }).click();
+await expect(page.getByText('Saved successfully')).toBeVisible();
+```
+
+### 2. `isVisible()` Without Assertion
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ ANTI-PATTERN: isVisible() returns boolean immediately — doesn't wait or assert
+const visible = await page.getByText('Success').isVisible();  // Returns false, test doesn't fail!
+
+// ✅ FIX: Use expect() for retry + assertion
+await expect(page.getByText('Success')).toBeVisible();
+```
+
+### 3. Test-Scoped Fixtures in `beforeAll`
+
+```typescript
+// ❌ ANTI-PATTERN: Crashes at runtime
+test.beforeAll(async ({ page }) => {
+  // ERROR: test.beforeAll() cannot consume test-scoped fixture 'page'
+  await page.goto('/setup');
+});
+
+// ✅ FIX: Use beforeEach with a run-once guard
+let initialized = false;
+test.beforeEach(async ({ page }) => {
+  if (!initialized) {
+    await page.goto('/setup');
+    initialized = true;
+  }
+});
+```
+
+### 4. Locators Outside Constructor Body
+
+```typescript
+// ❌ ANTI-PATTERN: Crashes with "Cannot read properties of undefined"
+class LoginPage {
+  readonly emailInput = this.page.getByLabel('Email');  // 'this.page' is undefined here!
+  constructor(readonly page: Page) {}
+}
+
+// ✅ FIX: Initialize locators inside the constructor
+class LoginPage {
+  readonly emailInput: Locator;
+  constructor(readonly page: Page) {
+    this.emailInput = page.getByLabel('Email');
+  }
+}
+```
+
+### 5. `Promise.race()` for Event + Action
+
+```typescript
+// ❌ ANTI-PATTERN: Race condition — download may resolve with undefined
+const download = await Promise.race([
+  page.waitForEvent('download'),
+  page.getByRole('button', { name: 'Export' }).click(),
+]);
+
+// ✅ FIX: Use Promise.all() — click triggers the event
+const [download] = await Promise.all([
+  page.waitForEvent('download'),
+  page.getByRole('button', { name: 'Export' }).click(),
+]);
+```
+
+---
+
+## 🟡 Design Anti-Patterns (Hurt Maintainability)
+
+### 6. Locators in Spec Files
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ ANTI-PATTERN: UI details leak into test files
+test('admin uploads document', async ({ page }) => {
+  await page.getByRole('button', { name: 'Upload' }).click();
+  await page.locator('input[type="file"]').setInputFiles('report.pdf');
+  await page.getByRole('button', { name: 'Confirm Upload' }).click();
+});
+
+// ✅ FIX: Delegate to Page Object
+test('admin uploads document', async ({ documentPage }) => {
+  await documentPage.uploadFile('report.pdf');
+});
+```
+
+### 7. Assertions Inside Page Objects
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ ANTI-PATTERN: POM makes test decisions
+class DocumentPage {
+  async uploadFile(path: string) {
+    await this.fileInput.setInputFiles(path);
+    await this.uploadButton.click();
+    await expect(this.successBanner).toBeVisible();  // Don't assert here!
+  }
+}
+
+// ✅ FIX: Page Object performs actions, test asserts
+class DocumentPage {
+  async uploadFile(path: string) {
+    await this.fileInput.setInputFiles(path);
+    await this.uploadButton.click();
+  }
+}
+
+// Test:
+await documentPage.uploadFile('report.pdf');
+await expect(documentPage.successBanner).toBeVisible();
+```
+
+### 8. `process.env` in Spec Files
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ ANTI-PATTERN: Environment details in tests
+test('admin login', async ({ page }) => {
+  await page.getByLabel('Email').fill(process.env.ADMIN_USER!);
+  await page.getByLabel('Password').fill(process.env.ADMIN_PASS!);
+});
+
+// ✅ FIX: Use fixtures for credentials
+test('admin login', async ({ loginPage }) => {
+  await loginPage.loginAs('admin');
+});
+```
+
+### 9. CSS/XPath When Role Locators Work
+
+```typescript
+// ❌ ANTI-PATTERN: Fragile CSS selector
+await page.locator('#main-content > div:nth-child(3) > button.btn-primary').click();
+
+// ✅ FIX: Semantic locator
+await page.getByRole('button', { name: 'Submit' }).click();
+```
+
+### 10. Shared Mutable State Between Tests
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ ANTI-PATTERN: Tests depend on each other's state
+let documentId: string;
+
+test('create document', async ({ api }) => {
+  documentId = await api.createDocument();
+});
+
+test('view document', async ({ page }) => {
+  await page.goto(`/documents/${documentId}`);  // Fails if first test fails!
+});
+
+// ✅ FIX: Each test creates its own data
+test('view document', async ({ page, api }) => {
+  const id = await api.createDocument();
+  await page.goto(`/documents/${id}`);
+});
+```
+
+---
+
+## 🟠 Performance Anti-Patterns (Slow Suites)
+
+### 11. UI Login in Every Test
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ ANTI-PATTERN: 3-5 seconds per test wasted on login
+test('upload doc', async ({ page }) => {
+  await page.goto('/login');
+  await page.fill('#email', 'admin@test.com');
+  await page.fill('#password', 'pass');
+  await page.click('button[type=submit]');
+  // ... actual test starts here
+});
+
+// ✅ FIX: Use storageState for pre-authenticated sessions
+// playwright.config.ts:
+use: { storageState: '.auth/admin.json' }
+```
+
+### 12. Not Cleaning Up Test Data
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ ANTI-PATTERN: Test data accumulates over time, slowing queries
+test('create 100 documents', async ({ api }) => {
+  for (let i = 0; i < 100; i++) {
+    await api.createDocument({ title: `Test ${i}` });
+  }
+  // Never cleans up — database grows with every run
+});
+
+// ✅ FIX: Cleanup in fixture teardown
+docFixture: async ({ request }, use) => {
+  const ids: string[] = [];
+  const create = async (data) => {
+    const res = await request.post('/api/documents', { data });
+    const { id } = await res.json();
+    ids.push(id);
+    return id;
+  };
+  await use({ create });
+  // Cleanup
+  for (const id of ids) await request.delete(`/api/documents/${id}`);
+},
+```
+
+### 13. `networkidle` for Everything
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ ANTI-PATTERN: Waits for 500ms of no network — slow and unreliable
+await page.goto('/dashboard', { waitUntil: 'networkidle' });
+
+// ✅ FIX: Wait for the specific element you need
+await page.goto('/dashboard');
+await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+```
+
+### 14. `toHaveScreenshot()` Without Masks
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ ANTI-PATTERN: Fails on dynamic content (timestamps, avatars, ads)
+await expect(page).toHaveScreenshot();
+
+// ✅ FIX: Mask dynamic areas
+await expect(page).toHaveScreenshot({
+  mask: [
+    page.getByTestId('timestamp'),
+    page.getByTestId('user-avatar'),
+    page.getByTestId('ad-banner'),
+  ],
+});
+```
+
+---
+
+## 🔵 Structural Anti-Patterns (Poor Architecture)
+
+### 15. God Page Object
+
+```typescript
+// ❌ ANTI-PATTERN: One massive POM with 200 locators and 50 methods
+class AppPage {
+  // Login locators, document locators, admin locators, settings locators...
+  // 200+ properties
+}
+
+// ✅ FIX: Separate into focused Page Objects + Components
+class LoginPage { /* login only */ }
+class DocumentPage { /* documents only */ }
+class NavbarComponent { /* shared navbar */ }
+```
+
+### 16. Deep Inheritance Chains
+
+```typescript
+// ❌ ANTI-PATTERN: 4-level inheritance
+class BasePage extends Object { /* ... */ }
+class AuthPage extends BasePage { /* ... */ }
+class AdminPage extends AuthPage { /* ... */ }
+class SuperAdminPage extends AdminPage { /* ... */ }
+
+// ✅ FIX: Composition
+class SuperAdminPage {
+  readonly navbar: NavbarComponent;
+  readonly adminPanel: AdminPanelComponent;
+  constructor(page: Page) {
+    this.navbar = new NavbarComponent(page);
+    this.adminPanel = new AdminPanelComponent(page);
+  }
+}
+```
+
+### 17. No Test Isolation
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ ANTI-PATTERN: Tests modify shared database without cleanup
+test('test A creates user', async () => { /* creates user "test-user" */ });
+test('test B checks user count', async () => { /* expects 5 users but finds 6 */ });
+```
+
+### 18. Ignoring Strict Mode Errors
+
+```typescript
+// ❌ ANTI-PATTERN: Using .first() to suppress strict mode without understanding why
+await page.getByRole('button').first().click();  // Which button?!
+
+// ✅ FIX: Be specific
+await page.getByRole('button', { name: 'Submit' }).click();
+```
+
+### 19. `page.evaluate()` for Everything
+
+```typescript
+// ❌ ANTI-PATTERN: Using evaluate when Playwright API exists
+let text = await page.evaluate(() => document.querySelector('.title')?.textContent);
+
+// ✅ FIX: Use Playwright API
+const text = await page.getByRole('heading').textContent();
+```
+
+### 20. No Error Context in Assertions
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ ANTI-PATTERN: Generic failure message
+await expect(row).toBeVisible();  // "Expected to be visible" — which row?
+
+// ✅ FIX: Custom message
+await expect(row, `Document DOC-${id} should appear in the table`).toBeVisible();
+```
+
+---
+
+## Quick Reference: Anti-Pattern Checklist
+
+| # | Anti-Pattern | Detection | Fix |
+|---|-------------|-----------|-----|
+| 1 | `waitForTimeout()` | AST Auditor | Web-first assertion |
+| 2 | `isVisible()` without expect | Code review | `expect().toBeVisible()` |
+| 3 | Fixtures in beforeAll | Runtime crash | beforeEach + guard |
+| 4 | Locators outside constructor | Runtime crash | Move to constructor |
+| 5 | Promise.race for events | Intermittent failure | Promise.all |
+| 6 | Locators in specs | AST Auditor | Page Objects |
+| 7 | Assertions in POMs | Code review | Assert in tests only |
+| 8 | process.env in specs | Code review | Fixtures |
+| 9 | CSS when role works | Code review | getByRole |
+| 10 | Shared mutable state | Flaky tests | Test isolation |
+
+
+
+> [!NOTE]
+> **Retention Layer:**
+> * **Key Idea:** User-facing semantic locators (roles, text) survive DOM refactors much better than CSS/XPath.
+> * **Common Mistake:** Relying on strict, deeply nested XPaths that break immediately when a div is added.
+> * **Enterprise Application:** Maintaining robust tests through massive React or Angular frontend rewrites.
+
+<CodeEditor
+  moduleId="62-anti-patterns"
+  taskIndex={0}
+  placeholder="// Task: The following code uses TWO critical anti-patterns.&#10;// Rewrite it using ONLY web-first assertions and semantic locators.&#10;//&#10;// BROKEN CODE:&#10;//   await page.click('#save');&#10;//   await page.waitForTimeout(2000);&#10;//   const text = await page.textContent('.message');&#10;//&#10;// Write your corrected version below:"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+await page.getByRole('button', { name: 'Save' }).click();
+await expect(page.getByRole('alert')).toContainText('Saved');
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="62-anti-patterns"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('anti-patterns challenge', async ({ page }) => {
+  await page.goto('https://app.com');
+  
+  // BUG: The developer is using hardcoded timeouts and manual sleep loops!
+  // Refactor this to use web-first assertions and retryable expect.poll
+  await page.waitForTimeout(5000);
+  const text = await page.locator('.message-box').textContent();
+  expect(text).toContain('Success');
+});`}
+/>
+<Quiz moduleId="anti-patterns" />
+

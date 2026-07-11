@@ -1,0 +1,149 @@
+﻿
+
+# 0.6: DOM & HTML Basics
+
+A browser is simply a piece of software that reads HTML text files and paints them onto the screen. 
+
+To automate a browser, you cannot tell the computer *"Click the blue button in the top right corner"*. The computer only understands code. You must understand the underlying structure: the DOM.
+
+---
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- HTML and CSS selectors.
+
+## 1. What is the DOM?
+
+The **Document Object Model (DOM)** is a tree-like representation of the HTML document. Every tag (like `<button>` or `<div>`) becomes a "Node" in this tree. JavaScript and Playwright interact directly with these nodes.
+
+```html
+<html>
+  <body>
+    <div class="login-container">
+      <h1 id="header" data-testid="title">Sign In</h1>
+      <input type="text" name="username" placeholder="Email" />
+      <button class="btn primary" disabled>Submit</button>
+    </div>
+  </body>
+</html>
+```
+
+In the example above:
+- `<div>` is the parent.
+- `<h1>`, `<input>`, and `<button>` are siblings inside the `<div>`.
+- `id`, `class`, and `name` are **Attributes** attached to the nodes.
+
+---
+
+## 2. Identifying Elements (CSS Selectors)
+
+To tell Playwright what to click, you must provide a "Locator" string. Historically, automation engineers used CSS selectors to find elements.
+
+### A. Tag Name
+Selects by the HTML tag. (This is usually too broad, as pages have many buttons).
+```javascript
+await page.locator('button').click(); // Clicks the FIRST button it finds
+```
+
+### B. ID (`#`)
+Selects a unique element by its `id` attribute. This is fast, but modern frontend frameworks (like React/Next) often generate dynamic, random IDs that change on every reload, rendering them useless for automation.
+```javascript
+await page.locator('#header').innerText(); // Returns "Sign In"
+```
+
+### C. Class Name (`.`)
+Selects elements containing a specific class. This is extremely brittle. If a frontend developer changes a class for styling purposes, your test will fail!
+```javascript
+await page.locator('.btn.primary').click(); // Chaining classes
+```
+
+### D. Attribute Selectors (`[]`)
+Selects elements based on custom attributes like `name`, `placeholder`, or custom test IDs.
+```javascript
+await page.locator('input[name="username"]').fill('admin@corp.com');
+```
+
+---
+
+## 3. The Modern Approach: Accessibility Locators
+
+Because CSS selectors are brittle and break when developers change the styling of the app, Playwright heavily advocates for **User-Facing Locators** (Accessibility Locators).
+
+If an engineer changes `class="btn primary"` to `class="btn secondary"`, a CSS locator breaks. But the user doesn't care about the class name—they just see a button that says "Submit".
+
+By using `getByRole` or `getByText`, you test the application exactly how a blind user with a screen reader experiences it, ensuring robust accessibility and resilient tests.
+
+```javascript
+// ❌ Brittle CSS Locator
+await page.locator('button.btn.primary').click();
+
+// ✅ Resilient User-Facing Locator
+await page.getByRole('button', { name: 'Submit' }).click();
+
+// ✅ Resilient User-Facing Locator
+await page.getByPlaceholder('Email').fill('admin@corp.com');
+```
+
+---
+
+## 4. Interactive Challenge: Write Accessibility Locators
+
+Imagine the following DOM structure is rendered on the page:
+```html
+<form>
+  <label for="email">User Email Address</label>
+  <input id="email" type="email" placeholder="Enter Email" />
+  <button class="btn-green">Sign In To Dashboard</button>
+</form>
+```
+
+**Your Task:** Write the Playwright `getBy` commands to fill the email and click the button. *Do not use `page.locator()` with CSS!* Use the modern User-Facing locators like `getByRole`, `getByPlaceholder`, or `getByLabel`.
+
+<CodeEditor
+  moduleId="06-js-ts-dom"
+  taskIndex={0}
+  placeholder={`const performLogin = async (page) => {\n  // 1. Fill the email input using its placeholder\n  await page.____________('Enter Email').fill('test@user.com');\n\n  // 2. Click the button using its role and exact text name\n  await page.____________('button', { name: 'Sign In To Dashboard' }).click();\n};\n`}
+/>
+
+---
+
+## Common Mistakes
+
+- **Hardcoding Waits**: Using `page.waitForTimeout()` instead of waiting for an element's state.
+- **Overly Broad Locators**: Using generic CSS selectors like `.button` that might break if multiple buttons are added. Always prefer user-facing attributes like `getByRole`.
+- **Ignoring Errors**: Catching errors in try/catch blocks without failing the test or logging the reason.
+
+
+## Challenge Exercise
+
+**Scenario**: You are analyzing a legacy pharma dashboard to plan your automation locators. The login form uses poorly structured HTML.
+
+**Task**: Write the raw JavaScript DOM queries to target the crucial elements.
+
+**Success Criteria**:
+- Write a query for the username input field.
+- Write a query for the submit button.
+
+<CodeEditor
+  moduleId="06-js-ts-dom"
+  taskIndex={1}
+  placeholder={`// Challenge: Refactor and correct the code below
+// 1. Declare variables using let or const (avoid var)
+// 2. Ensure syntax is valid and logic is clean
+
+var status = "active";
+console.log("Status: " + status);`}
+/>
+
+
+## Summary
+
+1. The DOM is the HTML tree that the browser renders.
+2. Relying on CSS classes (`.btn`) or IDs (`#header`) creates brittle tests that break when UI styling changes.
+3. Use **Accessibility Locators** (`getByRole`, `getByPlaceholder`, `getByText`) to simulate how real users interact with the page. 
+
+In the final module of the Bridge Course, we will introduce **TypeScript** and **Object-Oriented Programming** to learn how to organize these locators into maintainable Page Object Models.
+
+
+<Quiz moduleId="06-js-ts-dom" />

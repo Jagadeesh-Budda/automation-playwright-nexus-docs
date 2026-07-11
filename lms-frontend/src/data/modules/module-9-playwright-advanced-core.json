@@ -1,0 +1,640 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T10:36:32.990Z",
+  "lessons": [
+    {
+      "id": "50-core-context",
+      "title": "9.1: Browser Context & State",
+      "url": "courses/playwright/50-core-context",
+      "group": "🎭 MODULE 9: PLAYWRIGHT ADVANCED CORE",
+      "level": 7,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Concept",
+        "outcome": "Understand isolated execution and state persistence"
+      },
+      "objectives": [
+        {
+          "id": "context_isolation",
+          "title": "Master Browser Context vs Browser Instance"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "task-1",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "context_isolation",
+          "weight": 100
+        }
+      ],
+      "spec": {
+        "concept": "Isolation",
+        "tool": "BrowserContext"
+      },
+      "quizPool": {
+        "Easy": [
+          {
+            "objective": "browser_context",
+            "type": "scenario",
+            "difficulty": "easy",
+            "q": "What Playwright feature allows you to open two completely isolated, incognito-like sessions in the same browser process?",
+            "options": [
+              "An isolated, incognito-like session within a single browser instance.",
+              "A completely separate browser process (e.g., launching a new Chrome window).",
+              "The top-level `playwright.config.ts` configuration object.",
+              "The current URL the page is navigating to."
+            ],
+            "a": "An isolated, incognito-like session within a single browser instance.",
+            "explanation": "Playwright avoids the heavy resource cost of launching multiple browser applications. Instead, it launches one Browser process and creates multiple lightweight, perfectly isolated `BrowserContexts` (similar to Incognito tabs) that share absolutely no cookies, cache, or local storage.",
+            "scenario": "You want to test a chat application where User A talks to User B simultaneously, without their session cookies colliding."
+          },
+          {
+            "objective": "browser_context",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You have two completely independent tests in `login.spec.ts`. The first test logs into the application. The second test immediately follows it and tries to access the dashboard.",
+            "q": "Assuming default Playwright behavior, what will happen to the second test?",
+            "options": [
+              "It will fail because Playwright automatically creates a fresh, isolated BrowserContext (with no cookies) for every single test block.",
+              "It will pass because the tests share the same file and thus the same session.",
+              "It will pass because cookies are stored globally on the machine.",
+              "It will crash the test runner."
+            ],
+            "a": "It will fail because Playwright automatically creates a fresh, isolated BrowserContext (with no cookies) for every single test block.",
+            "explanation": "By design, Playwright guarantees test isolation. Every `test()` block receives a brand new, pristine `context` and `page` fixture. The login cookies from test #1 are destroyed the moment test #1 finishes."
+          },
+          {
+            "objective": "browser_context",
+            "type": "multi-select",
+            "difficulty": "easy",
+            "scenario": "You are migrating a suite and need to understand how Playwright handles browser data.",
+            "q": "Which of the following data types are strictly isolated within a single `BrowserContext`? (Select all that apply)",
+            "options": [
+              "Cookies",
+              "Local Storage (localStorage)",
+              "Session Storage (sessionStorage)",
+              "The installed Node.js version",
+              "The Playwright version"
+            ],
+            "a": [
+              "Cookies",
+              "Local Storage (localStorage)",
+              "Session Storage (sessionStorage)"
+            ],
+            "explanation": "A Browser Context isolates all web-related state: Cookies, Local Storage, Session Storage, Cache, and Permissions. The Node and Playwright versions belong to the execution environment, not the browser."
+          },
+          {
+            "objective": "browser_context",
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "test('custom context', async ({ browser }) => {\n  const context = await browser.newContext({ viewport: { width: 800, height: 600 } });\n  const page = await context.newPage();\n  // ... test logic ...\n});",
+            "q": "Why would an engineer manually inject the `browser` fixture and instantiate a `context` like this, instead of just using the default `page` fixture?",
+            "options": [
+              "To override the global viewport size or permissions for this specific test only.",
+              "Because the default `page` fixture does not have a viewport.",
+              "Because `browser.newContext()` runs much faster.",
+              "Because it is required for TypeScript."
+            ],
+            "a": "To override the global viewport size or permissions for this specific test only.",
+            "explanation": "The default `page` fixture uses the settings defined in `playwright.config.ts`. If you need to test a specific edge case (like simulating a tiny mobile viewport or granting Geolocation permissions) just for one test, you build a custom context manually from the `browser` object."
+          },
+          {
+            "objective": "browser_context",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You are testing a chat application. You need User A to send a message to User B, and you need to verify both sides of the conversation in real time.",
+            "q": "What is the most efficient Playwright pattern to achieve this within a single test?",
+            "options": [
+              "Instantiate two separate `BrowserContext` objects (`contextA` and `contextB`), log in separately on each, and alternate commands.",
+              "Open two tabs (`page1` and `page2`) in the same context.",
+              "Launch two completely different browser types (Chromium and Firefox).",
+              "You must write two separate tests."
+            ],
+            "a": "Instantiate two separate `BrowserContext` objects (`contextA` and `contextB`), log in separately on each, and alternate commands.",
+            "explanation": "Because contexts are perfectly isolated, you can have 'User A' logged into `contextA` and 'User B' logged into `contextB` simultaneously within the same test script. If you used two tabs in the *same* context, the session (cookies) would be shared, causing a conflict."
+          }
+        ],
+        "Medium": [
+          {
+            "objective": "browser_context",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "import { test } from '@playwright/test';\n\ntest.use({ storageState: 'admin-auth.json' });\n\ntest('admin panel access', async ({ page }) => {\n  await page.goto('/admin');\n  await expect(page.locator('#metrics')).toBeVisible();\n});",
+            "q": "What architectural pattern is this code demonstrating?",
+            "options": [
+              "It is mocking the backend `/admin` API using a JSON file.",
+              "It is injecting a pre-recorded session (cookies and localStorage) into the context before the test starts, entirely bypassing the UI login flow.",
+              "It is saving the test results to `admin-auth.json`.",
+              "It is forcing the test to run in offline mode."
+            ],
+            "a": "It is injecting a pre-recorded session (cookies and localStorage) into the context before the test starts, entirely bypassing the UI login flow.",
+            "explanation": "The `storageState` config injects previously saved auth tokens/cookies directly into the blank `BrowserContext`. When the test navigates to the app, the app instantly recognizes the user as logged in. This dramatically reduces test execution time."
+          },
+          {
+            "objective": "browser_context",
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "You successfully saved the `storageState` after logging in, but when you load it in the next test, the user is still asked to log in.",
+            "q": "Which of the following authentication mechanisms are explicitly NOT captured and restored by Playwright's `storageState` API? (Select all that apply)",
+            "options": [
+              "Cookies",
+              "IndexedDB",
+              "SessionStorage",
+              "LocalStorage",
+              "In-Memory JavaScript Variables (Redux State)"
+            ],
+            "a": [
+              "IndexedDB",
+              "SessionStorage",
+              "In-Memory JavaScript Variables (Redux State)"
+            ],
+            "explanation": "By default, Playwright's `storageState` *only* captures Cookies and LocalStorage. It explicitly does not capture SessionStorage (which is ephemeral by definition), IndexedDB (complex storage), or raw JS memory. If your app relies on IndexedDB for auth, `storageState` will fail."
+          },
+          {
+            "objective": "browser_context",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You want to clear the cookies in the middle of a test to simulate a session expiration.",
+            "q": "Which Playwright command correctly clears the browser state?",
+            "options": [
+              "await context.clearCookies();",
+              "await page.clear();",
+              "await browser.clearCache();",
+              "await page.evaluate(() => localStorage.clear());"
+            ],
+            "a": "await context.clearCookies();",
+            "explanation": "Cookies are managed at the `BrowserContext` level, not the `Page` level. Therefore, you must call `await context.clearCookies()` to wipe them. If you also need to clear localStorage, you must use `evaluate` on the page."
+          },
+          {
+            "objective": "browser_context",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "test('test with custom context', async ({ browser }) => {\n  const context = await browser.newContext();\n  const page = await context.newPage();\n  await page.goto('/login');\n  // ... test finishes ...\n});",
+            "q": "What is the critical resource-management omission in this test script?",
+            "options": [
+              "The script fails to call `await context.close()` at the end. Manually created contexts are not automatically garbage collected like default fixtures, leading to severe memory leaks in CI.",
+              "The script fails to close the browser.",
+              "The script fails to await the goto command.",
+              "There is no omission; Playwright handles it."
+            ],
+            "a": "The script fails to call `await context.close()` at the end. Manually created contexts are not automatically garbage collected like default fixtures, leading to severe memory leaks in CI.",
+            "explanation": "Default fixtures (`{ page, context }`) are automatically destroyed by the Playwright Test runner. However, if you manually instantiate `browser.newContext()`, YOU are responsible for closing it. Failing to do so leaves zombie contexts hanging in memory."
+          },
+          {
+            "objective": "browser_context",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You are testing an application that requires camera and microphone permissions. By default, Chromium prompts the user with a dialog asking for permission, which halts the headless test.",
+            "q": "How do you automatically grant these permissions in Playwright?",
+            "options": [
+              "Click the 'Allow' button using `page.click('text=Allow')`.",
+              "Inject the permissions via the `BrowserContext` configuration: `test.use({ permissions: ['camera', 'microphone'] })`.",
+              "Use `page.on('dialog', dialog => dialog.accept())`.",
+              "Use a bash script."
+            ],
+            "a": "Inject the permissions via the `BrowserContext` configuration: `test.use({ permissions: ['camera', 'microphone'] })`.",
+            "explanation": "Browser permissions (camera, geolocation, clipboard) are strictly managed at the `BrowserContext` level. By configuring the context with `permissions`, the browser silently grants access without ever showing the OS-level prompt."
+          }
+        ],
+        "Hard": [
+          {
+            "objective": "browser_context",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "import { test } from '@playwright/test';\ntest.describe.configure({ mode: 'parallel' });\n\ntest('A', async ({ page }) => { \n  await login(page); \n  await page.context().storageState({ path: 'state.json' }); \n});\n\ntest('B', async ({ page }) => { \n  await login(page); \n  await page.context().storageState({ path: 'state.json' }); \n});",
+            "q": "These two tests run in parallel and both attempt to write to the same `state.json` file. What severe enterprise concurrency flaw occurs here?",
+            "options": [
+              "A classic Race Condition. Both worker threads try to open and write to `state.json` simultaneously, corrupting the JSON file or throwing an `EBUSY` file lock error.",
+              "The file path is invalid.",
+              "Playwright cannot write files in parallel mode.",
+              "The `storageState` method does not accept a path argument."
+            ],
+            "a": "A classic Race Condition. Both worker threads try to open and write to `state.json` simultaneously, corrupting the JSON file or throwing an `EBUSY` file lock error.",
+            "explanation": "Parallel execution means multiple Node.js worker processes are running. If multiple processes attempt to write to the exact same file path (`state.json`) at the exact same millisecond, the OS will either lock the file (crashing the test) or corrupt the data. Setup scripts that write global state must be isolated using project dependencies (`setup` projects)."
+          },
+          {
+            "objective": "browser_context",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "Your team tests a highly secure banking application. The application issues a JWT token into `sessionStorage`. Because `storageState` does not capture `sessionStorage`, you must manually bridge this gap to achieve UI-less login.",
+            "q": "What is the correct architectural pattern to inject a token into `sessionStorage` before the application loads?",
+            "options": [
+              "Use `page.addInitScript(() => sessionStorage.setItem('token', 'xyz'))`.",
+              "Modify the `playwright.config.ts` to include `sessionStorage: true`.",
+              "Use `page.evaluate` after `page.goto`.",
+              "Write the token to a cookie instead."
+            ],
+            "a": "Use `page.addInitScript(() => sessionStorage.setItem('token', 'xyz'))`.",
+            "explanation": "SessionStorage is tied strictly to the document origin. If you use `evaluate` after navigation, the app has already booted, checked for the token, and kicked you to the login screen. You must use `addInitScript` so the browser injects the token into memory the millisecond the origin loads, but *before* the React app initializes."
+          },
+          {
+            "objective": "browser_context",
+            "type": "multi-select",
+            "difficulty": "hard",
+            "scenario": "An SDET architect is designing a test suite for an app with multiple distinct subdomains (`app.site.com`, `auth.site.com`, `billing.site.com`).",
+            "q": "When dealing with complex cross-domain architectures, what are the inherent security limitations of `BrowserContext` state injection? (Select all that apply)",
+            "options": [
+              "`storageState` LocalStorage injection is origin-specific. If you save state from `auth.site.com`, the LocalStorage will not be available on `app.site.com`.",
+              "Cookies cannot be scoped to wildcards like `.site.com` in `storageState`.",
+              "Playwright cannot navigate between subdomains in the same context.",
+              "Cross-Origin Resource Sharing (CORS) policies may prevent `addInitScript` from executing."
+            ],
+            "a": [
+              "`storageState` LocalStorage injection is origin-specific. If you save state from `auth.site.com`, the LocalStorage will not be available on `app.site.com`."
+            ],
+            "explanation": "Browser security models dictate that LocalStorage is strictly bound to a specific origin (protocol + domain + port). While cookies can be scoped broadly (`domain: '.site.com'`), `storageState` will only inject LocalStorage into the exact origin it was recorded from. If your app relies on LocalStorage passing between subdomains, injection becomes incredibly complex."
+          },
+          {
+            "objective": "browser_context",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "test('Negative Auth - Corrupt Cookie', async ({ browser }) => {\n  const state = JSON.parse(fs.readFileSync('auth.json', 'utf8'));\n  state.cookies[0].value = 'corrupted_string';\n  const context = await browser.newContext({ storageState: state });\n  // ...\n});",
+            "q": "What advanced testing strategy is being executed here?",
+            "options": [
+              "State Mutation Testing: Intentionally corrupting the serialized `storageState` object in memory before injecting it into the context to verify how the application's security layer handles invalid sessions.",
+              "Bypassing CORS.",
+              "Fixing a broken JSON file.",
+              "Simulating a network timeout."
+            ],
+            "a": "State Mutation Testing: Intentionally corrupting the serialized `storageState` object in memory before injecting it into the context to verify how the application's security layer handles invalid sessions.",
+            "explanation": "The `storageState` argument accepts a file path OR a raw JSON object. By parsing the auth file, mutating the token string, and passing the manipulated object to `newContext()`, the SDET can aggressively test the backend's validation logic without writing complex UI flows."
+          },
+          {
+            "objective": "browser_context",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You are running 100 tests in parallel. Playwright launches 4 worker processes. Each worker runs 25 tests sequentially. How many actual Chrome browser processes (PIDs) are launched during this entire execution?",
+            "q": "What is the mathematical resource profile of this execution?",
+            "options": [
+              "100 browser processes.",
+              "4 browser processes.",
+              "1 browser process.",
+              "25 browser processes."
+            ],
+            "a": "4 browser processes.",
+            "explanation": "Playwright launches exactly one Browser process per Worker. The worker then spins up lightweight `BrowserContexts` (tabs) sequentially for its 25 tests, tearing down the context after each test. This is the crux of Playwright's speed: avoiding the massive overhead of booting 100 distinct Chrome instances."
+          }
+        ]
+      },
+      "icon": "🌐",
+      "slug": "50-core-context",
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "enterprise",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET"
+    },
+    {
+      "id": "51-debugging-workflow",
+      "title": "9.2: The Debugging Playbook",
+      "url": "courses/playwright/51-debugging-workflow",
+      "group": "🎭 MODULE 9: PLAYWRIGHT ADVANCED CORE",
+      "level": 7,
+      "weight": 15,
+      "meta": {
+        "time": "30 mins",
+        "type": "Debug",
+        "outcome": "Master a systematic debugging workflow for failing tests"
+      },
+      "objectives": [
+        {
+          "id": "debug_workflow",
+          "title": "Follow a systematic approach to diagnose and fix test failures"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "task-1",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "debug_workflow",
+          "weight": 100
+        }
+      ],
+      "spec": {
+        "tool": "Trace Viewer",
+        "pattern": "Systematic Debugging"
+      },
+      "quizPool": {
+        "Easy": [
+          {
+            "objective": "debugging_workflow",
+            "type": "mcq",
+            "difficulty": "easy",
+            "q": "When a Playwright test fails in CI, what is the absolute best artifact to download to visually and technically understand exactly what happened?",
+            "options": [
+              "The Playwright Trace file (`trace.zip`).",
+              "The standard terminal output text.",
+              "The Chromium error log.",
+              "The `package-lock.json` file."
+            ],
+            "a": "The Playwright Trace file (`trace.zip`).",
+            "explanation": "The Playwright Trace is a revolutionary debugging artifact. It captures a full timeline of DOM snapshots, network requests, console logs, and action execution, allowing you to visually 'time travel' through the test exactly as it ran in CI."
+          },
+          {
+            "objective": "debugging_workflow",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You are writing a test locally and want to interactively explore the DOM, pause execution, and try out different locators in real-time.",
+            "q": "Which Playwright CLI command launches the test in interactive debug mode?",
+            "options": [
+              "npx playwright test --debug",
+              "npx playwright test --inspect",
+              "npx playwright test --interactive",
+              "npx playwright debug"
+            ],
+            "a": "npx playwright test --debug",
+            "explanation": "The `--debug` flag automatically opens the Playwright Inspector, pauses the test on the very first line, opens a headed browser, and allows you to step through the code line-by-line while evaluating locators."
+          },
+          {
+            "objective": "debugging_workflow",
+            "type": "multi-select",
+            "difficulty": "easy",
+            "scenario": "You have a test that runs perfectly on your machine, but fails randomly on the CI server. You suspect a race condition.",
+            "q": "Which of the following local debugging techniques can help expose hidden race conditions? (Select all that apply)",
+            "options": [
+              "Run the test with the `--repeat-each=100` flag to force it to run sequentially 100 times to catch the flake.",
+              "Run the test on a slower machine or use CPU throttling to mimic a weak CI server.",
+              "Add `page.waitForTimeout(10000)` to fix the test.",
+              "Ignore it until it fails 3 times in a row."
+            ],
+            "a": [
+              "Run the test with the `--repeat-each=100` flag to force it to run sequentially 100 times to catch the flake.",
+              "Run the test on a slower machine or use CPU throttling to mimic a weak CI server."
+            ],
+            "explanation": "Flaky tests are usually caused by the application or environment being slower than expected. Stress-testing the file locally via `--repeat-each` or artificially slowing down your machine are standard architectural techniques to surface the race condition."
+          },
+          {
+            "objective": "debugging_workflow",
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "test('verify modal', async ({ page }) => {\n  await page.click('#open');\n  await page.pause();\n  await expect(page.locator('.modal')).toBeVisible();\n});",
+            "q": "What is the specific function of the `page.pause()` command in this script?",
+            "options": [
+              "It halts execution permanently and opens the Playwright Inspector, allowing the developer to manually interact with the browser state at that exact moment before continuing.",
+              "It pauses the test for 5 seconds.",
+              "It causes the browser to reload.",
+              "It skips the assertion."
+            ],
+            "a": "It halts execution permanently and opens the Playwright Inspector, allowing the developer to manually interact with the browser state at that exact moment before continuing.",
+            "explanation": "`page.pause()` is an explicit breakpoint. It is incredibly useful for stopping a fast-moving test right before a complex interaction so you can manually inspect the DOM tree or test locators in the console."
+          },
+          {
+            "objective": "debugging_workflow",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You downloaded a `trace.zip` file from your Jenkins server.",
+            "q": "How do you view this file locally?",
+            "options": [
+              "Unzip it and double-click the `index.html` file.",
+              "Run `npx playwright show-trace path/to/trace.zip` in your terminal.",
+              "Open it in Microsoft Excel.",
+              "Upload it to GitHub."
+            ],
+            "a": "Run `npx playwright show-trace path/to/trace.zip` in your terminal.",
+            "explanation": "The `show-trace` command boots a local instance of the Playwright Trace Viewer web application and feeds it the encrypted/zipped data, bypassing browser CORS restrictions that occur if you just try to unzip it."
+          }
+        ],
+        "Medium": [
+          {
+            "objective": "debugging_workflow",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "await page.locator('.btn-primary').click();",
+            "q": "The test fails on this line with the error: `Error: strict mode violation: locator('.btn-primary') resolved to 4 elements`. What is the architectural rule being enforced here?",
+            "options": [
+              "Playwright forces all locators to be unique. If a locator matches multiple elements, Playwright refuses to guess which one you meant and throws an error to prevent unintentional interactions.",
+              "The `.btn-primary` class is not defined in the CSS.",
+              "The element is hidden.",
+              "You must use an XPath instead."
+            ],
+            "a": "Playwright forces all locators to be unique. If a locator matches multiple elements, Playwright refuses to guess which one you meant and throws an error to prevent unintentional interactions.",
+            "explanation": "This is Playwright's 'Strict Mode'. It is a core safety feature. Selenium would blindly click the first element it found. Playwright throws a hard error, forcing the SDET to refine the locator (e.g., `locator('.btn-primary').first()` or adding a text filter) to ensure deterministic execution."
+          },
+          {
+            "objective": "debugging_workflow",
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "You are utilizing the VS Code Playwright Extension to debug a test.",
+            "q": "Which of the following debugging actions can be performed entirely inside the VS Code IDE without touching the CLI? (Select all that apply)",
+            "options": [
+              "Setting visual breakpoints by clicking the gutter next to the line numbers.",
+              "Running a single test by clicking the 'Play' button next to the test title.",
+              "Opening the Trace Viewer for a failed test.",
+              "Generating a PDF report of the execution.",
+              "Recording new code via Codegen."
+            ],
+            "a": [
+              "Setting visual breakpoints by clicking the gutter next to the line numbers.",
+              "Running a single test by clicking the 'Play' button next to the test title.",
+              "Opening the Trace Viewer for a failed test.",
+              "Recording new code via Codegen."
+            ],
+            "explanation": "The Playwright VS Code extension provides a fully integrated GUI for almost the entire CLI feature set, including debugging, breakpoints, trace viewing, and codegen. PDF reports are not natively supported."
+          },
+          {
+            "objective": "debugging_workflow",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "Your test clicks a button to submit a form, but nothing happens. The test eventually times out on the next assertion. The UI looks correct, and the button is clearly visible.",
+            "q": "When looking at the Trace Viewer, which specific tab will instantly reveal if the frontend application threw an unhandled React exception when the button was clicked?",
+            "options": [
+              "The Network Tab",
+              "The Console Tab",
+              "The Source Tab",
+              "The Call Tab"
+            ],
+            "a": "The Console Tab",
+            "explanation": "The Console tab in the Trace Viewer captures all native browser `console.log`, `console.error`, and uncaught exceptions. If clicking a button causes the frontend framework to crash internally, the red error trace will be permanently captured here."
+          },
+          {
+            "objective": "debugging_workflow",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "test.use({ trace: 'retain-on-failure', video: 'on-first-retry' });",
+            "q": "What is the architectural and financial justification for configuring artifacts this way in an enterprise CI environment, rather than setting both to 'on'?",
+            "options": [
+              "Traces and videos consume massive amounts of CPU, RAM, and Disk Space. Recording them for every passing test is a waste of infrastructure money. Generating them only when a test fails or retries optimizes resources while preserving debugging capability.",
+              "Playwright cannot record videos for passing tests.",
+              "Tracing is incompatible with parallel execution.",
+              "It forces the tests to run faster."
+            ],
+            "a": "Traces and videos consume massive amounts of CPU, RAM, and Disk Space. Recording them for every passing test is a waste of infrastructure money. Generating them only when a test fails or retries optimizes resources while preserving debugging capability.",
+            "explanation": "At an enterprise scale (10,000+ tests), retaining traces for green runs can consume hundreds of gigabytes of storage per pipeline run. The `retain-on-failure` pattern ensures you only pay the storage cost when you actually need to debug a failure."
+          },
+          {
+            "objective": "debugging_workflow",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You are writing a test and struggling to find a locator for a specific SVG icon. You open the browser DevTools (F12) while paused in debug mode.",
+            "q": "How can you leverage the browser's native DevTools Console to test Playwright locators?",
+            "options": [
+              "Type `playwright.$('css-selector')` into the Chrome console.",
+              "Type `document.querySelector('css-selector')` and hope it matches.",
+              "Type `playwright.locator('css-selector')` into the console.",
+              "You cannot use Playwright specific engines (like role or text locators) inside the Chrome console."
+            ],
+            "a": "Type `playwright.$('css-selector')` into the Chrome console.",
+            "explanation": "When Playwright is attached to a browser, it injects a global `playwright` object into the DOM. By typing `playwright.$('text=Submit')` or `playwright.$('role=button')` directly into the Chrome console, you can evaluate Playwright's custom engine locators visually."
+          }
+        ],
+        "Hard": [
+          {
+            "objective": "debugging_workflow",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "import debug from 'debug';\nconst log = debug('app:tests:login');\n\ntest('login flow', async ({ page }) => {\n  log('Navigating to homepage');\n  await page.goto('/');\n  // ...\n});",
+            "q": "A senior architect mandates the use of the `debug` npm package instead of `console.log`. How do you mathematically expose these logs in the CI pipeline without modifying the code?",
+            "options": [
+              "Inject the environment variable `DEBUG=app:tests:*` into the CI runner. The `debug` package uses this to conditionally render the hidden logs, keeping standard output clean while providing deep observability when needed.",
+              "Run Playwright with the `--debug` flag.",
+              "Open the Trace Viewer.",
+              "Use the `console.log` interceptor."
+            ],
+            "a": "Inject the environment variable `DEBUG=app:tests:*` into the CI runner. The `debug` package uses this to conditionally render the hidden logs, keeping standard output clean while providing deep observability when needed.",
+            "explanation": "Enterprise pipelines rely on structured, toggleable observability. `console.log` pollutes standard output permanently. The `debug` package provides namespace-driven logging. By default, it is completely silent. When an SDET needs to investigate a CI failure, they inject `DEBUG=app:*` into the pipeline variables, turning on massive telemetry instantly."
+          },
+          {
+            "objective": "debugging_workflow",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "A test fails in CI on step 5. The Trace Viewer reveals that the DOM Snapshot for step 5 is completely blank (white screen). However, the Network tab shows all APIs returning 200 OK. The application is a React SPA.",
+            "q": "Based on this specific Trace fingerprint, what is the architectural root cause of the failure?",
+            "options": [
+              "The backend database crashed.",
+              "Playwright failed to capture the snapshot.",
+              "A fatal JavaScript exception occurred in the React rendering cycle (e.g., trying to read `.length` of undefined). The frontend framework crashed, resulting in the 'White Screen of Death', which Playwright faithfully recorded.",
+              "The test timed out."
+            ],
+            "a": "A fatal JavaScript exception occurred in the React rendering cycle (e.g., trying to read `.length` of undefined). The frontend framework crashed, resulting in the 'White Screen of Death', which Playwright faithfully recorded.",
+            "explanation": "This is a classic SPA failure signature. If the network is healthy but the DOM instantly vanishes or goes white, it mathematically proves the frontend client crashed during rendering. The SDET should pivot immediately to the Console tab in the Trace to extract the React stack trace to give to the developers."
+          },
+          {
+            "objective": "debugging_workflow",
+            "type": "multi-select",
+            "difficulty": "hard",
+            "scenario": "You are writing a pipeline script to debug a persistent Playwright runner crash (`SIGKILL` out of memory) on an underpowered AWS Jenkins node.",
+            "q": "Which environment variables dramatically alter Playwright's internal execution architecture to help diagnose or mitigate memory crashes? (Select all that apply)",
+            "options": [
+              "PWDEBUG=1",
+              "PLAYWRIGHT_HTML_REPORT=1",
+              "DEBUG=pw:api",
+              "NODE_OPTIONS=--max-old-space-size=4096",
+              "PLAYWRIGHT_BROWSERS_PATH=0"
+            ],
+            "a": [
+              "DEBUG=pw:api",
+              "NODE_OPTIONS=--max-old-space-size=4096"
+            ],
+            "explanation": "`DEBUG=pw:api` instructs Playwright to print every single internal CDP command it executes, providing immense logging. `NODE_OPTIONS=--max-old-space-size=4096` expands the V8 memory heap limit for the Node.js runner process, often preventing OOM crashes on constrained nodes."
+          },
+          {
+            "objective": "debugging_workflow",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "await page.route('**/*', route => {\n  console.log(route.request().url());\n  route.continue();\n});",
+            "q": "An SDET implements this globally to log all network traffic for debugging. Suddenly, execution time inflates by 400%, and tests start timing out. What is the architectural bottleneck?",
+            "options": [
+              "Using `**/*` intercepts absolutely every asset (images, fonts, CSS, JS). Routing every single sub-resource from the Chromium engine through the Node.js event loop and back creates a massive IPC (Inter-Process Communication) bottleneck.",
+              "Playwright disables caching when `page.route` is active.",
+              "The `console.log` method is asynchronous and slow.",
+              "`route.continue()` modifies the headers automatically."
+            ],
+            "a": "Using `**/*` intercepts absolutely every asset (images, fonts, CSS, JS). Routing every single sub-resource from the Chromium engine through the Node.js event loop and back creates a massive IPC (Inter-Process Communication) bottleneck.",
+            "explanation": "Network interception is expensive. Passing every single 1kb image request across the WebSocket boundary from Browser -> Node -> Browser crushes the CPU. Interception should always be strictly scoped to specific endpoints (e.g., `**/api/**`) to preserve performance."
+          },
+          {
+            "objective": "debugging_workflow",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "Your tests involve interacting with a complex, 3rd-party mapping library (like Mapbox or Google Maps) rendered entirely inside an HTML `<canvas>` element. Standard Playwright locators cannot see inside a canvas.",
+            "q": "What is the industry-standard Playwright debugging and automation strategy for asserting state inside a compiled Canvas?",
+            "options": [
+              "Use XPath.",
+              "Use `page.evaluate()` to tap directly into the mapping library's global window object (e.g., `window.map.getZoom()`) and extract the mathematical state directly, bypassing the DOM entirely.",
+              "Use Playwright's built-in `getByCanvas()` locator.",
+              "You cannot automate canvas applications."
+            ],
+            "a": "Use `page.evaluate()` to tap directly into the mapping library's global window object (e.g., `window.map.getZoom()`) and extract the mathematical state directly, bypassing the DOM entirely.",
+            "explanation": "A `<canvas>` is an opaque pixel grid. Playwright cannot read it. The enterprise solution is to coordinate with developers to expose the underlying data engine to the `window` object. You then use Playwright's JavaScript Execution Context (`page.evaluate`) to read the raw data model, ensuring perfect deterministic assertions."
+          }
+        ]
+      },
+      "icon": "🩺",
+      "slug": "51-debugging-workflow",
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "enterprise",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET"
+    }
+  ]
+}

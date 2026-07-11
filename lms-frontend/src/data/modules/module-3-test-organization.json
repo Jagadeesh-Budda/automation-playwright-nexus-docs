@@ -1,0 +1,465 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T10:36:32.990Z",
+  "lessons": [
+    {
+      "id": "19-test-org",
+      "title": "3.1: Test Organization",
+      "url": "courses/playwright/19-test-org",
+      "group": "📁 MODULE 3: TEST ORGANIZATION",
+      "level": 3,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Code",
+        "outcome": "Organize files and specs."
+      },
+      "objectives": [
+        {
+          "id": "03a_test_org_obj",
+          "title": "Complete 3.1: Test Organization"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "03a_test_org_obj",
+          "weight": 100
+        }
+      ],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "scenario",
+            "difficulty": "easy",
+            "q": "Which organizational strategy is the industry standard for Playwright test files to ensure scalability and parallelization?",
+            "options": [
+              "Group related tests logically in folders based on features or domains",
+              "Put all tests in a single massive file",
+              "Keep all tests in the root directory without folders",
+              "Use random file names to avoid conflicts"
+            ],
+            "a": "Group related tests logically in folders based on features or domains",
+            "explanation": "Grouping tests logically makes the test suite maintainable and easier to scale.",
+            "scenario": "Your team is arguing about how to structure a new repository containing 500 E2E tests for a massive e-commerce application."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You have a suite of 500 tests. You want to run only the tests related to the 'checkout' flow without manually passing file paths.",
+            "q": "What is the standard architectural approach?",
+            "options": [
+              "Use test.describe('checkout') and run `npx playwright test -g \"checkout\"`.",
+              "Put all checkout tests in a single checkout.spec.ts file and hardcode the path.",
+              "Use the --only CLI flag.",
+              "Comment out the other 450 tests before running."
+            ],
+            "a": "Use test.describe('checkout') and run `npx playwright test -g \"checkout\"`.",
+            "explanation": "The -g (grep) flag allows you to run tests matching a specific title or tag across your entire codebase, making it the standard way to run logical suites."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "An enterprise team is testing three distinct environments (QA, Staging, Prod) and uses a playwright.config.ts file.",
+            "q": "What is the most scalable way to handle environment-specific variables like Base URLs?",
+            "options": [
+              "Use dotenv to load environment variables and reference process.env.BASE_URL in the config's use block.",
+              "Hardcode the URLs directly into every .spec.ts file.",
+              "Create three separate config files (qa.config.ts, prod.config.ts) and duplicate the settings.",
+              "Use a global setup file to write the URL to a text file on disk."
+            ],
+            "a": "Use dotenv to load environment variables and reference process.env.BASE_URL in the config's use block.",
+            "explanation": "Injecting configurations via environment variables is a 12-Factor App best practice. It prevents hardcoded secrets and allows CI/CD pipelines to easily swap configurations without touching the code."
+          }
+        ]
+      },
+      "icon": "📁",
+      "slug": "19-test-org",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "20-describe-blocks",
+      "title": "3.2: Describe Blocks",
+      "url": "courses/playwright/20-describe-blocks",
+      "group": "📁 MODULE 3: TEST ORGANIZATION",
+      "level": 3,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Code",
+        "outcome": "Group related tests."
+      },
+      "objectives": [
+        {
+          "id": "03b_describe_blocks_obj",
+          "title": "Complete 3.2: Describe Blocks"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "03b_describe_blocks_obj",
+          "weight": 100
+        }
+      ],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "scenario",
+            "difficulty": "easy",
+            "q": "How can you logically group these tests in the file so that the HTML report visually separates them into distinct sections?",
+            "options": [
+              "To group related tests and share hooks/configuration",
+              "To execute an individual test assertion",
+              "To launch a new browser instance",
+              "To pause the test execution"
+            ],
+            "a": "To group related tests and share hooks/configuration",
+            "explanation": "test.describe blocks allow you to logically group tests and share before/after hooks among them.",
+            "scenario": "You have a test file with 15 tests. The first 5 test the 'Checkout' feature, and the last 10 test 'User Settings'."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "test.describe('Auth', () => {\n  test.beforeEach(async () => { /* login */ });\n  test('A', async () => {});\n});\ntest('B', async () => {});",
+            "q": "How many times will the beforeEach hook execute during this run?",
+            "options": [
+              "1 time (before test A).",
+              "2 times (before test A and test B).",
+              "0 times.",
+              "It runs once before the describe block starts."
+            ],
+            "a": "1 time (before test A).",
+            "explanation": "Hooks declared inside a test.describe block are strictly scoped to the tests within that block. Test 'B' exists outside the block and will not trigger the hook."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "test.describe.configure({ mode: 'parallel' });\ntest('A', async () => {});\ntest('B', async () => {});",
+            "q": "Assuming the global config does not enforce fullyParallel, what does this specific configuration block do?",
+            "options": [
+              "It overrides the default sequential file execution, forcing tests A and B to run concurrently in separate worker processes.",
+              "It forces tests A and B to run simultaneously in the same Node.js thread using Promise.all().",
+              "It tells the CI server to spawn another container.",
+              "It ignores any beforeEach hooks to save time."
+            ],
+            "a": "It overrides the default sequential file execution, forcing tests A and B to run concurrently in separate worker processes.",
+            "explanation": "By default, tests inside a single file run sequentially in the same worker. Using mode: 'parallel' inside a describe block breaks the tests apart, distributing them to separate OS-level worker processes to speed up execution."
+          }
+        ]
+      },
+      "icon": "📁",
+      "slug": "20-describe-blocks",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "21-before-after",
+      "title": "3.3: Before/After Hooks",
+      "url": "courses/playwright/21-before-after",
+      "group": "📁 MODULE 3: TEST ORGANIZATION",
+      "level": 3,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Code",
+        "outcome": "Setup and teardown."
+      },
+      "objectives": [
+        {
+          "id": "03c_before_after_obj",
+          "title": "Complete 3.3: Before/After Hooks"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Isolate Tests with Hooks",
+          "hint": "test.beforeEach(async ({ page }) => { ... });",
+          "rules": [
+            {
+              "type": "ast_callee",
+              "value": "test.beforeEach",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_callee",
+              "value": "test.afterEach",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_callee",
+              "value": "test.beforeEach",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_callee",
+              "value": "test.afterEach",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is keeping setup hooks lightweight an important architectural pattern?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which setup hook anti-pattern causes race conditions when `fullyParallel` is enabled?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "icon": "📁",
+      "slug": "21-before-after",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "22-duplication-problem",
+      "title": "3.4: The Duplication Problem",
+      "url": "courses/playwright/22-duplication-problem",
+      "group": "📁 MODULE 3: TEST ORGANIZATION",
+      "level": 3,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Code",
+        "outcome": "Experience maintenance pain."
+      },
+      "objectives": [
+        {
+          "id": "03d_duplication_problem_obj",
+          "title": "Complete 3.4: The Duplication Problem"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "Your test suite has 50 tests. 45 of them start by filling in a login form with the exact same selectors and credentials.",
+            "q": "What happens when the engineering team adds a 'Company Name' field to the login page?",
+            "options": [
+              "You must manually open 45 tests and update the code in every single one",
+              "Playwright automatically updates them using AI",
+              "The tests will continue passing because Playwright ignores new fields",
+              "The pipeline deletes the tests"
+            ],
+            "a": "You must manually open 45 tests and update the code in every single one",
+            "explanation": "Code duplication leads to severe maintenance overhead. A single UI change breaks everything and requires an arduous refactoring effort."
+          },
+          {
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "test('A', async () => { await login(); });\ntest('B', async () => { await login(); });",
+            "q": "What architectural concept aims to resolve this exact duplication?",
+            "options": [
+              "Page Object Model (POM) and Fixtures",
+              "Serial execution mode",
+              "Web-first assertions",
+              "Using global variables"
+            ],
+            "a": "Page Object Model (POM) and Fixtures",
+            "explanation": "Abstracting repeated logic into POMs or custom fixtures is the standard enterprise approach to achieving DRY (Don't Repeat Yourself) code."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "A junior SDET proposes moving all shared logic into a single massive `test.beforeEach` block at the top of a huge test file to avoid duplication.",
+            "q": "Why might this be an anti-pattern?",
+            "options": [
+              "It forces tests that don't need all that setup to run it anyway, increasing execution time and coupling",
+              "beforeEach hooks are forbidden in Playwright",
+              "It breaks parallelization",
+              "It throws a syntax error"
+            ],
+            "a": "It forces tests that don't need all that setup to run it anyway, increasing execution time and coupling",
+            "explanation": "While `beforeEach` is good for local setup, dumping *everything* there creates monolithic, slow tests. Fixtures are preferred because they only execute when explicitly requested by a test."
+          },
+          {
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "You are auditing a test repository for duplication code smells.",
+            "q": "Which of the following are strong indicators of the 'Duplication Problem'? (Select all that apply)",
+            "options": [
+              "The exact same CSS selector string appears in 10 different files",
+              "Multiple tests share the same 15 lines of setup code",
+              "Every test starts with `await page.goto('/')`",
+              "All tests use `expect()`"
+            ],
+            "a": [
+              "The exact same CSS selector string appears in 10 different files",
+              "Multiple tests share the same 15 lines of setup code"
+            ],
+            "explanation": "Duplicated strings (locators) and heavy duplicated logic (setup) are massive code smells. A single `page.goto` is acceptable, and `expect` is mandatory."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You have successfully abstracted your login logic into a reusable utility class. However, tests running in parallel are now sporadically failing with authentication errors.",
+            "q": "What architectural mistake likely caused this during refactoring?",
+            "options": [
+              "The utility class was instantiated globally outside the test blocks, causing workers to share state and overwrite each other's tokens",
+              "The utility class used async/await",
+              "Playwright cannot handle custom classes in parallel",
+              "The timeout was too low"
+            ],
+            "a": "The utility class was instantiated globally outside the test blocks, causing workers to share state and overwrite each other's tokens",
+            "explanation": "When removing duplication, engineers often mistakenly put shared instances in the global file scope. Playwright requires strict isolation; classes must be instantiated *inside* the test block or passed via fixtures."
+          }
+        ]
+      },
+      "icon": "📁",
+      "slug": "22-duplication-problem",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    }
+  ]
+}

@@ -1,0 +1,146 @@
+﻿# 8.1: The Sprint Cycle
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Understand the Automation Skill Authority (ASA) automation sprint cycle
+
+## What is the Sprint Cycle?
+
+In professional automation engineering, tests are not written randomly. They follow a structured, repeatable **5-day sprint cycle** designed to ensure every automation engineer produces stable, reviewed, and CI-ready code by the end of the week.
+
+Think of it like a factory assembly line — each day has a specific role, and skipping a step breaks the quality guarantee.
+
+## The ASA 5-Day Sprint Model
+
+| Day | Focus | Goal |
+|-----|-------|------|
+| **Day 1** | Concept & Planning | Read the spec, understand what to test |
+| **Day 2** | Code & Implementation | Write the test using POM + AAA pattern |
+| **Day 3** | Execution & Debug | Run the suite, fix failures, analyze traces |
+| **Day 4** | Architecture Review | Refactor, ensure 4-layer compliance |
+| **Day 5** | PR & Merge | Pass AST audit, get PR approved |
+
+## Core Tools in the ASA Stack
+
+```
+Playwright   → UI Automation Engine
+Jira         → Sprint tracking and ticket management
+GitHub       → Source control and Pull Request reviews
+.env files   → Environment-specific configuration
+```
+
+## Why This Process Matters
+
+Without a structured sprint cycle, automation engineers tend to:
+- Write tests directly in spec files without Page Objects (creates brittle tests)
+- Hardcode `sleep()` calls instead of using smart waiting (causes flaky CI failures)
+- Skip the architecture review (creates unmaintainable test suites)
+
+The ASA sprint cycle enforces discipline so your test suite grows **without accumulating technical debt**.
+
+## The Definition of Done (DoD)
+
+A test is **not done** until:
+1. ✅ It passes in `--headed` and `--headless` mode
+2. ✅ The AST Auditor passes in `--strict` mode (no hardcoded waits, no magic strings)
+3. ✅ A senior engineer has approved the Pull Request on GitHub
+4. ✅ The test passes in the CI/CD pipeline (GitHub Actions)
+
+> [!IMPORTANT]
+> **The #1 rule:** Never push code that fails locally. If a test fails on your machine, it will always fail in CI. Fix it first.
+
+## Real-World Context: Pharmaceutical DMS
+
+In a Document Management System (DMS) for a pharmaceutical company, automation tests are **regulatory artifacts**. A failing test isn't just a bug — it can block a product release. The sprint cycle ensures every test is treated with the seriousness it deserves.
+
+## Common Mistakes on Day 1
+
+❌ **Starting to code before reading the spec** — You will test the wrong thing.
+❌ **Skipping Jira ticket updates** — Your team loses visibility into progress.
+✅ **Correct approach:** Read the acceptance criteria first, write test scenarios in plain English, *then* open your code editor.
+
+## The Training Wheels Are Coming Off: Introduction to AST Gates
+
+> [!WARNING]
+> **Strict Grading Ahead**
+> Starting in the very next lesson, you are entering the Enterprise Practices stage. The simple "Sandbox" mode you have enjoyed so far is gone.
+
+In the previous stages, as long as your code worked and did what it was supposed to do, you passed the lesson.
+
+In the professional world, **working code is not enough**. Your code must be architecturally sound, maintainable, and strictly follow the team's design patterns. 
+
+To enforce this, this curriculum uses **Abstract Syntax Tree (AST) Gates**. 
+
+When you click "Verify" on future coding tasks, an automated linter will read your code structure. **You will fail the task if you:**
+* Hardcode a `page.waitForTimeout(5000)` instead of waiting for a state.
+* Use fragile CSS selectors instead of `getByRole`.
+* Put test logic inside a Page Object instead of keeping it in the spec file.
+
+The AST Gate does not care if your test passes. It cares *how* you wrote it. Prepare to be frustrated. Prepare to rewrite code that technically "works." This is how you transition from a scripter to a Software Engineer in Test.
+
+<CodeEditor
+  moduleId="40-onboarding"
+  taskIndex={0}
+  placeholder="// No code task for this concept module. Move on to 8.2!"
+/>
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="40-onboarding"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="40-onboarding" />
+

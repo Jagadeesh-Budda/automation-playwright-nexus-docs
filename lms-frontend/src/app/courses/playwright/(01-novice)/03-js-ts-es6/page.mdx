@@ -1,0 +1,246 @@
+﻿
+
+# 0.3: Arrays & ES6
+
+In automation, we rarely deal with single strings or numbers. We deal with **massive collections of data**. 
+
+When we query a database, read an API response, or fetch a list of elements from the DOM, that data is returned to us structured as **Objects** and **Arrays**. 
+
+If you try to write a loop in Playwright using an old-school `for(var i=0; i<10; i++)`, you are writing brittle code. Modern ES6 array methods are safer, cleaner, and strictly required for enterprise automation.
+
+---
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Destructuring and Spread.
+
+## 1. Deep Dive: Objects
+
+Objects are collections of Key-Value pairs. They are used to group related data representing a single entity (like a User, or an API Payload).
+
+```javascript
+// Creating an object using curly braces {}
+const apiPayload = {
+  endpoint: '/users/create',
+  method: 'POST',
+  headers: {
+    Authorization: 'Bearer 12345'
+  }
+};
+
+// Accessing properties via Dot Notation
+console.log(apiPayload.method); // 'POST'
+
+// Accessing nested properties
+console.log(apiPayload.headers.Authorization); // 'Bearer 12345'
+```
+
+If you have ever looked at a JSON file (JavaScript Object Notation), you already understand Objects.
+
+---
+
+## 2. Object Destructuring (Critical for Playwright)
+
+Destructuring is a syntax that allows you to "unpack" properties from objects into distinct variables automatically. 
+
+**This is the most common syntax you will see in Playwright.**
+
+```javascript
+const user = { username: 'admin', role: 'manager', id: 99 };
+
+// Old Way (Verbose)
+const role = user.role;
+const id = user.id;
+
+// Modern ES6 Way (Destructuring)
+// This pulls 'role' and 'id' directly out of the user object!
+const { role, id } = user;
+
+console.log(role); // 'manager'
+```
+
+### Destructuring in Playwright Signatures
+Playwright automatically creates an enormous "Context Object" containing the browser `page`, the API `request` context, browser contexts, and more. It passes this massive object to every single test.
+
+We use destructuring to pull out *only* the pieces we need for that specific test.
+
+```javascript
+import { test, expect } from '@playwright/test';
+
+// Look at the { page, request } inside the arguments!
+// We are destructuring the massive Playwright context object on the fly.
+test('API and UI hybrid flow', async ({ page, request }) => {
+  await request.post('/login');
+  await page.goto('/dashboard');
+});
+```
+
+---
+
+## 3. Deep Dive: Arrays
+
+Arrays are ordered lists of items. They use square brackets `[]`.
+
+```javascript
+const userRoles = ['admin', 'manager', 'editor', 'viewer'];
+
+// Arrays are zero-indexed!
+console.log(userRoles[0]); // 'admin'
+console.log(userRoles[2]); // 'editor'
+```
+
+You can also destructure arrays, pulling items out by their position:
+
+```javascript
+const [topRole, secondRole] = userRoles;
+console.log(topRole); // 'admin'
+```
+
+---
+
+## 4. Functional Iteration: Map & Filter
+
+When you want to loop over an array of data, **never use standard `for` loops**. They are prone to off-by-one errors and mutate state.
+
+Instead, we use Functional Iterators. These are functions attached to arrays that take a **Callback** (Remember those from the last lesson?) and apply it to every item in the array.
+
+### `.map()`
+Transforms every item in an array and returns a **brand new array**. It does *not* mutate the original array.
+
+```javascript
+const users = [
+  { id: 1, name: 'Alice' }, 
+  { id: 2, name: 'Bob' }
+];
+
+// We pass an arrow function callback into .map()
+// It runs on {id: 1}, returns 1. Runs on {id: 2}, returns 2.
+const userIds = users.map((user) => {
+  return user.id;
+});
+
+console.log(userIds); // [1, 2]
+```
+
+### `.filter()`
+Returns a **brand new array** containing *only* the items that match a specific condition.
+
+```javascript
+const responseCodes = [200, 404, 201, 500];
+
+// Return true if the code is less than 400
+// Notice we are using the implicit return single-line arrow function!
+const successes = responseCodes.filter((code) => code < 400);
+
+console.log(successes); // [200, 201]
+```
+
+---
+
+## 5. Interactive Challenge: Map Data
+
+Below is an array of mock API responses representing users.
+
+**Your Task:** Use `.map()` and an arrow function callback to create an array containing ONLY the email addresses of the users. Store the result in the `emails` variable.
+
+<CodeEditor
+  moduleId="03-js-ts-es6"
+  taskIndex={0}
+  placeholder={`const apiResponses = [\n  { name: 'Admin', email: 'admin@corp.com' },\n  { name: 'Guest', email: 'guest@corp.com' }\n];\n\n// WRITE YOUR CODE HERE (Use apiResponses.map):\nconst emails = [];\n\nconsole.log(emails); // Should output ['admin@corp.com', 'guest@corp.com']`}
+/>
+
+---
+
+## 6. The Spread Operator (`...`)
+
+The spread operator `...` is used to "expand" an array or object into its individual elements. It is heavily used in automation to clone configuration objects or merge API payloads safely without mutating the original in memory.
+
+```javascript
+const baseConfig = { timeout: 30000, retries: 2 };
+
+// We create a NEW object, "spread" the base properties into it, 
+// and add a new 'viewport' property.
+const mobileConfig = { 
+  ...baseConfig, 
+  viewport: { width: 375, height: 812 } 
+};
+
+console.log(mobileConfig); 
+// { timeout: 30000, retries: 2, viewport: { width: 375, height: 812 } }
+```
+
+> [!TIP]
+> The spread operator creates a *shallow* clone. This ensures you aren't accidentally editing the `baseConfig` memory reference when you configure the `mobileConfig`.
+
+## Summary
+
+1. **Objects `{}`** store key-value data. **Arrays `[]`** store ordered lists.
+2. **Destructuring** `const { page } = context` unpacks values quickly.
+3. Use **`.map()`** and **`.filter()`** instead of `for` loops.
+4. The **Spread Operator** `...` is the safest way to clone and merge configs.
+
+In the next module, we tackle the most important concept in all of automation: **Asynchrony**.
+
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="03-js-ts-es6"
+  taskIndex={1}
+  placeholder={`// Refactor this legacy code to use ES6 destructuring and array methods (.map or .filter)
+var config = { timeout: 30000, retries: 2, browserName: 'chromium' };
+var timeout = config.timeout;
+var retries = config.retries;
+
+var users = [{ name: 'Admin', active: true }, { name: 'Guest', active: false }];
+var activeUsers = [];
+for (var i = 0; i < users.length; i++) {
+  if (users[i].active == true) {
+    activeUsers.push(users[i]);
+  }
+}`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="03-js-ts-es6" />

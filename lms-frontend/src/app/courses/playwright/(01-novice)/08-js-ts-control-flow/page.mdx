@@ -1,0 +1,207 @@
+﻿
+
+# 0.8: Control Flow & Error Handling
+
+If you only know how to declare variables and functions, your scripts will run blindly from top to bottom. But in automation, the environment is unpredictable. Sometimes a modal pops up unexpectedly; sometimes the API returns a 500 error instead of a 200. 
+
+To handle this unpredictability, we must use **Control Flow** to give our scripts the ability to make decisions, and **Error Handling** to ensure our scripts don't just instantly crash when something unexpected happens.
+
+---
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Handle conditional logic and errors.
+
+## 1. The `if / else` Statement
+
+The `if` statement is the most fundamental decision-making tool in programming. It evaluates a condition inside parentheses `()`. 
+- If that condition resolves to `true`, it executes the block of code inside the curly braces `{}`. 
+- If it resolves to `false`, it skips that block completely.
+- You can chain multiple conditions using `else if`, or catch everything else using a final `else`.
+
+```javascript
+let userRole = 'guest';
+
+// The condition is checked using strict equality ===
+if (userRole === 'admin') {
+  console.log("Welcome to the dashboard, Admin!");
+} else if (userRole === 'editor') {
+  console.log("Welcome Editor. You have limited access.");
+} else {
+  console.log("Access Denied."); // This line will execute
+}
+```
+
+### Playwright Application
+In Playwright, you should generally avoid using `if/else` to check if a UI element exists. Relying on assertions (`expect(locator).toBeVisible()`) is much safer. 
+
+However, you *will* use `if/else` heavily when evaluating API responses or reading environment variables.
+
+```javascript
+const response = await request.post('/login');
+
+if (response.status() === 200) {
+  console.log("Login successful! Moving to dashboard.");
+} else {
+  console.log("Login failed with status: " + response.status());
+}
+```
+
+---
+
+## 2. Logical Operators (AND / OR / NOT)
+
+You often need to evaluate multiple conditions at once before making a decision.
+
+### AND (`&&`)
+Both conditions must be true for the block to execute.
+```javascript
+const hasUsername = true;
+const hasPassword = false;
+
+if (hasUsername && hasPassword) {
+  // Will NOT execute, because hasPassword is false
+  console.log("Ready to login."); 
+}
+```
+
+### OR (`||`)
+Only ONE of the conditions needs to be true.
+```javascript
+let browserType = 'webkit';
+
+if (browserType === 'firefox' || browserType === 'webkit') {
+  console.log("Running in a non-Chromium browser."); // Will execute!
+}
+```
+
+### NOT (`!`)
+Reverses the boolean value. If something is `true`, it becomes `false`.
+```javascript
+const isVisible = false;
+
+if (!isVisible) {
+  console.log("The element is hidden."); // Will execute!
+}
+```
+
+---
+
+## 3. Graceful Error Handling: `try / catch`
+
+In automation, things fail. A server goes down, an element is covered by an unexpected pop-up, or a file cannot be read from the hard drive. 
+
+When JavaScript encounters an unhandled error, **it instantly terminates the entire script.** This means if test 1 fails unexpectedly, tests 2, 3, and 4 might never even run.
+
+To prevent explosive failures, we "wrap" dangerous code in a `try` block. If the code explodes, JavaScript "catches" the explosion and passes the error details to the `catch` block, allowing the script to recover and continue running safely.
+
+```javascript
+const parseData = () => {
+  try {
+    console.log("1. Attempting to parse bad JSON...");
+    
+    // This will instantly throw a SyntaxError!
+    JSON.parse("THIS IS NOT JSON"); 
+    
+    console.log("2. This line will NEVER run.");
+  } catch (error) {
+    // The execution jumps directly here!
+    console.log("3. We caught an error! The script did not crash.");
+    console.log("Error details: " + error.message);
+  } finally {
+    // This block runs no matter what, whether it passed or failed.
+    // Extremely useful for closing database connections or closing browsers.
+    console.log("4. Cleaning up resources...");
+  }
+};
+
+parseData();
+```
+
+---
+
+## 4. Interactive Challenge: Safely Catch an API Failure
+
+Below is a script that mocks a fragile API call. Sometimes it works, sometimes it throws a fatal error.
+
+**Your Task:** Wrap the dangerous `unreliableApiCall()` inside a `try / catch` block. If it succeeds, log the result. If it fails, log the string `"We recovered gracefully!"` so that the script doesn't crash.
+
+<CodeEditor
+  moduleId="08-js-ts-control-flow"
+  taskIndex={0}
+  placeholder={`const unreliableApiCall = () => {\n  throw new Error("502 Bad Gateway: The server is down!");\n};\n\nconst runTest = () => {\n  console.log("Starting test...");\n  \n  // BUG: This function throws an error and crashes the script!\n  // Fix it by wrapping it in a try/catch block.\n  const result = unreliableApiCall();\n  console.log("Result: " + result);\n  \n  console.log("Test finished."); // This should print if you handled it correctly\n};\n\nrunTest();`}
+/>
+
+---
+
+## Summary
+1. Use **`if / else if / else`** for conditional branching logic.
+2. Use **`&&` (AND)**, **`||` (OR)**, and **`!` (NOT)** to combine multiple conditions.
+3. Use **`try / catch`** to execute dangerous code without crashing your entire test suite. The `finally` block is perfect for cleanup operations.
+
+In the next lesson, we will learn how to share logic across multiple files using ES Modules.
+
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="08-js-ts-control-flow"
+  taskIndex={1}
+  placeholder={`// Challenge: Handle network connection errors gracefully
+// Wrap the apiRequest function inside a try/catch block. If an error occurs, log it and return null.
+// FIX THE UNPROTECTED CODE BELOW:
+
+const apiRequest = () => {
+  throw new Error("503 Service Unavailable");
+};
+
+const executeTest = () => {
+  // Wrap this call in try/catch:
+  const response = apiRequest();
+  return response;
+};`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="08-js-ts-control-flow" />

@@ -1,0 +1,231 @@
+﻿# 14.3: Visual Regression Testing
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Master toHaveScreenshot() patterns
+
+## What is Visual Testing?
+
+Visual testing captures a **screenshot** of a page or element and compares it to a previously approved **baseline screenshot**. If any pixels change unexpectedly, the test fails.
+
+This catches bugs that functional tests miss:
+- Wrong font size or weight
+- Incorrect colors or spacing
+- Misaligned elements
+- Missing icons or images
+- Layout regressions on specific screen sizes
+
+## The `toHaveScreenshot()` Assertion
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('document list page looks correct', async ({ page }) => {
+  await page.goto('/documents');
+  
+  // Take a full-page screenshot and compare to baseline
+  await expect(page).toHaveScreenshot('document-list.png');
+});
+
+test('upload modal renders correctly', async ({ page }) => {
+  await page.goto('/documents');
+  await page.getByRole('button', { name: 'Upload' }).click();
+  
+  // Compare only the modal element, not the full page
+  const modal = page.getByRole('dialog');
+  await expect(modal).toHaveScreenshot('upload-modal.png');
+});
+```
+
+## First Run: Generating Baselines
+
+On the very first run, Playwright creates the baseline screenshots (there's nothing to compare to yet):
+
+```bash
+# Generate baseline screenshots
+npx playwright test --update-snapshots
+
+# Output:
+# ✓  visual › document list page looks correct
+#    Snapshot written: document-list.png
+```
+
+On every subsequent run, Playwright compares the current screenshot to the baseline.
+
+## When a Visual Test Fails
+
+```bash
+npx playwright test
+
+# Output:
+# ✗  visual › document list page looks correct
+#    Error: Screenshot comparison failed
+#    Expected: tests/visual/document-list-expected.png
+#    Actual:   test-results/visual/document-list-actual.png
+#    Diff:     test-results/visual/document-list-diff.png
+```
+
+The diff image highlights changed pixels in red. Open the HTML report to see all three images side by side.
+
+## Handling Dynamic Content
+
+Some content changes every run (timestamps, user-specific IDs). You must mask these before comparison:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('document list is visually stable', async ({ page }) => {
+  await page.goto('/documents');
+  
+  await expect(page).toHaveScreenshot('document-list.png', {
+    // Mask dynamic elements so they don't cause false failures
+    mask: [
+      page.getByTestId('current-timestamp'),
+      page.getByTestId('session-id'),
+      page.getByRole('img', { name: 'Avatar' }),  // User avatar might change
+    ],
+    
+    // Allow a small threshold for anti-aliasing differences
+    maxDiffPixelRatio: 0.01,  // Allow up to 1% pixel difference
+    
+    // Or set a maximum number of different pixels
+    maxDiffPixels: 100,
+  });
+});
+```
+
+## Component-Level Visual Tests
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('status badges render correctly for each state', async ({ page }) => {
+  // Navigate to a test page with all status variants
+  await page.goto('/test/status-badges');
+  
+  // Test each badge individually
+  const statuses = ['Draft', 'Pending Review', 'Approved', 'Rejected'];
+  
+  for (const status of statuses) {
+    const badge = page.getByRole('status', { name: status });
+    await expect(badge).toHaveScreenshot(`badge-${status.toLowerCase()}.png`);
+  }
+});
+```
+
+## Cross-Browser Visual Testing
+
+```typescript
+// playwright.config.ts — run visual tests on all browsers
+projects: [
+  {
+    name: 'visual-chrome',
+    testMatch: 'tests/visual/**',
+    use: { ...devices['Desktop Chrome'] },
+  },
+  {
+    name: 'visual-firefox',
+    testMatch: 'tests/visual/**',
+    use: { ...devices['Desktop Firefox'] },
+  },
+],
+```
+
+> [!IMPORTANT]
+> Screenshot baselines are platform and browser-specific. A screenshot taken on macOS will differ from one taken on Windows due to font rendering. Always generate baselines in the **same environment** where they'll be compared (ideally in CI using Docker).
+
+## Updating Baselines After Intentional Changes
+
+When a developer intentionally changes the UI (e.g., new button design), you need to update the baseline:
+
+```bash
+# Update ALL snapshots
+npx playwright test --update-snapshots
+
+# Update snapshots for one specific test file
+npx playwright test tests/visual/document-list.spec.ts --update-snapshots
+```
+
+
+
+> [!NOTE]
+> **Retention Layer:**
+> * **Key Idea:** Visual regression testing requires tolerance thresholds to account for OS-level rendering differences.
+> * **Common Mistake:** Expecting exactly 0 pixel diffs when running snapshots generated on Mac against Linux CI.
+> * **Enterprise Application:** Implementing cross-platform visual regression with acceptable `maxDiffPixels` thresholds.
+
+<CodeEditor
+  moduleId="65-adv-visual"
+  taskIndex={0}
+  placeholder="// Task: Write a visual regression test for a dialog.&#10;// Requirements:&#10;//   1. Click a 'View' button to open the dialog&#10;//   2. Take a screenshot of the dialog element&#10;//   3. Mask any dynamic timestamp elements to prevent false failures&#10;//&#10;// Hint: Use toHaveScreenshot() with the mask option"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+await page.getByRole('button', { name: 'View' }).click();
+const dialog = page.getByRole('dialog');
+await expect(dialog).toHaveScreenshot('view-dialog.png', {
+  mask: [dialog.getByTestId('timestamp')]
+});
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="65-adv-visual"
+  taskIndex={1}
+  placeholder={`# Challenge: Complete the command line task
+# Write the correct command below:
+`}
+/>
+<Quiz moduleId="adv-visual" />
+

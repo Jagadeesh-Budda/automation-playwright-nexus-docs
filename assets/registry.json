@@ -1,0 +1,49 @@
+{
+  "version": "1.2.0",
+  "issuer": "Automation Skill Authority (ASA) Mastery Authority",
+  "master_sig": "9a8b7c6d5e4f3a2b1c0d",
+  "audit_trail_id": "AT-2026-X991",
+  "last_updated": "2026-04-25T13:02:00Z",
+  "certificates": [
+    {
+      "id": "PS-MASTERY-JAG123",
+      "candidate": "Jagadeesh Budda",
+      "issue_date": "2026-04-25",
+      "expiry_date": "2027-04-25",
+      "status": "ACTIVE",
+      "hash": "05aa73be60cc7c0176210a90d6015872137da013e482d9f69548c5a7bb967ba1",
+      "version": "v1.2",
+      "notes": "Full Architectural Mastery Cleared"
+    },
+    {
+      "id": "PS-MASTERY-OLD-USER",
+      "candidate": "Former Employee",
+      "issue_date": "2024-01-01",
+      "expiry_date": "2025-01-01",
+      "status": "EXPIRED",
+      "hash": "e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1e1",
+      "version": "v1.0",
+      "notes": "Certification cycle completed"
+    },
+    {
+      "id": "PS-MASTERY-PENDING-AUDIT",
+      "candidate": "Contractor B",
+      "issue_date": "2026-04-10",
+      "expiry_date": "2027-04-10",
+      "status": "SUSPENDED",
+      "hash": "s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2s2",
+      "version": "v1.2",
+      "notes": "Pending manual review of AST logs"
+    },
+    {
+      "id": "PS-MASTERY-REVOKED-TEST",
+      "candidate": "Unauthorized User",
+      "issue_date": "2026-01-10",
+      "expiry_date": "2027-01-10",
+      "status": "REVOKED",
+      "hash": "f000000000000000000000000000000000000000000000000000000000000000",
+      "version": "v1.0",
+      "notes": "Integrity Violation Detected"
+    }
+  ]
+}

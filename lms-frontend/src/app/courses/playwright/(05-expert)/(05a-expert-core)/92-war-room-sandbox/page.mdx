@@ -1,0 +1,217 @@
+# 18.6: The War Room Sandbox
+
+import { ChapterHeader } from '@/components/ChapterHeader';
+
+<ChapterHeader
+  objective="Analyze and refactor a fundamentally broken test suite into a production-grade architecture."
+  time="20 mins"
+  type="Challenge"
+/>
+
+## Learning Objectives
+- Identify the 7 most dangerous anti-patterns in Playwright tests
+- Eliminate global state to achieve true parallel test execution
+- Refactor brittle UI-only setups into atomic API data generation
+
+## Welcome to the War Room
+
+You have just inherited a test suite from a junior automation engineer who recently left the company. The CI/CD pipeline is currently red. The suite fails unpredictably, uses hardcoded waits, breaks whenever the frontend team updates Tailwind CSS classes, and is completely unsafe to run in parallel.
+
+Your mission is to fix it using everything you've learned.
+
+---
+
+## 1. The Broken Code (Analyze the Damage)
+
+Review the following code block. Before scrolling down to the solution, identify at least **7 critical architectural violations**. Look closely at how state is managed, how asynchronous operations are handled, and how locators are structured.
+
+```typescript
+// ❌ THE BROKEN SUITE: tests/admin-dashboard.spec.ts
+import { test, expect } from '@playwright/test';
+
+// Violation 1: Shared global state! This is NOT parallel-safe!
+let createdUserId = '';
+let authenticationToken = '';
+
+test.describe('Admin Dashboard', () => {
+
+  test.beforeEach(async ({ page }) => {
+    // Violation 2: Hardcoded environment URLs and credentials
+    await page.goto('https://staging-dms.AEGIS.com/login');
+    
+    // Violation 3: Extremely brittle CSS ID locators
+    await page.locator('#username-input-v2-final').fill('admin@AEGIS.com');
+    await page.locator('.btn.btn-primary.login.w-full').click();
+    
+    // Violation 4: Hardcoded wait! The definition of flakiness and slow execution!
+    await page.waitForTimeout(5000); 
+
+    // Extracting auth token for global state
+    authenticationToken = await page.evaluate(() => localStorage.getItem('jwt')) || '';
+  });
+
+  test('Create a new user', async ({ page }) => {
+    // Navigating via UI instead of directly via URL or API
+    await page.locator('div > div > ul > li:nth-child(3) > a').click(); 
+    await page.locator('button:has-text("New User")').click();
+    
+    await page.getByLabel('Name').fill('Test User');
+    await page.getByLabel('Email').fill('test@AEGIS.com');
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    // Violation 5: Asserting .count() synchronously instead of using a web-first toHaveCount() assertion
+    const alertCount = await page.locator('.alert-success').count();
+    expect(alertCount).toBe(1);
+
+    // Saving ID to global state for the next test to use
+    createdUserId = await page.locator('#created-user-id').textContent() || '';
+  });
+
+  test('Verify created user exists and configure permissions', async ({ page }) => {
+    // Violation 6: Assumes the previous test ran successfully! 
+    // If run in parallel, createdUserId will be empty!
+    await page.goto(`https://staging-dms.AEGIS.com/users/${createdUserId}`);
+    
+    // Violation 7: Dangerous forEach loop with unawaited async code!
+    const tabs = ['Profile', 'Permissions', 'Audit'];
+    tabs.forEach(async (tab) => {
+      // Missing await! This loop finishes in 2ms before the first click even registers
+      page.getByRole('tab', { name: tab }).click(); 
+    });
+
+    await expect(page.getByText('Test User')).toBeVisible();
+  });
+});
+```
+
+---
+
+## 2. The Architectural Breakdown
+
+Why is this code so dangerous?
+
+1. **Global State Mutations:** `let createdUserId = ''`. Playwright runs tests in parallel across isolated Worker processes. Worker 1 might run the "Create" test and Worker 2 might run the "Verify" test simultaneously. Worker 2's memory space has an empty string for `createdUserId`, causing a 404 error.
+2. **Hardcoded Waits:** `waitForTimeout(5000)` means every test takes at least 5 seconds, even if the login finishes in 200ms. If the login takes 5.1 seconds under heavy load, the test fails.
+3. **Brittle Locators:** `.btn.btn-primary.login.w-full` will break the exact moment a frontend developer changes `w-full` to `w-1/2` using Tailwind CSS. 
+4. **Synchronous Async Loops:** `tabs.forEach(async (tab))` does not pause execution. The test will finish and close the browser before the tabs are ever clicked.
+5. **Coupled Workflows:** "Verify created user" relies entirely on the UI workflow of "Create a new user". If the "New User" button breaks, the "Verify" test fails, masking the true root cause.
+
+---
+
+## 3. The Refactored Masterpiece (The Solution)
+
+Here is how a Senior Automation Engineer refactors the suite to meet the **ASA Definition of Done**.
+
+### Step 1: Encapsulating State & Using API Setup
+We eliminate the global state by making every test atomic. The "Verify" test should create its own user instantly via the API, rather than relying on the UI.
+
+```typescript
+// ✅ THE REFACTORED SUITE: tests/admin-dashboard.spec.ts
+import { test, expect } from '@playwright/test';
+import { UserApi } from '../api/UserApi'; // Abstracted API logic
+import { LoginPage } from '../pages/LoginPage'; // Page Object Model
+
+test.describe('Admin Dashboard', () => {
+
+  test.beforeEach(async ({ page }) => {
+    // 1. Use Page Object and Environment Variables
+    const loginPage = new LoginPage(page);
+    await loginPage.navigate();
+    await loginPage.login(process.env.ADMIN_USER!, process.env.ADMIN_PASS!);
+    
+    // 2. Auto-waiting on the network instead of hardcoded 5000ms waits
+    await page.waitForLoadState('networkidle');
+  });
+
+  test('Create a new user via UI', async ({ page }) => {
+    // 3. User-Facing Locators (Semantic ARIA roles)
+    await page.getByRole('link', { name: 'Users' }).click();
+    await page.getByRole('button', { name: 'New User' }).click();
+    
+    // Generating dynamic data to avoid collisions
+    const uniqueEmail = `test-${Date.now()}@AEGIS.com`;
+    
+    await page.getByLabel('Name').fill('Test User');
+    await page.getByLabel('Email').fill(uniqueEmail);
+    await page.getByRole('button', { name: 'Save' }).click();
+
+    // 4. Web-First Assertions (Automatically retries until the alert appears)
+    await expect(page.locator('.alert-success')).toHaveCount(1);
+  });
+
+  test('Verify created user exists and configure permissions', async ({ page, request }) => {
+    // 5. Atomic State Setup: Create data instantly via API before verifying UI
+    const api = new UserApi(request);
+    const mockUser = await api.createUser({ name: 'Atomic User', role: 'Viewer' });
+    
+    await page.goto(`/users/${mockUser.id}`);
+    
+    // 6. Sequential, awaited async loops
+    const tabs = ['Profile', 'Permissions', 'Audit'];
+    for (const tab of tabs) {
+      await page.getByRole('tab', { name: tab }).click();
+      // Ensure tab content loads before clicking the next
+      await expect(page.getByRole('heading', { level: 2, name: tab })).toBeVisible(); 
+    }
+
+    await expect(page.getByText('Atomic User')).toBeVisible();
+
+    // 7. Teardown: Clean up the data so the environment stays pure
+    await api.deleteUser(mockUser.id);
+  });
+});
+```
+
+---
+
+## 4. The Capstone Preparation
+
+If you understand the difference between the Broken Code and the Refactored Masterpiece, you are ready for the Capstone Project.
+
+The difference isn't just "cleaner syntax"—it is the difference between a suite that takes 45 minutes to run and fails 20% of the time, and a suite that runs entirely in parallel, finishes in 3 minutes, and never flakes.
+
+<CodeEditor
+  moduleId="92-war-room-sandbox"
+  taskIndex={0}
+  placeholder="// Task: Abstract the User Creation API setup and teardown into a custom Playwright Fixture.&#10;// Requirements:&#10;//   1. Create a fixture called 'testUser'&#10;//   2. In the setup phase, call the API to create a unique user&#10;//   3. Yield the user data to the test via use()&#10;//   4. In the teardown phase, call the API to delete the user&#10;//&#10;// Any test that requests { testUser } should get a fresh, auto-cleaned-up user"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+export const test = base.extend<{ testUser: User }>({
+  testUser: async ({ request }, use) => {
+    // Setup: create user via API
+    const email = `test-${Date.now()}@company.com`;
+    const res = await request.post('/api/users', {
+      data: { email, name: 'Test User', role: 'viewer' }
+    });
+    const user = await res.json();
+
+    // Provide to test
+    await use(user);
+
+    // Teardown: delete user via API
+    await request.delete(`/api/users/${user.id}`);
+  },
+});
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Anti-Pattern Recognition | Spotting bad code is the first step to fixing it |
+| Parallel State Contamination | Global variables guarantee your suite will fail when scaled |
+| Atomic Data Setup | Bypassing the UI to create test data via API is the hallmark of Senior SDETs |
+
+> [!TIP]
+> **Next Step:** You are ready. Proceed to the Capstone Project Brief to prove your mastery.
+
+<Quiz moduleId="war-room-sandbox" />
+

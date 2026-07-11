@@ -1,0 +1,268 @@
+{
+  "hierarchy": [
+    {
+      "parent": "Language Fundamentals",
+      "children": [
+        "01-js-ts-variables",
+        "02-js-ts-functions",
+        "03-js-ts-es6",
+        "04-js-ts-objects",
+        "05-js-ts-async",
+        "06-js-ts-dom",
+        "07-js-ts-lite",
+        "08-js-ts-control-flow",
+        "09-js-ts-modules",
+        "23-js-ts-ts-oop",
+        "28-js-ts-generics"
+      ]
+    },
+    {
+      "parent": "Core Automation",
+      "children": [
+        "10-first-test",
+        "11-navigating-clicking",
+        "12-writing-assertions",
+        "13-running-reading",
+        "14-break-it"
+      ]
+    },
+    {
+      "parent": "Locators & Assertions",
+      "children": [
+        "15-getbyrole",
+        "16-assertions-deep",
+        "17-dynamic-elements",
+        "18-strict-mode",
+        "52-locators-code",
+        "53-locators-exec",
+        "54-locators-arch",
+        "64-adv-assertions"
+      ]
+    },
+    {
+      "parent": "Test Organization & POM",
+      "children": [
+        "19-test-org",
+        "20-describe-blocks",
+        "21-before-after",
+        "22-duplication-problem",
+        "24-what-are-poms",
+        "25-first-pom",
+        "26-multi-page",
+        "27-refactor-exercise"
+      ]
+    },
+    {
+      "parent": "Fixtures & Dependency Injection",
+      "children": [
+        "29-what-are-fixtures",
+        "30-custom-fixtures",
+        "31-fixture-dependencies",
+        "32-basetest-pattern",
+        "33-the-brief",
+        "34-hints",
+        "35-reference-solution"
+      ]
+    },
+    {
+      "parent": "Synchronization & Timeouts",
+      "children": [
+        "36-auto-waiting",
+        "37-assertions-vs-waits",
+        "38-timeouts",
+        "39-network-sync"
+      ]
+    },
+    {
+      "parent": "Enterprise Best Practices",
+      "children": [
+        "40-onboarding",
+        "45-quality-gates",
+        "47-migration-guide",
+        "62-anti-patterns",
+        "103-adv-auth",
+        "106-observability"
+      ]
+    },
+    {
+      "parent": "Advanced Browser Controls",
+      "children": [
+        "48-js-execution-context",
+        "49-browser-network-mechanics",
+        "50-core-context",
+        "51-debugging-workflow",
+        "55-iframes-dialogs",
+        "56-file-handling",
+        "57-multi-tab",
+        "70-clock-emulation"
+      ]
+    },
+    {
+      "parent": "Architecture & Design Patterns",
+      "children": [
+        "58-arch-layers",
+        "59-arch-interface",
+        "60-arch-debug",
+        "61-arch-entity"
+      ]
+    },
+    {
+      "parent": "Visual & Accessibility Testing",
+      "children": [
+        "65-adv-visual",
+        "68-accessibility"
+      ]
+    },
+    {
+      "parent": "Compliance & E-Signatures",
+      "children": [
+        "72-esign-compliance",
+        "73-esign-modal",
+        "74-esign-exec",
+        "75-esign-debug",
+        "76-esign-arch"
+      ]
+    },
+    {
+      "parent": "API & Hybrid Testing",
+      "children": [
+        "77-api-pyramid",
+        "78-api-request",
+        "79-api-hybrid",
+        "80-api-auth",
+        "81-api-controller",
+        "102-api-mocking"
+      ]
+    },
+    {
+      "parent": "Data-Driven Engineering",
+      "children": [
+        "82-data-logic",
+        "83-data-iteration",
+        "84-data-bulk",
+        "85-data-debug",
+        "86-data-factory"
+      ]
+    },
+    {
+      "parent": "AST & Framework Engineering",
+      "children": [
+        "87-ast-concept",
+        "88-ast-linter",
+        "89-ast-waits",
+        "90-ast-debug",
+        "91-ast-gate"
+      ]
+    },
+    {
+      "parent": "Test Orchestration & CI/CD",
+      "children": [
+        "98-github-actions",
+        "99-env-mastery",
+        "100-reporting",
+        "101-docker-ci"
+      ]
+    },
+    {
+      "parent": "Interview & Portfolio Projects",
+      "children": [
+        "92-war-room-sandbox",
+        "93-war-room-blind",
+        "94-capstone-brief",
+        "95-capstone-pom",
+        "96-capstone-exec",
+        "97-capstone-audit",
+        "108-capstone-project",
+        "109-capstone-verify",
+        "110-industry-banking",
+        "111-industry-ecommerce",
+        "112-industry-healthcare",
+        "113-interview-coding",
+        "114-interview-system-design",
+        "115-interview-behavioral",
+        "116-template-api",
+        "117-template-hybrid",
+        "118-template-reporting",
+        "200-test-data-management",
+        "201-network-mocking-deep-dive",
+        "202-refactor-bloathouse",
+        "203-failure-academy"
+      ]
+    }
+  ],
+  "prerequisites": [
+    {
+      "concept": "Core Automation",
+      "requires": [
+        "Language Fundamentals"
+      ]
+    },
+    {
+      "concept": "Locators & Assertions",
+      "requires": [
+        "Core Automation"
+      ]
+    },
+    {
+      "concept": "Test Organization & POM",
+      "requires": [
+        "Locators & Assertions"
+      ]
+    },
+    {
+      "concept": "Fixtures & Dependency Injection",
+      "requires": [
+        "Test Organization & POM"
+      ]
+    },
+    {
+      "concept": "Synchronization & Timeouts",
+      "requires": [
+        "Core Automation"
+      ]
+    },
+    {
+      "concept": "Advanced Browser Controls",
+      "requires": [
+        "Synchronization & Timeouts"
+      ]
+    },
+    {
+      "concept": "Architecture & Design Patterns",
+      "requires": [
+        "Fixtures & Dependency Injection"
+      ]
+    },
+    {
+      "concept": "Compliance & E-Signatures",
+      "requires": [
+        "Architecture & Design Patterns"
+      ]
+    },
+    {
+      "concept": "API & Hybrid Testing",
+      "requires": [
+        "Core Automation"
+      ]
+    },
+    {
+      "concept": "Data-Driven Engineering",
+      "requires": [
+        "API & Hybrid Testing"
+      ]
+    },
+    {
+      "concept": "AST & Framework Engineering",
+      "requires": [
+        "Language Fundamentals",
+        "Architecture & Design Patterns"
+      ]
+    },
+    {
+      "concept": "Test Orchestration & CI/CD",
+      "requires": [
+        "Enterprise Best Practices"
+      ]
+    }
+  ]
+}

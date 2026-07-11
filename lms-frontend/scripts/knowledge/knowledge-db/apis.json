@@ -1,0 +1,1804 @@
+[
+  {
+    "name": "page.goto()",
+    "description": "Playwright client interface method: page.goto()",
+    "sourceLessons": [
+      "03-js-ts-es6",
+      "07-js-ts-lite",
+      "10-first-test",
+      "11-navigating-clicking",
+      "14-break-it",
+      "16-assertions-deep",
+      "18-strict-mode",
+      "19-test-org",
+      "21-before-after",
+      "22-duplication-problem",
+      "23-js-ts-ts-oop",
+      "24-what-are-poms",
+      "25-first-pom",
+      "26-multi-page",
+      "29-what-are-fixtures",
+      "30-custom-fixtures",
+      "31-fixture-dependencies",
+      "35-reference-solution",
+      "36-auto-waiting",
+      "46-codegen",
+      "47-migration-guide",
+      "48-js-execution-context",
+      "49-browser-network-mechanics",
+      "50-core-context",
+      "51-debugging-workflow",
+      "52-locators-code",
+      "53-locators-exec",
+      "54-locators-arch",
+      "55-iframes-dialogs",
+      "57-multi-tab",
+      "58-arch-layers",
+      "62-anti-patterns",
+      "64-adv-assertions",
+      "65-adv-visual",
+      "66-adv-traces",
+      "67-adv-setup",
+      "68-accessibility",
+      "69-tags-annotations",
+      "70-clock-emulation",
+      "73-esign-modal",
+      "76-esign-arch",
+      "77-api-pyramid",
+      "79-api-hybrid",
+      "83-data-iteration",
+      "84-data-bulk",
+      "86-data-factory",
+      "92-war-room-sandbox",
+      "93-war-room-blind",
+      "95-capstone-pom",
+      "102-api-mocking",
+      "103-adv-auth",
+      "104-db-validation",
+      "105-network-debug",
+      "106-observability",
+      "107-ai-automation"
+    ],
+    "examples": [
+      {
+        "language": "javascript",
+        "code": "import { test, expect } from '@playwright/test';\n\n// Look at the { page, request } inside the arguments!\n// We are destructuring the massive Playwright context object on the fly.\ntest('API and UI hybrid flow', async ({ page, request }) => {\n  await request.post('/login');\n  await page.goto('/dashboard');\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/03-js-ts-es6/page.mdx",
+          "heading": "Destructuring in Playwright Signatures",
+          "lineRange": "68-77"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { Page } from '@playwright/test';\n\n// Passing the Page object into a helper function\nasync function loginAndNavigate(page: Page, url: string) {\n  await page.goto(url);\n  await page.getByRole('button', { name: 'Sign In' }).click();\n}",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/07-js-ts-lite/page.mdx",
+          "heading": "5. The Playwright `Page` Type",
+          "lineRange": "94-102"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('my very first test', async ({ page }) => {\n  // 1. Go to the Playwright website\n  await page.goto('https://playwright.dev');\n\n  // 2. Expect the title to contain \"Playwright\"\n  await expect(page).toHaveTitle(/Playwright/);\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/10-first-test/page.mdx",
+          "heading": "Step 3: Write Your First Test",
+          "lineRange": "55-65"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('has title', async ({ page }) => {\n  await page.goto('https://playwright.dev/');\n  await expect(page).toHaveTitle(/Playwright/);\n});\n\ntest('verify docs heading', async ({ page }) => {\n  await page.goto('https://playwright.dev/docs/intro');\n  // We use getByRole('heading') which is the best practice for finding headers\n  await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/10-first-test/page.mdx",
+          "heading": "Challenge Exercise",
+          "lineRange": "169-182"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('click the Get Started link', async ({ page }) => {\n  // 1. Start at the homepage\n  await page.goto('https://playwright.dev');\n\n  // 2. Find a link named \"Get started\" and click it\n  await page.getByRole('link', { name: 'Get started' }).click();\n\n  // 3. Check we landed on the right page by looking at the URL\n  await expect(page).toHaveURL(/.*intro/);\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/11-navigating-clicking/page.mdx",
+          "heading": "Interacting with the Page",
+          "lineRange": "18-31"
+        }
+      }
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/03-js-ts-es6/page.mdx",
+        "heading": "Destructuring in Playwright Signatures",
+        "lineRange": "68-77"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/07-js-ts-lite/page.mdx",
+        "heading": "5. The Playwright `Page` Type",
+        "lineRange": "94-102"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/10-first-test/page.mdx",
+        "heading": "Step 3: Write Your First Test",
+        "lineRange": "55-65"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/10-first-test/page.mdx",
+        "heading": "Challenge Exercise",
+        "lineRange": "169-182"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/11-navigating-clicking/page.mdx",
+        "heading": "Interacting with the Page",
+        "lineRange": "18-31"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/14-break-it/page.mdx",
+        "heading": "Intentionally Break a Test",
+        "lineRange": "22-32"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/16-assertions-deep/page.mdx",
+        "heading": "Soft Assertions",
+        "lineRange": "115-129"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/18-strict-mode/page.mdx",
+        "heading": "Debugging: `page.pause()`",
+        "lineRange": "49-60"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/19-test-org/page.mdx",
+        "heading": "1. Multiple Tests in One File",
+        "lineRange": "20-40"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/21-before-after/page.mdx",
+        "heading": "The Repetition Problem",
+        "lineRange": "14-46"
+      }
+    ]
+  },
+  {
+    "name": "locator.click()",
+    "description": "Playwright client interface method: locator.click()",
+    "sourceLessons": [
+      "04-js-ts-objects",
+      "05-js-ts-async",
+      "06-js-ts-dom",
+      "07-js-ts-lite",
+      "11-navigating-clicking",
+      "15-getbyrole",
+      "16-assertions-deep",
+      "17-dynamic-elements",
+      "18-strict-mode",
+      "19-test-org",
+      "21-before-after",
+      "22-duplication-problem",
+      "23-js-ts-ts-oop",
+      "24-what-are-poms",
+      "25-first-pom",
+      "26-multi-page",
+      "35-reference-solution",
+      "36-auto-waiting",
+      "37-assertions-vs-waits",
+      "38-timeouts",
+      "39-network-sync",
+      "45-quality-gates",
+      "46-codegen",
+      "47-migration-guide",
+      "48-js-execution-context",
+      "50-core-context",
+      "51-debugging-workflow",
+      "52-locators-code",
+      "53-locators-exec",
+      "54-locators-arch",
+      "55-iframes-dialogs",
+      "56-file-handling",
+      "57-multi-tab",
+      "58-arch-layers",
+      "59-arch-interface",
+      "60-arch-debug",
+      "62-anti-patterns",
+      "65-adv-visual",
+      "66-adv-traces",
+      "67-adv-setup",
+      "69-tags-annotations",
+      "70-clock-emulation",
+      "71-component-testing",
+      "72-esign-compliance",
+      "73-esign-modal",
+      "76-esign-arch",
+      "79-api-hybrid",
+      "82-data-logic",
+      "87-ast-concept",
+      "89-ast-waits",
+      "92-war-room-sandbox",
+      "93-war-room-blind",
+      "95-capstone-pom",
+      "96-capstone-exec",
+      "102-api-mocking",
+      "103-adv-auth",
+      "104-db-validation",
+      "105-network-debug",
+      "106-observability"
+    ],
+    "examples": [
+      {
+        "language": "javascript",
+        "code": "const clickOptions = {\n  force: true,\n  timeout: 5000\n};\n\n// We pass the object directly into the click method\nawait page.click('#submit', clickOptions);",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/04-js-ts-objects/page.mdx",
+          "heading": "6. Playwright Options Objects",
+          "lineRange": "146-154"
+        }
+      },
+      {
+        "language": "javascript",
+        "code": "await page.click('#submit', { force: true, timeout: 5000 });",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/04-js-ts-objects/page.mdx",
+          "heading": "6. Playwright Options Objects",
+          "lineRange": "157-159"
+        }
+      },
+      {
+        "language": "javascript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('Broken Flow', async ({ page }) => {\n  // ❌ Missing await!\n  // Playwright starts the click, but JS instantly moves to the next line!\n  page.click('#submit-btn'); \n  \n  // The script looks for the success banner BEFORE the click finishes!\n  // THE TEST FAILS RANDOMLY.\n  await expect(page.locator('.success')).toBeVisible(); \n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/05-js-ts-async/page.mdx",
+          "heading": "4. The Fatal Flaw in Automation",
+          "lineRange": "117-129"
+        }
+      },
+      {
+        "language": "javascript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('Parallel execution', async ({ page }) => {\n  // We wait for BOTH the click to happen AND the response to return, simultaneously.\n  const [response] = await Promise.all([\n    page.waitForResponse('**/api/data'),\n    page.click('#fetch-data-btn') // The action that triggers the response\n  ]);\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/05-js-ts-async/page.mdx",
+          "heading": "6. Promise.all()",
+          "lineRange": "154-164"
+        }
+      },
+      {
+        "language": "javascript",
+        "code": "await page.locator('button').click(); // Clicks the FIRST button it finds",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/06-js-ts-dom/page.mdx",
+          "heading": "A. Tag Name",
+          "lineRange": "45-47"
+        }
+      }
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/04-js-ts-objects/page.mdx",
+        "heading": "6. Playwright Options Objects",
+        "lineRange": "146-154"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/04-js-ts-objects/page.mdx",
+        "heading": "6. Playwright Options Objects",
+        "lineRange": "157-159"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/05-js-ts-async/page.mdx",
+        "heading": "4. The Fatal Flaw in Automation",
+        "lineRange": "117-129"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/05-js-ts-async/page.mdx",
+        "heading": "6. Promise.all()",
+        "lineRange": "154-164"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/06-js-ts-dom/page.mdx",
+        "heading": "A. Tag Name",
+        "lineRange": "45-47"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/06-js-ts-dom/page.mdx",
+        "heading": "C. Class Name (`.`)",
+        "lineRange": "57-59"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/06-js-ts-dom/page.mdx",
+        "heading": "3. The Modern Approach: Accessibility Locators",
+        "lineRange": "77-86"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/07-js-ts-lite/page.mdx",
+        "heading": "5. The Playwright `Page` Type",
+        "lineRange": "94-102"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/11-navigating-clicking/page.mdx",
+        "heading": "Interacting with the Page",
+        "lineRange": "18-31"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/11-navigating-clicking/page.mdx",
+        "heading": "How Playwright Finds Things: `getByRole`",
+        "lineRange": "37-39"
+      }
+    ]
+  },
+  {
+    "name": "locator.fill()",
+    "description": "Playwright client interface method: locator.fill()",
+    "sourceLessons": [
+      "06-js-ts-dom",
+      "15-getbyrole",
+      "16-assertions-deep",
+      "19-test-org",
+      "21-before-after",
+      "22-duplication-problem",
+      "23-js-ts-ts-oop",
+      "24-what-are-poms",
+      "25-first-pom",
+      "26-multi-page",
+      "35-reference-solution",
+      "36-auto-waiting",
+      "43-fundamentals-debug",
+      "45-quality-gates",
+      "46-codegen",
+      "47-migration-guide",
+      "48-js-execution-context",
+      "50-core-context",
+      "53-locators-exec",
+      "54-locators-arch",
+      "55-iframes-dialogs",
+      "57-multi-tab",
+      "58-arch-layers",
+      "59-arch-interface",
+      "60-arch-debug",
+      "62-anti-patterns",
+      "67-adv-setup",
+      "69-tags-annotations",
+      "71-component-testing",
+      "72-esign-compliance",
+      "73-esign-modal",
+      "75-esign-debug",
+      "82-data-logic",
+      "86-data-factory",
+      "92-war-room-sandbox",
+      "93-war-room-blind",
+      "95-capstone-pom",
+      "96-capstone-exec",
+      "103-adv-auth"
+    ],
+    "examples": [
+      {
+        "language": "javascript",
+        "code": "await page.locator('input[name=\"username\"]').fill('admin@corp.com');",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/06-js-ts-dom/page.mdx",
+          "heading": "D. Attribute Selectors (`[]`)",
+          "lineRange": "63-65"
+        }
+      },
+      {
+        "language": "javascript",
+        "code": "// ❌ Brittle CSS Locator\nawait page.locator('button.btn.primary').click();\n\n// ✅ Resilient User-Facing Locator\nawait page.getByRole('button', { name: 'Submit' }).click();\n\n// ✅ Resilient User-Facing Locator\nawait page.getByPlaceholder('Email').fill('admin@corp.com');",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/06-js-ts-dom/page.mdx",
+          "heading": "3. The Modern Approach: Accessibility Locators",
+          "lineRange": "77-86"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "// Finds the <input> connected to the \"Email\" label\nawait page.getByLabel('Email').fill('admin@example.com');\nawait page.getByLabel('Password').fill('secret123');",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/15-getbyrole/page.mdx",
+          "heading": "2. `getByLabel` (For Forms)",
+          "lineRange": "69-73"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\nconst submitBtn = page.getByRole('button', { name: 'Submit' });\n\n// Verify it starts disabled\nawait expect(submitBtn).toBeDisabled();\n\n// Fill out the form\nawait page.getByLabel('Email').fill('user@example.com');\n\n// Verify it becomes enabled\nawait expect(submitBtn).toBeEnabled();",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/16-assertions-deep/page.mdx",
+          "heading": "1. `toBeEnabled()` / `toBeDisabled()`",
+          "lineRange": "20-33"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\n// Test 1: Happy path\ntest('valid credentials succeed', async ({ page }) => {\n  await page.goto('/login');\n  await page.getByLabel('Email').fill('admin@example.com');\n  await page.getByLabel('Password').fill('secret123');\n  await page.getByRole('button', { name: 'Sign In' }).click();\n  await expect(page).toHaveURL('/dashboard');\n});\n\n// Test 2: Sad path\ntest('invalid credentials show error', async ({ page }) => {\n  await page.goto('/login');\n  await page.getByLabel('Email').fill('admin@example.com');\n  await page.getByLabel('Password').fill('WRONG');\n  await page.getByRole('button', { name: 'Sign In' }).click();\n  await expect(page.getByText('Invalid username or password')).toBeVisible();\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(02-advanced-beginner)/19-test-org/page.mdx",
+          "heading": "1. Multiple Tests in One File",
+          "lineRange": "20-40"
+        }
+      }
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/06-js-ts-dom/page.mdx",
+        "heading": "D. Attribute Selectors (`[]`)",
+        "lineRange": "63-65"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/06-js-ts-dom/page.mdx",
+        "heading": "3. The Modern Approach: Accessibility Locators",
+        "lineRange": "77-86"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/15-getbyrole/page.mdx",
+        "heading": "2. `getByLabel` (For Forms)",
+        "lineRange": "69-73"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/16-assertions-deep/page.mdx",
+        "heading": "1. `toBeEnabled()` / `toBeDisabled()`",
+        "lineRange": "20-33"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/19-test-org/page.mdx",
+        "heading": "1. Multiple Tests in One File",
+        "lineRange": "20-40"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/21-before-after/page.mdx",
+        "heading": "The Repetition Problem",
+        "lineRange": "14-46"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/21-before-after/page.mdx",
+        "heading": "The Solution: `test.beforeEach`",
+        "lineRange": "58-85"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/22-duplication-problem/page.mdx",
+        "heading": "The Limits of `beforeEach`",
+        "lineRange": "29-34"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/23-js-ts-ts-oop/page.mdx",
+        "heading": "1. The Problem: Messy Tests",
+        "lineRange": "20-30"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/23-js-ts-ts-oop/page.mdx",
+        "heading": "Encapsulation and Constructors",
+        "lineRange": "101-125"
+      }
+    ]
+  },
+  {
+    "name": "locator.getByRole()",
+    "description": "Playwright client interface method: locator.getByRole()",
+    "sourceLessons": [
+      "06-js-ts-dom",
+      "07-js-ts-lite",
+      "10-first-test",
+      "11-navigating-clicking",
+      "12-writing-assertions",
+      "15-getbyrole",
+      "16-assertions-deep",
+      "17-dynamic-elements",
+      "18-strict-mode",
+      "19-test-org",
+      "21-before-after",
+      "22-duplication-problem",
+      "23-js-ts-ts-oop",
+      "24-what-are-poms",
+      "25-first-pom",
+      "35-reference-solution",
+      "36-auto-waiting",
+      "37-assertions-vs-waits",
+      "38-timeouts",
+      "39-network-sync",
+      "46-codegen",
+      "47-migration-guide",
+      "49-browser-network-mechanics",
+      "51-debugging-workflow",
+      "52-locators-code",
+      "53-locators-exec",
+      "54-locators-arch",
+      "55-iframes-dialogs",
+      "56-file-handling",
+      "57-multi-tab",
+      "58-arch-layers",
+      "60-arch-debug",
+      "62-anti-patterns",
+      "64-adv-assertions",
+      "65-adv-visual",
+      "66-adv-traces",
+      "67-adv-setup",
+      "68-accessibility",
+      "69-tags-annotations",
+      "70-clock-emulation",
+      "71-component-testing",
+      "73-esign-modal",
+      "75-esign-debug",
+      "76-esign-arch",
+      "77-api-pyramid",
+      "79-api-hybrid",
+      "83-data-iteration",
+      "84-data-bulk",
+      "86-data-factory",
+      "89-ast-waits",
+      "92-war-room-sandbox",
+      "93-war-room-blind",
+      "95-capstone-pom",
+      "96-capstone-exec",
+      "97-capstone-audit"
+    ],
+    "examples": [
+      {
+        "language": "javascript",
+        "code": "// ❌ Brittle CSS Locator\nawait page.locator('button.btn.primary').click();\n\n// ✅ Resilient User-Facing Locator\nawait page.getByRole('button', { name: 'Submit' }).click();\n\n// ✅ Resilient User-Facing Locator\nawait page.getByPlaceholder('Email').fill('admin@corp.com');",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/06-js-ts-dom/page.mdx",
+          "heading": "3. The Modern Approach: Accessibility Locators",
+          "lineRange": "77-86"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { Page } from '@playwright/test';\n\n// Passing the Page object into a helper function\nasync function loginAndNavigate(page: Page, url: string) {\n  await page.goto(url);\n  await page.getByRole('button', { name: 'Sign In' }).click();\n}",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/07-js-ts-lite/page.mdx",
+          "heading": "5. The Playwright `Page` Type",
+          "lineRange": "94-102"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('has title', async ({ page }) => {\n  await page.goto('https://playwright.dev/');\n  await expect(page).toHaveTitle(/Playwright/);\n});\n\ntest('verify docs heading', async ({ page }) => {\n  await page.goto('https://playwright.dev/docs/intro');\n  // We use getByRole('heading') which is the best practice for finding headers\n  await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/10-first-test/page.mdx",
+          "heading": "Challenge Exercise",
+          "lineRange": "169-182"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('click the Get Started link', async ({ page }) => {\n  // 1. Start at the homepage\n  await page.goto('https://playwright.dev');\n\n  // 2. Find a link named \"Get started\" and click it\n  await page.getByRole('link', { name: 'Get started' }).click();\n\n  // 3. Check we landed on the right page by looking at the URL\n  await expect(page).toHaveURL(/.*intro/);\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/11-navigating-clicking/page.mdx",
+          "heading": "Interacting with the Page",
+          "lineRange": "18-31"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "await page.getByRole('link', { name: 'Get started' }).click();",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/11-navigating-clicking/page.mdx",
+          "heading": "How Playwright Finds Things: `getByRole`",
+          "lineRange": "37-39"
+        }
+      }
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/06-js-ts-dom/page.mdx",
+        "heading": "3. The Modern Approach: Accessibility Locators",
+        "lineRange": "77-86"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/07-js-ts-lite/page.mdx",
+        "heading": "5. The Playwright `Page` Type",
+        "lineRange": "94-102"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/10-first-test/page.mdx",
+        "heading": "Challenge Exercise",
+        "lineRange": "169-182"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/11-navigating-clicking/page.mdx",
+        "heading": "Interacting with the Page",
+        "lineRange": "18-31"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/11-navigating-clicking/page.mdx",
+        "heading": "How Playwright Finds Things: `getByRole`",
+        "lineRange": "37-39"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/12-writing-assertions/page.mdx",
+        "heading": "What is an Assertion?",
+        "lineRange": "16-21"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/12-writing-assertions/page.mdx",
+        "heading": "3. `toBeVisible()`",
+        "lineRange": "50-55"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/12-writing-assertions/page.mdx",
+        "heading": "4. `toHaveText()`",
+        "lineRange": "60-65"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/12-writing-assertions/page.mdx",
+        "heading": "5. `toContainText()`",
+        "lineRange": "70-76"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/15-getbyrole/page.mdx",
+        "heading": "The Locator Priority Ladder",
+        "lineRange": "16-22"
+      }
+    ]
+  },
+  {
+    "name": "locator.getByLabel()",
+    "description": "Playwright client interface method: locator.getByLabel()",
+    "sourceLessons": [
+      "15-getbyrole",
+      "16-assertions-deep",
+      "19-test-org",
+      "21-before-after",
+      "22-duplication-problem",
+      "24-what-are-poms",
+      "35-reference-solution",
+      "46-codegen",
+      "47-migration-guide",
+      "55-iframes-dialogs",
+      "56-file-handling",
+      "57-multi-tab",
+      "58-arch-layers",
+      "62-anti-patterns",
+      "64-adv-assertions",
+      "67-adv-setup",
+      "69-tags-annotations",
+      "71-component-testing",
+      "73-esign-modal",
+      "75-esign-debug",
+      "76-esign-arch",
+      "92-war-room-sandbox",
+      "93-war-room-blind",
+      "95-capstone-pom"
+    ],
+    "examples": [
+      {
+        "language": "typescript",
+        "code": "// Finds the <input> connected to the \"Email\" label\nawait page.getByLabel('Email').fill('admin@example.com');\nawait page.getByLabel('Password').fill('secret123');",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/15-getbyrole/page.mdx",
+          "heading": "2. `getByLabel` (For Forms)",
+          "lineRange": "69-73"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\nconst submitBtn = page.getByRole('button', { name: 'Submit' });\n\n// Verify it starts disabled\nawait expect(submitBtn).toBeDisabled();\n\n// Fill out the form\nawait page.getByLabel('Email').fill('user@example.com');\n\n// Verify it becomes enabled\nawait expect(submitBtn).toBeEnabled();",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/16-assertions-deep/page.mdx",
+          "heading": "1. `toBeEnabled()` / `toBeDisabled()`",
+          "lineRange": "20-33"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('validate profile page layout', async ({ page }) => {\n  await page.goto('/profile');\n\n  // If this fails, Playwright logs the error but KEEPS RUNNING\n  await expect.soft(page.getByRole('heading', { name: 'Profile' })).toBeVisible();\n  \n  // This will still execute\n  await expect.soft(page.getByLabel('Bio')).toBeVisible();\n\n  // The test will ultimately be marked as FAILED if any soft assertion failed\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/16-assertions-deep/page.mdx",
+          "heading": "Soft Assertions",
+          "lineRange": "115-129"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\n// Test 1: Happy path\ntest('valid credentials succeed', async ({ page }) => {\n  await page.goto('/login');\n  await page.getByLabel('Email').fill('admin@example.com');\n  await page.getByLabel('Password').fill('secret123');\n  await page.getByRole('button', { name: 'Sign In' }).click();\n  await expect(page).toHaveURL('/dashboard');\n});\n\n// Test 2: Sad path\ntest('invalid credentials show error', async ({ page }) => {\n  await page.goto('/login');\n  await page.getByLabel('Email').fill('admin@example.com');\n  await page.getByLabel('Password').fill('WRONG');\n  await page.getByRole('button', { name: 'Sign In' }).click();\n  await expect(page.getByText('Invalid username or password')).toBeVisible();\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(02-advanced-beginner)/19-test-org/page.mdx",
+          "heading": "1. Multiple Tests in One File",
+          "lineRange": "20-40"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest.describe('Dashboard Settings', () => {\n\n  test('user can update profile picture', async ({ page }) => {\n    // Repeated Setup\n    await page.goto('/login');\n    await page.getByLabel('Email').fill('admin@example.com');\n    await page.getByLabel('Password').fill('secret123');\n    await page.getByRole('button', { name: 'Sign In' }).click();\n    await page.getByRole('link', { name: 'Settings' }).click();\n\n    // Actual test logic\n    await page.getByLabel('Upload Avatar').setInputFiles('avatar.png');\n    await expect(page.getByText('Avatar updated')).toBeVisible();\n  });\n\n  test('user can change timezone', async ({ page }) => {\n    // Repeated Setup\n    await page.goto('/login');\n    await page.getByLabel('Email').fill('admin@example.com');\n    await page.getByLabel('Password').fill('secret123');\n    await page.getByRole('button', { name: 'Sign In' }).click();\n    await page.getByRole('link', { name: 'Settings' }).click();\n\n    // Actual test logic\n    await page.getByLabel('Timezone').selectOption('UTC');\n    await expect(page.getByText('Timezone saved')).toBeVisible();\n  });\n\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(02-advanced-beginner)/21-before-after/page.mdx",
+          "heading": "The Repetition Problem",
+          "lineRange": "14-46"
+        }
+      }
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/15-getbyrole/page.mdx",
+        "heading": "2. `getByLabel` (For Forms)",
+        "lineRange": "69-73"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/16-assertions-deep/page.mdx",
+        "heading": "1. `toBeEnabled()` / `toBeDisabled()`",
+        "lineRange": "20-33"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/16-assertions-deep/page.mdx",
+        "heading": "Soft Assertions",
+        "lineRange": "115-129"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/19-test-org/page.mdx",
+        "heading": "1. Multiple Tests in One File",
+        "lineRange": "20-40"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/21-before-after/page.mdx",
+        "heading": "The Repetition Problem",
+        "lineRange": "14-46"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/21-before-after/page.mdx",
+        "heading": "The Solution: `test.beforeEach`",
+        "lineRange": "58-85"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/22-duplication-problem/page.mdx",
+        "heading": "The Limits of `beforeEach`",
+        "lineRange": "29-34"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/24-what-are-poms/page.mdx",
+        "heading": "A Basic Page Object",
+        "lineRange": "55-80"
+      },
+      {
+        "file": "src/app/courses/playwright/(03-competent)/35-reference-solution/page.mdx",
+        "heading": "2. The Page Object",
+        "lineRange": "54-91"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/46-codegen/page.mdx",
+        "heading": "Generating Code: Step by Step",
+        "lineRange": "54-64"
+      }
+    ]
+  },
+  {
+    "name": "locator.getByText()",
+    "description": "Playwright client interface method: locator.getByText()",
+    "sourceLessons": [
+      "15-getbyrole",
+      "19-test-org",
+      "21-before-after",
+      "30-custom-fixtures",
+      "37-assertions-vs-waits",
+      "38-timeouts",
+      "45-quality-gates",
+      "46-codegen",
+      "49-browser-network-mechanics",
+      "55-iframes-dialogs",
+      "56-file-handling",
+      "57-multi-tab",
+      "60-arch-debug",
+      "62-anti-patterns",
+      "68-accessibility",
+      "69-tags-annotations",
+      "70-clock-emulation",
+      "71-component-testing",
+      "79-api-hybrid",
+      "89-ast-waits",
+      "90-ast-debug",
+      "92-war-room-sandbox",
+      "93-war-room-blind",
+      "95-capstone-pom",
+      "97-capstone-audit",
+      "102-api-mocking",
+      "105-network-debug"
+    ],
+    "examples": [
+      {
+        "language": "typescript",
+        "code": "// Find exact text\nawait page.getByText('Your order has been shipped', { exact: true }).toBeVisible();\n\n// Find partial text (the default)\nawait page.getByText('has been shipped').toBeVisible();",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/15-getbyrole/page.mdx",
+          "heading": "3. `getByText` (For Static Content)",
+          "lineRange": "81-87"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\n// Test 1: Happy path\ntest('valid credentials succeed', async ({ page }) => {\n  await page.goto('/login');\n  await page.getByLabel('Email').fill('admin@example.com');\n  await page.getByLabel('Password').fill('secret123');\n  await page.getByRole('button', { name: 'Sign In' }).click();\n  await expect(page).toHaveURL('/dashboard');\n});\n\n// Test 2: Sad path\ntest('invalid credentials show error', async ({ page }) => {\n  await page.goto('/login');\n  await page.getByLabel('Email').fill('admin@example.com');\n  await page.getByLabel('Password').fill('WRONG');\n  await page.getByRole('button', { name: 'Sign In' }).click();\n  await expect(page.getByText('Invalid username or password')).toBeVisible();\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(02-advanced-beginner)/19-test-org/page.mdx",
+          "heading": "1. Multiple Tests in One File",
+          "lineRange": "20-40"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest.describe('Dashboard Settings', () => {\n\n  test('user can update profile picture', async ({ page }) => {\n    // Repeated Setup\n    await page.goto('/login');\n    await page.getByLabel('Email').fill('admin@example.com');\n    await page.getByLabel('Password').fill('secret123');\n    await page.getByRole('button', { name: 'Sign In' }).click();\n    await page.getByRole('link', { name: 'Settings' }).click();\n\n    // Actual test logic\n    await page.getByLabel('Upload Avatar').setInputFiles('avatar.png');\n    await expect(page.getByText('Avatar updated')).toBeVisible();\n  });\n\n  test('user can change timezone', async ({ page }) => {\n    // Repeated Setup\n    await page.goto('/login');\n    await page.getByLabel('Email').fill('admin@example.com');\n    await page.getByLabel('Password').fill('secret123');\n    await page.getByRole('button', { name: 'Sign In' }).click();\n    await page.getByRole('link', { name: 'Settings' }).click();\n\n    // Actual test logic\n    await page.getByLabel('Timezone').selectOption('UTC');\n    await expect(page.getByText('Timezone saved')).toBeVisible();\n  });\n\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(02-advanced-beginner)/21-before-after/page.mdx",
+          "heading": "The Repetition Problem",
+          "lineRange": "14-46"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest.describe('Dashboard Settings', () => {\n\n  // This runs automatically before EACH test below it\n  test.beforeEach(async ({ page }) => {\n    await page.goto('/login');\n    await page.getByLabel('Email').fill('admin@example.com');\n    await page.getByLabel('Password').fill('secret123');\n    await page.getByRole('button', { name: 'Sign In' }).click();\n    await page.getByRole('link', { name: 'Settings' }).click();\n  });\n\n  test('user can update profile picture', async ({ page }) => {\n    // Playwright already logged in and navigated to Settings!\n    await page.getByLabel('Upload Avatar').setInputFiles('avatar.png');\n    await expect(page.getByText('Avatar updated')).toBeVisible();\n  });\n\n  test('user can change timezone', async ({ page }) => {\n    // Playwright logged in and navigated to Settings again from scratch!\n    await page.getByLabel('Timezone').selectOption('UTC');\n    await expect(page.getByText('Timezone saved')).toBeVisible();\n  });\n\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(02-advanced-beginner)/21-before-after/page.mdx",
+          "heading": "The Solution: `test.beforeEach`",
+          "lineRange": "58-85"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "// tests/login.spec.ts\n\n// ❌ OLD WAY: import { test, expect } from '@playwright/test';\n// ✅ NEW WAY: Import our extended test!\nimport { test, expect } from '../fixtures';\n\ntest('admin can see dashboard', async ({ loginPage }) => {\n  // Notice we didn't have to write \"new LoginPage(page)\"!\n  // And we didn't have to write \"await page.goto('/login')\"!\n  \n  await loginPage.login('admin', 'secret123');\n  await expect(loginPage.page.getByText('Welcome Admin')).toBeVisible();\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(03-competent)/30-custom-fixtures/page.mdx",
+          "heading": "Using the Fixture in a Test",
+          "lineRange": "51-65"
+        }
+      }
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/15-getbyrole/page.mdx",
+        "heading": "3. `getByText` (For Static Content)",
+        "lineRange": "81-87"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/19-test-org/page.mdx",
+        "heading": "1. Multiple Tests in One File",
+        "lineRange": "20-40"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/21-before-after/page.mdx",
+        "heading": "The Repetition Problem",
+        "lineRange": "14-46"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/21-before-after/page.mdx",
+        "heading": "The Solution: `test.beforeEach`",
+        "lineRange": "58-85"
+      },
+      {
+        "file": "src/app/courses/playwright/(03-competent)/30-custom-fixtures/page.mdx",
+        "heading": "Using the Fixture in a Test",
+        "lineRange": "51-65"
+      },
+      {
+        "file": "src/app/courses/playwright/(03-competent)/37-assertions-vs-waits/page.mdx",
+        "heading": "The Problem with Manual Waits",
+        "lineRange": "24-27"
+      },
+      {
+        "file": "src/app/courses/playwright/(03-competent)/37-assertions-vs-waits/page.mdx",
+        "heading": "Web-First Assertions",
+        "lineRange": "37-42"
+      },
+      {
+        "file": "src/app/courses/playwright/(03-competent)/38-timeouts/page.mdx",
+        "heading": "3. The Expect Timeout (Default: 5,000ms)",
+        "lineRange": "36-41"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/45-quality-gates/page.mdx",
+        "heading": "Gate 1: No Hardcoded Sleeps",
+        "lineRange": "32-40"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/46-codegen/page.mdx",
+        "heading": "Raw codegen output",
+        "lineRange": "125-138"
+      }
+    ]
+  },
+  {
+    "name": "locator.getByTestId()",
+    "description": "Playwright client interface method: locator.getByTestId()",
+    "sourceLessons": [
+      "15-getbyrole",
+      "35-reference-solution",
+      "37-assertions-vs-waits",
+      "52-locators-code",
+      "57-multi-tab",
+      "62-anti-patterns",
+      "64-adv-assertions",
+      "65-adv-visual",
+      "70-clock-emulation",
+      "73-esign-modal",
+      "76-esign-arch",
+      "79-api-hybrid",
+      "83-data-iteration",
+      "84-data-bulk",
+      "93-war-room-blind",
+      "95-capstone-pom"
+    ],
+    "examples": [
+      {
+        "language": "typescript",
+        "code": "// In your test\nawait page.getByTestId('user-avatar-menu').click();",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/15-getbyrole/page.mdx",
+          "heading": "4. `getByTestId` (The Escape Hatch)",
+          "lineRange": "100-103"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { Page, Locator } from '@playwright/test';\n\nexport class TodoPage {\n  readonly newTodoInput: Locator;\n  readonly todoList: Locator;\n\n  constructor(public readonly page: Page) {\n    // 💡 ARCHITECTURE NOTE: Locators are defined once in the constructor. \n    // If the UI changes, you only update this one file, not 50 tests.\n    this.newTodoInput = page.getByPlaceholder('What needs to be done?');\n    this.todoList = page.getByTestId('todo-item');\n  }\n\n  async goto() {\n    await this.page.goto('/');\n  }\n\n  async addTodo(text: string) {\n    await this.newTodoInput.fill(text);\n    await this.newTodoInput.press('Enter');\n  }\n\n  async markComplete(text: string) {\n    // 💡 ARCHITECTURE NOTE: filter() is incredibly powerful for lists.\n    // It scopes the locator down to just the li element containing our text.\n    let item = this.todoList.filter({ hasText: text });\n    await item.getByRole('checkbox').check();\n  }\n\n  async deleteTodo(text: string) {\n    const item = this.todoList.filter({ hasText: text });\n    // The destroy button is hidden until hover\n    await item.hover();\n    await item.getByLabel('Delete').click();\n  }\n}",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(03-competent)/35-reference-solution/page.mdx",
+          "heading": "2. The Page Object",
+          "lineRange": "54-91"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\n// 1. Trigger the heavy calculation\nawait page.getByRole('button', { name: 'Calculate Taxes' }).click();\n\n// 2. Synchronize the test by asserting the expected result\n// The test will pause here for up to 5 seconds waiting for the text to change!\nawait expect(page.getByTestId('tax-total')).toHaveText('$1,500.00');\n\n// 3. The test safely continues knowing the calculation is complete\nawait page.getByRole('button', { name: 'Submit Tax Return' }).click();",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(03-competent)/37-assertions-vs-waits/page.mdx",
+          "heading": "Assertions as Synchronization Points",
+          "lineRange": "54-66"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "// Find a card that contains a specific badge element\nconst overdueCard = page.getByTestId('document-card').filter({\n  has: page.getByRole('status', { name: 'Overdue' })\n});\n\n// Find a row that has an unchecked checkbox\nconst unselectedRow = page.getByRole('row').filter({\n  has: page.getByRole('checkbox', { checked: false })\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/52-locators-code/page.mdx",
+          "heading": "`has` — Filter by child locator",
+          "lineRange": "43-53"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('multi-user approval workflow', async ({ browser }) => {\n  // Create two isolated contexts (like two different users)\n  const adminContext = await browser.newContext();\n  const reviewerContext = await browser.newContext();\n  \n  const adminPage = await adminContext.newPage();\n  const reviewerPage = await reviewerContext.newPage();\n  \n  // Admin submits a document\n  await adminPage.goto('/documents/DOC-001');\n  await adminPage.getByRole('button', { name: 'Submit for Review' }).click();\n  \n  // Reviewer sees and approves it (different user, different session)\n  await reviewerPage.goto('/review-queue');\n  await expect(reviewerPage.getByText('DOC-001')).toBeVisible();\n  await reviewerPage.getByRole('button', { name: 'Approve' }).click();\n  \n  // Admin sees the updated status\n  await adminPage.reload();\n  await expect(adminPage.getByTestId('status')).toContainText('Approved');\n  \n  // Clean up\n  await adminContext.close();\n  await reviewerContext.close();\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/57-multi-tab/page.mdx",
+          "heading": "Working with Multiple Pages",
+          "lineRange": "46-74"
+        }
+      }
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/15-getbyrole/page.mdx",
+        "heading": "4. `getByTestId` (The Escape Hatch)",
+        "lineRange": "100-103"
+      },
+      {
+        "file": "src/app/courses/playwright/(03-competent)/35-reference-solution/page.mdx",
+        "heading": "2. The Page Object",
+        "lineRange": "54-91"
+      },
+      {
+        "file": "src/app/courses/playwright/(03-competent)/37-assertions-vs-waits/page.mdx",
+        "heading": "Assertions as Synchronization Points",
+        "lineRange": "54-66"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/52-locators-code/page.mdx",
+        "heading": "`has` — Filter by child locator",
+        "lineRange": "43-53"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/57-multi-tab/page.mdx",
+        "heading": "Working with Multiple Pages",
+        "lineRange": "46-74"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/57-multi-tab/page.mdx",
+        "heading": "Transferring Data Between Tabs",
+        "lineRange": "160-183"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/62-anti-patterns/page.mdx",
+        "heading": "14. `toHaveScreenshot()` Without Masks",
+        "lineRange": "263-277"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/64-adv-assertions/page.mdx",
+        "heading": "Soft Assertions: Collect All Failures",
+        "lineRange": "150-165"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/64-adv-assertions/page.mdx",
+        "heading": "Custom Matchers with `expect.extend()`",
+        "lineRange": "186-229"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/65-adv-visual/page.mdx",
+        "heading": "Handling Dynamic Content",
+        "lineRange": "75-96"
+      }
+    ]
+  },
+  {
+    "name": "expect()",
+    "description": "Playwright client interface method: expect()",
+    "sourceLessons": [
+      "05-js-ts-async",
+      "10-first-test",
+      "11-navigating-clicking",
+      "12-writing-assertions",
+      "14-break-it",
+      "15-getbyrole",
+      "16-assertions-deep",
+      "17-dynamic-elements",
+      "19-test-org",
+      "21-before-after",
+      "23-js-ts-ts-oop",
+      "24-what-are-poms",
+      "25-first-pom",
+      "26-multi-page",
+      "30-custom-fixtures",
+      "31-fixture-dependencies",
+      "32-basetest-pattern",
+      "35-reference-solution",
+      "37-assertions-vs-waits",
+      "38-timeouts",
+      "39-network-sync",
+      "45-quality-gates",
+      "46-codegen",
+      "47-migration-guide",
+      "48-js-execution-context",
+      "49-browser-network-mechanics",
+      "51-debugging-workflow",
+      "52-locators-code",
+      "53-locators-exec",
+      "54-locators-arch",
+      "55-iframes-dialogs",
+      "56-file-handling",
+      "57-multi-tab",
+      "58-arch-layers",
+      "59-arch-interface",
+      "60-arch-debug",
+      "61-arch-entity",
+      "62-anti-patterns",
+      "63-adv-parallel",
+      "64-adv-assertions",
+      "65-adv-visual",
+      "68-accessibility",
+      "69-tags-annotations",
+      "70-clock-emulation",
+      "71-component-testing",
+      "72-esign-compliance",
+      "73-esign-modal",
+      "74-esign-exec",
+      "75-esign-debug",
+      "76-esign-arch",
+      "77-api-pyramid",
+      "78-api-request",
+      "79-api-hybrid",
+      "80-api-auth",
+      "81-api-controller",
+      "82-data-logic",
+      "83-data-iteration",
+      "84-data-bulk",
+      "85-data-debug",
+      "86-data-factory",
+      "89-ast-waits",
+      "90-ast-debug",
+      "92-war-room-sandbox",
+      "93-war-room-blind",
+      "95-capstone-pom",
+      "96-capstone-exec",
+      "97-capstone-audit",
+      "100-reporting",
+      "102-api-mocking",
+      "103-adv-auth",
+      "104-db-validation",
+      "105-network-debug",
+      "106-observability",
+      "117-template-hybrid"
+    ],
+    "examples": [
+      {
+        "language": "javascript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('Broken Flow', async ({ page }) => {\n  // ❌ Missing await!\n  // Playwright starts the click, but JS instantly moves to the next line!\n  page.click('#submit-btn'); \n  \n  // The script looks for the success banner BEFORE the click finishes!\n  // THE TEST FAILS RANDOMLY.\n  await expect(page.locator('.success')).toBeVisible(); \n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/05-js-ts-async/page.mdx",
+          "heading": "4. The Fatal Flaw in Automation",
+          "lineRange": "117-129"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('my very first test', async ({ page }) => {\n  // 1. Go to the Playwright website\n  await page.goto('https://playwright.dev');\n\n  // 2. Expect the title to contain \"Playwright\"\n  await expect(page).toHaveTitle(/Playwright/);\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/10-first-test/page.mdx",
+          "heading": "Step 3: Write Your First Test",
+          "lineRange": "55-65"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('has title', async ({ page }) => {\n  await page.goto('https://playwright.dev/');\n  await expect(page).toHaveTitle(/Playwright/);\n});\n\ntest('verify docs heading', async ({ page }) => {\n  await page.goto('https://playwright.dev/docs/intro');\n  // We use getByRole('heading') which is the best practice for finding headers\n  await expect(page.getByRole('heading', { name: 'Installation' })).toBeVisible();\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/10-first-test/page.mdx",
+          "heading": "Challenge Exercise",
+          "lineRange": "169-182"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('click the Get Started link', async ({ page }) => {\n  // 1. Start at the homepage\n  await page.goto('https://playwright.dev');\n\n  // 2. Find a link named \"Get started\" and click it\n  await page.getByRole('link', { name: 'Get started' }).click();\n\n  // 3. Check we landed on the right page by looking at the URL\n  await expect(page).toHaveURL(/.*intro/);\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/11-navigating-clicking/page.mdx",
+          "heading": "Interacting with the Page",
+          "lineRange": "18-31"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\nawait expect(page).toHaveURL(/.*intro/);",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(01-novice)/11-navigating-clicking/page.mdx",
+          "heading": "Checking the URL",
+          "lineRange": "69-73"
+        }
+      }
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/05-js-ts-async/page.mdx",
+        "heading": "4. The Fatal Flaw in Automation",
+        "lineRange": "117-129"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/10-first-test/page.mdx",
+        "heading": "Step 3: Write Your First Test",
+        "lineRange": "55-65"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/10-first-test/page.mdx",
+        "heading": "Challenge Exercise",
+        "lineRange": "169-182"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/11-navigating-clicking/page.mdx",
+        "heading": "Interacting with the Page",
+        "lineRange": "18-31"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/11-navigating-clicking/page.mdx",
+        "heading": "Checking the URL",
+        "lineRange": "69-73"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/12-writing-assertions/page.mdx",
+        "heading": "What is an Assertion?",
+        "lineRange": "16-21"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/12-writing-assertions/page.mdx",
+        "heading": "1. `toHaveTitle()`",
+        "lineRange": "30-34"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/12-writing-assertions/page.mdx",
+        "heading": "2. `toHaveURL()`",
+        "lineRange": "39-45"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/12-writing-assertions/page.mdx",
+        "heading": "3. `toBeVisible()`",
+        "lineRange": "50-55"
+      },
+      {
+        "file": "src/app/courses/playwright/(01-novice)/12-writing-assertions/page.mdx",
+        "heading": "4. `toHaveText()`",
+        "lineRange": "60-65"
+      }
+    ]
+  },
+  {
+    "name": "page.route()",
+    "description": "Playwright client interface method: page.route()",
+    "sourceLessons": [
+      "47-migration-guide",
+      "49-browser-network-mechanics",
+      "79-api-hybrid",
+      "102-api-mocking",
+      "106-observability"
+    ],
+    "examples": [
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\n// Playwright\nawait page.route('/api/documents', route => {\n  route.fulfill({\n    status: 200,\n    json: [{ id: 'DOC-001', title: 'Test' }],\n  });\n});\n\nawait page.goto('/documents');\nawait expect(page.getByRole('row')).toHaveCount(1);\n// No need for cy.wait() — web-first assertions retry automatically",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/47-migration-guide/page.mdx",
+          "heading": "Before & After: API Interception",
+          "lineRange": "115-129"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('Dashboard renders massive datasets cleanly', async ({ page }) => {\n  // 1. Intercept the heavy API call\n  await page.route('**/api/v2/analytics/summary', async route => {\n    // 2. Fulfill instantly with fake data\n    await route.fulfill({\n      status: 200,\n      contentType: 'application/json',\n      body: JSON.stringify({\n        totalRevenue: 5000000,\n        activeUsers: 12500,\n        churnRate: '1.2%'\n      })\n    });\n  });\n\n  // 3. Load the page (Hydrates and receives fake data in ~200ms)\n  await page.goto('/dashboard');\n  \n  // 4. Assert the UI rendered the mocked data\n  await expect(page.getByText('$5,000,000')).toBeVisible();\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+          "heading": "1. `route.fulfill()` — The Instant Mock",
+          "lineRange": "102-126"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('Forces Admin View via Proxy Interception', async ({ page }) => {\n  await page.route('**/api/users/me', async route => {\n    // 1. Fetch the REAL response from the real server\n    const response = await route.fetch();\n    const json = await response.json();\n    \n    // 2. Mutate the response payload\n    json.role = 'SuperAdmin';\n    json.permissions.push('DELETE_ORG');\n\n    // 3. Fulfill the route with the mutated data\n    await route.fulfill({\n      response, // Inherits original headers/status\n      json      // Overrides the body\n    });\n  });\n\n  await page.goto('/profile');\n  await expect(page.getByRole('button', { name: 'Delete Organization' })).toBeVisible();\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+          "heading": "2. `route.fetch()` — The Proxy Pattern",
+          "lineRange": "132-155"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "// Block all images from loading to speed up test execution!\nawait page.route('**/*.{png,jpg,jpeg,gif,svg}', route => route.abort('blockedbyclient'));\n\n// Simulate an analytics tracker timing out\nawait page.route('**/google-analytics/**', route => route.abort('timedout'));",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+          "heading": "3. `route.abort()` — Simulating Catastrophic Failures",
+          "lineRange": "161-167"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('Mocking specific GraphQL Queries', async ({ page }) => {\n  await page.route('**/graphql', async route => {\n    const request = route.request();\n    const postData = JSON.parse(request.postData() || '{}');\n\n    // Check the GraphQL Operation Name\n    if (postData.operationName === 'GetUserSettings') {\n      await route.fulfill({\n        json: { data: { userSettings: { theme: 'dark', notifications: false } } }\n      });\n    } else {\n      // If it's not the query we care about, let it hit the real server\n      await route.continue();\n    }\n  });\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+          "heading": "Mocking GraphQL Endpoints",
+          "lineRange": "177-196"
+        }
+      }
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/47-migration-guide/page.mdx",
+        "heading": "Before & After: API Interception",
+        "lineRange": "115-129"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+        "heading": "1. `route.fulfill()` — The Instant Mock",
+        "lineRange": "102-126"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+        "heading": "2. `route.fetch()` — The Proxy Pattern",
+        "lineRange": "132-155"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+        "heading": "3. `route.abort()` — Simulating Catastrophic Failures",
+        "lineRange": "161-167"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+        "heading": "Mocking GraphQL Endpoints",
+        "lineRange": "177-196"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/79-api-hybrid/page.mdx",
+        "heading": "Pattern 3: API Mocking with `route`",
+        "lineRange": "96-120"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/79-api-hybrid/page.mdx",
+        "heading": "Pattern 4: Modifying Requests with `route.continue()`",
+        "lineRange": "126-144"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/79-api-hybrid/page.mdx",
+        "heading": "Pattern 4: Modifying Requests with `route.continue()`",
+        "lineRange": "148-154"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/79-api-hybrid/page.mdx",
+        "heading": "Pattern 5: Modifying Responses",
+        "lineRange": "160-183"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/79-api-hybrid/page.mdx",
+        "heading": "Pattern 6: Route Chaining with `route.fallback()`",
+        "lineRange": "189-205"
+      }
+    ]
+  },
+  {
+    "name": "route.fulfill()",
+    "description": "Playwright client interface method: route.fulfill()",
+    "sourceLessons": [
+      "47-migration-guide",
+      "49-browser-network-mechanics",
+      "79-api-hybrid",
+      "102-api-mocking"
+    ],
+    "examples": [
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\n// Playwright\nawait page.route('/api/documents', route => {\n  route.fulfill({\n    status: 200,\n    json: [{ id: 'DOC-001', title: 'Test' }],\n  });\n});\n\nawait page.goto('/documents');\nawait expect(page.getByRole('row')).toHaveCount(1);\n// No need for cy.wait() — web-first assertions retry automatically",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/47-migration-guide/page.mdx",
+          "heading": "Before & After: API Interception",
+          "lineRange": "115-129"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('Dashboard renders massive datasets cleanly', async ({ page }) => {\n  // 1. Intercept the heavy API call\n  await page.route('**/api/v2/analytics/summary', async route => {\n    // 2. Fulfill instantly with fake data\n    await route.fulfill({\n      status: 200,\n      contentType: 'application/json',\n      body: JSON.stringify({\n        totalRevenue: 5000000,\n        activeUsers: 12500,\n        churnRate: '1.2%'\n      })\n    });\n  });\n\n  // 3. Load the page (Hydrates and receives fake data in ~200ms)\n  await page.goto('/dashboard');\n  \n  // 4. Assert the UI rendered the mocked data\n  await expect(page.getByText('$5,000,000')).toBeVisible();\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+          "heading": "1. `route.fulfill()` — The Instant Mock",
+          "lineRange": "102-126"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('Forces Admin View via Proxy Interception', async ({ page }) => {\n  await page.route('**/api/users/me', async route => {\n    // 1. Fetch the REAL response from the real server\n    const response = await route.fetch();\n    const json = await response.json();\n    \n    // 2. Mutate the response payload\n    json.role = 'SuperAdmin';\n    json.permissions.push('DELETE_ORG');\n\n    // 3. Fulfill the route with the mutated data\n    await route.fulfill({\n      response, // Inherits original headers/status\n      json      // Overrides the body\n    });\n  });\n\n  await page.goto('/profile');\n  await expect(page.getByRole('button', { name: 'Delete Organization' })).toBeVisible();\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+          "heading": "2. `route.fetch()` — The Proxy Pattern",
+          "lineRange": "132-155"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('Mocking specific GraphQL Queries', async ({ page }) => {\n  await page.route('**/graphql', async route => {\n    const request = route.request();\n    const postData = JSON.parse(request.postData() || '{}');\n\n    // Check the GraphQL Operation Name\n    if (postData.operationName === 'GetUserSettings') {\n      await route.fulfill({\n        json: { data: { userSettings: { theme: 'dark', notifications: false } } }\n      });\n    } else {\n      // If it's not the query we care about, let it hit the real server\n      await route.continue();\n    }\n  });\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+          "heading": "Mocking GraphQL Endpoints",
+          "lineRange": "177-196"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "// ✅ Ensuring mocked responses bypass CORS restrictions\nawait route.fulfill({\n  status: 200,\n  headers: {\n    'Access-Control-Allow-Origin': '*',\n    'Content-Type': 'application/json'\n  },\n  body: JSON.stringify({ success: true })\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+          "heading": "CORS Headers in Mocked Responses",
+          "lineRange": "202-212"
+        }
+      }
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/47-migration-guide/page.mdx",
+        "heading": "Before & After: API Interception",
+        "lineRange": "115-129"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+        "heading": "1. `route.fulfill()` — The Instant Mock",
+        "lineRange": "102-126"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+        "heading": "2. `route.fetch()` — The Proxy Pattern",
+        "lineRange": "132-155"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+        "heading": "Mocking GraphQL Endpoints",
+        "lineRange": "177-196"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+        "heading": "CORS Headers in Mocked Responses",
+        "lineRange": "202-212"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/79-api-hybrid/page.mdx",
+        "heading": "Pattern 3: API Mocking with `route`",
+        "lineRange": "96-120"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/79-api-hybrid/page.mdx",
+        "heading": "Pattern 5: Modifying Responses",
+        "lineRange": "160-183"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/79-api-hybrid/page.mdx",
+        "heading": "Pattern 6: Route Chaining with `route.fallback()`",
+        "lineRange": "189-205"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/79-api-hybrid/page.mdx",
+        "heading": "Pattern 9: Testing Loading States",
+        "lineRange": "264-285"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/79-api-hybrid/page.mdx",
+        "heading": "`page.route()` vs `page.on('request')` — Key Differences",
+        "lineRange": "371-380"
+      }
+    ]
+  },
+  {
+    "name": "test.extend()",
+    "description": "Playwright client interface method: test.extend()",
+    "sourceLessons": [],
+    "examples": [],
+    "confidence": 0.8,
+    "references": []
+  },
+  {
+    "name": "test.describe()",
+    "description": "Playwright client interface method: test.describe()",
+    "sourceLessons": [
+      "20-describe-blocks",
+      "21-before-after",
+      "35-reference-solution",
+      "45-quality-gates",
+      "54-locators-arch",
+      "58-arch-layers",
+      "63-adv-parallel",
+      "69-tags-annotations",
+      "72-esign-compliance",
+      "74-esign-exec",
+      "80-api-auth",
+      "82-data-logic",
+      "84-data-bulk",
+      "86-data-factory",
+      "92-war-room-sandbox",
+      "93-war-room-blind",
+      "96-capstone-exec",
+      "97-capstone-audit",
+      "100-reporting",
+      "109-capstone-verify"
+    ],
+    "examples": [
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\n// Group 1\ntest.describe('Guest Checkout', () => {\n  \n  test('can checkout with valid credit card', async ({ page }) => {\n    // ...\n  });\n\n  test('declines expired credit card', async ({ page }) => {\n    // ...\n  });\n\n});\n\n// Group 2\ntest.describe('Logged-in Checkout', () => {\n\n  test('auto-fills saved shipping address', async ({ page }) => {\n    // ...\n  });\n\n  test('allows applying loyalty points', async ({ page }) => {\n    // ...\n  });\n\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(02-advanced-beginner)/20-describe-blocks/page.mdx",
+          "heading": "Grouping Tests",
+          "lineRange": "16-44"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest.describe('Dashboard Settings', () => {\n\n  test('user can update profile picture', async ({ page }) => {\n    // Repeated Setup\n    await page.goto('/login');\n    await page.getByLabel('Email').fill('admin@example.com');\n    await page.getByLabel('Password').fill('secret123');\n    await page.getByRole('button', { name: 'Sign In' }).click();\n    await page.getByRole('link', { name: 'Settings' }).click();\n\n    // Actual test logic\n    await page.getByLabel('Upload Avatar').setInputFiles('avatar.png');\n    await expect(page.getByText('Avatar updated')).toBeVisible();\n  });\n\n  test('user can change timezone', async ({ page }) => {\n    // Repeated Setup\n    await page.goto('/login');\n    await page.getByLabel('Email').fill('admin@example.com');\n    await page.getByLabel('Password').fill('secret123');\n    await page.getByRole('button', { name: 'Sign In' }).click();\n    await page.getByRole('link', { name: 'Settings' }).click();\n\n    // Actual test logic\n    await page.getByLabel('Timezone').selectOption('UTC');\n    await expect(page.getByText('Timezone saved')).toBeVisible();\n  });\n\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(02-advanced-beginner)/21-before-after/page.mdx",
+          "heading": "The Repetition Problem",
+          "lineRange": "14-46"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest.describe('Dashboard Settings', () => {\n\n  // This runs automatically before EACH test below it\n  test.beforeEach(async ({ page }) => {\n    await page.goto('/login');\n    await page.getByLabel('Email').fill('admin@example.com');\n    await page.getByLabel('Password').fill('secret123');\n    await page.getByRole('button', { name: 'Sign In' }).click();\n    await page.getByRole('link', { name: 'Settings' }).click();\n  });\n\n  test('user can update profile picture', async ({ page }) => {\n    // Playwright already logged in and navigated to Settings!\n    await page.getByLabel('Upload Avatar').setInputFiles('avatar.png');\n    await expect(page.getByText('Avatar updated')).toBeVisible();\n  });\n\n  test('user can change timezone', async ({ page }) => {\n    // Playwright logged in and navigated to Settings again from scratch!\n    await page.getByLabel('Timezone').selectOption('UTC');\n    await expect(page.getByText('Timezone saved')).toBeVisible();\n  });\n\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(02-advanced-beginner)/21-before-after/page.mdx",
+          "heading": "The Solution: `test.beforeEach`",
+          "lineRange": "58-85"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '../fixtures/baseTest';\n\ntest.describe('Todo MVC Scenarios', () => {\n  \n  test('user can add a todo', async ({ todoPage }) => {\n    await todoPage.addTodo('Buy groceries');\n    await expect(todoPage.todoList).toHaveText(['Buy groceries']);\n  });\n\n  test('user can complete a todo', async ({ todoPage }) => {\n    await todoPage.addTodo('Wash the car');\n    await todoPage.markComplete('Wash the car');\n    \n    const item = todoPage.todoList.filter({ hasText: 'Wash the car' });\n    await expect(item).toHaveClass(/completed/);\n  });\n\n  test('user can delete a todo', async ({ todoPage }) => {\n    await todoPage.addTodo('Read a book');\n    await todoPage.deleteTodo('Read a book');\n    \n    await expect(todoPage.todoList).toHaveCount(0);\n  });\n\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(03-competent)/35-reference-solution/page.mdx",
+          "heading": "4. The Tests",
+          "lineRange": "124-150"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\n// ❌ BANNED — no describe block\ntest('login works', async ({ page }) => { ... });\n\n// ✅ CORRECT\ntest.describe('Authentication', () => {\n  test('login works', async ({ page }) => { ... });\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/45-quality-gates/page.mdx",
+          "heading": "Gate 5: Every Test Must Have a `test.describe` Block",
+          "lineRange": "76-86"
+        }
+      }
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/20-describe-blocks/page.mdx",
+        "heading": "Grouping Tests",
+        "lineRange": "16-44"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/21-before-after/page.mdx",
+        "heading": "The Repetition Problem",
+        "lineRange": "14-46"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/21-before-after/page.mdx",
+        "heading": "The Solution: `test.beforeEach`",
+        "lineRange": "58-85"
+      },
+      {
+        "file": "src/app/courses/playwright/(03-competent)/35-reference-solution/page.mdx",
+        "heading": "4. The Tests",
+        "lineRange": "124-150"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/45-quality-gates/page.mdx",
+        "heading": "Gate 5: Every Test Must Have a `test.describe` Block",
+        "lineRange": "76-86"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/54-locators-arch/page.mdx",
+        "heading": "Using Dynamic Locator Methods in Tests",
+        "lineRange": "106-127"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/58-arch-layers/page.mdx",
+        "heading": "Layer 1: Tests — \"What\"",
+        "lineRange": "71-91"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/63-adv-parallel/page.mdx",
+        "heading": "`test.describe.configure()` — Granular Control",
+        "lineRange": "158-170"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/63-adv-parallel/page.mdx",
+        "heading": "Forcing Serial Execution When Needed",
+        "lineRange": "176-188"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/69-tags-annotations/page.mdx",
+        "heading": "Tag entire describe blocks",
+        "lineRange": "40-49"
+      }
+    ]
+  },
+  {
+    "name": "locator.frameLocator()",
+    "description": "Playwright client interface method: locator.frameLocator()",
+    "sourceLessons": [
+      "55-iframes-dialogs"
+    ],
+    "examples": [
+      {
+        "language": "typescript",
+        "code": "// Target elements inside an iframe by its CSS selector or attribute\nconst paymentFrame = page.frameLocator('#payment-iframe');\n\n// Now use any locator inside the frame — same API as page\nawait paymentFrame.getByLabel('Card Number').fill('4242424242424242');\nawait paymentFrame.getByLabel('Expiry').fill('12/28');\nawait paymentFrame.getByLabel('CVC').fill('123');\nawait paymentFrame.getByRole('button', { name: 'Pay Now' }).click();",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+          "heading": "`page.frameLocator()` — The iframe Gateway",
+          "lineRange": "16-25"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "// By ID\nlet frame = page.frameLocator('#iframe-id');\n\n// By name\nlet frame = page.frameLocator('iframe[name=\"editor\"]');\n\n// By src URL\nlet frame = page.frameLocator('iframe[src*=\"payment\"]');\n\n// By title attribute (accessible)\nlet frame = page.frameLocator('iframe[title=\"Payment Form\"]');\n\n// By nth index (when multiple iframes exist)\nconst frame = page.frameLocator('iframe').nth(0);",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+          "heading": "Finding iframes by different selectors",
+          "lineRange": "29-44"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "// Outer page → first iframe → second iframe\nconst outerFrame = page.frameLocator('#outer-frame');\nconst innerFrame = outerFrame.frameLocator('#inner-frame');\n\nawait innerFrame.getByRole('button', { name: 'Confirm' }).click();",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+          "heading": "Nested iframes",
+          "lineRange": "50-56"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\nconst editorFrame = page.frameLocator('#wysiwyg-editor');\n\n// All standard assertions work inside frames\nawait expect(editorFrame.getByRole('heading')).toContainText('Document Title');\nawait expect(editorFrame.getByRole('paragraph')).toHaveCount(3);\nawait expect(editorFrame.getByText('Draft saved')).toBeVisible();",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+          "heading": "Assertions Inside iframes",
+          "lineRange": "60-69"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "// This works even if the iframe is from a different domain\nconst stripeFrame = page.frameLocator('iframe[src*=\"stripe.com\"]');\nawait stripeFrame.getByLabel('Card number').fill('4242424242424242');",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+          "heading": "Cross-Origin iframes",
+          "lineRange": "75-79"
+        }
+      }
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+        "heading": "`page.frameLocator()` — The iframe Gateway",
+        "lineRange": "16-25"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+        "heading": "Finding iframes by different selectors",
+        "lineRange": "29-44"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+        "heading": "Nested iframes",
+        "lineRange": "50-56"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+        "heading": "Assertions Inside iframes",
+        "lineRange": "60-69"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+        "heading": "Cross-Origin iframes",
+        "lineRange": "75-79"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+        "heading": "Frame vs FrameLocator",
+        "lineRange": "88-96"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+        "heading": "Real-World Example: Rich Text Editor",
+        "lineRange": "100-120"
+      }
+    ]
+  },
+  {
+    "name": "page.on('dialog')",
+    "description": "Playwright client interface method: page.on('dialog')",
+    "sourceLessons": [
+      "55-iframes-dialogs",
+      "73-esign-modal"
+    ],
+    "examples": [
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\ntest('handles confirmation dialog', async ({ page }) => {\n  // Set up the handler BEFORE triggering the dialog\n  page.on('dialog', async dialog => {\n    console.log(`Dialog type: ${dialog.type()}`);    // 'alert', 'confirm', 'prompt', 'beforeunload'\n    console.log(`Dialog message: ${dialog.message()}`);\n    \n    await dialog.accept();  // Click OK / Yes\n  });\n  \n  // Now trigger the action that opens the dialog\n  await page.getByRole('button', { name: 'Delete Document' }).click();\n  \n  // The dialog was automatically handled — continue with assertions\n  await expect(page.getByText('Document deleted')).toBeVisible();\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+          "heading": "`page.on('dialog')` — The Handler Pattern",
+          "lineRange": "132-150"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\npage.on('dialog', async dialog => {\n  expect(dialog.type()).toBe('alert');\n  expect(dialog.message()).toBe('Document saved successfully');\n  await dialog.accept();  // Only option is OK\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+          "heading": "`alert()` — Information only",
+          "lineRange": "156-164"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\n// Accept the confirmation (click \"OK\")\npage.on('dialog', async dialog => {\n  expect(dialog.type()).toBe('confirm');\n  expect(dialog.message()).toContain('Are you sure you want to delete');\n  await dialog.accept();\n});\n\n// Dismiss the confirmation (click \"Cancel\")\npage.on('dialog', async dialog => {\n  await dialog.dismiss();  // Click Cancel\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+          "heading": "`confirm()` — Accept or Dismiss",
+          "lineRange": "168-182"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\npage.on('dialog', async dialog => {\n  expect(dialog.type()).toBe('prompt');\n  expect(dialog.message()).toBe('Enter document title:');\n  expect(dialog.defaultValue()).toBe('Untitled');  // Default value in the prompt\n  \n  await dialog.accept('Protocol v3.0');  // Enter text and click OK\n});\n\nawait page.evaluate(() => {\n  let title = prompt('Enter document title:', 'Untitled');\n  document.title = title || 'Untitled';\n});",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+          "heading": "`prompt()` — Accept with Input",
+          "lineRange": "186-201"
+        }
+      },
+      {
+        "language": "typescript",
+        "code": "import { test, expect } from '@playwright/test';\n\npage.on('dialog', async dialog => {\n  expect(dialog.type()).toBe('beforeunload');\n  await dialog.accept();  // Leave the page\n  // OR await dialog.dismiss();  // Stay on the page\n});\n\n// Navigate away from a page with unsaved changes\nawait page.goto('/other-page');",
+        "isExample": true,
+        "sourceReference": {
+          "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+          "heading": "`beforeunload` — Unsaved Changes Warning",
+          "lineRange": "205-216"
+        }
+      }
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+        "heading": "`page.on('dialog')` — The Handler Pattern",
+        "lineRange": "132-150"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+        "heading": "`alert()` — Information only",
+        "lineRange": "156-164"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+        "heading": "`confirm()` — Accept or Dismiss",
+        "lineRange": "168-182"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+        "heading": "`prompt()` — Accept with Input",
+        "lineRange": "186-201"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+        "heading": "`beforeunload` — Unsaved Changes Warning",
+        "lineRange": "205-216"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/55-iframes-dialogs/page.mdx",
+        "heading": "Auto-Dismissing All Dialogs",
+        "lineRange": "232-237"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/73-esign-modal/page.mdx",
+        "heading": "Handling Browser Native Dialogs (`alert`, `confirm`, `prompt`)",
+        "lineRange": "130-148"
+      }
+    ]
+  }
+]

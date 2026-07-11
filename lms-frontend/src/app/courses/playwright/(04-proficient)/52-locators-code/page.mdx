@@ -1,0 +1,231 @@
+﻿# 10.1: Advanced Locator Composition
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Use .filter() and .hasText() like a pro
+
+## The Problem: Multiple Matching Elements
+
+Most pages contain repeated UI patterns — rows in a table, items in a list, cards in a grid. Your locator will match ALL of them. You need to **filter** down to the one specific element you care about.
+
+```typescript
+// This returns ALL rows in the table (not useful for targeting one)
+const allRows = page.getByRole('row');  // Could be 50 rows!
+```
+
+## The `.filter()` Method
+
+`.filter()` is the most powerful way to narrow down a locator. It accepts a locator and returns only the matching elements.
+
+```typescript
+// Get only the table row that contains the text "Pending Review"
+const pendingRow = page.getByRole('row').filter({ hasText: 'Pending Review' });
+
+// Click the "Review" button INSIDE that specific row
+await pendingRow.getByRole('button', { name: 'Review' }).click();
+```
+
+## Filter Options
+
+### `hasText` — Filter by visible text
+
+```typescript
+// Find the row that contains "Clinical Trial Report"
+const docRow = page.getByRole('row').filter({ hasText: 'Clinical Trial Report' });
+
+// Also works with regex (case-insensitive)
+const approvedRow = page.getByRole('row').filter({ hasText: /approved/i });
+```
+
+### `has` — Filter by child locator
+
+```typescript
+// Find a card that contains a specific badge element
+const overdueCard = page.getByTestId('document-card').filter({
+  has: page.getByRole('status', { name: 'Overdue' })
+});
+
+// Find a row that has an unchecked checkbox
+const unselectedRow = page.getByRole('row').filter({
+  has: page.getByRole('checkbox', { checked: false })
+});
+```
+
+### `hasNot` — Exclude elements containing something
+
+```typescript
+// Get all document rows EXCEPT draft ones
+const publishedDocs = page.getByRole('row').filter({
+  hasNot: page.getByRole('status', { name: 'Draft' })
+});
+```
+
+## Chaining Filters
+
+You can chain multiple filters for complex targeting:
+
+```typescript
+// Find a row that:
+// 1. Contains "Clinical Trial"
+// 2. Is in "Pending" status
+// 3. Has a Review button
+const targetRow = page.getByRole('row')
+  .filter({ hasText: 'Clinical Trial' })
+  .filter({ has: page.getByRole('status', { name: 'Pending' }) })
+  .filter({ has: page.getByRole('button', { name: 'Review' }) });
+
+await targetRow.getByRole('button', { name: 'Review' }).click();
+```
+
+## Targeting by Position: `.first()`, `.last()`, `.nth()`
+
+```typescript
+// Get the first notification in the list
+await page.getByRole('listitem').first().click();
+
+// Get the last item
+await page.getByRole('listitem').last().click();
+
+// Get the 3rd item (0-indexed)
+await page.getByRole('listitem').nth(2).click();
+```
+
+## Counting Matched Elements
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Verify the table has exactly 10 rows (excluding header)
+const dataRows = page.getByRole('row').filter({ hasText: /\d{4}-\d{2}-\d{2}/ }); // rows with dates
+await expect(dataRows).toHaveCount(10);
+
+// Verify at least one row exists
+const count = await dataRows.count();
+expect(count).toBeGreaterThan(0);
+```
+
+## Real-World Example: DMS Document Table
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('reviewer can approve a pending document', async ({ page }) => {
+  await page.goto('/documents');
+
+  // Find the specific document row
+  const targetDoc = page.getByRole('row').filter({ hasText: 'Q3 Safety Report' });
+
+  // Verify it's in Pending state before action
+  await expect(targetDoc.getByRole('status')).toContainText('Pending');
+
+  // Click the Approve button inside that row
+  await targetDoc.getByRole('button', { name: 'Approve' }).click();
+
+  // Confirm in the modal
+  await page.getByRole('dialog').getByRole('button', { name: 'Confirm Approval' }).click();
+
+  // Verify status changed
+  await expect(targetDoc.getByRole('status')).toContainText('Approved');
+});
+```
+
+## Iterating Over All Matching Elements
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Get all document titles and verify none are expired
+const documentRows = page.getByRole('row').filter({ hasText: /DOC-\d+/ });
+const count = await documentRows.count();
+
+for (let i = 0; i < count; i++) {
+  const row = documentRows.nth(i);
+  const status = await row.getByRole('status').textContent();
+  expect(status).not.toBe('Expired');
+}
+```
+
+<CodeEditor
+  moduleId="52-locators-code"
+  taskIndex={0}
+  placeholder="// Task: Filter a table row that contains 'Completed' and click its Review button&#10;const completedRow = page.getByRole('row').filter({ hasText: 'Completed' });&#10;await completedRow.getByRole('button', { name: 'Review' }).click();"
+/>
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="52-locators-code"
+  taskIndex={1}
+  placeholder={`// Challenge: Select the 'Edit' button in the row containing the user 'Sarah'
+// Use child/parent locator filtering (.filter)
+// FIX THE SELECTOR BELOW:
+
+const row = page.getByRole('row').filter({ hasText: 'Sarah' });
+// Click the Edit button in this specific row:`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="locators-code" />
+
+
+
+export const astRules = [
+  {
+    type: "ast_callee_any",
+    values: ["page.getByRole", "page.getByText", "page.getByLabel", "page.getByPlaceholder"],
+    message: "You must use an accessible web-first locator (e.g., getByRole or getByText)."
+  }
+];

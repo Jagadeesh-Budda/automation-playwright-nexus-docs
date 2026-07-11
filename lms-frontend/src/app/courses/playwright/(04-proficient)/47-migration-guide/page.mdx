@@ -1,0 +1,231 @@
+﻿# 8.8: Selenium/Cypress → Playwright
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Understand key differences between Playwright and other test tools
+
+## If You Know Selenium
+
+### Key Mental Model Shifts
+
+| Selenium Concept | Playwright Equivalent | Key Difference |
+|-----------------|----------------------|----------------|
+| `WebDriver` | `Browser` / `BrowserContext` | Playwright uses contexts for isolation, not separate drivers |
+| `WebElement` | `Locator` | Locators are **lazy** — they don't query the DOM until you act |
+| `driver.findElement(By.id())` | `page.getByRole()` | Playwright prefers semantic/accessible locators |
+| `WebDriverWait` + `ExpectedConditions` | Built-in auto-waiting | Playwright waits automatically — no explicit waits needed |
+| `Thread.sleep()` | ❌ Banned | Use `expect().toBeVisible()` instead |
+| `driver.switchTo().frame()` | `page.frameLocator()` | No need to "switch" — frameLocator chains naturally |
+| `driver.switchTo().window()` | `page.waitForEvent('popup')` | Playwright gives you the page directly |
+| `Actions` class | `locator.hover()`, `locator.dragTo()` | Built into locators, no separate class |
+| `driver.manage().timeouts()` | `playwright.config.ts` | Centralized configuration |
+| Page Factory (Java) | `test.extend()` fixtures | Dependency injection built into the framework |
+| TestNG/JUnit `@BeforeEach` | `test.beforeEach()` | Same concept, different syntax |
+| Selenium Grid | Playwright Sharding | `--shard=1/3` across CI machines |
+
+### Before & After: Login Test
+
+```java
+// Selenium (Java)
+WebDriver driver = new ChromeDriver();
+driver.get("https://dms.example.com/login");
+driver.findElement(By.id("email")).sendKeys("admin@test.com");
+driver.findElement(By.id("password")).sendKeys("secret");
+driver.findElement(By.cssSelector("button[type='submit']")).click();
+
+WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+wait.until(ExpectedConditions.urlContains("/dashboard"));
+
+String title = driver.findElement(By.tagName("h1")).getText();
+Assert.assertEquals(title, "Dashboard");
+driver.quit();
+```
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Playwright (TypeScript)
+test('admin can login', async ({ page }) => {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill('admin@test.com');
+  await page.getByLabel('Password').fill('secret');
+  await page.getByRole('button', { name: 'Sign In' }).click();
+  
+  await expect(page).toHaveURL('/dashboard');
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dashboard');
+  // No driver.quit() — Playwright handles cleanup via fixtures
+});
+```
+
+### Top 5 Things Selenium Users Get Wrong in Playwright
+
+1. **Adding explicit waits** — Playwright auto-waits. Don't add `waitForSelector()` before `click()`.
+2. **Using `page.$()` (ElementHandle)** — Use `page.getByRole()` (Locator) instead. Locators are lazy and resilient.
+3. **Closing the browser manually** — Playwright fixtures handle cleanup automatically.
+4. **Using CSS selectors for everything** — Use `getByRole()`, `getByLabel()`, `getByText()` first.
+5. **Creating a "Base Test" class with inheritance** — Use `test.extend()` with fixtures instead.
+
+---
+
+## If You Know Cypress
+
+### Key Mental Model Shifts
+
+| Cypress Concept | Playwright Equivalent | Key Difference |
+|----------------|----------------------|----------------|
+| `cy.visit()` | `page.goto()` | Same concept |
+| `cy.get('.selector')` | `page.getByRole()` | Playwright prefers semantic locators |
+| `cy.contains('text')` | `page.getByText('text')` | Same concept |
+| `cy.intercept()` | `page.route()` | Same concept, different API |
+| `cy.fixture()` | `test.extend()` fixtures | Different meaning — Cypress fixtures are data files |
+| Automatic retry | Automatic retry | Both auto-retry — similar philosophy |
+| Chaining (`cy.get().click()`) | Await chaining (`await locator.click()`) | Playwright uses `async/await` |
+| `beforeEach()` hooks | `test.beforeEach()` | Same concept |
+| `cy.wrap()` | Not needed | Playwright natively handles async |
+| `cy.task()` | Direct Node.js access | Playwright tests run in Node.js directly |
+| `cypress.config.js` | `playwright.config.ts` | Same concept |
+| Cypress Dashboard | Playwright HTML Report | Different reporting tools |
+
+### Critical Difference: Architecture
+
+```
+Cypress:     Browser ← injects commands → Your test (runs in browser)
+Playwright:  Node.js → controls browser via DevTools Protocol → Browser
+```
+
+**Why this matters:**
+- **Cypress** runs inside the browser — limited to one tab, one domain, one browser
+- **Playwright** runs outside the browser — supports multiple tabs, multiple browsers, multiple domains, API calls, file system access
+
+### Before & After: API Interception
+
+```javascript
+// Cypress
+cy.intercept('GET', '/api/documents', {
+  statusCode: 200,
+  body: [{ id: 'DOC-001', title: 'Test' }],
+}).as('getDocuments');
+
+cy.visit('/documents');
+cy.wait('@getDocuments');
+cy.get('[data-testid="doc-row"]').should('have.length', 1);
+```
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Playwright
+await page.route('/api/documents', route => {
+  route.fulfill({
+    status: 200,
+    json: [{ id: 'DOC-001', title: 'Test' }],
+  });
+});
+
+await page.goto('/documents');
+await expect(page.getByRole('row')).toHaveCount(1);
+// No need for cy.wait() — web-first assertions retry automatically
+```
+
+### Top 5 Things Cypress Users Get Wrong in Playwright
+
+1. **Forgetting `await`** — Every Playwright action needs `await`. Cypress chains implicitly.
+2. **Looking for `cy.wait()`** — Use `expect().toBeVisible()` or `page.waitForResponse()` instead.
+3. **Expecting single-tab limitation** — Playwright supports multi-tab! Use `page.waitForEvent('popup')`.
+4. **Using `data-cy` attribute** — Playwright calls it `data-testid` (configurable in config).
+5. **Missing `should()` chaining** — Use `await expect(locator).toBeVisible()` — it's separate from the locator.
+
+---
+
+## Migration Checklist
+
+### From Selenium
+- [ ] Replace `findElement(By.*)` with `getByRole()`, `getByLabel()`, `getByText()`
+- [ ] Remove all explicit waits (`WebDriverWait`, `Thread.sleep`)
+- [ ] Replace Page Factory with `test.extend()` fixtures
+- [ ] Replace `driver.switchTo().frame()` with `page.frameLocator()`
+- [ ] Replace Selenium Grid with `--shard` flag
+- [ ] Replace TestNG/JUnit annotations with `test.describe()` / `test.beforeEach()`
+
+### From Cypress
+- [ ] Add `await` to every action and assertion
+- [ ] Replace `cy.get('.selector')` with `page.getByRole()`
+- [ ] Replace `cy.intercept()` with `page.route()`
+- [ ] Replace `cy.fixture()` data files with `test.extend()` fixtures or JSON imports
+- [ ] Replace `cy.wait('@alias')` with web-first assertions
+- [ ] Replace `cypress.config.js` with `playwright.config.ts`
+
+<CodeEditor
+  moduleId="47-migration-guide"
+  taskIndex={0}
+  placeholder="// Task: Convert this Selenium-style test to Playwright&#10;// Selenium: driver.findElement(By.id('email')).sendKeys('test@test.com')&#10;// Selenium: new WebDriverWait(driver, 10).until(EC.urlContains('/dashboard'))&#10;&#10;// Playwright:&#10;await page.getByLabel('Email').fill('test@test.com');&#10;await expect(page).toHaveURL(/dashboard/);"
+/>
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="47-migration-guide"
+  taskIndex={1}
+  placeholder={`// Challenge: Convert Selenium locator/assertion to Playwright web-first locator/assertion.
+// Selenium: WebElement btn = driver.findElement(By.id("submit")); btn.click();
+// Selenium: assertEquals(driver.getCurrentUrl(), "https://dashboard.com");
+
+// Write your Playwright conversion below:`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="migration-guide" />
+

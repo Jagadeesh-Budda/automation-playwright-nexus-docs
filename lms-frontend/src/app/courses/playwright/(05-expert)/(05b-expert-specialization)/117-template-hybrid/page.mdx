@@ -1,0 +1,160 @@
+# 22.2: Hybrid E2E Boilerplate
+
+import { ChapterHeader } from '@/components/ChapterHeader';
+
+<ChapterHeader
+  objective="Master this critical concept to build robust, scalable Playwright automation."
+  time="15 mins"
+  type="Concept"
+/>
+
+## Learning Objectives
+- Understand the core architectural patterns
+- Identify and avoid common anti-patterns
+- Implement production-grade automation scripts
+
+
+The Hybrid E2E Framework is the industry "Golden Standard". Instead of starting a UI test by logging in via the web browser, clicking through menus, and manually setting up data (which takes 30 seconds), this template uses API requests to seed the database in 200 milliseconds, and then jumps straight to the UI assertion.
+
+<div className="bg-slate-900 border border-slate-700 p-6 rounded-xl my-8">
+  <h3 className="text-cyan-400 font-bold m-0 mb-2 flex items-center gap-2">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 17l6-6-6-6v12zm16-12h-8v2h8v-2zm0 4h-8v2h8v-2zm0 4h-8v2h8v-2z"/></svg>
+    Scaffold the Framework
+  </h3>
+  <div className="text-slate-300 m-0">
+    Run this command in your terminal to generate this repository locally:
+    <div className="bg-slate-950 p-4 rounded-lg mt-4 font-mono text-sm border border-slate-800 flex justify-between items-center">
+      <span>npx @playwright-academy/create-hybrid-framework@latest my-hybrid-tests</span>
+    </div>
+  </div>
+</div>
+
+## The Architecture
+
+<Tabs>
+  <Tab title="Why This Template?">
+    **The Problem**: UI automation is notoriously slow and flaky because it relies on the DOM to reach the desired system state.
+    
+    **The Solution**: This template introduces **API Data Factories**. Before a UI test runs, the framework makes backend API calls to generate isolated users, populate carts, or configure accounts. 
+    *   **Hermeticity**: Every test gets its own unique data, preventing parallel execution collisions.
+    *   **Velocity**: Setup time drops from seconds to milliseconds.
+    *   **POM Architecture**: Includes a strictly structured Page Object Model layer.
+  </Tab>
+
+  <Tab title="Directory Structure">
+    ```text
+    my-hybrid-tests/
+    ├── playwright.config.ts      # Multi-browser matrix configured
+    ├── package.json              
+    ├── src/
+    │   ├── pages/                # Page Object Models (e.g., CheckoutPage.ts)
+    │   ├── components/           # Reusable UI fragments (e.g., NavigationBar.ts)
+    │   ├── factories/            # API Factories (e.g., UserFactory.ts)
+    │   └── utils/                # DB Connection utilities
+    └── tests/
+        ├── e2e/                  # Full cross-system user flows
+        ├── auth/                 # Cookie injection UI bypass tests
+        └── visual/               # Visual regression snapshots
+    ```
+  </Tab>
+
+  <Tab title="The API Data Factory">
+    This is the core pattern that makes the Hybrid template so powerful. Notice how we use `request.post` inside a standard UI `test`.
+
+    ```typescript
+    import { test, expect } from '@playwright/test';
+    import { CheckoutPage } from '../../src/pages/CheckoutPage';
+
+    test('User can checkout successfully', async ({ page, request }) => {
+      // 1. API FACTORY: Seed data instantly
+      const user = await request.post('/api/users/generate').then(r => r.json());
+      await request.post(`/api/cart/${user.id}/add`, { data: { item: 'Laptop' } });
+
+      // 2. UI ASSERTION: Jump straight to the finish line
+      const checkout = new CheckoutPage(page);
+      await checkout.loginAs(user.email);
+      await checkout.navigateToCart();
+      await expect(checkout.totalPrice).toHaveText('$999.00');
+    });
+    ```
+  </Tab>
+
+  <Tab title="Anti-Patterns">
+    To understand why this template is the "Golden Standard", look at what it prevents:
+    *   ❌ Creating test data by clicking through the UI (Too slow).
+    *   ❌ Sharing the same test user across parallel workers (Causes collision flakiness).
+    *   ❌ Using static accounts (`admin1`, `admin2`) that require manual resetting.
+    *   ❌ Hardcoding database IDs in tests.
+    
+    This template enforces:
+    *   ✅ API Factories generating isolated state.
+    *   ✅ Cryptographically unique test data per worker.
+    *   ✅ 100% Hermetic environments.
+  </Tab>
+
+  <Tab title="When NOT To Use">
+    **Senior Engineers understand tradeoffs.** Do not use this Hybrid Template if:
+    *   You are at a small startup with only 20 tests total (the initial architecture setup cost outweighs the time saved).
+    *   Your system relies entirely on legacy monolithic databases without REST/GraphQL APIs available for seeding state.
+  </Tab>
+</Tabs>
+
+---
+
+## Interactive Sandbox
+
+You can browse the complete source code for this template directly in your browser. Explore the `src/factories` directory to see how we build reusable API data generation functions.
+
+<CodeEditor
+  moduleId="117-template-hybrid"
+  taskIndex={0}
+/>
+
+
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="117-template-hybrid"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="117-template-hybrid" />

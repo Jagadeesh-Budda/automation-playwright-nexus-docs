@@ -1,0 +1,246 @@
+# 16.4: Handling 401 Unauthorized
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Identify and fix auth token leaks
+
+## What Must Be Tested in Auth?
+
+Authentication is the most critical part of any system. A bug here doesn't just fail a test — it's a security vulnerability. Test:
+
+1. **Positive cases** — valid credentials grant access
+2. **Negative cases** — invalid credentials are rejected
+3. **Authorization** — users can only access what their role permits
+4. **Token lifecycle** — tokens expire, refresh, and invalidate correctly
+5. **Session security** — concurrent sessions, logout behavior
+
+## Testing the Login API
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test.describe('Authentication API', () => {
+  test('valid credentials return a JWT token', async ({ request }) => {
+    let response = await request.post('/api/auth/login', {
+      data: {
+        email: process.env.ADMIN_USER,
+        password: process.env.ADMIN_PASS
+      }
+    });
+
+    expect(response.status()).toBe(200);
+    
+    let body = await response.json();
+    expect(body.token).toBeDefined();
+    expect(body.token).toMatch(/^[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+\.[A-Za-z0-9-_]+$/); // JWT format
+    expect(body.expiresIn).toBeGreaterThan(0);
+    expect(body.user.role).toBe('admin');
+  });
+
+  test('invalid password returns 401', async ({ request }) => {
+    let response = await request.post('/api/auth/login', {
+      data: { email: process.env.ADMIN_USER, password: 'wrong-password' }
+    });
+    
+    expect(response.status()).toBe(401);
+    const body = await response.json();
+    expect(body.error).toBe('Invalid credentials');
+    
+    // Security: Response must NOT reveal which field was wrong
+    expect(body.error).not.toContain('email');
+    expect(body.error).not.toContain('password');
+  });
+
+  test('non-existent user returns 401 (not 404)', async ({ request }) => {
+    // Returning 404 reveals that the user doesn't exist — a security leak!
+    let response = await request.post('/api/auth/login', {
+      data: { email: 'nonexistent@example.com', password: 'anything' }
+    });
+    
+    expect(response.status()).toBe(401);  // Must not be 404!
+  });
+
+  test('SQL injection in email field is rejected safely', async ({ request }) => {
+    const response = await request.post('/api/auth/login', {
+      data: { email: "'; DROP TABLE users; --", password: 'anything' }
+    });
+    
+    // Must return 400 (bad request) or 401, NOT 500 (server error)
+    expect([400, 401]).toContain(response.status());
+  });
+});
+```
+
+## Testing Authorization (Role-Based Access Control)
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test.describe('Authorization Boundaries', () => {
+  let adminToken: string;
+  let viewerToken: string;
+  
+  test.beforeAll(async ({ playwright }) => {
+    // request is a test-scoped fixture and cannot be consumed in beforeAll.
+    // Instead, use worker-scoped playwright.request to create a manual context.
+    const apiRequestContext = await playwright.request.newContext();
+
+    const adminRes = await apiRequestContext.post('/api/auth/login', {
+      data: { email: process.env.ADMIN_USER, password: process.env.ADMIN_PASS }
+    });
+    adminToken = (await adminRes.json()).token;
+    
+    const viewerRes = await apiRequestContext.post('/api/auth/login', {
+      data: { email: process.env.VIEWER_USER, password: process.env.VIEWER_PASS }
+    });
+    viewerToken = (await viewerRes.json()).token;
+
+    await apiRequestContext.dispose();
+  });
+
+  test('admin can delete documents', async ({ request }) => {
+    let response = await request.delete('/api/documents/DOC-TEST-001', {
+      headers: { Authorization: `Bearer ${adminToken}` }
+    });
+    expect(response.status()).toBe(204);
+  });
+
+  test('viewer cannot delete documents (403 Forbidden)', async ({ request }) => {
+    let response = await request.delete('/api/documents/DOC-TEST-002', {
+      headers: { Authorization: `Bearer ${viewerToken}` }
+    });
+    expect(response.status()).toBe(403);
+    const body = await response.json();
+    expect(body.error).toContain('Insufficient permissions');
+  });
+
+  test('unauthenticated requests return 401', async ({ request }) => {
+    // No Authorization header
+    let response = await request.get('/api/documents');
+    expect(response.status()).toBe(401);
+  });
+
+  test('expired token returns 401 (not 403)', async ({ request }) => {
+    const expiredToken = 'eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1MDAwMDAwMDB9.invalid';
+    const response = await request.get('/api/documents', {
+      headers: { Authorization: `Bearer ${expiredToken}` }
+    });
+    expect(response.status()).toBe(401);
+  });
+});
+```
+
+## Testing the Token Refresh Flow
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('refresh token generates a new access token', async ({ request }) => {
+  // Step 1: Login to get initial tokens
+  const loginRes = await request.post('/api/auth/login', {
+    data: { email: process.env.ADMIN_USER, password: process.env.ADMIN_PASS }
+  });
+  const { token, refreshToken } = await loginRes.json();
+
+  // Step 2: Use the refresh token to get a new access token
+  const refreshRes = await request.post('/api/auth/refresh', {
+    data: { refreshToken }
+  });
+  
+  expect(refreshRes.status()).toBe(200);
+  const { token: newToken } = await refreshRes.json();
+  
+  // The new token should be different from the original
+  expect(newToken).not.toBe(token);
+  
+  // The new token should work for authenticated requests
+  const docsRes = await request.get('/api/documents', {
+    headers: { Authorization: `Bearer ${newToken}` }
+  });
+  expect(docsRes.status()).toBe(200);
+});
+```
+
+<CodeEditor
+  moduleId="80-api-auth"
+  taskIndex={0}
+  placeholder="// Task: Write a negative authorization test.&#10;// Requirements:&#10;//   1. Send a DELETE request to /api/documents/DOC-001&#10;//   2. Use a 'viewer' role token in the Authorization header&#10;//   3. Assert the response status is 403 (Forbidden)&#10;//&#10;// A viewer should NOT be able to delete documents"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('viewer cannot delete', async ({ request }) => {
+  const response = await request.delete('/api/documents/DOC-001', {
+    headers: { Authorization: `Bearer ${viewerToken}` }
+  });
+  expect(response.status()).toBe(403);
+});
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="80-api-auth"
+  taskIndex={1}
+  placeholder={`# Challenge: Complete the command line task
+# Write the correct command below:
+`}
+/>
+<Quiz moduleId="api-auth" />
+
+export const astRules = [
+  {
+    type: "ast_callee_any",
+    values: ["request.post", "request.get"],
+    message: "You must use the Playwright APIRequestContext to perform the authentication request."
+  }
+];

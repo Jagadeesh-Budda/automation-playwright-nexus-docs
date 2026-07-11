@@ -1,0 +1,148 @@
+
+# 7.3: Timeouts & waitFor
+
+import { ChapterHeader } from '@/components/ChapterHeader';
+
+<ChapterHeader
+  objective="Understand Playwright's timeout hierarchy and learn when to use internal `.waitFor()` synchronization."
+  time="10 mins"
+  type="Concept"
+/>
+
+## Learning Objectives
+- Identify the three layers of timeouts (Test, Action, Expect)
+- Override the default `expect` timeout for specific slow assertions
+- Use `.waitFor()` internally within Page Objects for strict synchronization
+
+## The Three Layers of Timeouts
+
+When a test fails because it "timed out", it's important to understand *which* timeout actually triggered the failure. Playwright has three main layers of timeouts.
+
+### 1. The Global Test Timeout (Default: 30,000ms)
+This is the absolute maximum time a single test file is allowed to run. If your test takes longer than 30 seconds to finish everything, Playwright violently kills it. 
+
+* **When to change:** Only if you have a massive end-to-end test that legitimately takes 2 minutes to run. You configure this in `playwright.config.ts`.
+
+### 2. The Action Timeout (Default: No Timeout)
+This is the maximum time Playwright will wait for an element to become "actionable" (visible, stable, enabled) during a `.click()` or `.fill()`. 
+
+* **Note:** By default, actions wait indefinitely (or until the Global Test Timeout kills them).
+
+### 3. The Expect Timeout (Default: 5,000ms)
+This is the maximum time `expect().toBeVisible()` will auto-retry before failing. 
+
+* **When to change:** If a specific calculation takes 10 seconds, you can override the timeout for just that one assertion.
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Override the timeout for a single slow assertion
+await expect(page.getByText('Report Generated')).toBeVisible({ timeout: 10000 });
+```
+
+## When to use `.waitFor()`
+
+In the previous lesson, we said you shouldn't use `.waitFor()` to verify UI states. You should use `expect()`.
+
+So when *do* you use `.waitFor()`?
+
+You use it when you are inside a **Page Object action method** and you need to ensure an action has completely settled before returning control to the test.
+
+```typescript
+// pages/UploadPage.ts
+async uploadFile(filename: string) {
+  // 1. Perform the action
+  await this.uploadInput.setInputFiles(filename);
+  await this.submitButton.click();
+
+  // 2. Synchronize! We must wait for the upload spinner to disappear
+  // BEFORE we let the test continue to the next step.
+  await this.loadingSpinner.waitFor({ state: 'hidden' });
+}
+```
+
+Notice that we use `waitFor({ state: 'hidden' })` instead of `expect().toBeHidden()`. 
+
+Why? Because Page Objects shouldn't contain assertions (`expect`). Assertions belong in the test file! A Page Object's job is just to execute an action and ensure that action finished successfully. `.waitFor()` is the perfect tool for this internal synchronization.
+
+### The Four States of `waitFor()`
+- `'visible'`: Wait for it to appear (the default).
+- `'hidden'`: Wait for it to disappear.
+- `'attached'`: Wait for it to exist in the DOM (even if invisible).
+- `'detached'`: Wait for it to be completely removed from the DOM.
+
+---
+
+## Practice Exercise
+
+<CodeEditor
+  moduleId="38-timeouts"
+  taskIndex={0}
+  placeholder={`// Practice: The data export takes 12 seconds.\n// Write the assertion that waits for the "Export Complete" text, \n// overriding the default 5s timeout.\n\n`}
+/>
+
+---
+
+## Common Mistakes
+
+- **Hardcoding Waits**: Using `page.waitForTimeout()` instead of waiting for an element's state.
+- **Overly Broad Locators**: Using generic CSS selectors like `.button` that might break if multiple buttons are added. Always prefer user-facing attributes like `getByRole`.
+- **Ignoring Errors**: Catching errors in try/catch blocks without failing the test or logging the reason.
+
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** You are writing a Page Object method to delete a user. The delete animation fades the user row out over 1.5 seconds. If the method returns before the fade finishes, the test might try to verify the deletion too early and flake.
+
+**Your Task:** Write the internal `.waitFor()` synchronization to ensure the row is completely gone before the method finishes.
+
+**Constraints:**
+- ❌ You may NOT use `expect()` (assertions do not belong in Page Objects)
+- ✅ You MUST wait for the `'hidden'` state
+
+<CodeEditor
+  moduleId="38-timeouts"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('override custom timeout', async ({ page }) => {
+  await page.goto('https://heavy-reports.com');
+  await page.getByRole('button', { name: 'Export PDF' }).click();
+
+  // BUG: The PDF generation takes 15 seconds, exceeding the default 5s assertion timeout.
+  // Override the timeout limit for this assertion only, setting it to 20 seconds.
+  await expect(page.getByText('PDF Generation Complete')).toBeVisible();
+});`}
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+async function deleteUser(username) {
+  const row = this.page.getByRole('row', { name: username });
+  await row.getByRole('button', { name: 'Delete' }).click();
+  
+  // This blocks the POM method from returning until the fade animation finishes
+  await row.waitFor({ state: 'hidden' });
+}
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Timeout Hierarchy | Test > Action > Expect timeouts govern execution limits |
+| Timeout Overrides | Slow UI elements can be accommodated without increasing global timeouts |
+| Internal `waitFor` | Keeps Page Object methods synchronous with the UI state |
+
+> [!TIP]
+> **Next Step:** Proceed to the Network Sync module to learn how to wait for invisible backend traffic.
+
+<Quiz moduleId="38-timeouts" />

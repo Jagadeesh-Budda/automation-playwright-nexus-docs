@@ -1,0 +1,46 @@
+{
+  "onboarding": [
+    {
+      "id": "q1",
+      "text": "Analyzing trace: [{'action':'click','duration':30005,'error':'Timeout'}]. What is the root cause?",
+      "options": [
+        "Action timeout exceeded default 30s",
+        "Network latency on backend",
+        "Browser crashed",
+        "Invalid selector syntax"
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "Trace analysis: [{'action':'goto','status':'failed','error':'net::ERR_CONNECTION_REFUSED'}]. Identify the issue:",
+      "options": [
+        "Backend server is not running",
+        "DNS lookup failed",
+        "SSL certificate expired",
+        "Selector not found"
+      ]
+    }
+  ],
+  "ast-gate": [
+    {
+      "id": "q3",
+      "text": "Audit Trace: [{'rule':'No-Op Assertion','node':'expect(true).toBeTruthy()'}]. Why is this a 'Hard Fail'?",
+      "options": [
+        "Assertion does not validate UI state",
+        "Node version is incompatible",
+        "Syntax error in expression",
+        "Missing await on expect"
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "Audit Trace: [{'rule':'Brittle Selector','selector':'div > span > nth-child(2)'}]. Recommended fix:",
+      "options": [
+        "Use getByTestId or getByRole",
+        "Use page.waitForSelector",
+        "Increase test timeout",
+        "Use CSS nth-of-type"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,508 @@
+﻿# 10.3: Component-Based Locators
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Isolate locators using the Component pattern
+
+## Where Do Locators Live?
+
+In the ASA architecture, **locators always live in Page Object files** (Layer 2). They are never written directly in spec files. This is enforced by the AST Auditor's Gate 4.
+
+The question isn't whether to use Page Objects — it's *how* to structure them.
+
+## The Recommended Page Object Pattern
+
+```typescript
+// pages/DocumentPage.ts
+import { Page, Locator } from '@playwright/test';
+
+export class DocumentPage {
+  readonly page: Page;
+  
+  // ─────────────────────────────────────────
+  // Section 1: Locators (declared as properties)
+  // ─────────────────────────────────────────
+  
+  // Navigation
+  readonly uploadButton: Locator;
+  readonly exportButton: Locator;
+  
+  // Document table
+  readonly documentTable: Locator;
+  readonly tableRows: Locator;
+  readonly searchBox: Locator;
+  
+  // Status messages
+  readonly successBanner: Locator;
+  readonly errorBanner: Locator;
+  readonly loadingSpinner: Locator;
+  
+  // Upload modal
+  readonly uploadModal: Locator;
+  readonly fileInput: Locator;
+  readonly uploadConfirmButton: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    
+    // Navigation
+    this.uploadButton = page.getByRole('button', { name: 'Upload Document' });
+    this.exportButton = page.getByRole('button', { name: 'Export' });
+    
+    // Document table
+    this.documentTable = page.getByRole('table', { name: 'Documents' });
+    this.tableRows = this.documentTable.getByRole('row').filter({ hasText: /DOC-/ });
+    this.searchBox = page.getByRole('searchbox', { name: 'Search documents' });
+    
+    // Status messages
+    this.successBanner = page.getByRole('alert').filter({ hasText: /success/i });
+    this.errorBanner = page.getByRole('alert').filter({ hasText: /error/i });
+    this.loadingSpinner = page.getByRole('progressbar');
+    
+    // Upload modal
+    this.uploadModal = page.getByRole('dialog', { name: 'Upload Document' });
+    this.fileInput = this.uploadModal.locator('input[type="file"]');
+    this.uploadConfirmButton = this.uploadModal.getByRole('button', { name: 'Upload' });
+  }
+
+  // ─────────────────────────────────────────
+  // Section 2: Methods (business actions)
+  // ─────────────────────────────────────────
+
+  async navigate() {
+    await this.page.goto('/documents');
+  }
+
+  async uploadFile(filePath: string) {
+    await this.uploadButton.click();
+    await this.fileInput.setInputFiles(filePath);
+    await this.uploadConfirmButton.click();
+    await this.loadingSpinner.waitFor({ state: 'hidden' });
+  }
+
+  async searchForDocument(query: string) {
+    await this.searchBox.fill(query);
+    await this.loadingSpinner.waitFor({ state: 'hidden' });
+  }
+
+  // Dynamic locators — return a locator based on input
+  getRowByDocId(docId: string): Locator {
+    return this.tableRows.filter({ hasText: docId });
+  }
+
+  getStatusBadge(docId: string): Locator {
+    return this.getRowByDocId(docId).getByRole('status');
+  }
+
+  getActionButton(docId: string, action: string): Locator {
+    return this.getRowByDocId(docId).getByRole('button', { name: action });
+  }
+}
+```
+
+## Using Dynamic Locator Methods in Tests
+
+```typescript
+// tests/documents/document-workflow.spec.ts
+import { test, expect } from '../../fixtures/baseTest';
+
+test.describe('Document Workflow', () => {
+  test('admin approves a pending document', async ({ page, documentPage }) => {
+    await documentPage.navigate();
+    
+    const docId = 'DOC-2024-001';
+    
+    // Get the status before action
+    await expect(documentPage.getStatusBadge(docId)).toContainText('Pending');
+    
+    // Perform the action
+    await documentPage.getActionButton(docId, 'Approve').click();
+    await page.getByRole('dialog').getByRole('button', { name: 'Confirm' }).click();
+    
+    // Verify the outcome
+    await expect(documentPage.getStatusBadge(docId)).toContainText('Approved');
+  });
+});
+```
+
+## Nested Component Hierarchies
+
+For complex pages, extract reusable **Component classes** that are composed into Page Objects:
+
+```typescript
+// components/DataTableComponent.ts
+import { Page, Locator } from '@playwright/test';
+
+export class DataTableComponent {
+  readonly root: Locator;
+  readonly rows: Locator;
+  readonly searchBox: Locator;
+  readonly pagination: Locator;
+  readonly sortHeaders: Locator;
+
+  constructor(page: Page, tableName: string) {
+    this.root = page.getByRole('table', { name: tableName });
+    this.rows = this.root.getByRole('row');
+    this.searchBox = page.getByRole('searchbox', { name: `Search ${tableName}` });
+    this.pagination = page.getByRole('navigation', { name: 'Pagination' });
+    this.sortHeaders = this.root.getByRole('columnheader');
+  }
+
+  async sortBy(columnName: string) {
+    await this.sortHeaders.filter({ hasText: columnName }).click();
+  }
+
+  async goToPage(pageNumber: number) {
+    await this.pagination.getByRole('button', { name: `Page ${pageNumber}` }).click();
+  }
+
+  getRowByText(text: string): Locator {
+    return this.rows.filter({ hasText: text });
+  }
+
+  getCellValue(rowText: string, columnIndex: number): Locator {
+    return this.getRowByText(rowText).getByRole('cell').nth(columnIndex);
+  }
+}
+```
+
+```typescript
+// pages/DocumentPage.ts — uses DataTableComponent
+import { DataTableComponent } from '../components/DataTableComponent';
+
+export class DocumentPage {
+  readonly page: Page;
+  readonly documentTable: DataTableComponent;
+  readonly auditTable: DataTableComponent;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.documentTable = new DataTableComponent(page, 'Documents');
+    this.auditTable = new DataTableComponent(page, 'Audit Log');
+  }
+
+  async sortDocumentsBy(column: string) {
+    await this.documentTable.sortBy(column);
+  }
+}
+```
+
+## Complex Widget Automation
+
+### Date Picker
+
+```typescript
+// components/DatePickerComponent.ts
+export class DatePickerComponent {
+  readonly root: Locator;
+  readonly triggerButton: Locator;
+  readonly calendar: Locator;
+
+  constructor(page: Page, label: string) {
+    this.root = page.getByRole('group', { name: label });
+    this.triggerButton = this.root.getByRole('button');
+    this.calendar = page.getByRole('dialog', { name: 'Calendar' });
+  }
+
+  async selectDate(year: number, month: string, day: number) {
+    await this.triggerButton.click();
+    
+    // Navigate to correct month/year
+    const monthYearHeader = this.calendar.getByRole('heading');
+    while (!await monthYearHeader.textContent()?.then(t => t?.includes(`${month} ${year}`))) {
+      await this.calendar.getByRole('button', { name: 'Next month' }).click();
+    }
+    
+    await this.calendar.getByRole('gridcell', { name: String(day) }).click();
+  }
+
+  async getSelectedDate(): Promise<string> {
+    return await this.triggerButton.textContent() ?? '';
+  }
+}
+```
+
+### Autocomplete / Typeahead
+
+```typescript
+// components/AutocompleteComponent.ts
+export class AutocompleteComponent {
+  readonly input: Locator;
+  readonly dropdown: Locator;
+  readonly options: Locator;
+  readonly clearButton: Locator;
+
+  constructor(page: Page, label: string) {
+    this.input = page.getByRole('combobox', { name: label });
+    this.dropdown = page.getByRole('listbox');
+    this.options = this.dropdown.getByRole('option');
+    this.clearButton = page.getByRole('button', { name: `Clear ${label}` });
+  }
+
+  async selectOption(text: string) {
+    await this.input.fill(text);
+    await this.options.filter({ hasText: text }).first().click();
+  }
+
+  async getSelectedValue(): Promise<string> {
+    return await this.input.inputValue();
+  }
+
+  async clearSelection() {
+    await this.clearButton.click();
+  }
+}
+```
+
+## Composition Over Inheritance
+
+When two Page Objects share behavior, **compose** shared components instead of extending a base class:
+
+```typescript
+// ❌ Avoid: Deep inheritance hierarchy
+class BasePage { /* ... */ }
+class AuthenticatedPage extends BasePage { /* ... */ }
+class DocumentPage extends AuthenticatedPage { /* ... */ }
+class SpecialDocumentPage extends DocumentPage { /* ... */ }
+
+// ✅ Prefer: Composition — reuse components
+class DocumentPage {
+  readonly navbar: NavbarComponent;
+  readonly sidebar: SidebarComponent;
+  readonly table: DataTableComponent;
+  readonly datePicker: DatePickerComponent;
+
+  constructor(page: Page) {
+    this.navbar = new NavbarComponent(page);
+    this.sidebar = new SidebarComponent(page);
+    this.table = new DataTableComponent(page, 'Documents');
+    this.datePicker = new DatePickerComponent(page, 'Due Date');
+  }
+}
+```
+
+## Dynamic Pages (Role-Based & Feature Flags)
+
+Handle pages whose structure changes based on user role or feature flags:
+
+```typescript
+export class DashboardPage {
+  readonly page: Page;
+  readonly heading: Locator;
+  
+  // Conditional elements — may or may not exist
+  readonly adminPanel: Locator;
+  readonly reviewerQueue: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.heading = page.getByRole('heading', { level: 1 });
+    this.adminPanel = page.getByRole('region', { name: 'Admin Panel' });
+    this.reviewerQueue = page.getByRole('region', { name: 'Review Queue' });
+  }
+
+  async isAdminView(): Promise<boolean> {
+    return await this.adminPanel.isVisible();
+  }
+
+  async isReviewerView(): Promise<boolean> {
+    return await this.reviewerQueue.isVisible();
+  }
+
+  // Method adapts behavior based on current view
+  async getPrimaryAction(): Promise<Locator> {
+    if (await this.isAdminView()) {
+      return this.page.getByRole('button', { name: 'Manage Users' });
+    }
+    return this.page.getByRole('button', { name: 'Start Review' });
+  }
+}
+```
+
+## Multi-Tab Page Objects
+
+Handle actions that open new tabs/windows:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+export class DocumentPage {
+  readonly page: Page;
+
+  constructor(page: Page) {
+    this.page = page;
+  }
+
+  async openPreviewInNewTab(docId: string): Promise<Page> {
+    const popupPromise = this.page.waitForEvent('popup');
+    await this.getActionButton(docId, 'Preview').click();
+    const previewPage = await popupPromise;
+    await previewPage.waitForLoadState();
+    return previewPage;  // Caller can interact with the new tab
+  }
+}
+
+// In the test:
+test('document preview opens correctly', async ({ documentPage }) => {
+  const previewTab = await documentPage.openPreviewInNewTab('DOC-001');
+  
+  await expect(previewTab.getByRole('heading')).toContainText('Document Preview');
+  await previewTab.close();
+});
+```
+
+## Anti-Patterns to Avoid
+
+### ❌ Anti-Pattern 1: Locators as methods (recreated every call)
+```typescript
+// Bad — creates a new locator object on every call (though functionally works)
+getUploadButton() {
+  return this.page.getByRole('button', { name: 'Upload' });
+}
+```
+
+### ✅ Correct: Locators as properties (created once, assigned in constructor)
+```typescript
+import { Page, Locator } from '@playwright/test';
+
+export class LoginPage {
+  readonly page: Page;
+  readonly uploadButton: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.uploadButton = page.getByRole('button', { name: 'Upload' });
+  }
+}
+```
+
+### ❌ Anti-Pattern 2: CSS strings scattered everywhere
+```typescript
+this.btn = page.locator('.btn-primary.upload-btn');
+```
+
+### ✅ Correct: Semantic locators
+```typescript
+this.uploadButton = page.getByRole('button', { name: 'Upload Document' });
+```
+
+### ❌ Anti-Pattern 3: Assertions inside Page Objects
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Bad — Page Objects should PERFORM actions, not VERIFY them
+async uploadFile(path: string) {
+  await this.fileInput.setInputFiles(path);
+  await this.uploadConfirmButton.click();
+  await expect(this.successBanner).toBeVisible();  // ❌ Don't assert here!
+}
+```
+
+### ✅ Correct: Return state, let the test assert
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Page Object performs actions
+async uploadFile(path: string) {
+  await this.fileInput.setInputFiles(path);
+  await this.uploadConfirmButton.click();
+}
+
+// Test asserts the outcome
+test('upload shows success', async ({ documentPage }) => {
+  await documentPage.uploadFile('report.pdf');
+  await expect(documentPage.successBanner).toBeVisible();  // ✅ Assert in the test
+});
+```
+
+<CodeEditor
+  moduleId="54-locators-arch"
+  taskIndex={0}
+  placeholder="// Task: Create a reusable DataTableComponent that can sort and paginate&#10;export class DataTableComponent {&#10;  readonly root: Locator;&#10;  constructor(page: Page, name: string) {&#10;    this.root = page.getByRole('table', { name });&#10;  }&#10;  async sortBy(col: string) {&#10;    await this.root.getByRole('columnheader', { name: col }).click();&#10;  }&#10;}"
+/>
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="54-locators-arch"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="locators-arch" />
+
+
+
+export const astRules = [
+  {
+    type: "ast_forbidden_callee",
+    value: "page.waitForTimeout",
+    message: "Use auto-retrying assertions or web-first locators instead of hardcoded waits."
+  }
+];

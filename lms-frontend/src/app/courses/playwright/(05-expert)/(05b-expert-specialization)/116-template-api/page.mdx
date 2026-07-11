@@ -1,0 +1,156 @@
+# 22.1: API Framework Boilerplate
+
+import { ChapterHeader } from '@/components/ChapterHeader';
+
+<ChapterHeader
+  objective="Master this critical concept to build robust, scalable Playwright automation."
+  time="15 mins"
+  type="Concept"
+/>
+
+## Learning Objectives
+- Understand the core architectural patterns
+- Identify and avoid common anti-patterns
+- Implement production-grade automation scripts
+
+
+Welcome to the **Enterprise Templates Track**. This track bridges the gap between learning and doing. The templates provided here are production-ready boilerplates that you can immediately scaffold into your company's repositories.
+
+This template is designed specifically for **Pure API Testing**. It does not use Playwright's browser engines. It relies solely on `request` contexts to perform blazing-fast microservice validation.
+
+<div className="bg-slate-900 border border-slate-700 p-6 rounded-xl my-8">
+  <h3 className="text-cyan-400 font-bold m-0 mb-2 flex items-center gap-2">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 17l6-6-6-6v12zm16-12h-8v2h8v-2zm0 4h-8v2h8v-2zm0 4h-8v2h8v-2z"/></svg>
+    Scaffold the Framework
+  </h3>
+  <div className="text-slate-300 m-0">
+    Run this command in your terminal to generate this repository locally:
+    <div className="bg-slate-950 p-4 rounded-lg mt-4 font-mono text-sm border border-slate-800 flex justify-between items-center">
+      <span>npx @playwright-academy/create-api-framework@latest my-api-tests</span>
+    </div>
+  </div>
+</div>
+
+## The Architecture
+
+<Tabs>
+  <Tab title="Why This Template?">
+    **The Problem**: Many SDETs try to test APIs using Postman or RestAssured, leading to fragmented tooling if the rest of the team uses TypeScript.
+    
+    **The Solution**: This template uses Playwright's `APIRequestContext` to run headless, Node.js-native API requests. 
+    *   **Speed**: It can execute 500 API tests in under 10 seconds.
+    *   **Auth Caching**: It uses a `global-setup` script to fetch a JWT token once, and caches it to the `storageState.json` so individual tests don't have to authenticate.
+    *   **Schema Validation**: It comes pre-installed with `zod` for strict JSON payload validation.
+  </Tab>
+
+  <Tab title="Directory Structure">
+    ```text
+    my-api-tests/
+    ├── playwright.config.ts      # Configured for 0 workers, no browsers
+    ├── global-setup.ts           # Fetches & caches JWT tokens
+    ├── package.json              # Includes 'zod' and 'dotenv'
+    ├── .env                      # API_URL, CLIENT_ID, CLIENT_SECRET
+    ├── src/
+    │   ├── clients/              # API Client wrappers (e.g., UserClient.ts)
+    │   ├── schemas/              # Zod validation schemas
+    │   ├── data/                 # JSON fixtures for POST requests
+    │   └── middleware/           # API Resilience Layer
+    │       ├── RetryMiddleware.ts
+    │       ├── AuthMiddleware.ts
+    │       └── LoggingMiddleware.ts
+    └── tests/
+        ├── auth.spec.ts          # Validates 401s and token refreshing
+        ├── users.spec.ts         # GET/POST/PUT/DELETE flows
+        └── graphql.spec.ts       # GraphQL query structure testing
+    ```
+  </Tab>
+
+  <Tab title="Core Configuration">
+    The key to this template is the `playwright.config.ts`. Notice that we don't define any browser projects.
+
+    ```typescript
+    import { defineConfig } from '@playwright/test';
+
+    export default defineConfig({
+      testDir: './tests',
+      globalSetup: require.resolve('./global-setup'),
+      use: {
+        baseURL: process.env.API_URL || 'https://api.staging.internal',
+        // Inject the cached JWT token into every test automatically
+        storageState: 'state.json', 
+        extraHTTPHeaders: {
+          'Accept': 'application/json',
+          'X-Automation-Suite': 'true'
+        }
+      },
+    });
+    ```
+  </Tab>
+
+  <Tab title="When NOT To Use">
+    **Senior Engineers understand tradeoffs.** Do not use this Pure API Template if:
+    *   Your primary risk is the UI rendering (e.g., a highly visual React dashboard).
+    *   80% of your validation requirements are UI-driven.
+    *   Your backend APIs are extremely brittle or lack staging parity.
+  </Tab>
+</Tabs>
+
+---
+
+## Interactive Sandbox
+
+You can browse the complete source code for this template directly in your browser. Use the file explorer on the left of the editor to investigate the `global-setup.ts` and API clients.
+
+<CodeEditor
+  moduleId="116-template-api"
+  taskIndex={0}
+/>
+
+
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="116-template-api"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="116-template-api" />

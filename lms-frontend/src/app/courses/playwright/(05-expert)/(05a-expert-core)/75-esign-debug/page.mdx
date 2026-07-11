@@ -1,0 +1,215 @@
+﻿# 15.4: Modal Interception Errors
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Identify and fix overlay issues
+
+## Common E-Sign Test Failures
+
+E-Sign tests fail more often than standard UI tests because they involve:
+- Real cryptographic validation (server-side)
+- Database writes (audit trail creation)
+- Complex modal interactions with animations
+- Multi-step flows with interdependencies
+
+## Failure 1: "Password Incorrect" in Test but Works Manually
+
+**Symptom:** The test fills the password field correctly, but the signature fails with "Invalid credentials".
+
+**Root cause:** The password may contain special characters (`!`, `@`, `#`) that are typed literally but the keyboard events send the wrong character.
+
+**Fix:** Use `fill()` not `type()`:
+```typescript
+// ❌ May mistype special characters
+await passwordInput.type('P@ssw0rd!');
+
+// ✅ Sets the value directly without keyboard simulation
+await passwordInput.fill('P@ssw0rd!');
+
+// If fill() still fails, try pressSequentially
+await passwordInput.pressSequentially('P@ssw0rd!', { delay: 50 });
+```
+
+## Failure 2: Modal Appears but Interactions Fail
+
+**Symptom:** Test opens the E-Sign modal, but clicks on buttons inside it fail.
+
+**Root cause:** The modal may use `aria-modal="true"` which traps focus. Or the modal has an entrance animation.
+
+**Fix:** Wait for the modal to be fully stable:
+```typescript
+import { test, expect } from '@playwright/test';
+
+const modal = page.getByRole('dialog', { name: 'Electronic Signature' });
+
+// Wait for modal to appear AND be stable (no animation)
+await expect(modal).toBeVisible();
+await expect(modal).not.toHaveClass(/animating/);
+
+// Now interact
+await modal.getByLabel('Reason').fill('Approved');
+```
+
+## Failure 3: Race Condition — Audit Trail Not Created Yet
+
+**Symptom:** After signing, the test immediately checks the audit trail and finds it empty.
+
+**Root cause:** The audit trail is created asynchronously. The test moved on before the server finished writing to the database.
+
+**Fix:** Wait for the audit entry to appear:
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ Race condition — audit might not exist yet
+await eSignPage.signDocument({ reason: 'Approved', password: pass });
+await auditPage.navigateTo(docId);
+let count = await auditPage.getAllEntries().count();
+expect(count).toBe(3);  // Flaky!
+
+// ✅ Poll until the entry appears
+await eSignPage.signDocument({ reason: 'Approved', password: pass });
+await auditPage.navigateTo(docId);
+
+await expect(async () => {
+  const count = await auditPage.getAllEntries().count();
+  expect(count).toBeGreaterThanOrEqual(3);
+}).toPass({ timeout: 10_000 });
+```
+
+## Failure 4: Test Pollutes Next Test (State Leak)
+
+**Symptom:** Test 1 passes, but Test 2 (which uses the same document) fails because the document is already "Approved".
+
+**Root cause:** Tests are not cleaning up after themselves. Or they depend on document state from a previous test.
+
+**Fix:** Each test creates its own document:
+```typescript
+let testDocId: string;
+
+test.beforeEach(async ({ uploadPage }) => {
+  // Create a fresh document for each test
+  testDocId = await uploadPage.uploadDocument({
+    title: `Test-${Date.now()}`,
+    file: 'fixtures/sample.pdf'
+  });
+});
+
+test.afterEach(async ({ apiClient }) => {
+  // Clean up the document after each test
+  if (testDocId) {
+    await apiClient.delete(`/documents/${testDocId}`);
+  }
+});
+```
+
+## Failure 5: "Element Detached From DOM" on Modal Close
+
+**Symptom:** After signing, the test tries to verify something in the modal, but the modal has already closed and the element was removed.
+
+**Fix:** Always assert on the **page** after the modal closes, not on the modal's elements:
+```typescript
+import { test, expect } from '@playwright/test';
+
+await eSignModal.sign({ reason: '...', password: pass });
+
+// ❌ Modal is now closed, this element is gone!
+await expect(eSignModal.successMessage).toBeVisible();
+
+// ✅ Assert on the page-level element that appears after modal closes
+await expect(page.getByRole('status', { name: 'Document Approved' })).toBeVisible();
+```
+
+## Debugging Network Requests
+
+If E-Sign tests fail intermittently, log the API responses:
+
+```typescript
+// Add this to your test or beforeEach for debugging
+page.on('response', response => {
+  if (response.url().includes('/api/signatures')) {
+    console.log(`Signature API: ${response.status()} ${response.url()}`);
+  }
+});
+
+page.on('requestfailed', request => {
+  console.error(`FAILED REQUEST: ${request.url()} — ${request.failure()?.errorText}`);
+});
+```
+
+<CodeEditor
+  moduleId="75-esign-debug"
+  taskIndex={0}
+  placeholder="// Task: Fix the race condition after signing a document.&#10;// The audit trail takes time to populate. Your test must WAIT for entries to appear.&#10;// Requirements:&#10;//   1. Sign the document with a reason and password&#10;//   2. Navigate to the audit page&#10;//   3. Use a retry mechanism to wait until at least 3 entries exist&#10;//&#10;// Hint: Use expect().toPass() for retrying assertions"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+await eSignPage.signDocument({ reason: 'Approved', password: pass });
+await auditPage.navigateTo(docId);
+
+await expect(async () => {
+  const count = await auditPage.getAllEntries().count();
+  expect(count).toBeGreaterThanOrEqual(3);
+}).toPass({ timeout: 10_000 });
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="75-esign-debug"
+  taskIndex={1}
+  placeholder={`# Challenge: Complete the command line task
+# Write the correct command below:
+`}
+/>
+<Quiz moduleId="esign-debug" />
+

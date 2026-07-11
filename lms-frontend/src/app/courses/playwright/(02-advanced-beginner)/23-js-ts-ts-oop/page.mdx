@@ -1,0 +1,249 @@
+﻿
+
+# Pre-4: TypeScript Classes Deep Dive
+
+Welcome to the final module of the Bridge Course. 
+
+The core Playwright Academy curriculum is written entirely in **TypeScript**. To build enterprise automation architecture (like Page Object Models, API Controllers, and Fixtures), you must understand strict typing and Object-Oriented Programming (OOP).
+
+---
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Interfaces, Types, and Classes.
+
+## 1. The Problem: Messy Tests
+
+Before we learn the syntax of TypeScript classes, let's understand **why** we need them. Look at this standard Playwright test:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('admin can login and view dashboard', async ({ page }) => {
+  // Messy DOM interactions mixed with test logic!
+  await page.goto('/login');
+  await page.getByPlaceholder('Email').fill('admin@corp.com');
+  await page.getByRole('button', { name: 'Sign In' }).click();
+  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+});
+```
+
+If the developers change the "Email" placeholder to "Username", you have to find and update this string in 500 different test files. This is unmaintainable.
+
+Now look at the exact same test, rewritten using a **Page Object Model (POM)**:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('admin can login and view dashboard', async ({ page }) => {
+  const loginPage = new LoginPage(page);
+  await loginPage.login('admin@corp.com');
+  await expect(loginPage.dashboardHeading).toBeVisible();
+});
+```
+
+Beautiful, isn't it? If the UI changes, we only update the `LoginPage` file once, and all 500 tests keep working.
+
+To build these reusable Page Objects, you must understand two concepts: **Strict Typing** and **Object-Oriented Programming (OOP)**. Let's learn them now.
+
+---
+
+## 2. Why TypeScript?
+
+JavaScript is "dynamically typed." It allows you to do incredibly dangerous things, like multiplying a string by an array, and won't warn you until the code actually runs in production and crashes.
+
+TypeScript is a "strongly typed" layer on top of JavaScript. It forces you to declare exactly what type of data variables and functions expect, catching errors in your IDE before you even run the test.
+
+---
+
+## 2. Interfaces & Types
+
+An `interface` defines the "shape" of an object. It acts as a strict contract. If you try to pass an object that doesn't match the contract, TypeScript will throw a compilation error immediately.
+
+```typescript
+// We define a contract for what an Environment should look like
+interface EnvironmentConfig {
+  baseUrl: string;
+  timeoutMs: number;
+  isStaging: boolean;
+}
+
+// ✅ Valid: Matches the interface shape exactly
+const qaEnv: EnvironmentConfig = {
+  baseUrl: 'https://qa.app.com',
+  timeoutMs: 15000,
+  isStaging: true
+};
+
+// ❌ Error: Property 'isStaging' is missing!
+// TypeScript will draw a red squiggly line under this in your editor.
+const prodEnv: EnvironmentConfig = {
+  baseUrl: 'https://prod.app.com',
+  timeoutMs: 30000
+};
+```
+
+---
+
+## 3. Object-Oriented Programming (Classes)
+
+OOP is a programming paradigm based on "Classes" and "Objects". 
+- A **Class** is a blueprint (e.g., the architectural blueprint of a Car).
+- An **Object** is an instantiated occurrence of that class (e.g., a specific red Toyota sitting in your driveway).
+
+In Playwright, we use Classes to represent distinct web pages (This is called the **Page Object Model** or **POM**). We encapsulate the locators and actions relevant to that page inside the class, hiding the messy details from the actual test file.
+
+### Encapsulation and Constructors
+
+The `constructor` is a special method that runs the exact moment an object is instantiated using the `new` keyword.
+
+```typescript
+import { Page, Locator } from '@playwright/test';
+
+// 1. The Class Blueprint
+export class LoginPage {
+  
+  // 2. Class Properties (Strongly typed)
+  private readonly page: Page;
+  private readonly usernameInput: Locator;
+  private readonly submitBtn: Locator;
+
+  // 3. The Constructor: Initializes the object state when "new" is called
+  constructor(page: Page) {
+    this.page = page;
+    this.usernameInput = page.getByPlaceholder('Email');
+    this.submitBtn = page.getByRole('button', { name: 'Sign In' });
+  }
+
+  // 4. Class Methods (Actions)
+  async login(user: string) {
+    await this.usernameInput.fill(user);
+    await this.submitBtn.click();
+  }
+}
+```
+
+### Instantiation in Tests
+
+Now, in our actual test file, we instantiate an Object from our Class blueprint. Notice how clean the test becomes when the messy DOM interactions are hidden inside the class.
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('User can login', async ({ page }) => {
+  // We use the "new" keyword to create an Object from the Blueprint
+  // We pass the Playwright 'page' into the constructor!
+  const loginPage = new LoginPage(page);
+  
+  // We call the method
+  await loginPage.login('admin@corp.com');
+});
+```
+
+---
+
+## 4. Interactive Challenge: Build a POM
+
+**Your Task:** Below is the skeleton for a `DashboardPage` class. 
+1. Inside the constructor, assign the `logoutBtn` property to a locator that finds a button with the name "Logout". 
+2. Create an `async` method called `performLogout()` that clicks the button.
+
+<CodeEditor
+  moduleId="23-js-ts-ts-oop"
+  taskIndex={0}
+  placeholder={`class DashboardPage {\n  constructor(page) {\n    this.page = page;\n    // Define the logoutBtn locator here\n    this.logoutBtn = page.________________________;\n  }\n\n  // Define the performLogout method here\n  \n\n}`}
+/>
+
+---
+
+## Congratulations!
+
+You have successfully completed the Zero to Hero Bridge Course. You now understand Variables, Strict Equality, Arrow Functions, Destructuring, Promises, the Event Loop, the DOM, Accessibility Locators, TypeScript Interfaces, and ES6 Classes.
+
+You are fully prepared to tackle the advanced architectural concepts in **Module 1: Playwright Fundamentals**.
+
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="23-js-ts-ts-oop"
+  taskIndex={1}
+  placeholder={`// Challenge: Encapsulate locators and methods inside a POM class
+// Complete the Page Object Model class implementation below:
+
+import { Page, Locator } from '@playwright/test';
+
+export class SettingsPage {
+  readonly page: Page;
+  readonly themeDropdown: Locator;
+  readonly saveBtn: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    // Define settings page locators here:
+    this.themeDropdown = page.________________________;
+    this.saveBtn = page.________________________;
+  }
+
+  async selectDarkTheme() {
+    // Write the method implementation here:
+  }
+}`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="23-js-ts-ts-oop" />

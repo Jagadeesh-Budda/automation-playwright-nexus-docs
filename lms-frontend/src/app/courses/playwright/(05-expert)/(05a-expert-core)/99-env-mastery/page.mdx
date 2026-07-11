@@ -1,0 +1,197 @@
+﻿# 16.2: Environment Mastery
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Manage .env and playwright.config.ts
+
+## The Environment Problem
+
+Most test suites only work in one environment. Professional frameworks work in any environment by changing a single configuration variable.
+
+```
+Developer machine    → http://localhost:3000
+Staging environment  → https://staging.pharmadoc.example.com
+UAT environment      → https://uat.pharmadoc.example.com
+Production (read-only) → https://pharmadoc.example.com
+```
+
+## The `.env` File Hierarchy
+
+```bash
+.env                  # Default values (committed to git, no secrets)
+.env.local            # Developer-specific overrides (NOT committed)
+.env.staging          # Staging environment (NOT committed)
+.env.production       # Production environment (NOT committed)
+```
+
+```bash
+# .env (safe to commit — no secrets)
+BASE_URL=http://localhost:3000
+API_TIMEOUT=10000
+SCREENSHOT_ON_FAIL=true
+
+# .env.local (never commit this)
+BASE_URL=http://localhost:3001  # Override for your specific machine
+ADMIN_USER=local_admin@test.com
+ADMIN_PASS=localpassword123
+```
+
+## Loading the Right Environment
+
+```typescript
+// playwright.config.ts
+import { defineConfig } from '@playwright/test';
+import dotenv from 'dotenv';
+import path from 'path';
+
+// Load the environment-specific .env file
+const ENV = process.env.TEST_ENV || 'local';
+dotenv.config({ path: path.resolve(`.env.${ENV}`) });
+dotenv.config(); // Also load .env as defaults
+
+console.log(`Running tests against: ${ENV} (${process.env.BASE_URL})`);
+
+export default defineConfig({
+  use: {
+    baseURL: process.env.BASE_URL,
+  },
+});
+```
+
+```bash
+# Run tests against staging
+TEST_ENV=staging npx playwright test
+
+# Run tests against UAT
+TEST_ENV=uat npx playwright test
+
+# Run tests against local (default)
+npx playwright test
+```
+
+## Environment-Specific Test Skipping
+
+Some tests only make sense in certain environments:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test.skip(process.env.TEST_ENV === 'production', 'Skipped in production — read-only environment');
+
+test('admin can delete a document', async ({ documentPage }) => {
+  // This test is skipped in production
+  await documentPage.deleteDocument('DOC-001');
+});
+```
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Or use test tags to group environment-specific tests
+test('performance test — only in staging', {
+  annotation: { type: 'skip', description: 'Only runs in staging' },
+}, async ({ page }) => {
+  // ...
+});
+```
+
+## Environment Configuration Validation
+
+Add a startup check to catch misconfigured environments early:
+
+```typescript
+// utils/env-validator.ts
+export function validateEnvironment(): void {
+  const required = [
+    'BASE_URL',
+    'ADMIN_USER', 'ADMIN_PASS',
+    'REVIEWER_USER', 'REVIEWER_PASS',
+  ];
+  
+  const missing = required.filter(key => !process.env[key]);
+  
+  if (missing.length > 0) {
+    throw new Error(
+      `Missing required environment variables:\n${missing.map(k => `  - ${k}`).join('\n')}\n\n` +
+      `Copy .env.example to .env and fill in the values.`
+    );
+  }
+  
+  // Validate URL format
+  try {
+    new URL(process.env.BASE_URL!);
+  } catch {
+    throw new Error(`BASE_URL is not a valid URL: ${process.env.BASE_URL}`);
+  }
+  
+  console.log(`✅ Environment validated for: ${process.env.BASE_URL}`);
+}
+```
+
+```typescript
+// global-setup.ts
+import { validateEnvironment } from './utils/env-validator';
+
+export default async function globalSetup() {
+  validateEnvironment();  // Fails fast with a clear error message
+  // ...rest of setup
+}
+```
+
+## Multi-Environment `playwright.config.ts`
+
+```typescript
+// playwright.config.ts
+import { defineConfig } from '@playwright/test';
+
+const ENV = process.env.TEST_ENV || 'local';
+
+const environments = {
+  local:      { baseURL: 'http://localhost:3000', workers: 2, retries: 0 },
+  staging:    { baseURL: 'https://staging.pharmadoc.com', workers: 4, retries: 2 },
+  uat:        { baseURL: 'https://uat.pharmadoc.com', workers: 2, retries: 1 },
+  production: { baseURL: 'https://pharmadoc.com', workers: 1, retries: 0 },
+};
+
+const config = environments[ENV] ?? environments.local;
+
+export default defineConfig({
+  use: { baseURL: config.baseURL },
+  workers: config.workers,
+  retries: config.retries,
+  
+  // In CI, always record trace on failure
+  ...(process.env.CI && {
+    retries: 2,
+    reporter: [['html'], ['github']],
+  }),
+});
+```
+
+## Challenge Exercise
+
+**Business Context**:
+The test suite needs to run against local, staging, and production environments, but developers keep accidentally committing hardcoded staging credentials.
+
+**Mission**:
+Implement a dynamic environment configuration system.
+
+**Constraints**:
+- Must use `.env` files for secrets.
+- Must fall back to local URLs if no environment is specified.
+
+**Deliverables**:
+- A centralized config loader.
+- Updates to `playwright.config.ts`.
+
+**Success Criteria**:
+- The suite correctly reads authentication tokens via `process.env`.
+- Execution can swap environments using a command-line flag.
+
+<CodeEditor
+  moduleId="99-env-mastery"
+  taskIndex={0}
+/>
+
+

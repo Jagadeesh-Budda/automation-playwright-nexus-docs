@@ -1,0 +1,462 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T10:36:32.990Z",
+  "lessons": [
+    {
+      "id": "23-js-ts-ts-oop",
+      "title": "Pre-4: TypeScript Classes Deep Dive",
+      "url": "courses/playwright/23-js-ts-ts-oop",
+      "group": "🏛️ MODULE 4: PAGE OBJECTS",
+      "level": 4,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Concept",
+        "outcome": "Understand TS and Classes."
+      },
+      "objectives": [
+        {
+          "id": "ts_oop",
+          "title": "Interfaces, Types, and Classes."
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Challenge",
+          "hint": "Complete the code implementation",
+          "rules": [
+            {
+              "type": "ast_node",
+              "value": "ClassDeclaration",
+              "required": true
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_node",
+              "value": "ClassDeclaration",
+              "required": true
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is encapsulating logic inside classes an important architectural pattern for test maintenance?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which OOP anti-pattern makes Page Objects impossible to use in parallel execution?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "icon": "🌱",
+      "slug": "23-js-ts-ts-oop",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "24-what-are-poms",
+      "title": "4.1: What Are Page Objects?",
+      "url": "courses/playwright/24-what-are-poms",
+      "group": "🏛️ MODULE 4: PAGE OBJECTS",
+      "level": 4,
+      "weight": 5,
+      "meta": {
+        "time": "20 mins",
+        "type": "Code",
+        "outcome": "Understand the POM concept."
+      },
+      "objectives": [
+        {
+          "id": "04b_what_are_poms_obj",
+          "title": "Complete 4.1: What Are Page Objects?"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "04b_what_are_poms_obj",
+          "weight": 100
+        }
+      ],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "scenario",
+            "difficulty": "easy",
+            "q": "If the Page Object Model (POM) pattern had been used, how would resolving this failure be different?",
+            "options": [
+              "It encapsulates page-specific logic and locators for better maintainability",
+              "It makes the test run significantly faster",
+              "It automatically generates assertions",
+              "It prevents network errors"
+            ],
+            "a": "It encapsulates page-specific logic and locators for better maintainability",
+            "explanation": "POM isolates page elements and actions, reducing duplication and making UI changes easier to handle.",
+            "scenario": "The developer changes the ID of the login button from '#login-btn' to '#submit-auth'. 45 of your UI tests immediately fail."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "The UI team changes the ID of the login button from #btn-login to #submit-login. Your test suite has 50 tests that click this button.",
+            "q": "If you are using the POM pattern, how many files do you need to modify?",
+            "options": [
+              "Exactly 1 file (the LoginPage class).",
+              "50 files (every test that uses the button).",
+              "0 files (Playwright automatically finds the new button).",
+              "You must update the playwright.config.ts file."
+            ],
+            "a": "Exactly 1 file (the LoginPage class).",
+            "explanation": "This is the primary value proposition of POM. The locator is defined centrally in the Page Object class. When the UI changes, you update the single source of truth, and all 50 tests inherit the fix automatically."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "q": "What is a known anti-pattern when implementing the Page Object Model in Playwright?",
+            "options": [
+              "Including assertions (e.g., expect(page).toHaveTitle()) directly inside the Page Object methods.",
+              "Passing the page fixture into the constructor of the class.",
+              "Creating methods that return locators instead of executing actions.",
+              "Typing the class properties as Locator."
+            ],
+            "a": "Including assertions (e.g., expect(page).toHaveTitle()) directly inside the Page Object methods.",
+            "explanation": "Page Objects should represent the *state* and *actions* of the page, not the *intent* of the test. Burying assertions inside POM methods hides test logic, makes debugging difficult, and reduces the reusability of the action methods. Assertions belong in the .spec.ts files."
+          }
+        ]
+      },
+      "icon": "🏛️",
+      "slug": "24-what-are-poms",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "25-first-pom",
+      "title": "4.2: Your First Page Object",
+      "url": "courses/playwright/25-first-pom",
+      "group": "🏛️ MODULE 4: PAGE OBJECTS",
+      "level": 4,
+      "weight": 5,
+      "meta": {
+        "time": "25 mins",
+        "type": "Code",
+        "outcome": "Create a POM class."
+      },
+      "objectives": [
+        {
+          "id": "04c_first_pom_obj",
+          "title": "Complete 4.2: Your First Page Object"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Challenge",
+          "hint": "Complete the code implementation",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is separating page locators from test logic an important architectural pattern?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which Page Object anti-pattern violates the Single Responsibility Principle?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "icon": "🏛️",
+      "slug": "25-first-pom",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "26-multi-page",
+      "title": "4.3: Multi-Page Tests",
+      "url": "courses/playwright/26-multi-page",
+      "group": "🏛️ MODULE 4: PAGE OBJECTS",
+      "level": 4,
+      "weight": 5,
+      "meta": {
+        "time": "20 mins",
+        "type": "Code",
+        "outcome": "Chain page objects."
+      },
+      "objectives": [
+        {
+          "id": "04d_multi_page_obj",
+          "title": "Complete 4.3: Multi-Page Tests"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Challenge",
+          "hint": "Complete the code implementation",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is the Factory pattern for Page Objects an important architectural choice in multi-page flows?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which multi-page anti-pattern leads to infinite loop redirects during authentication?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "icon": "🏛️",
+      "slug": "26-multi-page",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "27-refactor-exercise",
+      "title": "4.4: The Refactor Exercise",
+      "url": "courses/playwright/27-refactor-exercise",
+      "group": "🏛️ MODULE 4: PAGE OBJECTS",
+      "level": 4,
+      "weight": 5,
+      "meta": {
+        "time": "30 mins",
+        "type": "Code",
+        "outcome": "Refactor messy tests."
+      },
+      "objectives": [
+        {
+          "id": "04e_refactor_exercise_obj",
+          "title": "Complete 4.4: The Refactor Exercise"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Challenge",
+          "hint": "Complete the code implementation",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is deduplicating raw Playwright calls an important architectural pattern?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which refactoring anti-pattern accidentally couples unrelated test suites together?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "icon": "🏛️",
+      "slug": "27-refactor-exercise",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    }
+  ]
+}

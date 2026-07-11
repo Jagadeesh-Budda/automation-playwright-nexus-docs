@@ -1,0 +1,156 @@
+
+# 7.2: Assertions vs Waits
+
+import { ChapterHeader } from '@/components/ChapterHeader';
+
+<ChapterHeader
+  objective="Master the use of web-first assertions as test synchronization points instead of manual waits."
+  time="10 mins"
+  type="Concept"
+/>
+
+## Learning Objectives
+- Differentiate between manual waits and web-first assertions
+- Use assertions to pause test execution until the UI reaches the desired state
+- Eliminate explicit `.waitFor()` calls from test code
+
+## The Problem with Manual Waits
+
+Sometimes, you need to wait for something to happen on the screen *before* you can interact with it, but you aren't doing an action like `.click()`.
+
+For example, you submit a form, and you want to wait for the "Success" banner to appear before checking its text.
+
+A beginner might try to write something like this:
+```typescript
+// ❌ Anti-pattern: Waiting for an element explicitly
+await page.getByText('Success').waitFor({ state: 'visible' });
+```
+
+While `.waitFor()` exists, Playwright strongly discourages using it for verifying UI states. It makes the code verbose and harder to read.
+
+## Web-First Assertions
+
+Instead of waiting for an element and *then* asserting on it, Playwright combines both concepts into **Web-First Assertions**.
+
+You already learned these in Module 1!
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ✅ Pro-pattern: Auto-retrying assertion
+await expect(page.getByText('Success')).toBeVisible();
+```
+
+When you write `expect().toBeVisible()`, Playwright does not check the screen once and instantly fail if it's not there. 
+
+Playwright will **auto-retry** that assertion for up to 5 seconds. It sits in a loop: "Is it visible? No. Is it visible? No. Is it visible? YES." The moment it becomes visible, the assertion passes and the test continues.
+
+## Assertions as Synchronization Points
+
+Because of this auto-retry behavior, you should use assertions as "synchronization points" in your tests.
+
+If you click a button that triggers a heavy 3-second database calculation, don't write `sleep(3000)`. Instead, assert that the resulting UI state has changed!
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// 1. Trigger the heavy calculation
+await page.getByRole('button', { name: 'Calculate Taxes' }).click();
+
+// 2. Synchronize the test by asserting the expected result
+// The test will pause here for up to 5 seconds waiting for the text to change!
+await expect(page.getByTestId('tax-total')).toHaveText('$1,500.00');
+
+// 3. The test safely continues knowing the calculation is complete
+await page.getByRole('button', { name: 'Submit Tax Return' }).click();
+```
+
+By using assertions to wait for the UI to update, your tests run exactly as fast as your application, without any arbitrary sleeps or flaky manual waits.
+
+---
+
+## Practice Exercise
+
+<CodeEditor
+  moduleId="37-assertions-vs-waits"
+  taskIndex={0}
+  placeholder={`// Practice: Rewrite this bad code using a web-first assertion\n// Bad:\n// await page.getByRole('alert').waitFor({ state: 'visible' });\n// await expect(page.getByRole('alert')).toHaveText('Success!');\n\n// Good:\n`}
+/>
+
+---
+
+## Common Mistakes
+
+- **Hardcoding Waits**: Using `page.waitForTimeout()` instead of waiting for an element's state.
+- **Overly Broad Locators**: Using generic CSS selectors like `.button` that might break if multiple buttons are added. Always prefer user-facing attributes like `getByRole`.
+- **Ignoring Errors**: Catching errors in try/catch blocks without failing the test or logging the reason.
+
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** After submitting a registration form, the backend takes a few seconds to create the account. Finally, a welcome message appears.
+
+**Your Task:** Write the assertion that waits for the welcome message to be visible and asserts its text.
+
+**Constraints:**
+- ❌ You may NOT use `.waitFor()`
+- ✅ You MUST use a single `await expect()` statement
+
+<CodeEditor
+  moduleId="37-assertions-vs-waits"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('assertions vs waits challenge', async ({ page }) => {
+  await page.goto('https://dynamic-app.com');
+  await page.getByRole('button', { name: 'Load' }).click();
+
+  // BUG: The developer is retrieving state manually and making a static assertion.
+  // This causes flakiness if the text is delayed! Refactor to a web-first assertion.
+  await page.waitForTimeout(2000);
+  const text = await page.getByTestId('status').textContent();
+  expect(text).toBe('Loaded');
+});`}
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('registration sync', async ({ page }) => {
+  await page.getByRole('button', { name: 'Register' }).click();
+  
+  // This single line waits for visibility AND checks the text!
+  await expect(page.getByRole('heading', { name: 'Welcome, new user!' })).toBeVisible();
+});
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Web-First Assertions | `expect().toBeVisible()` combines a wait and an assertion into one line |
+| Synchronization | Tests must pause and wait for the application to catch up |
+| Auto-Retrying | Playwright will poll the DOM for up to 5 seconds by default |
+
+> [!TIP]
+> **Next Step:** Proceed to the Timeouts module to learn what happens when an assertion auto-retries for too long.
+
+<Quiz moduleId="37-assertions-vs-waits" />
+
+
+export const astRules = [
+  {
+    type: "ast_forbidden_callee",
+    value: "page.waitForTimeout",
+    message: "Use auto-retrying assertions or web-first locators instead of hardcoded waits."
+  }
+];

@@ -1,0 +1,279 @@
+﻿# 18.2: Custom Linter Heuristics
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Implement regex-based code auditing
+
+## What is an AST Linter?
+
+An AST Linter is a tool that walks the AST of your code and reports **rule violations** — specific patterns that you've decided are forbidden or required in your codebase.
+
+Unlike ESLint (which is general-purpose), the ASA linter enforces **automation-specific** rules that ESLint doesn't know about.
+
+## Building a Complete AST Linter
+
+```typescript
+// utils/AstLinter.ts
+import { parse } from '@typescript-eslint/typescript-estree';
+import * as fs from 'fs';
+import * as path from 'path';
+import { glob } from 'glob';
+
+interface Violation {
+  rule: string;
+  file: string;
+  line: number;
+  column: number;
+  message: string;
+  severity: 'error' | 'warning';
+}
+
+interface LintRule {
+  name: string;
+  severity: 'error' | 'warning';
+  check: (ast: any, filePath: string) => Violation[];
+}
+
+export class AstLinter {
+  private rules: LintRule[] = [];
+  private violations: Violation[] = [];
+
+  // Register a rule
+  addRule(rule: LintRule): this {
+    this.rules.push(rule);
+    return this;
+  }
+
+  // Lint a single file
+  lintFile(filePath: string): Violation[] {
+    const code = fs.readFileSync(filePath, 'utf-8');
+    let ast: any;
+    
+    try {
+      ast = parse(code, { jsx: false, loc: true, range: true });
+    } catch (err: any) {
+      return [{ 
+        rule: 'parse-error', 
+        file: filePath, 
+        line: 0, 
+        column: 0,
+        message: `Failed to parse: ${err.message}`,
+        severity: 'error'
+      }];
+    }
+    
+    const fileViolations: Violation[] = [];
+    for (const rule of this.rules) {
+      fileViolations.push(...rule.check(ast, filePath));
+    }
+    return fileViolations;
+  }
+
+  // Lint raw code string directly
+  lintCode(code: string, filePath: string): Violation[] {
+    let ast: any;
+    try {
+      ast = parse(code, { jsx: false, loc: true, range: true });
+    } catch (err: any) {
+      return [{ 
+        rule: 'parse-error', 
+        file: filePath, 
+        line: 0, 
+        column: 0,
+        message: `Failed to parse: ${err.message}`,
+        severity: 'error'
+      }];
+    }
+    
+    const codeViolations: Violation[] = [];
+    for (const rule of this.rules) {
+      codeViolations.push(...rule.check(ast, filePath));
+    }
+    return codeViolations;
+  }
+
+  // Lint all files matching a glob pattern
+  lintDirectory(pattern: string): Violation[] {
+    const files = glob.sync(pattern);
+    this.violations = [];
+    
+    for (const file of files) {
+      this.violations.push(...this.lintFile(file));
+    }
+    
+    return this.violations;
+  }
+
+  // Print a readable report
+  report(): void {
+    const errors = this.violations.filter(v => v.severity === 'error');
+    const warnings = this.violations.filter(v => v.severity === 'warning');
+    
+    for (const v of this.violations) {
+      const icon = v.severity === 'error' ? '❌' : '⚠️';
+      console.log(`${icon} [${v.rule}] ${v.file}:${v.line} — ${v.message}`);
+    }
+    
+    console.log(`\n${this.violations.length} problems (${errors.length} errors, ${warnings.length} warnings)`);
+    
+    if (errors.length > 0) {
+      process.exit(1);  // Fail the CI build
+    }
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────
+// Built-in Rules
+// ─────────────────────────────────────────────────────────────────
+
+export const noHardcodedSleepRule: LintRule = {
+  name: 'no-hardcoded-sleep',
+  severity: 'error',
+  check(ast, filePath) {
+    const violations: Violation[] = [];
+    walk(ast, (node) => {
+      if (isCallTo(node, 'waitForTimeout') || isCallTo(node, 'sleep')) {
+        violations.push({
+          rule: 'no-hardcoded-sleep',
+          file: filePath,
+          line: node.loc.start.line,
+          column: node.loc.start.column,
+          message: 'Hardcoded sleep is prohibited. Use web-first assertions instead.',
+          severity: 'error',
+        });
+      }
+    });
+    return violations;
+  }
+};
+
+// Helper: check if a node is a call to a specific method
+function isCallTo(node: any, methodName: string): boolean {
+  return (
+    node.type === 'CallExpression' &&
+    node.callee?.type === 'MemberExpression' &&
+    node.callee.property?.name === methodName
+  );
+}
+
+// Helper: recursive AST walker with parent pointer attachment and circular reference protection
+function walk(node: any, visitor: (node: any) => void, parent?: any): void {
+  if (!node || typeof node !== 'object') return;
+  
+  if (parent) {
+    node.parent = parent;
+  }
+  
+  visitor(node);
+  for (const key of Object.keys(node)) {
+    if (key === 'parent') continue; // Prevent circular stack overflow
+    if (Array.isArray(node[key])) {
+      node[key].forEach((child: any) => walk(child, visitor, node));
+    } else {
+      walk(node[key], visitor, node);
+    }
+  }
+}
+```
+
+## Using the Linter in a Script
+
+```typescript
+// scripts/lint.ts
+import { AstLinter, noHardcodedSleepRule } from '../utils/AstLinter';
+
+const linter = new AstLinter()
+  .addRule(noHardcodedSleepRule);
+
+const violations = linter.lintDirectory('tests/**/*.spec.ts');
+linter.report();
+
+// Exits with code 1 if any errors found — fails the CI build!
+```
+
+```bash
+# Run the linter
+npx ts-node scripts/lint.ts
+```
+
+<CodeEditor
+  moduleId="88-ast-linter"
+  taskIndex={0}
+  placeholder="// Task: Use the AstLinter class to scan all spec files for hardcoded sleeps.&#10;// Requirements:&#10;//   1. Create a new AstLinter instance&#10;//   2. Add the noHardcodedSleepRule&#10;//   3. Run it against all files matching 'tests/**/*.spec.ts'&#10;//   4. Print the violation report"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+const linter = new AstLinter().addRule(noHardcodedSleepRule);
+const violations = linter.lintDirectory('tests/**/*.spec.ts');
+linter.report();
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="88-ast-linter"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<Quiz moduleId="ast-linter" />
+

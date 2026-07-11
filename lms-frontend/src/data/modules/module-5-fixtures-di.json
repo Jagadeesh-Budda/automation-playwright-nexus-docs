@@ -1,0 +1,534 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T10:36:32.990Z",
+  "lessons": [
+    {
+      "id": "28-js-ts-generics",
+      "title": "Pre-5: TypeScript Generics Deep Dive",
+      "url": "courses/playwright/28-js-ts-generics",
+      "group": "🧩 MODULE 5: FIXTURES & DI",
+      "level": 5,
+      "weight": 5,
+      "meta": {
+        "time": "25 mins",
+        "type": "Code",
+        "outcome": "Create generic functions, interfaces, and utility types from scratch."
+      },
+      "objectives": [
+        {
+          "id": "ts_generics",
+          "title": "Author generic functions and use built-in utility types."
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Challenge",
+          "hint": "Complete the code implementation",
+          "rules": [
+            {
+              "type": "ast_node",
+              "value": "VariableDeclaration",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "function identity<T>(arg: T): T {\n  return arg;\n}",
+            "q": "What does the `<T>` signify in this TypeScript function?",
+            "options": [
+              "It declares a Type Variable (Generic), allowing the function to accept and return any type while maintaining strict type safety",
+              "It is a syntax error in JavaScript",
+              "It casts the argument to a string",
+              "It means the function returns a Promise"
+            ],
+            "a": "It declares a Type Variable (Generic), allowing the function to accept and return any type while maintaining strict type safety",
+            "explanation": "Generics allow you to write reusable components that work with a variety of types rather than a single one, while still giving you perfect autocomplete."
+          },
+          {
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You are creating an API testing utility that parses JSON responses. The response structure changes depending on the endpoint.",
+            "q": "How do Generics help in this scenario?",
+            "options": [
+              "You can pass the expected Interface as a Generic type parameter, so the returned data is correctly typed",
+              "Generics automatically mock the API response",
+              "Generics make the API request faster",
+              "Generics bypass CORS errors"
+            ],
+            "a": "You can pass the expected Interface as a Generic type parameter, so the returned data is correctly typed",
+            "explanation": "By calling `fetchData<UserResponse>()`, TypeScript knows the result matches the UserResponse shape."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "interface ResponseData<DataShape> {\n  status: number;\n  payload: DataShape;\n}",
+            "q": "How would you correctly instantiate this type for an API returning a `string` payload?",
+            "options": [
+              "let res: ResponseData<string>;",
+              "let res: ResponseData(string);",
+              "let res: ResponseData = string;",
+              "let res<string>: ResponseData;"
+            ],
+            "a": "let res: ResponseData<string>;",
+            "explanation": "You pass the type argument inside angle brackets `< >` when using the generic interface."
+          },
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "A developer writes a generic function but TypeScript complains because they try to call `arg.length`, and TypeScript doesn't know if the generic `T` has a length property.",
+            "q": "How can you fix this using Generic Constraints?",
+            "options": [
+              "Change `<T>` to `<T extends { length: number }>`",
+              "Cast arg to `any`",
+              "Change the generic to `<T = length>`",
+              "Remove the generic entirely"
+            ],
+            "a": "Change `<T>` to `<T extends { length: number }>`",
+            "explanation": "The `extends` keyword in a generic declaration enforces a constraint, ensuring the passed type meets specific minimum requirements (like having a length property)."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "const getProperty = <T, K extends keyof T>(obj: T, key: K) => {\n  return obj[key];\n};",
+            "q": "What sophisticated type-safety mechanism is being used here?",
+            "options": [
+              "The compiler is enforcing that the requested 'key' strictly exists as a property name on the generic object 'T'",
+              "It is converting the object into an array of keys",
+              "It is making the property optional",
+              "It is a runtime validation check"
+            ],
+            "a": "The compiler is enforcing that the requested 'key' strictly exists as a property name on the generic object 'T'",
+            "explanation": "Using `K extends keyof T` is an advanced TypeScript pattern that guarantees you cannot ask for a property that doesn't exist on the object, preventing undefined errors at compile time."
+          }
+        ]
+      },
+      "icon": "🌱",
+      "slug": "28-js-ts-generics",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "29-what-are-fixtures",
+      "title": "5.1: What Are Fixtures?",
+      "url": "courses/playwright/29-what-are-fixtures",
+      "group": "🧩 MODULE 5: FIXTURES & DI",
+      "level": 5,
+      "weight": 5,
+      "meta": {
+        "time": "20 mins",
+        "type": "Code",
+        "outcome": "Understand dependency injection."
+      },
+      "objectives": [
+        {
+          "id": "05b_what_are_fixtures_obj",
+          "title": "Complete 5.1: What Are Fixtures?"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "05b_what_are_fixtures_obj",
+          "weight": 100
+        }
+      ],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "mcq",
+            "difficulty": "easy",
+            "q": "Why are Playwright fixtures generally preferred over standard beforeEach hooks?",
+            "options": [
+              "Fixtures establish strong isolation and explicit dependency injection per test",
+              "Fixtures are exactly the same as beforeEach hooks",
+              "Fixtures run asynchronously while hooks are synchronous",
+              "Fixtures only run once per test suite"
+            ],
+            "a": "Fixtures establish strong isolation and explicit dependency injection per test",
+            "explanation": "Fixtures provide independent, isolated environments for each test, avoiding shared state issues."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "q": "What happens to the page fixture after a test block finishes executing?",
+            "options": [
+              "Playwright automatically tears down the isolated Browser Context and closes the page, ensuring a clean slate for the next test.",
+              "The page remains open and is reused by the next test in the file.",
+              "The developer must manually call await page.close() or memory leaks will occur.",
+              "The entire Browser executable is killed and rebooted."
+            ],
+            "a": "Playwright automatically tears down the isolated Browser Context and closes the page, ensuring a clean slate for the next test.",
+            "explanation": "Built-in fixtures like page are bound to the lifecycle of the test. Playwright handles the teardown automatically, guaranteeing that no cookies, local storage, or DOM state bleed into the next test."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "test('Purchase', async ({ browser }) => {\n  const context = await browser.newContext();\n  const page = await context.newPage();\n});",
+            "q": "Why might a Senior SDET choose to manually inject the browser fixture and create their own context, instead of just using the default page fixture?",
+            "options": [
+              "Because they need to simulate a multi-tab or multi-user scenario (e.g., User A and User B interacting simultaneously in separate isolated sessions).",
+              "Because the default page fixture does not support JavaScript.",
+              "Because the browser fixture executes tests 50% faster.",
+              "Because the page fixture cannot handle await page.goto()."
+            ],
+            "a": "Because they need to simulate a multi-tab or multi-user scenario (e.g., User A and User B interacting simultaneously in separate isolated sessions).",
+            "explanation": "The default page fixture provides a single, isolated context. If you are testing a real-time chat application and need two users logged in simultaneously with different cookies, you must inject the raw browser fixture and instantiate multiple distinct contexts manually."
+          }
+        ]
+      },
+      "icon": "🧩",
+      "slug": "29-what-are-fixtures",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "30-custom-fixtures",
+      "title": "5.2: Creating Custom Fixtures",
+      "url": "courses/playwright/30-custom-fixtures",
+      "group": "🧩 MODULE 5: FIXTURES & DI",
+      "level": 5,
+      "weight": 5,
+      "meta": {
+        "time": "25 mins",
+        "type": "Code",
+        "outcome": "Use test.extend()."
+      },
+      "objectives": [
+        {
+          "id": "05c_custom_fixtures_obj",
+          "title": "Complete 5.2: Creating Custom Fixtures"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Challenge",
+          "hint": "Complete the code implementation",
+          "rules": [
+            {
+              "type": "ast_callee_any",
+              "values": [
+                "base.extend",
+                "test.extend"
+              ],
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "const test = base.extend({\n  adminPage: async ({ page }, use) => {\n    await login(page, 'admin');\n    await use(page);\n  }\n});",
+            "q": "In this custom fixture, what does the `use()` function do?",
+            "options": [
+              "It pauses the fixture and hands execution control over to the actual test block, passing the initialized data",
+              "It deletes the page object",
+              "It throws an error if the test fails",
+              "It runs an assertion"
+            ],
+            "a": "It pauses the fixture and hands execution control over to the actual test block, passing the initialized data",
+            "explanation": "The `use()` callback is the boundary between the Setup phase and the Test phase. Calling it 'yields' the execution to the test."
+          },
+          {
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You have created a custom fixture called `databaseConnection`. You want a specific test to utilize it.",
+            "q": "How do you request this fixture in your test?",
+            "options": [
+              "Simply add `{ databaseConnection }` to the test function arguments",
+              "Call global.databaseConnection",
+              "Import it directly from the file",
+              "Use the --fixture CLI flag"
+            ],
+            "a": "Simply add `{ databaseConnection }` to the test function arguments",
+            "explanation": "Playwright uses Dependency Injection. You just destructure the name of the fixture in the argument list, and Playwright dynamically initializes it for you."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "const test = base.extend({\n  logger: async ({}, use) => {\n    console.log('Setup');\n    await use();\n    console.log('Teardown');\n  }\n});",
+            "q": "If the test fails, does the 'Teardown' code still execute?",
+            "options": [
+              "Yes. Code placed after `use()` is guaranteed to execute during the teardown phase, regardless of test pass/fail status",
+              "No, the worker crashes immediately",
+              "Only if you add a try/catch block",
+              "Yes, but it runs before the test ends"
+            ],
+            "a": "Yes. Code placed after `use()` is guaranteed to execute during the teardown phase, regardless of test pass/fail status",
+            "explanation": "Fixtures natively handle safe teardown. The engine ensures the block after `use()` runs so you can clean up databases or close connections safely."
+          },
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You want your custom `adminPage` fixture to execute automatically for every single test in the file, even if the test doesn't explicitly request it in the arguments.",
+            "q": "How can you achieve this?",
+            "options": [
+              "Set `auto: true` in the fixture options definition",
+              "You cannot do this; fixtures must always be requested",
+              "Put it in the test.describe",
+              "Name the fixture 'global'"
+            ],
+            "a": "Set `auto: true` in the fixture options definition",
+            "explanation": "You can define automatic fixtures by passing an array syntax: `adminPage: [ async ({}, use) => { ... }, { auto: true } ]`. These act like transparent beforeEach hooks."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "multi-select",
+            "difficulty": "hard",
+            "scenario": "A Senior SDET argues that Fixtures are architecturally superior to standard Page Object Models instantiated in `beforeEach` hooks.",
+            "q": "What are the primary architectural benefits of Playwright Fixtures? (Select all that apply)",
+            "options": [
+              "Lazy loading: Fixtures only instantiate if a test specifically requests them, saving execution time",
+              "Encapsulated teardown: Fixtures handle their own cleanup safely without needing a separate `afterEach` block",
+              "Global State: Fixtures share the exact same variable instance across all tests in parallel",
+              "Composability: Fixtures can depend on other fixtures to build complex dependency trees safely"
+            ],
+            "a": [
+              "Lazy loading: Fixtures only instantiate if a test specifically requests them, saving execution time",
+              "Encapsulated teardown: Fixtures handle their own cleanup safely without needing a separate `afterEach` block",
+              "Composability: Fixtures can depend on other fixtures to build complex dependency trees safely"
+            ],
+            "explanation": "Fixtures are isolated per-test, they do NOT share global state (which is a good thing!). They excel in lazy evaluation, encapsulation, and tree-like composability."
+          }
+        ]
+      },
+      "icon": "🧩",
+      "slug": "30-custom-fixtures",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "31-fixture-dependencies",
+      "title": "5.3: Fixture Dependencies",
+      "url": "courses/playwright/31-fixture-dependencies",
+      "group": "🧩 MODULE 5: FIXTURES & DI",
+      "level": 5,
+      "weight": 5,
+      "meta": {
+        "time": "20 mins",
+        "type": "Code",
+        "outcome": "Chain fixtures."
+      },
+      "objectives": [
+        {
+          "id": "05d_fixture_dependencies_obj",
+          "title": "Complete 5.3: Fixture Dependencies"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Challenge",
+          "hint": "Complete the code implementation",
+          "rules": [
+            {
+              "type": "ast_callee_any",
+              "values": [
+                "base.extend",
+                "test.extend"
+              ],
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is composing fixtures hierarchically an important architectural pattern?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which fixture anti-pattern causes database deadlocks during parallel teardown?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "icon": "🧩",
+      "slug": "31-fixture-dependencies",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "32-basetest-pattern",
+      "title": "5.4: The BaseTest Pattern",
+      "url": "courses/playwright/32-basetest-pattern",
+      "group": "🧩 MODULE 5: FIXTURES & DI",
+      "level": 5,
+      "weight": 5,
+      "meta": {
+        "time": "20 mins",
+        "type": "Code",
+        "outcome": "Centralize fixtures."
+      },
+      "objectives": [
+        {
+          "id": "05e_basetest_pattern_obj",
+          "title": "Complete 5.4: The BaseTest Pattern"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Challenge",
+          "hint": "Complete the code implementation",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is utilizing a central Base Test an important architectural pattern for scaling teams?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which Base Test anti-pattern creates a monolithic bottleneck for all test execution?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "icon": "🧩",
+      "slug": "32-basetest-pattern",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    }
+  ]
+}

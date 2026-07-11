@@ -1,0 +1,198 @@
+﻿## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Successfully clone and verify repository
+
+## Why Environment Validation Matters
+
+Before you write a single line of test code, your environment must be **100% correct**. A broken environment causes phantom failures that waste hours of debugging time. The environment validation checklist ensures every engineer starts from the same baseline.
+
+## Step 1: Clone the Repository
+
+```bash
+# 8.3: Environment Validation
+git clone https://github.com/your-org/dms-automation.git
+
+# Navigate into the project directory
+cd dms-automation
+
+# Verify the remote URL is correct
+git remote -v
+# Expected output:
+# origin  https://github.com/your-org/dms-automation.git (fetch)
+# origin  https://github.com/your-org/dms-automation.git (push)
+```
+
+## Step 2: Install Dependencies
+
+```bash
+# Install all Node.js packages listed in package.json
+npm install
+
+# Install Playwright browsers (Chromium, Firefox, WebKit)
+npx playwright install
+
+# Install system dependencies for browsers (required on Linux/CI)
+npx playwright install-deps
+```
+
+> [!TIP]
+> If `npm install` fails, delete `node_modules/` and `package-lock.json` then try again:
+> ```bash
+> rm -rf node_modules package-lock.json
+> npm install
+> ```
+
+## Step 3: Configure Your Environment Variables
+
+```bash
+# Copy the example env file to create your own
+cp .env.example .env
+
+# Open .env and fill in the actual values
+# You will receive these from your team lead
+nano .env  # or open with VS Code
+```
+
+## Step 4: Run the Environment Health Check
+
+```bash
+# Run the full smoke test suite to verify everything works
+npm test
+
+# OR run a specific smoke test
+npx playwright test tests/smoke/health-check.spec.ts --headed
+```
+
+**Expected output when environment is correct:**
+```
+Running 5 tests using 4 workers
+  ✓  smoke › homepage loads (2.3s)
+  ✓  smoke › login page accessible (1.8s)
+  ✓  smoke › API responds with 200 (0.9s)
+  ✓  smoke › database connection OK (1.2s)
+  ✓  smoke › file upload service OK (2.1s)
+
+5 passed (8.3s)
+```
+
+## Step 5: Verify Node.js and npm Versions
+
+Mismatched Node versions cause silent, hard-to-debug failures. Always verify:
+
+```bash
+node --version    # Should be >= 18.0.0
+npm --version     # Should be >= 9.0.0
+npx --version     # Should match npm version
+```
+
+## Environment Validation Checklist
+
+| Check | Command | Expected Result |
+|-------|---------|-----------------|
+| Git remote connected | `git remote -v` | Shows your org URL |
+| Dependencies installed | `ls node_modules` | Folder exists |
+| Browsers installed | `npx playwright install --dry-run` | No missing browsers |
+| `.env` configured | `cat .env` | All keys present |
+| Tests pass | `npm test` | All smoke tests green |
+
+## Common Environment Failures
+
+### ❌ "Cannot find module" error
+```bash
+# Fix: Reinstall dependencies
+rm -rf node_modules
+npm install
+```
+
+### ❌ "Browser not found" error
+```bash
+# Fix: Install Playwright browsers
+npx playwright install
+```
+
+### ❌ "ECONNREFUSED" - App not reachable
+```bash
+# Fix: Check BASE_URL in your .env file
+# Make sure the staging server is running
+```
+
+### ❌ SSL Certificate errors
+```bash
+# Fix: Add to playwright.config.ts
+use: {
+  ignoreHTTPSErrors: true,  // Only for staging/dev!
+}
+```
+
+<CodeEditor
+  moduleId="42-fundamentals-exec"
+  taskIndex={0}
+  placeholder="// Task: Write the two git commands to clone and verify a repository&#10;git clone https://github.com/your-org/dms-automation.git&#10;git remote -v"
+/>
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="42-fundamentals-exec"
+  taskIndex={1}
+  placeholder={`// Challenge: Write Git commands to sync local branch with main by rebasing.
+// Retrieve latest updates from origin, then perform a linear rebase onto origin/main.
+// Write the commands below:`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="fundamentals-exec" />
+

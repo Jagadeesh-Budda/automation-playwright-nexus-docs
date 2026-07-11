@@ -1,0 +1,229 @@
+﻿# 0.4: Objects & Literals
+
+In the previous lessons, we discussed primitive data types (Strings, Numbers, Booleans). But what if you need to represent something more complex, like a User with a name, email, and password? 
+
+In JavaScript and TypeScript, we group related data together using **Objects**. Objects are foundational to UI automation—you will use them constantly to store test data, define configuration options, and pass arguments to Playwright methods.
+
+---
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Complete 0.4: Objects & Literals
+
+## 1. The Object Literal Syntax
+
+An object is simply a collection of **Key-Value pairs** (also known as properties). We create an object using curly braces `{}`. This is called the "Object Literal" syntax.
+
+```javascript
+const user = {
+  firstName: "Jane",
+  lastName: "Doe",
+  age: 28,
+  isAdmin: true
+};
+```
+
+Think of an object like a filing cabinet drawer labeled `user`, and inside that drawer are individual folders labeled `firstName`, `lastName`, etc.
+
+### Accessing Data (Dot Notation)
+To read a value from an object, we use **Dot Notation**.
+
+```javascript
+console.log(user.firstName); // Outputs: Jane
+console.log(user.isAdmin);   // Outputs: true
+```
+
+---
+
+## 2. Objects in Automation (Test Data)
+
+Why are objects so important in automation? Because tests require **Data**.
+
+Instead of creating five separate variables for a login test, we group them into a single, clean `credentials` object.
+
+```javascript
+// ❌ Messy and hard to pass between functions
+const loginEmail = "test@example.com";
+const loginPassword = "Password123!";
+const loginRole = "Admin";
+
+// ✅ Clean and organized
+const credentials = {
+  email: "test@example.com",
+  password: "Password123!",
+  role: "Admin"
+};
+
+// We can pass the whole object into a login function
+await performLogin(credentials);
+```
+
+---
+
+## 3. Nested Objects
+
+Objects can hold any data type, including arrays or *other objects*. This allows you to model complex, real-world data structures (like API payloads).
+
+```javascript
+const mockApiResponse = {
+  status: 200,
+  data: {
+    userId: 1045,
+    preferences: {
+      theme: "dark",
+      notifications: true
+    }
+  }
+};
+```
+
+To visualize how this looks:
+
+```text
+API Response
+└── data
+    └── preferences
+        └── theme
+```
+
+Accessing this nested data uses chained dot notation:
+```javascript
+// Following the path down the tree
+console.log(mockApiResponse.data.preferences.theme); // Outputs: dark
+```
+
+---
+
+## 4. Modifying Objects
+
+Even if an object is declared with `const`, **you can still modify its properties.** 
+
+Remember the Golden Rule from Lesson 0.1: `const` prevents you from sticking the label on a *new box*. But it does NOT prevent you from opening the box and changing what's inside!
+
+```javascript
+let settings = {
+  timeout: 5000,
+  retries: 1
+};
+
+// ✅ This is perfectly legal! We are modifying a property inside the object.
+settings.timeout = 10000;
+
+// ❌ This will crash! We are trying to assign a completely new object to the 'settings' label.
+settings = { timeout: 10000, retries: 1 };
+```
+
+---
+
+## 5. Destructuring (ES6 Magic)
+
+Often, you have an object with many properties, but you only need one or two. Instead of writing `user.firstName` and `user.email` over and over, you can "unpack" the object into variables. This is called **Destructuring**.
+
+```javascript
+const testEnvironment = {
+  url: "https://staging.myapp.com",
+  browser: "chromium",
+  headless: true
+};
+
+// Unpacking the properties into individual variables
+const { url, browser } = testEnvironment;
+
+console.log(url);     // Outputs: https://staging.myapp.com
+console.log(browser); // Outputs: chromium
+```
+
+> [!TIP]
+> You will see destructuring *everywhere* in Playwright. For example, when you write a test: `test('My test', async ({ page, request }) => { ... })`. You are actually destructuring the `page` and `request` objects out of Playwright's core fixture object!
+
+---
+
+## 6. Playwright Options Objects
+
+Playwright methods often take an "Options Object" as an argument to configure how the method behaves. You will see this pattern constantly.
+
+```javascript
+const clickOptions = {
+  force: true,
+  timeout: 5000
+};
+
+// We pass the object directly into the click method
+await page.click('#submit', clickOptions);
+```
+
+You can even create the object "inline" directly inside the function call:
+```javascript
+await page.click('#submit', { force: true, timeout: 5000 });
+```
+
+---
+
+## 7. Interactive Challenge: Test Data Objects
+
+Let's practice creating and reading from objects.
+
+**Your Task:**
+1. Create an object literal named `loginData` with two properties:
+   - `email` (string) set to `"qa@test.com"`
+   - `password` (string) set to `"Password123"`
+2. Fix the `console.log` so it correctly prints the password using Dot Notation.
+
+<CodeEditor
+  moduleId="04-js-ts-objects"
+  taskIndex={0}
+  placeholder={`// 1. Create your loginData object here\nconst loginData = {\n  \n};\n\n// 2. Fix the log below to print the password value\nconsole.log(loginData);`}
+/>
+
+---
+
+## Common Mistakes
+
+- **Hardcoding Waits**: Using `page.waitForTimeout()` instead of waiting for an element's state.
+- **Overly Broad Locators**: Using generic CSS selectors like `.button` that might break if multiple buttons are added. Always prefer user-facing attributes like `getByRole`.
+- **Ignoring Errors**: Catching errors in try/catch blocks without failing the test or logging the reason.
+
+
+## Challenge Exercise
+
+**Scenario**: You are testing an e-commerce checkout flow. The API requires a deeply nested user profile object for the test data payload.
+
+**Task**: Define a TypeScript interface `UserProfile` and create an instance of it.
+
+**Success Criteria**:
+- Interface includes email, shipping address, and an optional billing address.
+- Object instance correctly maps to the interface.
+
+**Hints**:
+- Hint 1: Use the `?` operator for optional properties.
+
+<CodeEditor
+  moduleId="04-js-ts-objects"
+  taskIndex={1}
+  placeholder={`// Challenge: Define a UserProfile interface and create an instance
+// The instance must contain an email, shippingAddress, and optional billingAddress.
+// FIX THE INCOMPLETE CODE BELOW:
+
+interface UserProfile {
+  email: string;
+  shippingAddress: string;
+  // Add optional billingAddress here:
+}
+
+const profile: UserProfile = {
+  email: "user@example.com",
+  // Complete the object properties below:
+};`}
+/>
+
+
+## Summary
+
+1. **Objects** group related data into Key-Value pairs using `{}`.
+2. Access values using **Dot Notation** (e.g., `user.name` or `api.data.theme`).
+3. You can modify properties of a `const` object, but you cannot reassign the object itself.
+4. **Destructuring** lets you extract properties directly into variables (e.g., `const { page } = ...`).
+5. Objects are essential for passing configuration options and grouping test data in Playwright.
+
+<Quiz moduleId="04-js-ts-objects" />

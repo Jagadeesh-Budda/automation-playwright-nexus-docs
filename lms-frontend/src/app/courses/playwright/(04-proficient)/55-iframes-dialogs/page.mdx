@@ -1,0 +1,347 @@
+﻿# 10.4: iframes & Native Dialogs
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Use frameLocator() and page.on('dialog')
+
+## Working with iframes
+
+iframes embed a separate HTML document inside a page. They're everywhere: payment forms (Stripe), embedded widgets, third-party integrations, WYSIWYG editors.
+
+Playwright cannot directly access elements inside an iframe using `page.getByRole()`. You need `page.frameLocator()`.
+
+## `page.frameLocator()` — The iframe Gateway
+
+```typescript
+// Target elements inside an iframe by its CSS selector or attribute
+const paymentFrame = page.frameLocator('#payment-iframe');
+
+// Now use any locator inside the frame — same API as page
+await paymentFrame.getByLabel('Card Number').fill('4242424242424242');
+await paymentFrame.getByLabel('Expiry').fill('12/28');
+await paymentFrame.getByLabel('CVC').fill('123');
+await paymentFrame.getByRole('button', { name: 'Pay Now' }).click();
+```
+
+### Finding iframes by different selectors
+
+```typescript
+// By ID
+let frame = page.frameLocator('#iframe-id');
+
+// By name
+let frame = page.frameLocator('iframe[name="editor"]');
+
+// By src URL
+let frame = page.frameLocator('iframe[src*="payment"]');
+
+// By title attribute (accessible)
+let frame = page.frameLocator('iframe[title="Payment Form"]');
+
+// By nth index (when multiple iframes exist)
+const frame = page.frameLocator('iframe').nth(0);
+```
+
+## Nested iframes
+
+When an iframe contains another iframe:
+
+```typescript
+// Outer page → first iframe → second iframe
+const outerFrame = page.frameLocator('#outer-frame');
+const innerFrame = outerFrame.frameLocator('#inner-frame');
+
+await innerFrame.getByRole('button', { name: 'Confirm' }).click();
+```
+
+## Assertions Inside iframes
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+const editorFrame = page.frameLocator('#wysiwyg-editor');
+
+// All standard assertions work inside frames
+await expect(editorFrame.getByRole('heading')).toContainText('Document Title');
+await expect(editorFrame.getByRole('paragraph')).toHaveCount(3);
+await expect(editorFrame.getByText('Draft saved')).toBeVisible();
+```
+
+## Cross-Origin iframes
+
+By default, Playwright can access cross-origin iframes. No special configuration needed:
+
+```typescript
+// This works even if the iframe is from a different domain
+const stripeFrame = page.frameLocator('iframe[src*="stripe.com"]');
+await stripeFrame.getByLabel('Card number').fill('4242424242424242');
+```
+
+## Frame vs FrameLocator
+
+| API | Type | Use Case |
+|-----|------|----------|
+| `page.frameLocator()` | `FrameLocator` | Locating elements inside iframes (recommended) |
+| `page.frame()` | `Frame \| null` | Direct frame access for navigation/evaluation |
+
+```typescript
+// frameLocator — for element interaction (preferred)
+await page.frameLocator('#editor').getByRole('button').click();
+
+// frame — for page-level operations
+const frame = page.frame({ name: 'editor' });
+await frame?.goto('https://editor.example.com/new');
+const title = await frame?.title();
+```
+
+## Real-World Example: Rich Text Editor
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('user can format text in the WYSIWYG editor', async ({ page }) => {
+  await page.goto('/documents/new');
+  
+  const editor = page.frameLocator('#tinymce-editor');
+  
+  // Type content
+  await editor.getByRole('textbox').fill('Important Protocol Update');
+  
+  // Select the text
+  await editor.getByRole('textbox').press('Control+A');
+  
+  // Apply bold formatting (button is in the parent page, not the iframe!)
+  await page.getByRole('button', { name: 'Bold' }).click();
+  
+  // Verify inside the iframe
+  await expect(editor.locator('strong')).toContainText('Important Protocol Update');
+});
+```
+
+---
+
+## Native Browser Dialogs
+
+Native browser dialogs (`alert()`, `confirm()`, `prompt()`) are NOT part of the DOM — they're browser-level UI that blocks JavaScript execution.
+
+## `page.on('dialog')` — The Handler Pattern
+
+You must set up a listener **before** the dialog appears:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('handles confirmation dialog', async ({ page }) => {
+  // Set up the handler BEFORE triggering the dialog
+  page.on('dialog', async dialog => {
+    console.log(`Dialog type: ${dialog.type()}`);    // 'alert', 'confirm', 'prompt', 'beforeunload'
+    console.log(`Dialog message: ${dialog.message()}`);
+    
+    await dialog.accept();  // Click OK / Yes
+  });
+  
+  // Now trigger the action that opens the dialog
+  await page.getByRole('button', { name: 'Delete Document' }).click();
+  
+  // The dialog was automatically handled — continue with assertions
+  await expect(page.getByText('Document deleted')).toBeVisible();
+});
+```
+
+## Handling Different Dialog Types
+
+### `alert()` — Information only
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+page.on('dialog', async dialog => {
+  expect(dialog.type()).toBe('alert');
+  expect(dialog.message()).toBe('Document saved successfully');
+  await dialog.accept();  // Only option is OK
+});
+```
+
+### `confirm()` — Accept or Dismiss
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Accept the confirmation (click "OK")
+page.on('dialog', async dialog => {
+  expect(dialog.type()).toBe('confirm');
+  expect(dialog.message()).toContain('Are you sure you want to delete');
+  await dialog.accept();
+});
+
+// Dismiss the confirmation (click "Cancel")
+page.on('dialog', async dialog => {
+  await dialog.dismiss();  // Click Cancel
+});
+```
+
+### `prompt()` — Accept with Input
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+page.on('dialog', async dialog => {
+  expect(dialog.type()).toBe('prompt');
+  expect(dialog.message()).toBe('Enter document title:');
+  expect(dialog.defaultValue()).toBe('Untitled');  // Default value in the prompt
+  
+  await dialog.accept('Protocol v3.0');  // Enter text and click OK
+});
+
+await page.evaluate(() => {
+  let title = prompt('Enter document title:', 'Untitled');
+  document.title = title || 'Untitled';
+});
+```
+
+### `beforeunload` — Unsaved Changes Warning
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+page.on('dialog', async dialog => {
+  expect(dialog.type()).toBe('beforeunload');
+  await dialog.accept();  // Leave the page
+  // OR await dialog.dismiss();  // Stay on the page
+});
+
+// Navigate away from a page with unsaved changes
+await page.goto('/other-page');
+```
+
+## One-Time Dialog Handling with `page.once()`
+
+```typescript
+// Handle only the NEXT dialog, then stop listening
+page.once('dialog', async dialog => {
+  await dialog.accept();
+});
+
+await page.getByRole('button', { name: 'Delete' }).click();
+// Subsequent dialogs won't be handled — they'll block!
+```
+
+## Auto-Dismissing All Dialogs
+
+```typescript
+// In your fixture — automatically dismiss all dialogs
+test.beforeEach(async ({ page }) => {
+  page.on('dialog', dialog => dialog.dismiss());
+});
+```
+
+## Real-World Example: Delete with Confirmation
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('deleting a document requires confirmation', async ({ page, documentPage }) => {
+  await documentPage.navigate();
+  
+  // Test 1: Dismiss the dialog — document should NOT be deleted
+  page.once('dialog', async dialog => {
+    expect(dialog.message()).toContain('permanently delete');
+    await dialog.dismiss();
+  });
+  
+  await documentPage.getActionButton('DOC-001', 'Delete').click();
+  await expect(documentPage.getRowByDocId('DOC-001')).toBeVisible();  // Still there
+  
+  // Test 2: Accept the dialog — document SHOULD be deleted
+  page.once('dialog', async dialog => {
+    await dialog.accept();
+  });
+  
+  await documentPage.getActionButton('DOC-001', 'Delete').click();
+  await expect(documentPage.getRowByDocId('DOC-001')).not.toBeVisible();  // Gone
+});
+```
+
+> [!WARNING]
+> If a native dialog appears and you have no `page.on('dialog')` handler, Playwright will automatically **dismiss** it. This can cause unexpected test behavior. Always set up explicit handlers.
+
+
+
+> [!NOTE]
+> **Retention Layer:**
+> * **Key Idea:** Iframes create completely isolated DOM trees, requiring special `.frameLocator()` targeting.
+> * **Common Mistake:** Using standard `page.locator()` queries for elements trapped inside an iframe context.
+> * **Enterprise Application:** Automating interactions with embedded third-party widgets (Stripe, Zendesk, PayPal).
+
+<CodeEditor
+  moduleId="55-iframes-dialogs"
+  taskIndex={0}
+  placeholder="// Task: Fill a payment form inside an iframe&#10;const frame = page.frameLocator('#payment-iframe');&#10;await frame.getByLabel('Card Number').fill('4242424242424242');&#10;await frame.getByLabel('Expiry').fill('12/28');&#10;await frame.getByRole('button', { name: 'Pay' }).click();"
+/>
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="55-iframes-dialogs"
+  taskIndex={1}
+  placeholder={`// Challenge: Interact with elements inside an iframe and handle dialog alert prompts.
+// Locate iframe '#editor-frame', fill text, click submit, and accept the dialog prompt.
+// Complete the script below:`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="iframes-dialogs" />
+

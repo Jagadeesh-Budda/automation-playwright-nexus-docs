@@ -1,0 +1,136 @@
+﻿# 13.1: Build the Enterprise Framework
+
+You have reached the pinnacle of the Automation Skill Authority curriculum. Over the last 75 modules, you have mastered Locators, Network Interception, POM, Fixtures, and Orchestration. 
+
+Now, you must prove you can build a production-ready system from the ground up.
+
+<div className="bg-slate-900 border border-slate-700 p-6 rounded-xl my-8">
+  <h3 className="text-cyan-400 font-bold m-0 mb-2 flex items-center gap-2">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    The Mission
+  </h3>
+  <div className="text-slate-300 m-0">
+    Your company is migrating from Selenium to Playwright. The Director of QA has tasked you with building the architectural foundation of the new Enterprise E2E Suite. You are not just writing tests; you are building the <strong>engine</strong> that 50 other developers will use.
+  </div>
+</div>
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Construct a 4-Layer Architecture (POM, API, Fixtures, Tests)
+- Integrate Github Actions & Reporting
+
+## Architectural Requirements
+
+To pass this Capstone, your repository must contain the following **4-Layer Enterprise Architecture**:
+
+### 1. The Page Object Model (POM) Layer
+You must construct a deeply nested Page Object architecture. 
+*   **BasePage:** A custom class that wraps standard Playwright actions (click, fill) with automatic logging and custom retry mechanics.
+*   **DomainPages:** Login, Dashboard, and Checkout pages that inherit from the `BasePage`.
+
+### 2. The API / Hybrid Layer
+UI testing alone is too slow for enterprise CI/CD. 
+*   You must build an `APIRequestBuilder` utility.
+*   Your tests must use `request.post()` to automatically generate test data (e.g., seeding a user account) in the `beforeEach` block, before the UI test even begins.
+
+### 3. The Custom Fixtures Layer
+The heart of Playwright extensibility.
+*   Extend the base `test` object in a `fixtures.ts` file.
+*   Inject your Page Objects directly into the test signatures (e.g., `test('Checkout', async ({ checkoutPage }) => { ... })`).
+*   Implement a custom Fixture that captures browser console errors and fails the test automatically if an error is detected.
+
+### 4. The Orchestration Layer
+The framework is useless if it doesn't run in the cloud.
+*   Write a complete `playwright.config.ts`.
+*   Configure **Test Data Management** using `.env` files for `STAGING` and `PRODUCTION`.
+*   Create a `.github/workflows/playwright.yml` file to execute tests on `push` to `main`, archiving the HTML reports.
+
+## The Challenge
+
+Below is your empty IDE. You must write the code for the `fixtures.ts` and `playwright.config.ts` files that satisfy the Enterprise Requirements above. 
+
+> [!WARNING]
+> This is a strict evaluation. The ASA validation engine will statically analyze your Abstract Syntax Tree to ensure you are actually using `test.extend` and configuring `retries` properly.
+
+Good luck, Architect.
+
+<CodeEditor
+  moduleId="108-capstone-project"
+  taskIndex={0}
+/>
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="108-capstone-project"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="capstone-project" />

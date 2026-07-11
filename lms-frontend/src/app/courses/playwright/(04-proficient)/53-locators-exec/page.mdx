@@ -1,0 +1,212 @@
+﻿# 10.2: Dynamic Tables & Lists
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Interact with specific cells in dynamic tables
+
+## The Challenge of Dynamic Tables
+
+Static tables are easy — you know what data will be there. But real-world enterprise apps have **dynamic tables** where:
+- Data changes based on server state
+- Rows are added, removed, or reordered between test runs
+- Tables are paginated across multiple pages
+- Sorting/filtering changes what's visible
+
+Your tests must handle all of this without becoming brittle.
+
+## Fundamental Table Strategies
+
+### Strategy 1: Test by Content, Not Position
+
+```typescript
+// ❌ Fragile — breaks if the row order changes
+await page.getByRole('row').nth(2).getByRole('button', { name: 'Edit' }).click();
+
+// ✅ Resilient — finds the row regardless of position
+await page.getByRole('row')
+  .filter({ hasText: 'DOC-2024-001' })
+  .getByRole('button', { name: 'Edit' })
+  .click();
+```
+
+### Strategy 2: Verify Data Existence, Not Count
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ Fragile — fails if someone adds a new document
+await expect(page.getByRole('row')).toHaveCount(15);
+
+// ✅ Resilient — checks the condition you actually care about
+await expect(page.getByRole('row').filter({ hasText: 'Q3 Report' })).toBeVisible();
+```
+
+## Working with Paginated Tables
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('find a document across multiple pages', async ({ page }) => {
+  await page.goto('/documents');
+  
+  const targetDocId = 'DOC-2024-0099';
+  let found = false;
+  
+  while (!found) {
+    const targetRow = page.getByRole('row').filter({ hasText: targetDocId });
+    
+    if (await targetRow.isVisible()) {
+      found = true;
+      await targetRow.getByRole('button', { name: 'View' }).click();
+    } else {
+      // Go to the next page
+      const nextButton = page.getByRole('button', { name: 'Next' });
+      if (await nextButton.isDisabled()) {
+        throw new Error(`Document ${targetDocId} not found on any page`);
+      }
+      await nextButton.click();
+      // Wait for the table to reload
+      await expect(page.getByRole('progressbar')).toBeHidden();
+    }
+  }
+});
+```
+
+## Extracting Data from a Table
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('export and verify all document titles', async ({ page }) => {
+  await page.goto('/documents');
+  
+  // Get all rows (excluding header row)
+  const dataRows = page.getByRole('row').filter({ hasText: /DOC-\d+/ });
+  const count = await dataRows.count();
+  
+  const documentIds: string[] = [];
+  
+  for (let i = 0; i < count; i++) {
+    const row = dataRows.nth(i);
+    const idCell = row.getByRole('cell').first();
+    let id = await idCell.textContent();
+    if (id) documentIds.push(id.trim());
+  }
+  
+  console.log('Found documents:', documentIds);
+  expect(documentIds.length).toBeGreaterThan(0);
+  expect(documentIds.every(id => id.startsWith('DOC-'))).toBeTruthy();
+});
+```
+
+## Testing Sort Functionality
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('documents table sorts by date correctly', async ({ page }) => {
+  await page.goto('/documents');
+  
+  // Click the Date column header to sort ascending
+  await page.getByRole('columnheader', { name: 'Date' }).click();
+  
+  // Get the dates from the first and last row
+  const firstDate = await page.getByRole('row').nth(1)
+    .getByRole('cell').nth(2).textContent();
+  const lastDate = await page.getByRole('row').last()
+    .getByRole('cell').nth(2).textContent();
+  
+  // Verify ascending order
+  expect(new Date(firstDate!).getTime()).toBeLessThan(new Date(lastDate!).getTime());
+  
+  // Click again to sort descending
+  await page.getByRole('columnheader', { name: 'Date' }).click();
+  
+  // Verify order reversed
+  const newFirstDate = await page.getByRole('row').nth(1)
+    .getByRole('cell').nth(2).textContent();
+  expect(new Date(newFirstDate!).getTime()).toBeGreaterThan(new Date(lastDate!).getTime());
+});
+```
+
+## Testing Search/Filter Functionality
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('search filters the document list', async ({ page }) => {
+  await page.goto('/documents');
+  
+  const initialCount = await page.getByRole('row').filter({ hasText: /DOC-/ }).count();
+  
+  // Type in the search box
+  await page.getByRole('searchbox').fill('Clinical Trial');
+  
+  // Wait for the table to update
+  await expect(page.getByRole('progressbar')).toBeHidden();
+  
+  const filteredCount = await page.getByRole('row').filter({ hasText: /DOC-/ }).count();
+  
+  // Filtered results should be fewer than original
+  expect(filteredCount).toBeLessThan(initialCount);
+  
+  // All visible rows should contain the search term
+  const allRows = page.getByRole('row').filter({ hasText: /DOC-/ });
+  const count = await allRows.count();
+  
+  for (let i = 0; i < count; i++) {
+    const text = await allRows.nth(i).textContent();
+    expect(text?.toLowerCase()).toContain('clinical trial');
+  }
+});
+```
+
+## Handling Loading States
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// After a table action (sort, filter, paginate), always wait for loading to complete
+const loadingSpinner = page.getByRole('progressbar');
+
+// Pattern 1: Wait for spinner to appear then disappear
+await expect(loadingSpinner).toBeVisible({ timeout: 2000 });
+await expect(loadingSpinner).toBeHidden({ timeout: 10000 });
+
+// Pattern 2: Wait for the first row to appear
+await expect(page.getByRole('row').nth(1)).toBeVisible();
+```
+
+## Challenge Exercise
+
+**Scenario**: A recent deployment changed the DOM structure of the payment processing page, breaking your automated tests.
+
+**Problem Statement**: The generic CSS selector `.submit-btn` now matches three hidden elements on the page, causing Playwright strict mode errors.
+
+**Requirements**:
+- Investigate the broken locator.
+- Refactor the locator to use a robust, accessibility-first approach.
+
+**Success Criteria**:
+- The locator specifically targets the visible 'Process Payment' button.
+- The script uses `getByRole` or similar robust methods.
+
+<CodeEditor
+  moduleId="53-locators-exec"
+  taskIndex={0}
+/>
+
+
+## Summary
+
+We practiced executing tests with advanced locators. You applied component-based locators to target specific elements within dynamic lists and tables, ensuring your tests interact with the correct UI components.
+
+
+export const astRules = [
+  {
+    type: "ast_callee_any",
+    values: ["page.getByRole", "page.getByText", "page.getByLabel", "page.getByPlaceholder"],
+    message: "You must use an accessible web-first locator (e.g., getByRole or getByText)."
+  }
+];

@@ -1,0 +1,240 @@
+﻿# 15.3: Multi-Step Approval Flows
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Verify end-to-end status transitions with signatures
+
+## The Complete E-Sign Test Scenario
+
+In a pharmaceutical DMS, a complete E-Sign workflow looks like this:
+
+```
+QA Engineer creates a Protocol document (Admin)
+       ↓
+Document submitted for review (Admin)
+       ↓
+Reviewer receives notification
+       ↓
+Reviewer reads the document
+       ↓
+Reviewer signs with reason + password (Reviewer)
+       ↓
+System records the signature in the Audit Trail
+       ↓
+Document status → "Approved"
+       ↓
+QA Auditor verifies the audit trail is complete
+```
+
+## Complete Test Suite Implementation
+
+```typescript
+// tests/e-sign/complete-workflow.spec.ts
+import { test, expect } from '../../fixtures/baseTest';
+import { DocumentBuilder } from '../../entities/DocumentBuilder';
+
+test.describe('E-Sign Complete Workflow', () => {
+  // Enforce serial mode since tests must run sequentially and share state
+  test.describe.configure({ mode: 'serial' });
+  
+  let documentId: string;
+
+  // Create a fresh test document before the workflow starts
+  test.beforeEach(async ({ uploadPage }) => {
+    // Run-once guard to prevent recreation on subsequent tests
+    if (documentId) return;
+
+    const doc = new DocumentBuilder()
+      .withTitle(`Test Protocol ${Date.now()}`)
+      .withType('Protocol')
+      .withDepartment('Regulatory')
+      .build();
+    
+    documentId = await uploadPage.uploadDocument(doc);
+    console.log(`Created test document: ${documentId}`);
+  });
+
+  test('1. Admin submits document for review', async ({ documentPage }) => {
+    await documentPage.navigateTo(documentId);
+    await documentPage.submitForReview();
+    await expect(documentPage.getStatusBadge(documentId)).toContainText('Pending Review');
+  });
+
+  test('2. Reviewer can open and read the document', async ({ eSignPage }) => {
+    await eSignPage.openDocument(documentId);
+    
+    // Verify document content is accessible
+    await expect(eSignPage.documentTitle).toBeVisible();
+    await expect(eSignPage.documentContent).toBeVisible();
+    
+    // Verify the Sign button is present but requires intent
+    await expect(eSignPage.signButton).toBeVisible();
+    await expect(eSignPage.signButton).toBeEnabled();
+  });
+
+  test('3. Reviewer successfully signs the document', async ({ eSignPage }) => {
+    await eSignPage.openDocument(documentId);
+    
+    await eSignPage.signDocument({
+      reason: 'Protocol reviewed and compliant with ICH E6(R2) guidelines',
+      password: process.env.REVIEWER_PASS!,
+      comment: 'No deviations found. All sections complete.'
+    });
+    
+    // Verify immediate success feedback
+    await expect(eSignPage.signatureConfirmation).toBeVisible();
+    await expect(eSignPage.signatureConfirmation).toContainText('Document signed successfully');
+  });
+
+  test('4. Document status reflects the approval', async ({ documentPage }) => {
+    await documentPage.navigate();
+    
+    const statusBadge = documentPage.getStatusBadge(documentId);
+    await expect(statusBadge).toContainText('Approved');
+    
+    // Verify the approval date is visible
+    const approvalDate = documentPage.getApprovalDate(documentId);
+    await expect(approvalDate).toBeVisible();
+  });
+
+  test('5. Audit trail is complete and accurate', async ({ auditPage }) => {
+    await auditPage.navigateTo(documentId);
+    
+    const entries = auditPage.getAllEntries();
+    const count = await entries.count();
+    
+    // Should have at least 3 entries: Created, Submitted, Signed
+    expect(count).toBeGreaterThanOrEqual(3);
+    
+    const latestEntry = auditPage.getLatestEntry();
+    await expect(latestEntry.action).toContainText('Signed');
+    await expect(latestEntry.user).toContainText(process.env.REVIEWER_USER!);
+    await expect(latestEntry.reason).toContainText('ICH E6(R2)');
+  });
+
+  test('6. Approved document cannot be re-signed', async ({ eSignPage }) => {
+    await eSignPage.openDocument(documentId);
+    
+    // Sign button should not be available on approved documents
+    await expect(eSignPage.signButton).not.toBeVisible();
+    await expect(eSignPage.approvedBadge).toBeVisible();
+  });
+});
+```
+
+## Cross-Browser Execution
+
+Run the complete workflow across all target browsers:
+
+```bash
+# Run on all browsers defined in playwright.config.ts
+npx playwright test tests/e-sign/complete-workflow.spec.ts
+
+# Run only on Chrome for quick validation
+npx playwright test tests/e-sign/complete-workflow.spec.ts --project=chromium
+
+# Run in headed mode to observe the workflow visually
+npx playwright test tests/e-sign/complete-workflow.spec.ts --headed --project=chromium
+```
+
+## Network Interception for Reliability
+
+Some E-Sign operations are slow (server-side crypto, email notifications). Use network waiting to ensure the test doesn't proceed until the backend has processed the signature:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('signing completes with server confirmation', async ({ page, eSignPage }) => {
+  // Set up the network interceptor BEFORE triggering the action
+  const signatureResponse = page.waitForResponse(
+    resp => resp.url().includes('/api/signatures') && resp.status() === 201
+  );
+  
+  await eSignPage.openDocument(documentId);
+  await eSignPage.signDocument({ reason: 'Approved', password: process.env.REVIEWER_PASS! });
+  
+  // Wait for the server to respond
+  const response = await signatureResponse;
+  const body = await response.json();
+  
+  expect(body.signatureId).toBeDefined();
+  expect(body.hash).toMatch(/^[a-f0-9]{64}$/);  // SHA-256 hash
+  expect(body.timestamp).toBeDefined();
+});
+```
+
+<CodeEditor
+  moduleId="74-esign-exec"
+  taskIndex={0}
+  placeholder="// Task: Write a test that verifies the audit trail displays the reviewer's identity.&#10;// Requirements:&#10;//   1. Navigate to a specific document's audit trail&#10;//   2. Get the latest audit entry&#10;//   3. Assert the entry's user field contains the reviewer's email&#10;//&#10;// Use the auditPage fixture"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('audit trail shows reviewer name', async ({ auditPage }) => {
+  await auditPage.navigateTo('DOC-001');
+  const latestEntry = auditPage.getLatestEntry();
+  await expect(latestEntry.user).toContainText('reviewer@example.com');
+});
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="74-esign-exec"
+  taskIndex={1}
+  placeholder={`# Challenge: Complete the command line task
+# Write the correct command below:
+`}
+/>
+<Quiz moduleId="esign-exec" />
+

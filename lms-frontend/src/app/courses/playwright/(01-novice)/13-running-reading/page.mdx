@@ -1,0 +1,124 @@
+﻿
+# 1.4: Running & Reading Results
+
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Complete 1.4: Running & Reading Results
+
+## The Playwright CLI
+
+So far, you've used `npx playwright test` to run all your tests. But as your project grows, running hundreds of tests every time you make a tiny change takes too long.
+
+Playwright's Command Line Interface (CLI) gives you fine-grained control over what runs.
+
+### 1. Headless vs. Headed
+
+By default, Playwright runs tests in **headless** mode. The browser runs in the background, without a visible window. It's fast, but you can't see what's happening.
+
+To watch the browser actually open and click things:
+
+```bash
+npx playwright test --headed
+```
+
+### 2. Open the HTML Report
+
+To see a beautiful HTML breakdown of your test results:
+
+```bash
+npx playwright show-report
+```
+
+The HTML report is your best friend. When you run `show-report`, notice the sidebar and the test details:
+
+1. **Test Steps:** Playwright breaks down every `await` line into a distinct step in the report, showing you exactly how many milliseconds it took.
+2. **Browsers:** You'll see results for `chromium`, `firefox`, and `webkit`. You can filter by browser using the tabs at the top.
+3. **Attachments:** If a test fails, Playwright can automatically attach screenshots and "traces" (a full recording of the test) to this report. We'll explore traces in a later module.
+
+### 3. Run a Specific File
+
+If you only want to run the tests inside `tests/navigation.spec.ts`:
+
+```bash
+npx playwright test tests/navigation.spec.ts
+```
+
+### 4. Run a Specific Test by Name
+
+If a file has multiple tests, but you only want to run the one named "click the Get Started link":
+
+```bash
+npx playwright test --grep "click the Get Started"
+```
+
+The `--grep` flag searches for tests matching that name and only runs those.
+
+## Exercise
+
+Try these commands in your terminal:
+1. Run all tests in headed mode. Watch the browsers pop up!
+2. Open the HTML report to see what happened.
+3. Run *only* your assertions test file.
+4. Use `--grep` to run a test by its title.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Forgetting `--project`**  
+> **Wrong:** `npx playwright test --headed` (Opens 3 browsers at once!)  
+> **Correct:** `npx playwright test --headed --project=chromium`  
+> **Why:** If you don't specify a project, Playwright runs the test across all configured browsers (Chromium, Firefox, WebKit) simultaneously, which can be visually overwhelming when debugging in headed mode.
+
+> [!WARNING]
+> **Mistake 2: Stale Reports**  
+> **Wrong:** Relying on an old `playwright-report` folder without re-running tests.  
+> **Correct:** The report updates automatically, but always verify the timestamp in the report header.
+
+---
+
+## Challenge Exercise
+
+You have learned the core CLI flags. Now combine them.
+
+**Scenario:** You have a massive test suite, but you only want to visually debug the "smoke" tests on Firefox.
+
+**Your Task:** Write the exact terminal command to run tests that have the word `@smoke` in their title, using the Firefox browser, with the browser window visible.
+
+**Constraints:**
+- ✅ You MUST use the `npx playwright test` command
+- ✅ You MUST combine three different CLI flags
+
+<CodeEditor
+  moduleId="13-running-reading"
+  taskIndex={0}
+  placeholder={`# Write your terminal command below:\n\n`}
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```bash
+npx playwright test --grep "@smoke" --project=firefox --headed
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| CLI Control | Running specific tests saves massive amounts of time |
+| Headed Mode | `--headed` lets you visually verify what the test is doing |
+| Filtering | `--grep` and passing file paths allows precise execution |
+| HTML Report | The `show-report` command is your primary debugging dashboard |
+
+> [!TIP]
+> **Next Step:** Proceed to the Break It module to see how test failures appear in the report.
+
+<Quiz moduleId="13-running-reading" />

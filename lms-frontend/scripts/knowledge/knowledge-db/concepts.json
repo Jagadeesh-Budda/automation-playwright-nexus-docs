@@ -1,0 +1,2104 @@
+[
+  {
+    "name": "Language Fundamentals",
+    "description": "Covers understand basic js types., understand js functions., understand objects and arrays., understand object literals., understand the event loop., understand the dom., recognize interfaces, types, and classes., master if/else, switch, and try/catch blocks., understand import, export, and module scope., understand ts and classes., create generic functions, interfaces, and utility types from scratch.",
+    "headings": [
+      "0.1: Variables & Data Types",
+      "Learning Objectives",
+      "1. What is a Variable?",
+      "Visualizing Memory",
+      "2. The Death of `var`",
+      "3. The Golden Rule: Default to `const`",
+      "Why is this important?",
+      "4. When to use `let`",
+      "5. Interactive Challenge: Fixing an Assignment Error",
+      "6. Primitives: The Basic Data Types",
+      "7. Strict Equality (`===` vs `==`)",
+      "The Solution: Triple Equals",
+      "8. Interactive Challenge: Assertion Bugs",
+      "Challenge Exercise",
+      "0.2: Functions & Scope",
+      "1. What is a Function?",
+      "Traditional Functions (The Old Way)",
+      "2. Arrow Functions (The Modern Way)",
+      "The Implicit Return",
+      "3. Interactive Challenge: Convert to Arrow",
+      "4. Lexical Scope (Visibility)",
+      "5. The Core Secret: Callbacks",
+      "Why do we care?",
+      "The Standard Inline Syntax",
+      "6. Interactive Challenge: Write a Callback",
+      "0.3: Arrays & ES6",
+      "1. Deep Dive: Objects",
+      "2. Object Destructuring (Critical for Playwright)",
+      "Destructuring in Playwright Signatures",
+      "3. Deep Dive: Arrays",
+      "4. Functional Iteration: Map & Filter",
+      "`.map()`",
+      "`.filter()`",
+      "5. Interactive Challenge: Map Data",
+      "6. The Spread Operator (`...`)",
+      "1. The Object Literal Syntax",
+      "Accessing Data (Dot Notation)",
+      "2. Objects in Automation (Test Data)",
+      "3. Nested Objects",
+      "4. Modifying Objects",
+      "5. Destructuring (ES6 Magic)",
+      "6. Playwright Options Objects",
+      "7. Interactive Challenge: Test Data Objects",
+      "1. The Restaurant Analogy (The Event Loop)",
+      "2. Promises",
+      "3. Async / Await",
+      "4. The Fatal Flaw in Automation",
+      "5. Interactive Challenge: Fix the Flaky Script",
+      "6. Promise.all()",
+      "0.6: DOM & HTML Basics",
+      "1. What is the DOM?",
+      "2. Identifying Elements (CSS Selectors)",
+      "A. Tag Name",
+      "B. ID (`#`)",
+      "C. Class Name (`.`)",
+      "D. Attribute Selectors (`[]`)",
+      "3. The Modern Approach: Accessibility Locators",
+      "4. Interactive Challenge: Write Accessibility Locators",
+      "1. Catching Bugs Before You Run",
+      "2. Basic Type Annotations",
+      "3. Function Parameters",
+      "4. Interfaces (Defining Object Shapes)",
+      "5. The Playwright `Page` Type",
+      "6. Interactive Challenge: Typing an API Response",
+      "0.8: Control Flow & Error Handling",
+      "1. The `if / else` Statement",
+      "Playwright Application",
+      "2. Logical Operators (AND / OR / NOT)",
+      "AND (`&&`)",
+      "OR (`||`)",
+      "NOT (`!`)",
+      "3. Graceful Error Handling: `try / catch`",
+      "4. Interactive Challenge: Safely Catch an API Failure",
+      "0.9: ES Modules & Imports",
+      "1. What is a Module?",
+      "2. Named Exports",
+      "The Origin File: `utils.js`",
+      "The Consumer File: `test.spec.js`",
+      "3. Default Exports",
+      "The Origin File: `LoginPage.js`",
+      "4. The Playwright Import Signature",
+      "5. Interactive Challenge: Fix the Import",
+      "Pre-4: TypeScript Classes Deep Dive",
+      "1. The Problem: Messy Tests",
+      "2. Why TypeScript?",
+      "2. Interfaces & Types",
+      "3. Object-Oriented Programming (Classes)",
+      "Encapsulation and Constructors",
+      "Instantiation in Tests",
+      "4. Interactive Challenge: Build a POM",
+      "Congratulations!",
+      "Pre-5: TypeScript Generics Deep Dive",
+      "1. The Problem Generics Solve",
+      "2. Your First Generic Function",
+      "The Arrow Function Version",
+      "3. Multiple Type Parameters",
+      "4. Generic Constraints",
+      "5. Generic Interfaces",
+      "6. Built-in Utility Types",
+      "`Partial` — Make all properties optional",
+      "`Pick` — Select specific properties",
+      "`Omit` — Remove specific properties",
+      "`Record` — Create a typed dictionary",
+      "Composing Utility Types",
+      "7. The Factory Pattern (Why This Matters for Playwright)",
+      "8. Interactive Challenge: Build a Generic API Response Parser",
+      "9. How This Connects to Playwright"
+    ],
+    "sourceLessons": [
+      {
+        "id": "01-js-ts-variables",
+        "title": "0.1: Variables & Data Types",
+        "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION"
+      },
+      {
+        "id": "02-js-ts-functions",
+        "title": "0.2: Functions & Scope",
+        "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION"
+      },
+      {
+        "id": "03-js-ts-es6",
+        "title": "0.3: Arrays & ES6",
+        "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION"
+      },
+      {
+        "id": "04-js-ts-objects",
+        "title": "0.4: Objects & Literals",
+        "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION"
+      },
+      {
+        "id": "05-js-ts-async",
+        "title": "0.5: Async/Await & Promises",
+        "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION"
+      },
+      {
+        "id": "06-js-ts-dom",
+        "title": "0.6: DOM & HTML Basics",
+        "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION"
+      },
+      {
+        "id": "07-js-ts-lite",
+        "title": "0.7: TypeScript Lite",
+        "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION"
+      },
+      {
+        "id": "08-js-ts-control-flow",
+        "title": "0.8: Control Flow & Error Handling",
+        "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION"
+      },
+      {
+        "id": "09-js-ts-modules",
+        "title": "0.9: ES Modules & Imports",
+        "group": "🌱 MODULE 0: JS/TS FOR AUTOMATION"
+      },
+      {
+        "id": "23-js-ts-ts-oop",
+        "title": "Pre-4: TypeScript Classes Deep Dive",
+        "group": "🏛️ MODULE 4: PAGE OBJECTS"
+      },
+      {
+        "id": "28-js-ts-generics",
+        "title": "Pre-5: TypeScript Generics Deep Dive",
+        "group": "🧩 MODULE 5: FIXTURES & DI"
+      }
+    ],
+    "confidence": 0.95,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/01-js-ts-variables/page.mdx",
+        "heading": "0.1: Variables & Data Types",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/02-js-ts-functions/page.mdx",
+        "heading": "0.2: Functions & Scope",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/03-js-ts-es6/page.mdx",
+        "heading": "0.3: Arrays & ES6",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/04-js-ts-objects/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/05-js-ts-async/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/06-js-ts-dom/page.mdx",
+        "heading": "0.6: DOM & HTML Basics",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/07-js-ts-lite/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/08-js-ts-control-flow/page.mdx",
+        "heading": "0.8: Control Flow & Error Handling",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/09-js-ts-modules/page.mdx",
+        "heading": "0.9: ES Modules & Imports",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/23-js-ts-ts-oop/page.mdx",
+        "heading": "Pre-4: TypeScript Classes Deep Dive",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/28-js-ts-generics/page.mdx",
+        "heading": "Pre-5: TypeScript Generics Deep Dive",
+        "lineRange": "1-100"
+      }
+    ]
+  },
+  {
+    "name": "Core Automation",
+    "description": "Covers run a playwright test., interact with a page., verify page state., understand cli and reports., understand failure and error reading.",
+    "headings": [
+      "1.1: Your First Test",
+      "Learning Objectives",
+      "The Goal",
+      "Step 1: Initialize Playwright",
+      "Step 2: Look at What Was Created",
+      "Step 3: Write Your First Test",
+      "Breaking it down:",
+      "Step 4: Run It!",
+      "Step 5: Read the Report",
+      "Practice Exercise",
+      "Challenge Exercise",
+      "1.2: Navigating & Clicking",
+      "Interacting with the Page",
+      "How Playwright Finds Things: `getByRole`",
+      "The `.click()` Action",
+      "Checking the URL",
+      "1.3: Writing Assertions",
+      "What is an Assertion?",
+      "The Essential 5 Assertions",
+      "1. `toHaveTitle()`",
+      "2. `toHaveURL()`",
+      "3. `toBeVisible()`",
+      "4. `toHaveText()`",
+      "5. `toContainText()`",
+      "Auto-Retrying",
+      "Exercise",
+      "1.4: Running & Reading Results",
+      "The Playwright CLI",
+      "1. Headless vs. Headed",
+      "2. Open the HTML Report",
+      "3. Run a Specific File",
+      "4. Run a Specific Test by Name",
+      "1.5: Break It On Purpose",
+      "Fear of the Red X",
+      "Intentionally Break a Test",
+      "Reading the Error Message",
+      "The HTML Report",
+      "The Fix Cycle"
+    ],
+    "sourceLessons": [
+      {
+        "id": "10-first-test",
+        "title": "1.1: Your First Test",
+        "group": "🚀 MODULE 1: YOUR FIRST TEST"
+      },
+      {
+        "id": "11-navigating-clicking",
+        "title": "1.2: Navigating & Clicking",
+        "group": "🚀 MODULE 1: YOUR FIRST TEST"
+      },
+      {
+        "id": "12-writing-assertions",
+        "title": "1.3: Writing Assertions",
+        "group": "🚀 MODULE 1: YOUR FIRST TEST"
+      },
+      {
+        "id": "13-running-reading",
+        "title": "1.4: Running & Reading Results",
+        "group": "🚀 MODULE 1: YOUR FIRST TEST"
+      },
+      {
+        "id": "14-break-it",
+        "title": "1.5: Break It On Purpose",
+        "group": "🚀 MODULE 1: YOUR FIRST TEST"
+      }
+    ],
+    "confidence": 0.96,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/10-first-test/page.mdx",
+        "heading": "1.1: Your First Test",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/11-navigating-clicking/page.mdx",
+        "heading": "1.2: Navigating & Clicking",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/12-writing-assertions/page.mdx",
+        "heading": "1.3: Writing Assertions",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/13-running-reading/page.mdx",
+        "heading": "1.4: Running & Reading Results",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/14-break-it/page.mdx",
+        "heading": "1.5: Break It On Purpose",
+        "lineRange": "1-100"
+      }
+    ]
+  },
+  {
+    "name": "Locators & Assertions",
+    "description": "Covers use semantic locators., master expect matchers., work with lists and tables., fix ambiguous locators., isolate elements using complex filtering logic, automate complex data grid interactions, encapsulate ui regions into reusable components, extend the playwright assertion engine for business logic",
+    "headings": [
+      "2.1: getByRole & Friends",
+      "Learning Objectives",
+      "The Locator Priority Ladder",
+      "1. `getByRole` (The Gold Standard)",
+      "2. `getByLabel` (For Forms)",
+      "3. `getByText` (For Static Content)",
+      "4. `getByTestId` (The Escape Hatch)",
+      "Exercise",
+      "Challenge Exercise",
+      "2.2: Assertions Deep Dive",
+      "Expanding Your Toolkit",
+      "1. `toBeEnabled()` / `toBeDisabled()`",
+      "2. `toBeChecked()`",
+      "3. `toHaveAttribute()`",
+      "4. `toHaveCount()`",
+      "Auto-Retrying Assertions",
+      "Soft Assertions",
+      "2.3: Dynamic Elements",
+      "The Problem with Lists",
+      "Solution 1: Chaining Locators",
+      "Solution 2: Filtering",
+      "Solution 3: Indexing (Use with Caution)",
+      "Putting It Together: The Table Pattern",
+      "2.4: Strict Mode & Debugging Basics",
+      "The \"Strict Mode\" Violation",
+      "Why does it crash?",
+      "How to fix a Strict Mode Violation",
+      "Debugging: `page.pause()`",
+      "UI Mode (The Ultimate Debugger)",
+      "The Problem: Multiple Matching Elements",
+      "The `.filter()` Method",
+      "Filter Options",
+      "`hasText` — Filter by visible text",
+      "`has` — Filter by child locator",
+      "`hasNot` — Exclude elements containing something",
+      "Chaining Filters",
+      "Targeting by Position: `.first()`, `.last()`, `.nth()`",
+      "Counting Matched Elements",
+      "Real-World Example: DMS Document Table",
+      "Iterating Over All Matching Elements",
+      "The Challenge of Dynamic Tables",
+      "Fundamental Table Strategies",
+      "Strategy 1: Test by Content, Not Position",
+      "Strategy 2: Verify Data Existence, Not Count",
+      "Working with Paginated Tables",
+      "Extracting Data from a Table",
+      "Testing Sort Functionality",
+      "Testing Search/Filter Functionality",
+      "Handling Loading States",
+      "Where Do Locators Live?",
+      "The Recommended Page Object Pattern",
+      "Using Dynamic Locator Methods in Tests",
+      "Nested Component Hierarchies",
+      "Complex Widget Automation",
+      "Date Picker",
+      "Autocomplete / Typeahead",
+      "Composition Over Inheritance",
+      "Dynamic Pages (Role-Based & Feature Flags)",
+      "Multi-Tab Page Objects",
+      "Anti-Patterns to Avoid",
+      "❌ Anti-Pattern 1: Locators as methods (recreated every call)",
+      "✅ Correct: Locators as properties (created once, assigned in constructor)",
+      "❌ Anti-Pattern 2: CSS strings scattered everywhere",
+      "✅ Correct: Semantic locators",
+      "❌ Anti-Pattern 3: Assertions inside Page Objects",
+      "✅ Correct: Return state, let the test assert",
+      "The Assertion Philosophy",
+      "Page-Level Assertions",
+      "Element Visibility & State",
+      "⚠️ Negation Semantics: A Critical Distinction",
+      "Text Content Assertions",
+      "Attribute Assertions",
+      "Count & Value Assertions",
+      "Soft Assertions: Collect All Failures",
+      "Custom Error Messages",
+      "Custom Matchers with `expect.extend()`",
+      "`expect.poll()` — Retry Arbitrary Functions",
+      "When to use `expect.poll()` vs `expect.toPass()`",
+      "Snapshot Testing for Data",
+      "Assertion Best Practices",
+      "✅ Assert state, not implementation",
+      "✅ One assertion per concern",
+      "✅ Use custom messages for complex flows"
+    ],
+    "sourceLessons": [
+      {
+        "id": "15-getbyrole",
+        "title": "2.1: getByRole & Friends",
+        "group": "🔍 MODULE 2: LOCATORS & ASSERTIONS"
+      },
+      {
+        "id": "16-assertions-deep",
+        "title": "2.2: Assertions Deep Dive",
+        "group": "🔍 MODULE 2: LOCATORS & ASSERTIONS"
+      },
+      {
+        "id": "17-dynamic-elements",
+        "title": "2.3: Dynamic Elements",
+        "group": "🔍 MODULE 2: LOCATORS & ASSERTIONS"
+      },
+      {
+        "id": "18-strict-mode",
+        "title": "2.4: Strict Mode & Debugging Basics",
+        "group": "🔍 MODULE 2: LOCATORS & ASSERTIONS"
+      },
+      {
+        "id": "52-locators-code",
+        "title": "10.1: Advanced Locator Composition",
+        "group": "🗝️ MODULE 10: ADVANCED LOCATORS"
+      },
+      {
+        "id": "53-locators-exec",
+        "title": "10.2: Dynamic Tables & Lists",
+        "group": "🗝️ MODULE 10: ADVANCED LOCATORS"
+      },
+      {
+        "id": "54-locators-arch",
+        "title": "10.3: Component-Based Locators",
+        "group": "🗝️ MODULE 10: ADVANCED LOCATORS"
+      },
+      {
+        "id": "64-adv-assertions",
+        "title": "14.2: Custom Expect Assertions",
+        "group": "⚡ MODULE 14: ADVANCED FEATURES"
+      }
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/15-getbyrole/page.mdx",
+        "heading": "2.1: getByRole & Friends",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/16-assertions-deep/page.mdx",
+        "heading": "2.2: Assertions Deep Dive",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/17-dynamic-elements/page.mdx",
+        "heading": "2.3: Dynamic Elements",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/18-strict-mode/page.mdx",
+        "heading": "2.4: Strict Mode & Debugging Basics",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/52-locators-code/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/53-locators-exec/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/54-locators-arch/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/64-adv-assertions/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      }
+    ]
+  },
+  {
+    "name": "Test Organization & POM",
+    "description": "Covers organize files and specs., group related tests., setup and teardown., experience maintenance pain., understand the pom concept., create a pom class., chain page objects., refactor messy tests.",
+    "headings": [
+      "3.1: Test Organization",
+      "Learning Objectives",
+      "Moving Beyond a Single Test",
+      "1. Multiple Tests in One File",
+      "2. Naming Conventions",
+      "3. Folder Organization",
+      "The Power of Isolation",
+      "Challenge Exercise",
+      "3.2: Describe Blocks",
+      "Grouping Tests",
+      "Why use `describe`?",
+      "1. Better Reporting",
+      "2. Targeted Execution (`--grep`)",
+      "3. Shared Setup",
+      "3.3: Before/After Hooks",
+      "The Repetition Problem",
+      "The Solution: `test.beforeEach`",
+      "Other Hooks",
+      "Exercise",
+      "3.4: The Duplication Problem",
+      "The Limits of `beforeEach`",
+      "The Nightmare Scenario",
+      "The Need for Abstraction",
+      "4.1: What Are Page Objects?",
+      "The Answer to Our Pain",
+      "A Basic Page Object",
+      "How Tests Use Page Objects",
+      "The Nightmare is Over",
+      "4.2: Your First Page Object",
+      "Dissecting a Real Page Object",
+      "Hands-On: Building the Page Object",
+      "Hands-On: Using the Page Object",
+      "4.3: Multi-Page Tests",
+      "The Real World is Multi-Page",
+      "Chaining Page Objects",
+      "Page Objects Returning Page Objects (Advanced)",
+      "4.4: The Refactor Exercise",
+      "Your Mission",
+      "Step 1: Create the Page Object",
+      "Step 2: Refactor the Tests",
+      "Step 3: Verify",
+      "The \"Aha!\" Moment"
+    ],
+    "sourceLessons": [
+      {
+        "id": "19-test-org",
+        "title": "3.1: Test Organization",
+        "group": "📁 MODULE 3: TEST ORGANIZATION"
+      },
+      {
+        "id": "20-describe-blocks",
+        "title": "3.2: Describe Blocks",
+        "group": "📁 MODULE 3: TEST ORGANIZATION"
+      },
+      {
+        "id": "21-before-after",
+        "title": "3.3: Before/After Hooks",
+        "group": "📁 MODULE 3: TEST ORGANIZATION"
+      },
+      {
+        "id": "22-duplication-problem",
+        "title": "3.4: The Duplication Problem",
+        "group": "📁 MODULE 3: TEST ORGANIZATION"
+      },
+      {
+        "id": "24-what-are-poms",
+        "title": "4.1: What Are Page Objects?",
+        "group": "🏛️ MODULE 4: PAGE OBJECTS"
+      },
+      {
+        "id": "25-first-pom",
+        "title": "4.2: Your First Page Object",
+        "group": "🏛️ MODULE 4: PAGE OBJECTS"
+      },
+      {
+        "id": "26-multi-page",
+        "title": "4.3: Multi-Page Tests",
+        "group": "🏛️ MODULE 4: PAGE OBJECTS"
+      },
+      {
+        "id": "27-refactor-exercise",
+        "title": "4.4: The Refactor Exercise",
+        "group": "🏛️ MODULE 4: PAGE OBJECTS"
+      }
+    ],
+    "confidence": 0.96,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/19-test-org/page.mdx",
+        "heading": "3.1: Test Organization",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/20-describe-blocks/page.mdx",
+        "heading": "3.2: Describe Blocks",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/21-before-after/page.mdx",
+        "heading": "3.3: Before/After Hooks",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/22-duplication-problem/page.mdx",
+        "heading": "3.4: The Duplication Problem",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/24-what-are-poms/page.mdx",
+        "heading": "4.1: What Are Page Objects?",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/25-first-pom/page.mdx",
+        "heading": "4.2: Your First Page Object",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/26-multi-page/page.mdx",
+        "heading": "4.3: Multi-Page Tests",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/27-refactor-exercise/page.mdx",
+        "heading": "4.4: The Refactor Exercise",
+        "lineRange": "1-100"
+      }
+    ]
+  },
+  {
+    "name": "Fixtures & Dependency Injection",
+    "description": "Covers understand dependency injection., use test.extend()., chain fixtures., centralize fixtures., design and implement a complete playwright framework from scratch using pom and fixtures., get unstuck if needed., compare your architecture with a reference standard.",
+    "headings": [
+      "5.1: What Are Fixtures?",
+      "Learning Objectives",
+      "The Final Duplication",
+      "Enter Fixtures",
+      "The Magic of Custom Fixtures",
+      "Challenge Exercise",
+      "5.2: Creating Custom Fixtures",
+      "Extending the Base Test",
+      "The Magic of the `use` Callback",
+      "Using the Fixture in a Test",
+      "Exercise",
+      "5.3: Fixture Dependencies",
+      "The Problem: Complex Setup",
+      "Fixtures Depending on Fixtures",
+      "The Dependency Graph",
+      "5.4: The BaseTest Pattern",
+      "The Problem with `fixtures.ts`",
+      "Splitting Fixtures",
+      "The `baseTest.ts` File",
+      "The Final Test Architecture",
+      "Congratulations!",
+      "6.1: The Challenge Brief",
+      "Why This Challenge Matters",
+      "Your Mission",
+      "The Rules",
+      "The Requirements",
+      "1. Business Flows to Test",
+      "2. Technical Constraints",
+      "The Rubric (100 Points)",
+      "6.2: Challenge Hints",
+      "Hint 1: Starting the Project",
+      "Hint 2: The Configuration File",
+      "Hint 3: Locating Todo Elements",
+      "Hint 4: The Fixture Syntax",
+      "Hint 5: Using the Fixture",
+      "6.3: Reference Solution",
+      "1. The Configuration",
+      "2. The Page Object",
+      "3. The Fixture",
+      "4. The Tests",
+      "Grade Yourself",
+      "What To Do Next"
+    ],
+    "sourceLessons": [
+      {
+        "id": "29-what-are-fixtures",
+        "title": "5.1: What Are Fixtures?",
+        "group": "🧩 MODULE 5: FIXTURES & DI"
+      },
+      {
+        "id": "30-custom-fixtures",
+        "title": "5.2: Creating Custom Fixtures",
+        "group": "🧩 MODULE 5: FIXTURES & DI"
+      },
+      {
+        "id": "31-fixture-dependencies",
+        "title": "5.3: Fixture Dependencies",
+        "group": "🧩 MODULE 5: FIXTURES & DI"
+      },
+      {
+        "id": "32-basetest-pattern",
+        "title": "5.4: The BaseTest Pattern",
+        "group": "🧩 MODULE 5: FIXTURES & DI"
+      },
+      {
+        "id": "33-the-brief",
+        "title": "6.1: The Challenge Brief",
+        "group": "🏗️ MODULE 6: THE FRAMEWORK CHALLENGE"
+      },
+      {
+        "id": "34-hints",
+        "title": "6.2: Challenge Hints",
+        "group": "🏗️ MODULE 6: THE FRAMEWORK CHALLENGE"
+      },
+      {
+        "id": "35-reference-solution",
+        "title": "6.3: Reference Solution",
+        "group": "🏗️ MODULE 6: THE FRAMEWORK CHALLENGE"
+      }
+    ],
+    "confidence": 0.95,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/29-what-are-fixtures/page.mdx",
+        "heading": "5.1: What Are Fixtures?",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/30-custom-fixtures/page.mdx",
+        "heading": "5.2: Creating Custom Fixtures",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/31-fixture-dependencies/page.mdx",
+        "heading": "5.3: Fixture Dependencies",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/32-basetest-pattern/page.mdx",
+        "heading": "5.4: The BaseTest Pattern",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/33-the-brief/page.mdx",
+        "heading": "6.1: The Challenge Brief",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/34-hints/page.mdx",
+        "heading": "6.2: Challenge Hints",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/35-reference-solution/page.mdx",
+        "heading": "6.3: Reference Solution",
+        "lineRange": "1-100"
+      }
+    ]
+  },
+  {
+    "name": "Synchronization & Timeouts",
+    "description": "Covers understand playwright's built-in auto-waiting mechanisms., learn when to use web-first assertions instead of explicit waits., master the different timeout layers and how to explicitly wait for states., learn to defeat flakiness by waiting for api responses instead of ui elements.",
+    "headings": [
+      "7.1: Auto Waiting & Actionability",
+      "Learning Objectives",
+      "The Flakiness Problem",
+      "Playwright's Auto-Waiting",
+      "Trust the Framework",
+      "Practice Exercise",
+      "Challenge Exercise",
+      "7.2: Assertions vs Waits",
+      "The Problem with Manual Waits",
+      "Web-First Assertions",
+      "Assertions as Synchronization Points",
+      "7.3: Timeouts & waitFor",
+      "The Three Layers of Timeouts",
+      "1. The Global Test Timeout (Default: 30,000ms)",
+      "2. The Action Timeout (Default: No Timeout)",
+      "3. The Expect Timeout (Default: 5,000ms)",
+      "When to use `.waitFor()`",
+      "The Four States of `waitFor()`",
+      "7.4: Network Synchronization",
+      "The Limits of UI Waiting",
+      "Waiting for the Network",
+      "Why is this better?",
+      "The Promise Pattern"
+    ],
+    "sourceLessons": [
+      {
+        "id": "36-auto-waiting",
+        "title": "7.1: Auto Waiting & Actionability",
+        "group": "⏱️ MODULE 7: SYNCHRONIZATION & RELIABILITY"
+      },
+      {
+        "id": "37-assertions-vs-waits",
+        "title": "7.2: Assertions vs Waits",
+        "group": "⏱️ MODULE 7: SYNCHRONIZATION & RELIABILITY"
+      },
+      {
+        "id": "38-timeouts",
+        "title": "7.3: Timeouts & waitFor",
+        "group": "⏱️ MODULE 7: SYNCHRONIZATION & RELIABILITY"
+      },
+      {
+        "id": "39-network-sync",
+        "title": "7.4: Network Synchronization",
+        "group": "⏱️ MODULE 7: SYNCHRONIZATION & RELIABILITY"
+      }
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/36-auto-waiting/page.mdx",
+        "heading": "7.1: Auto Waiting & Actionability",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/37-assertions-vs-waits/page.mdx",
+        "heading": "7.2: Assertions vs Waits",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/38-timeouts/page.mdx",
+        "heading": "7.3: Timeouts & waitFor",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/39-network-sync/page.mdx",
+        "heading": "7.4: Network Synchronization",
+        "lineRange": "1-100"
+      }
+    ]
+  },
+  {
+    "name": "Enterprise Best Practices",
+    "description": "Covers align with automation skill authority (asa) agile automation delivery, learn how the ast auditor validates your code quality, map your selenium or cypress knowledge to playwright concepts, recognize and fix the 20 most common playwright anti-patterns, master advanced concepts in playwright automation and infrastructure., master advanced concepts in playwright automation and infrastructure.",
+    "headings": [
+      "Learning Objectives",
+      "What is the Sprint Cycle?",
+      "The ASA 5-Day Sprint Model",
+      "Core Tools in the ASA Stack",
+      "Why This Process Matters",
+      "The Definition of Done (DoD)",
+      "Real-World Context: Pharmaceutical DMS",
+      "The Training Wheels Are Coming Off: Introduction to AST Gates",
+      "Challenge Exercise",
+      "What is an AST?",
+      "Why Use an AST Auditor?",
+      "The 5 AST Quality Gates",
+      "Gate 1: No Hardcoded Sleeps",
+      "Gate 2: No Hardcoded Credentials",
+      "Gate 3: Await All Async Operations",
+      "Gate 4: No Direct `page.locator()` in Spec Files",
+      "Gate 5: Every Test Must Have a `test.describe` Block",
+      "Running the AST Auditor",
+      "How the Auditor Works (Simplified)",
+      "If You Know Selenium",
+      "Key Mental Model Shifts",
+      "Before & After: Login Test",
+      "Top 5 Things Selenium Users Get Wrong in Playwright",
+      "If You Know Cypress",
+      "Critical Difference: Architecture",
+      "Before & After: API Interception",
+      "Top 5 Things Cypress Users Get Wrong in Playwright",
+      "Migration Checklist",
+      "From Selenium",
+      "From Cypress",
+      "Why Anti-Patterns Matter",
+      "🔴 Critical Anti-Patterns (Break Tests)",
+      "1. Hardcoded Sleeps",
+      "2. `isVisible()` Without Assertion",
+      "3. Test-Scoped Fixtures in `beforeAll`",
+      "4. Locators Outside Constructor Body",
+      "5. `Promise.race()` for Event + Action",
+      "🟡 Design Anti-Patterns (Hurt Maintainability)",
+      "6. Locators in Spec Files",
+      "7. Assertions Inside Page Objects",
+      "8. `process.env` in Spec Files",
+      "9. CSS/XPath When Role Locators Work",
+      "10. Shared Mutable State Between Tests",
+      "🟠 Performance Anti-Patterns (Slow Suites)",
+      "11. UI Login in Every Test",
+      "12. Not Cleaning Up Test Data",
+      "13. `networkidle` for Everything",
+      "14. `toHaveScreenshot()` Without Masks",
+      "🔵 Structural Anti-Patterns (Poor Architecture)",
+      "15. God Page Object",
+      "16. Deep Inheritance Chains",
+      "17. No Test Isolation",
+      "18. Ignoring Strict Mode Errors",
+      "19. `page.evaluate()` for Everything",
+      "20. No Error Context in Assertions",
+      "Quick Reference: Anti-Pattern Checklist",
+      "MFA TOTP Injection",
+      "The Flakiness of UI Authentication",
+      "Global Setup: The Storage State Blueprint",
+      "Bypassing the UI Entirely (API Token Exchange)",
+      "Dealing with SessionStorage and LocalStorage",
+      "Multi-Role Testing (RBAC)",
+      "Telemetry Pipeline",
+      "Testing vs. Observability",
+      "Distributed Tracing (Correlation IDs)",
+      "Synthetic Monitoring in Production",
+      "Out-of-Band Log Validation",
+      "Protecting Production Analytics (RUM)"
+    ],
+    "sourceLessons": [
+      {
+        "id": "40-onboarding",
+        "title": "8.1: The Sprint Cycle",
+        "group": "🧱 MODULE 8: ENTERPRISE PRACTICES"
+      },
+      {
+        "id": "45-quality-gates",
+        "title": "8.6: AST Quality Gates",
+        "group": "🧱 MODULE 8: ENTERPRISE PRACTICES"
+      },
+      {
+        "id": "47-migration-guide",
+        "title": "8.8: Selenium/Cypress → Playwright",
+        "group": "🧱 MODULE 8: ENTERPRISE PRACTICES"
+      },
+      {
+        "id": "62-anti-patterns",
+        "title": "12.5: The Anti-Pattern Catalog",
+        "group": "🏗️ MODULE 12: ADVANCED ARCHITECTURE"
+      },
+      {
+        "id": "103-adv-auth",
+        "title": "19.2: Advanced Authentication Strategies",
+        "group": "🌐 MODULE 19: ADVANCED ENTERPRISE TOPOLOGIES"
+      },
+      {
+        "id": "106-observability",
+        "title": "19.5: Observability & Monitoring",
+        "group": "🌐 MODULE 19: ADVANCED ENTERPRISE TOPOLOGIES"
+      }
+    ],
+    "confidence": 0.96,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/40-onboarding/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/45-quality-gates/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/47-migration-guide/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/62-anti-patterns/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/103-adv-auth/page.mdx",
+        "heading": "MFA TOTP Injection",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/106-observability/page.mdx",
+        "heading": "Telemetry Pipeline",
+        "lineRange": "1-100"
+      }
+    ]
+  },
+  {
+    "name": "Advanced Browser Controls",
+    "description": "Covers understand isolated execution and state persistence, master a systematic debugging workflow for failing tests, master iframe locators and native browser dialog handling, automate file uploads and downloads including validation, handle popups, new tabs, and multi-window workflows, control time, location, permissions, and device characteristics",
+    "headings": [
+      "8.9: The JavaScript Execution Context",
+      "Learning Objectives",
+      "The Playwright Medium: Node.js",
+      "1. The Call Stack vs. The Microtask Queue",
+      "The Missing `await` Disaster",
+      "2. The `forEach` Trap in Data-Driven Testing",
+      "Why this fails:",
+      "Solution A: Sequential Execution (`for...of`)",
+      "Solution B: Parallel Execution (`Promise.all`)",
+      "3. Worker Scope and Global Variable Leaks",
+      "The Fix: Worker Fixtures or Encapsulation",
+      "4. Advanced Destructuring and Closures in Fixtures",
+      "Fixture Closures",
+      "How `await use()` Actually Works",
+      "5. `Promise.allSettled()` vs `Promise.all()`",
+      "Challenge Exercise",
+      "8.10: Browser Engine & Network Mechanics",
+      "The Illusion of Visibility: DOM Hydration",
+      "Why this breaks Automation",
+      "The Professional Solution",
+      "Network Interception: Playwright's True Superpower",
+      "CDP vs Legacy WebDriver",
+      "Browser Engine Execution",
+      "1. `route.fulfill()` — The Instant Mock",
+      "2. `route.fetch()` — The Proxy Pattern",
+      "3. `route.abort()` — Simulating Catastrophic Failures",
+      "Mocking GraphQL Endpoints",
+      "CORS Headers in Mocked Responses",
+      "The Browser Hierarchy",
+      "What is a Browser Context?",
+      "Context vs Browser: Side-by-Side",
+      "Creating and Using Contexts",
+      "The Power of Saved Auth State",
+      "Multi-User Testing",
+      "Context Options: Fine-Tuning Behavior",
+      "The Debugging Mindset",
+      "Step 1: Reproduce the Failure",
+      "Step 2: Use Trace Viewer",
+      "What to look for in the Trace Viewer",
+      "Step 3: Interactive Debugging",
+      "`page.pause()` — Breakpoint in the Test",
+      "`PWDEBUG=1` — Debug Without Modifying Code",
+      "`--ui` Mode — The Best of Both Worlds",
+      "Step 4: Capture Console Errors",
+      "Step 5: Screenshot Strategies",
+      "On-Failure Screenshots (Automatic)",
+      "Custom Screenshots with Context",
+      "Full-Page Screenshot",
+      "Step 6: Rerunning Failures",
+      "VS Code Playwright Extension",
+      "Common Failure Patterns & Fixes",
+      "Pattern 1: \"Element not found\" but it's on the page",
+      "Pattern 2: Test passes locally, fails in CI",
+      "Pattern 3: Test is flaky (sometimes passes, sometimes fails)",
+      "Pattern 4: Timeout on `page.goto()`",
+      "The Complete Debugging Checklist",
+      "Write the correct command below:",
+      "Working with iframes",
+      "`page.frameLocator()` — The iframe Gateway",
+      "Finding iframes by different selectors",
+      "Nested iframes",
+      "Assertions Inside iframes",
+      "Cross-Origin iframes",
+      "Frame vs FrameLocator",
+      "Real-World Example: Rich Text Editor",
+      "Native Browser Dialogs",
+      "`page.on('dialog')` — The Handler Pattern",
+      "Handling Different Dialog Types",
+      "`alert()` — Information only",
+      "`confirm()` — Accept or Dismiss",
+      "`prompt()` — Accept with Input",
+      "`beforeunload` — Unsaved Changes Warning",
+      "One-Time Dialog Handling with `page.once()`",
+      "Auto-Dismissing All Dialogs",
+      "Real-World Example: Delete with Confirmation",
+      "File Uploads",
+      "Basic File Upload with `setInputFiles()`",
+      "Targeting Hidden File Inputs",
+      "Creating Files on the Fly",
+      "Upload via Buffer (No File on Disk)",
+      "File Upload with Size Validation",
+      "File Type Validation",
+      "Drag and Drop File Upload",
+      "Using the `filechooser` Event",
+      "File Downloads",
+      "Basic Download Handling",
+      "Validating Downloaded File Content",
+      "Download via Readable Stream",
+      "Handling Downloads that Open in New Tab",
+      "Configuring Download Behavior",
+      "Download with Timeout",
+      "Upload → Download Round-Trip Test",
+      "When Do Multi-Tab Scenarios Arise?",
+      "Handling `target=\"_blank\"` Links",
+      "Working with Multiple Pages",
+      "Getting All Open Pages in a Context",
+      "OAuth / SSO Login Popup",
+      "`window.open()` Interception",
+      "Transferring Data Between Tabs",
+      "Handling Multiple Browser Windows",
+      "Popup Page Object Pattern",
+      "Clock API — Controlling Time",
+      "Installing a Fake Clock",
+      "Clock Methods",
+      "Testing a Countdown Timer",
+      "Testing Date-Dependent UI",
+      "Device Emulation",
+      "Viewport Emulation",
+      "Per-Test Viewport Override",
+      "Geolocation Emulation",
+      "Color Scheme (Dark Mode)",
+      "Reduced Motion",
+      "Offline Mode",
+      "Locale and Timezone",
+      "Permission Emulation",
+      "Combining Clock + Emulation"
+    ],
+    "sourceLessons": [
+      {
+        "id": "48-js-execution-context",
+        "title": "8.9: The JavaScript Execution Context",
+        "group": "🧱 MODULE 8: ENTERPRISE PRACTICES"
+      },
+      {
+        "id": "49-browser-network-mechanics",
+        "title": "8.10: Browser Engine & Network Mechanics",
+        "group": "🧱 MODULE 8: ENTERPRISE PRACTICES"
+      },
+      {
+        "id": "50-core-context",
+        "title": "9.1: Browser Context & State",
+        "group": "🎭 MODULE 9: PLAYWRIGHT ADVANCED CORE"
+      },
+      {
+        "id": "51-debugging-workflow",
+        "title": "9.2: The Debugging Playbook",
+        "group": "🎭 MODULE 9: PLAYWRIGHT ADVANCED CORE"
+      },
+      {
+        "id": "55-iframes-dialogs",
+        "title": "10.4: iframes & Native Dialogs",
+        "group": "🗝️ MODULE 10: ADVANCED LOCATORS"
+      },
+      {
+        "id": "56-file-handling",
+        "title": "10.5: File Upload & Download",
+        "group": "🗝️ MODULE 10: ADVANCED LOCATORS"
+      },
+      {
+        "id": "57-multi-tab",
+        "title": "10.6: Multi-Tab & Multi-Window",
+        "group": "🗝️ MODULE 10: ADVANCED LOCATORS"
+      },
+      {
+        "id": "70-clock-emulation",
+        "title": "14.8: Clock & Device Emulation",
+        "group": "⚡ MODULE 14: ADVANCED FEATURES"
+      }
+    ],
+    "confidence": 0.95,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/48-js-execution-context/page.mdx",
+        "heading": "8.9: The JavaScript Execution Context",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/49-browser-network-mechanics/page.mdx",
+        "heading": "8.10: Browser Engine & Network Mechanics",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/50-core-context/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/51-debugging-workflow/page.mdx",
+        "heading": "The Debugging Mindset",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/55-iframes-dialogs/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/56-file-handling/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/57-multi-tab/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/70-clock-emulation/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      }
+    ]
+  },
+  {
+    "name": "Architecture & Design Patterns",
+    "description": "Covers enforce clean boundaries between data, ui, and logic, implement contract-driven page objects, audit and fix violations of the 4-layer design, model business data independently from ui",
+    "headings": [
+      "Component vs Page Object",
+      "Learning Objectives",
+      "Why Layered Architecture?",
+      "Layer Diagram",
+      "Layer 1: Tests — \"What\"",
+      "The Page Object Solution",
+      "Layer 3: Components — Shared UI Pieces",
+      "Layer 4: Entities — Data Types",
+      "The Data Flow",
+      "Challenge Exercise",
+      "Why TypeScript in Test Automation?",
+      "Defining Data Interfaces",
+      "Using Interfaces in Page Objects",
+      "Using Interfaces in Test Data",
+      "Interface vs Type: When to Use Each",
+      "Generic Utility Types in Test Code",
+      "Type-Safe Fixture Definitions",
+      "Architectural Debt: How It Accumulates",
+      "Red Flag: Selectors in Test Files",
+      "Red Flag: Test Logic in Page Objects",
+      "Red Flag: Layer Leaking",
+      "Debugging Architecture with the AST Auditor",
+      "Refactoring Pattern: Extract and Delegate",
+      "Write the correct command below:",
+      "What is the Entity Layer?",
+      "Complete Entity Definitions for a DMS",
+      "The Builder Pattern for Test Data",
+      "Using the Builder in Tests",
+      "Static Test Data: JSON Files"
+    ],
+    "sourceLessons": [
+      {
+        "id": "58-arch-layers",
+        "title": "12.1: The 4-Layer Separation",
+        "group": "🏗️ MODULE 12: ADVANCED ARCHITECTURE"
+      },
+      {
+        "id": "59-arch-interface",
+        "title": "12.2: The ValidatedPage Interface",
+        "group": "🏗️ MODULE 12: ADVANCED ARCHITECTURE"
+      },
+      {
+        "id": "60-arch-debug",
+        "title": "12.3: Finding Leaky Abstractions",
+        "group": "🏗️ MODULE 12: ADVANCED ARCHITECTURE"
+      },
+      {
+        "id": "61-arch-entity",
+        "title": "12.4: Entity-Page Relationships",
+        "group": "🏗️ MODULE 12: ADVANCED ARCHITECTURE"
+      }
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/58-arch-layers/page.mdx",
+        "heading": "Component vs Page Object",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/59-arch-interface/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/60-arch-debug/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/61-arch-entity/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      }
+    ]
+  },
+  {
+    "name": "Visual & Accessibility Testing",
+    "description": "Covers detect ui regressions using snapshot comparison, verify wcag compliance using playwright's accessibility assertions",
+    "headings": [
+      "Learning Objectives",
+      "What is Visual Testing?",
+      "The `toHaveScreenshot()` Assertion",
+      "First Run: Generating Baselines",
+      "When a Visual Test Fails",
+      "Handling Dynamic Content",
+      "Component-Level Visual Tests",
+      "Cross-Browser Visual Testing",
+      "Updating Baselines After Intentional Changes",
+      "Challenge Exercise",
+      "Write the correct command below:",
+      "Why Accessibility Testing Matters",
+      "The Accessibility Tree",
+      "Accessibility Assertions",
+      "`toHaveAccessibleName()`",
+      "`toHaveAccessibleDescription()`",
+      "`toHaveRole()`",
+      "ARIA Snapshot Testing",
+      "Partial ARIA Snapshots with Regex",
+      "Inspecting the Accessibility Tree",
+      "Common Accessibility Checks",
+      "1. All images have alt text",
+      "2. Form fields have labels",
+      "3. Color contrast is sufficient",
+      "4. Keyboard navigation works",
+      "Integrating with axe-core",
+      "Accessibility Testing in CI"
+    ],
+    "sourceLessons": [
+      {
+        "id": "65-adv-visual",
+        "title": "14.3: Visual Regression Testing",
+        "group": "⚡ MODULE 14: ADVANCED FEATURES"
+      },
+      {
+        "id": "68-accessibility",
+        "title": "14.6: Accessibility Testing",
+        "group": "⚡ MODULE 14: ADVANCED FEATURES"
+      }
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/65-adv-visual/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/68-accessibility/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      }
+    ]
+  },
+  {
+    "name": "Compliance & E-Signatures",
+    "description": "Covers understand regulatory requirements for digital signatures, automate interactions with the global signature component, automate a complete regulatory approval workflow, resolve 'element is not clickable' errors caused by modals, implement centralized modal management",
+    "headings": [
+      "Learning Objectives",
+      "What is E-Sign Compliance?",
+      "The E-Sign Workflow (Standard)",
+      "What We Must Test",
+      "21 CFR Part 11 Compliance Checklist",
+      "Writing the Compliance Test Suite",
+      "Challenge Exercise",
+      "Why Modals Are Tricky",
+      "The Core Strategy: Scope All Locators to the Dialog",
+      "Complete E-Sign Modal Page Object",
+      "Multi-Step Modal Workflow",
+      "Handling Browser Native Dialogs (`alert`, `confirm`, `prompt`)",
+      "Preventing Animation Interference",
+      "The Complete E-Sign Test Scenario",
+      "Complete Test Suite Implementation",
+      "Cross-Browser Execution",
+      "Network Interception for Reliability",
+      "Write the correct command below:",
+      "Common E-Sign Test Failures",
+      "Failure 1: \"Password Incorrect\" in Test but Works Manually",
+      "Failure 2: Modal Appears but Interactions Fail",
+      "Failure 3: Race Condition — Audit Trail Not Created Yet",
+      "Failure 4: Test Pollutes Next Test (State Leak)",
+      "Failure 5: \"Element Detached From DOM\" on Modal Close",
+      "Debugging Network Requests",
+      "The Compliance Testing Layer Map",
+      "The AuditTrailPage Object",
+      "The AuditEntry Component",
+      "Compliance Report Generation"
+    ],
+    "sourceLessons": [
+      {
+        "id": "72-esign-compliance",
+        "title": "15.1: 21 CFR Part 11 Compliance",
+        "group": "✍️ MODULE 15: E-SIGNATURE & MODALS"
+      },
+      {
+        "id": "73-esign-modal",
+        "title": "15.2: The ESignModal Component",
+        "group": "✍️ MODULE 15: E-SIGNATURE & MODALS"
+      },
+      {
+        "id": "74-esign-exec",
+        "title": "15.3: Multi-Step Approval Flows",
+        "group": "✍️ MODULE 15: E-SIGNATURE & MODALS"
+      },
+      {
+        "id": "75-esign-debug",
+        "title": "15.4: Modal Interception Errors",
+        "group": "✍️ MODULE 15: E-SIGNATURE & MODALS"
+      },
+      {
+        "id": "76-esign-arch",
+        "title": "15.5: The Singleton Modal Pattern",
+        "group": "✍️ MODULE 15: E-SIGNATURE & MODALS"
+      }
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/72-esign-compliance/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/73-esign-modal/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/74-esign-exec/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/75-esign-debug/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/76-esign-arch/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      }
+    ]
+  },
+  {
+    "name": "API & Hybrid Testing",
+    "description": "Covers adopt a balanced testing strategy for speed and coverage, execute restful operations using playwright, automate a high-speed hybrid test flow, resolve api authentication and token issues, encapsulate api calls into reusable controllers, master advanced concepts in playwright automation and infrastructure.",
+    "headings": [
+      "Learning Objectives",
+      "The Test Pyramid",
+      "Playwright's API Testing Capability",
+      "When to Use API Tests vs UI Tests",
+      "The Hybrid Strategy",
+      "The `apiRequest` Context",
+      "Challenge Exercise",
+      "16.2: The Request Fixture",
+      "The `request` Fixture",
+      "All HTTP Methods",
+      "Reading the Response",
+      "Sending Headers and Auth Tokens",
+      "Creating a Reusable API Client",
+      "File Upload via API",
+      "16.3: Hybrid Data Setup",
+      "The Hybrid Pattern",
+      "Pattern 1: API Setup → UI Verification",
+      "Pattern 2: UI Action → API Verification",
+      "Pattern 3: API Mocking with `route`",
+      "Pattern 4: Modifying Requests with `route.continue()`",
+      "Pattern 5: Modifying Responses",
+      "Pattern 6: Route Chaining with `route.fallback()`",
+      "Pattern 7: Aborting Requests (Offline Simulation)",
+      "Pattern 8: HAR Recording & Playback",
+      "Pattern 9: Testing Loading States",
+      "Network Request Assertions",
+      "Passive Response Monitoring",
+      "Session Reuse Architecture",
+      "`page.route()` vs `page.on('request')` — Key Differences",
+      "16.4: Handling 401 Unauthorized",
+      "What Must Be Tested in Auth?",
+      "Testing the Login API",
+      "Testing Authorization (Role-Based Access Control)",
+      "Testing the Token Refresh Flow",
+      "Write the correct command below:",
+      "The Hybrid Test Pattern",
+      "The Problem with Direct API Calls in Tests",
+      "The API Controller Layer",
+      "The Auth Controller",
+      "Using Controllers in Tests",
+      "Wire Controllers into Fixtures",
+      "19.1: API Mocking & Virtualization",
+      "Service Virtualization",
+      "The Problem with Staging Environments",
+      "The Solution: Service Virtualization",
+      "Basic Interception (`route.fulfill`)",
+      "Testing Impossible Edge Cases (Negative Testing)",
+      "Aborting Unnecessary Traffic (`route.abort`)",
+      "Response Mutation (Proxying)",
+      "Using External Fixture Files"
+    ],
+    "sourceLessons": [
+      {
+        "id": "77-api-pyramid",
+        "title": "16.1: The Automation Pyramid",
+        "group": "🔌 MODULE 16: API TESTING & HYBRID FLOWS"
+      },
+      {
+        "id": "78-api-request",
+        "title": "16.2: The Request Fixture",
+        "group": "🔌 MODULE 16: API TESTING & HYBRID FLOWS"
+      },
+      {
+        "id": "79-api-hybrid",
+        "title": "16.3: Hybrid Data Setup",
+        "group": "🔌 MODULE 16: API TESTING & HYBRID FLOWS"
+      },
+      {
+        "id": "80-api-auth",
+        "title": "16.4: Handling 401 Unauthorized",
+        "group": "🔌 MODULE 16: API TESTING & HYBRID FLOWS"
+      },
+      {
+        "id": "81-api-controller",
+        "title": "16.5: The API Controller Pattern",
+        "group": "🔌 MODULE 16: API TESTING & HYBRID FLOWS"
+      },
+      {
+        "id": "102-api-mocking",
+        "title": "19.1: API Mocking & Virtualization",
+        "group": "🌐 MODULE 19: ADVANCED ENTERPRISE TOPOLOGIES"
+      }
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/77-api-pyramid/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/78-api-request/page.mdx",
+        "heading": "16.2: The Request Fixture",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/79-api-hybrid/page.mdx",
+        "heading": "16.3: Hybrid Data Setup",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/80-api-auth/page.mdx",
+        "heading": "16.4: Handling 401 Unauthorized",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/81-api-controller/page.mdx",
+        "heading": "The Hybrid Test Pattern",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/102-api-mocking/page.mdx",
+        "heading": "19.1: API Mocking & Virtualization",
+        "lineRange": "1-100"
+      }
+    ]
+  },
+  {
+    "name": "Data-Driven Engineering",
+    "description": "Covers design data-driven suites for maximum coverage, use for-of loops to generate dynamic test cases, automate a high-volume bulk import validation, isolate and analyze specific data-set failures, decouple test data from test logic using factories",
+    "headings": [
+      "Learning Objectives",
+      "What is Parameterized Testing?",
+      "Method 1: `test.each` — The Playwright Way",
+      "Method 2: Data-Driven Validation Tests",
+      "Method 3: JSON File-Based Test Data",
+      "Method 4: Boundary Value Analysis",
+      "Test Tags for Organization",
+      "Challenge Exercise",
+      "Iterating Over UI Data",
+      "Pattern 1: Count-Based Loop",
+      "Pattern 2: `allTextContents()` for Bulk Reading",
+      "Pattern 3: `allInnerTexts()` for Table Columns",
+      "Iterating Over API Response Data",
+      "Pattern 4: Validate Every Item in an API List",
+      "Pattern 5: Cross-Reference API and UI Data",
+      "Parallel Data Iteration with `Promise.all`",
+      "Why Bulk Data Testing?",
+      "Bulk Create via API (Fastest Method)",
+      "Data Seeding with Factories",
+      "Using the DataFactory in Tests",
+      "Write the correct command below:",
+      "The \"Data State Problem\"",
+      "Problem 1: Stale Data From a Previous Run",
+      "Problem 2: Tests Sharing Mutable State",
+      "Problem 3: Missing Test Fixtures",
+      "Problem 4: Race Condition in Parallel Data Creation",
+      "Debugging Data Issues",
+      "Log the actual API response",
+      "Use `test.info()` to add diagnostic data",
+      "Inspect the database directly",
+      "What is a Data Factory?",
+      "The Complete Data Factory",
+      "The API Data Factory (Creates Records in DB)",
+      "Using the Factory in Tests"
+    ],
+    "sourceLessons": [
+      {
+        "id": "82-data-logic",
+        "title": "17.1: Parameterization vs. Permutation",
+        "group": "📊 MODULE 17: DATA-DRIVEN ENGINEERING"
+      },
+      {
+        "id": "83-data-iteration",
+        "title": "17.2: Iterating over Data Sets",
+        "group": "📊 MODULE 17: DATA-DRIVEN ENGINEERING"
+      },
+      {
+        "id": "84-data-bulk",
+        "title": "17.3: Bulk Inventory Import",
+        "group": "📊 MODULE 17: DATA-DRIVEN ENGINEERING"
+      },
+      {
+        "id": "85-data-debug",
+        "title": "17.4: Handling Partial Failures",
+        "group": "📊 MODULE 17: DATA-DRIVEN ENGINEERING"
+      },
+      {
+        "id": "86-data-factory",
+        "title": "17.5: The Test Factory Pattern",
+        "group": "📊 MODULE 17: DATA-DRIVEN ENGINEERING"
+      }
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/82-data-logic/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/83-data-iteration/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/84-data-bulk/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/85-data-debug/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/86-data-factory/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      }
+    ]
+  },
+  {
+    "name": "AST & Framework Engineering",
+    "description": "Covers understand how code is parsed for validation, write rules to detect anti-patterns, enforce the 'zero sleep' policy programmatically, fix syntax issues that block static analysis, build an industrial-grade pr validation engine",
+    "headings": [
+      "Learning Objectives",
+      "What Happens When Your Code is Parsed?",
+      "The Parser: `acorn`",
+      "Walking the AST",
+      "Gate 1 Implementation: Detecting `waitForTimeout`",
+      "Gate 3 Implementation: Detecting Missing `await`",
+      "The Full Audit Pipeline",
+      "Challenge Exercise",
+      "What is an AST Linter?",
+      "Building a Complete AST Linter",
+      "Using the Linter in a Script",
+      "The Wait Anti-Pattern Problem",
+      "The Wait Pattern Analyser Rule",
+      "What to Use Instead",
+      "Instead of `waitForTimeout`:",
+      "Instead of `Promise + setTimeout`:",
+      "Instead of a polling while-loop:",
+      "Write the correct command below:",
+      "When Your AST Rules Produce False Positives",
+      "Debug Step 1: Visualize the AST",
+      "Debug Step 2: Log Node Types During Walking",
+      "Debug Step 3: Unit Test Your Rules",
+      "Common Rule Bugs and Fixes",
+      "Bug 1: Rule matches too broadly",
+      "Bug 2: Null reference in AST walking",
+      "Bug 3: Missing array iteration",
+      "The Gate Architecture",
+      "The Rules Registry",
+      "The Full AST Audit Script",
+      "The Shift-Left Pipeline",
+      "Integrating into GitHub Actions",
+      "Pre-Commit Hook (Local Enforcement)",
+      "Exit Codes Reference"
+    ],
+    "sourceLessons": [
+      {
+        "id": "87-ast-concept",
+        "title": "18.1: The Abstract Syntax Tree (AST)",
+        "group": "🛠️ MODULE 18: FRAMEWORK ENGINEERING & AST"
+      },
+      {
+        "id": "88-ast-linter",
+        "title": "18.2: Custom Linter Heuristics",
+        "group": "🛠️ MODULE 18: FRAMEWORK ENGINEERING & AST"
+      },
+      {
+        "id": "89-ast-waits",
+        "title": "18.3: Zero Hardcoded Wait Gate",
+        "group": "🛠️ MODULE 18: FRAMEWORK ENGINEERING & AST"
+      },
+      {
+        "id": "90-ast-debug",
+        "title": "18.4: Analyzing Parsing Errors",
+        "group": "🛠️ MODULE 18: FRAMEWORK ENGINEERING & AST"
+      },
+      {
+        "id": "91-ast-gate",
+        "title": "18.5: The Quality Gate Pattern",
+        "group": "🛠️ MODULE 18: FRAMEWORK ENGINEERING & AST"
+      }
+    ],
+    "confidence": 0.97,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/87-ast-concept/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/88-ast-linter/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/89-ast-waits/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/90-ast-debug/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/91-ast-gate/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      }
+    ]
+  },
+  {
+    "name": "Test Orchestration & CI/CD",
+    "description": "Covers automate the quality gate at scale, master cross-environment scaling, communicate value to stakeholders, run playwright reliably in docker containers for consistent ci results",
+    "headings": [
+      "Shard Matrix Pipeline",
+      "Learning Objectives",
+      "Why CI/CD for Automation?",
+      "Complete CI Workflow File",
+      "Storing Secrets in GitHub",
+      "Branch Protection Rules",
+      "Notification Setup",
+      "Challenge Exercise",
+      "The Environment Problem",
+      "The `.env` File Hierarchy",
+      "Loading the Right Environment",
+      "Environment-Specific Test Skipping",
+      "Environment Configuration Validation",
+      "Multi-Environment `playwright.config.ts`",
+      "Why Reporting Matters",
+      "Built-in: Playwright HTML Report",
+      "Allure Report Integration",
+      "Trend Analysis: Tracking Results Over Time",
+      "Container Immutability",
+      "Why Docker for Playwright?",
+      "The Official Playwright Docker Image",
+      "Running Tests in Docker (Quick Start)",
+      "Dockerfile for Your Project",
+      "Build and Run",
+      "Docker Compose for Complex Setups",
+      "Browser Caching in GitHub Actions",
+      "Running in GitHub Actions with Docker",
+      "Linux-Specific Considerations",
+      "Missing System Dependencies",
+      "Running Headed in Docker (for Debugging)",
+      "Debugging CI Failures",
+      "Save Traces as Artifacts",
+      "View Traces from CI",
+      "Performance Tips for Docker/CI",
+      "Production-Ready CI Configuration"
+    ],
+    "sourceLessons": [
+      {
+        "id": "98-github-actions",
+        "title": "16.1: GitHub Actions CI",
+        "group": "⚙️ MODULE 16: ORCHESTRATION"
+      },
+      {
+        "id": "99-env-mastery",
+        "title": "16.2: Environment Mastery",
+        "group": "⚙️ MODULE 16: ORCHESTRATION"
+      },
+      {
+        "id": "100-reporting",
+        "title": "16.3: Industrial Reporting",
+        "group": "⚙️ MODULE 16: ORCHESTRATION"
+      },
+      {
+        "id": "101-docker-ci",
+        "title": "16.4: Docker & Containerized Execution",
+        "group": "⚙️ MODULE 16: ORCHESTRATION"
+      }
+    ],
+    "confidence": 0.97,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/98-github-actions/page.mdx",
+        "heading": "Shard Matrix Pipeline",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/99-env-mastery/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/100-reporting/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/101-docker-ci/page.mdx",
+        "heading": "Container Immutability",
+        "lineRange": "1-100"
+      }
+    ]
+  },
+  {
+    "name": "Interview & Portfolio Projects",
+    "description": "Covers debug 3 broken test suites with zero labels, zero comments, and zero hints., analyze complex business requirements for automation, implement the complete loginpage page object with all methods., write the complete login and document workflow test suites., write a complete 5-gate bash audit script., architect a complete enterprise playwright framework from scratch., verify credentials and explore the career roadmap, demonstrate banking automation: role fixtures, mfa interception, pdf download, shadow dom., demonstrate e-commerce automation: api interception, storage state, parameterized tests., demonstrate gxp automation: graphql interception, canvas signature, multi-role fixtures., api seeding, cleanup, idempotency, isolation, and shared state., simulate 500s, timeouts, offline, rate limiting., refactor a monolithic 500-test framework into an optimized suite., solve environment drift, race conditions, browser layout bugs, and data pollution.",
+    "headings": [
+      "18.6: The War Room Sandbox",
+      "Learning Objectives",
+      "Welcome to the War Room",
+      "1. The Broken Code (Analyze the Damage)",
+      "2. The Architectural Breakdown",
+      "3. The Refactored Masterpiece (The Solution)",
+      "Step 1: Encapsulating State & Using API Setup",
+      "4. The Capstone Preparation",
+      "Welcome to the Blind War Room",
+      "Challenge A: The Silent Race Condition",
+      "Your Task",
+      "Challenge B: The Data Collision",
+      "Challenge C: The Environment Phantom",
+      "The Difference",
+      "Challenge Exercise",
+      "What is the Capstone?",
+      "The Target Application",
+      "Capstone Acceptance Criteria",
+      "Capstone Project Structure (Target)",
+      "Planning Your Capstone",
+      "Day-by-Day Capstone Plan",
+      "23.2: Building the POM Foundation",
+      "Implementation Order",
+      "Complete `LoginPage.ts`",
+      "Complete `DocumentPage.ts`",
+      "Complete `ESignPage.ts`",
+      "Complete `UploadPage.ts`",
+      "Complete `ReviewPage.ts`",
+      "Complete `AuditTrailPage.ts`",
+      "The Complete Test Suite",
+      "`tests/auth/login.spec.ts`",
+      "`tests/documents/workflow.spec.ts`",
+      "`tests/e-sign/signature-workflow.spec.ts`",
+      "`tests/api/documents-api.spec.ts`",
+      "Running the Full Suite",
+      "The Peer Review Checklist",
+      "Architectural Audit",
+      "AST Quality Gate Audit",
+      "Test Quality Audit",
+      "Coverage Audit",
+      "Performance Baseline",
+      "Common Audit Failures and Fixes",
+      "Write the correct command below:",
+      "Architectural Requirements",
+      "1. The Page Object Model (POM) Layer",
+      "2. The API / Hybrid Layer",
+      "3. The Custom Fixtures Layer",
+      "4. The Orchestration Layer",
+      "The Challenge",
+      "The Verification Protocol",
+      "Step 1: Environment Verification",
+      "Step 2: AST Full Audit",
+      "Step 3: Full Test Suite Execution",
+      "Step 4: Final Checklist Sign-Off",
+      "Claiming Your Certificate",
+      "What's Next?",
+      "Claim & Verify Credentials",
+      "Application Architecture",
+      "The Scenario",
+      "Requirements",
+      "What You Must Demonstrate",
+      "Project Success Criteria",
+      "Bonus Challenges",
+      "The Sandbox",
+      "21.1: Technical Phone Screen",
+      "21.2: SDET System Design",
+      "The Whiteboard Evaluation",
+      "21.3: QA Behavioral Scenarios",
+      "The STAR Method Framework",
+      "Scenario 1: The Production Outage",
+      "Scenario 2: The Executive Release Block",
+      "Scenario 3: The Flake Epidemic",
+      "Scenario 4: The \"Rockstar\" Developer",
+      "Scenario 5: The Refactoring Risk",
+      "Practice Exercise",
+      "22.1: API Framework Boilerplate",
+      "The Architecture",
+      "Interactive Sandbox",
+      "22.2: Hybrid E2E Boilerplate",
+      "22.3: Observability Boilerplate"
+    ],
+    "sourceLessons": [
+      {
+        "id": "92-war-room-sandbox",
+        "title": "18.6: The War Room Sandbox",
+        "group": "🛠️ MODULE 18: FRAMEWORK ENGINEERING & AST"
+      },
+      {
+        "id": "93-war-room-blind",
+        "title": "11.1: Blind War Room — Unlabeled Debugging",
+        "group": "⚔️ MODULE 11: WAR ROOM"
+      },
+      {
+        "id": "94-capstone-brief",
+        "title": "23.1: The Capstone Blueprint",
+        "group": "🏆 MODULE 23: FINAL CAPSTONE CERTIFICATION"
+      },
+      {
+        "id": "95-capstone-pom",
+        "title": "23.2: Building the POM Foundation",
+        "group": "🏆 MODULE 23: FINAL CAPSTONE CERTIFICATION"
+      },
+      {
+        "id": "96-capstone-exec",
+        "title": "23.3: The Golden Flow (E2E)",
+        "group": "🏆 MODULE 23: FINAL CAPSTONE CERTIFICATION"
+      },
+      {
+        "id": "97-capstone-audit",
+        "title": "23.4: The Final Quality Gate",
+        "group": "🏆 MODULE 23: FINAL CAPSTONE CERTIFICATION"
+      },
+      {
+        "id": "108-capstone-project",
+        "title": "13.1: Build the Enterprise Framework",
+        "group": "🎓 MODULE 13: MILESTONE PROJECT"
+      },
+      {
+        "id": "109-capstone-verify",
+        "title": "13.2: Certification Claim",
+        "group": "🎓 MODULE 13: MILESTONE PROJECT"
+      },
+      {
+        "id": "110-industry-banking",
+        "title": "20.1: 🏦 Banking Specialist Project",
+        "group": "🚀 MODULE 20: INDUSTRY TRACKS"
+      },
+      {
+        "id": "111-industry-ecommerce",
+        "title": "20.2: 🛒 Commerce Specialist Project",
+        "group": "🚀 MODULE 20: INDUSTRY TRACKS"
+      },
+      {
+        "id": "112-industry-healthcare",
+        "title": "20.3: 🏥 Pharma Specialist Project",
+        "group": "🚀 MODULE 20: INDUSTRY TRACKS"
+      },
+      {
+        "id": "113-interview-coding",
+        "title": "21.1: Technical Phone Screen",
+        "group": "🎤 MODULE 21: INTERVIEW PREP"
+      },
+      {
+        "id": "114-interview-system-design",
+        "title": "21.2: SDET System Design",
+        "group": "🎤 MODULE 21: INTERVIEW PREP"
+      },
+      {
+        "id": "115-interview-behavioral",
+        "title": "21.3: QA Behavioral Scenarios",
+        "group": "🎤 MODULE 21: INTERVIEW PREP"
+      },
+      {
+        "id": "116-template-api",
+        "title": "22.1: API Framework Boilerplate",
+        "group": "📦 MODULE 22: ENTERPRISE TEMPLATES"
+      },
+      {
+        "id": "117-template-hybrid",
+        "title": "22.2: Hybrid E2E Boilerplate",
+        "group": "📦 MODULE 22: ENTERPRISE TEMPLATES"
+      },
+      {
+        "id": "118-template-reporting",
+        "title": "22.3: Observability Boilerplate",
+        "group": "📦 MODULE 22: ENTERPRISE TEMPLATES"
+      },
+      {
+        "id": "200-test-data-management",
+        "title": "Module D: Test Data Management",
+        "group": "💎 ELITE TIER: ENGINEERING"
+      },
+      {
+        "id": "201-network-mocking-deep-dive",
+        "title": "Module E: Network Mocking Deep Dive",
+        "group": "💎 ELITE TIER: ENGINEERING"
+      },
+      {
+        "id": "202-refactor-bloathouse",
+        "title": "Module F: Refactor the Bloathouse",
+        "group": "💎 ELITE TIER: ENGINEERING"
+      },
+      {
+        "id": "203-failure-academy",
+        "title": "Module G: The Failure Academy",
+        "group": "💎 ELITE TIER: ENGINEERING"
+      }
+    ],
+    "confidence": 0.91,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/92-war-room-sandbox/page.mdx",
+        "heading": "18.6: The War Room Sandbox",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/93-war-room-blind/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/94-capstone-brief/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/95-capstone-pom/page.mdx",
+        "heading": "23.2: Building the POM Foundation",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/96-capstone-exec/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/97-capstone-audit/page.mdx",
+        "heading": "The Peer Review Checklist",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/108-capstone-project/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/109-capstone-verify/page.mdx",
+        "heading": "The Verification Protocol",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/110-industry-banking/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/111-industry-ecommerce/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/112-industry-healthcare/page.mdx",
+        "heading": "Learning Objectives",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/113-interview-coding/page.mdx",
+        "heading": "21.1: Technical Phone Screen",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/114-interview-system-design/page.mdx",
+        "heading": "21.2: SDET System Design",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/115-interview-behavioral/page.mdx",
+        "heading": "21.3: QA Behavioral Scenarios",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/116-template-api/page.mdx",
+        "heading": "22.1: API Framework Boilerplate",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/117-template-hybrid/page.mdx",
+        "heading": "22.2: Hybrid E2E Boilerplate",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/118-template-reporting/page.mdx",
+        "heading": "22.3: Observability Boilerplate",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/200-test-data-management/page.mdx",
+        "heading": "Introduction",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/201-network-mocking-deep-dive/page.mdx",
+        "heading": "Introduction",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/202-refactor-bloathouse/page.mdx",
+        "heading": "Introduction",
+        "lineRange": "1-100"
+      },
+      {
+        "file": "src/app/courses/playwright/203-failure-academy/page.mdx",
+        "heading": "Introduction",
+        "lineRange": "1-100"
+      }
+    ]
+  }
+]

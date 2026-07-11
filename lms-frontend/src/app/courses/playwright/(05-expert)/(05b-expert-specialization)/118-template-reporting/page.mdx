@@ -1,0 +1,163 @@
+# 22.3: Observability Boilerplate
+
+import { ChapterHeader } from '@/components/ChapterHeader';
+
+<ChapterHeader
+  objective="Master this critical concept to build robust, scalable Playwright automation."
+  time="15 mins"
+  type="Concept"
+/>
+
+## Learning Objectives
+- Understand the core architectural patterns
+- Identify and avoid common anti-patterns
+- Implement production-grade automation scripts
+
+
+When you have 10,000 tests running in CI/CD, the terminal output is useless. You need deep observability, rich HTML reports, and instant alerts when critical P0 flows fail.
+
+This template focuses entirely on **Metrics and Reporting**. It is heavily pre-configured with Allure Reports, Slack Webhook integrations, and GitHub Actions telemetry.
+
+<div className="bg-slate-900 border border-slate-700 p-6 rounded-xl my-8">
+  <h3 className="text-cyan-400 font-bold m-0 mb-2 flex items-center gap-2">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 17l6-6-6-6v12zm16-12h-8v2h8v-2zm0 4h-8v2h8v-2zm0 4h-8v2h8v-2z"/></svg>
+    Scaffold the Framework
+  </h3>
+  <div className="text-slate-300 m-0">
+    Run this command in your terminal to generate this repository locally:
+    <div className="bg-slate-950 p-4 rounded-lg mt-4 font-mono text-sm border border-slate-800 flex justify-between items-center">
+      <span>npx @playwright-academy/create-observability-framework@latest my-reporting-tests</span>
+    </div>
+  </div>
+</div>
+
+## The Architecture
+
+<Tabs>
+  <Tab title="Why This Template?">
+    **The Problem**: Flaky tests are ignored because the standard HTML report doesn't track historical failure rates or alert the team in real-time.
+    
+    **The Solution**: This template integrates Enterprise-grade observability tools. 
+    *   **Allure Reports**: Generates beautiful, trend-tracking dashboards that show failure history over time.
+    *   **Custom Slack Reporter**: A custom Playwright reporter class that POSTs a summary message to a Slack channel only if the build fails.
+    *   **CI/CD Ready**: Includes a massive `.github/workflows/main.yml` configured for 20-worker sharding.
+  </Tab>
+
+  <Tab title="Directory Structure">
+    ```text
+    my-reporting-tests/
+    ├── playwright.config.ts      # Configured with multiple custom reporters
+    ├── .github/
+    │   └── workflows/
+    │       └── e2e.yml           # GitHub Actions sharding matrix
+    ├── src/
+    │   └── reporters/            
+    │       └── SlackReporter.ts  # Custom class implementing Reporter interface
+    ├── tests/
+    │   └── telemetry.spec.ts     
+    └── package.json              # Includes allure-playwright
+    ```
+  </Tab>
+
+  <Tab title="The Custom Slack Reporter">
+    Playwright allows you to write custom reporters. This template includes a script that intercepts the `onEnd` event to ping your team.
+
+    ```typescript
+    import { Reporter, FullResult } from '@playwright/test/reporter';
+    import fetch from 'node-fetch';
+
+    export default class SlackReporter implements Reporter {
+      async onEnd(result: FullResult) {
+        if (result.status === 'passed') return; // Only alert on failures
+
+        const payload = {
+          text: `🚨 *Nightly E2E Failed!* 🚨\nStatus: ${result.status}\nDuration: ${result.duration}ms\n<https://github.com/org/repo/actions|View Logs>`
+        };
+
+        await fetch(process.env.SLACK_WEBHOOK_URL!, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+      }
+    }
+    ```
+  </Tab>
+
+  <Tab title="Enterprise Monitoring">
+    True observability goes beyond HTML reports. It requires longitudinal trend monitoring.
+    
+    **Playwright ➡️ Reporter ➡️ DataDog ➡️ Dashboard ➡️ Alerting**
+
+    This template is built to extract key metrics on `onEnd` and POST them to Enterprise Telemetry systems like **DataDog** or **New Relic**, allowing teams to monitor:
+    *   **Failure Rate**: Is the `main` branch getting unhealthier over the past 30 days?
+    *   **Execution Duration**: Did a recent dependency upgrade slow the test suite down by 5 minutes?
+    *   **Flake Percentage**: Tracking which specific test IDs exhibit the highest standard deviation in results.
+  </Tab>
+
+  <Tab title="When NOT To Use">
+    **Senior Engineers understand tradeoffs.** Do not use this heavy Observability Template if:
+    *   You are a solo engineer hacking on a side project.
+    *   You do not have a CI/CD pipeline (e.g., GitHub Actions, Jenkins) running your tests headless in the cloud.
+    *   Your company does not use Slack/Teams or centralized telemetry tools.
+  </Tab>
+</Tabs>
+
+---
+
+## Interactive Sandbox
+
+You can browse the complete source code for this template directly in your browser. Open the `src/reporters` folder to see how the Slack integration works under the hood.
+
+<CodeEditor
+  moduleId="118-template-reporting"
+  taskIndex={0}
+/>
+
+
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="118-template-reporting"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="118-template-reporting" />

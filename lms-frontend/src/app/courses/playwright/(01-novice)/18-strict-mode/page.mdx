@@ -1,0 +1,149 @@
+﻿
+# 2.4: Strict Mode & Debugging Basics
+
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Complete 2.4: Strict Mode & Debugging Basics
+
+## The "Strict Mode" Violation
+
+Playwright operates in **Strict Mode**. This is one of its most important features.
+
+Strict Mode means: **If you ask Playwright to click an element, and it finds MORE THAN ONE matching element, it will instantly crash the test.**
+
+```typescript
+// Imagine a page with two "Submit" buttons (one at the top, one at the bottom)
+await page.getByRole('button', { name: 'Submit' }).click(); 
+// ❌ CRASH: strict mode violation
+```
+
+### Why does it crash?
+
+Older frameworks would just silently click the *first* button they found. 
+
+But what if the developer added a hidden "Submit" button at the very top of the HTML? Your test would silently start clicking the wrong button, and you wouldn't know until the test failed much later with a confusing error.
+
+Playwright forces you to be explicit. If there are two buttons, you must tell Playwright exactly which one you mean.
+
+### How to fix a Strict Mode Violation
+
+1. **Be more specific:** Can you use `getByRole` with a different name?
+2. **Filter by parent:** Find the section of the page first, then find the button inside it.
+
+```typescript
+// Find the footer first, then the submit button inside the footer
+const footer = page.getByRole('contentinfo'); // HTML5 footer role
+await footer.getByRole('button', { name: 'Submit' }).click();
+```
+
+3. **Use `.first()` or `.nth()`:** Only if the elements are truly identical lists (as covered in the last lesson).
+
+## Debugging: `page.pause()`
+
+When your test fails, and the error message isn't enough, you need to see what the browser is seeing.
+
+You can freeze time by adding `await page.pause()` to your test:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('debug my test', async ({ page }) => {
+  await page.goto('https://playwright.dev');
+  
+  // Freeze the test here!
+  await page.pause(); 
+  
+  await page.getByRole('button', { name: 'Get started' }).click();
+});
+```
+
+When you run this test (make sure you run it **headed** with `--headed`), the browser will open and completely pause. 
+
+A tool called the **Playwright Inspector** will pop up. 
+- You can explore the page in the browser.
+- You can test new locators in the Inspector to see what they highlight.
+- You can click the "Resume" button to let the test continue.
+
+> [!IMPORTANT]
+> Never commit `await page.pause()` to your codebase! It will cause your automated CI/CD pipeline to hang forever waiting for someone to click "Resume".
+
+## UI Mode (The Ultimate Debugger)
+
+There's an even better way to debug tests: **UI Mode**.
+
+Instead of running `npx playwright test`, run:
+
+```bash
+npx playwright test --ui
+```
+
+This opens a dedicated dashboard where you can:
+- See a list of all your tests.
+- Click any test to run it visually.
+- Scrub back and forth in time through every single click and network request.
+- Inspect the DOM as it looked at *any* moment in the past.
+
+Whenever you get stuck finding a locator, UI Mode is the best place to figure it out.
+
+## Exercise
+
+1. Run `npx playwright test --ui` in your terminal.
+2. Run one of your existing tests from the UI dashboard.
+3. Click on the different steps in the left sidebar and watch how the page snapshot changes in the middle window.
+
+---
+
+## Common Mistakes
+
+- **Hardcoding Waits**: Using `page.waitForTimeout()` instead of waiting for an element's state.
+- **Overly Broad Locators**: Using generic CSS selectors like `.button` that might break if multiple buttons are added. Always prefer user-facing attributes like `getByRole`.
+- **Ignoring Errors**: Catching errors in try/catch blocks without failing the test or logging the reason.
+
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="18-strict-mode"
+  taskIndex={0}
+  placeholder="// Challenge: Implement the workflow\n// Write your code here:"
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="18-strict-mode" />

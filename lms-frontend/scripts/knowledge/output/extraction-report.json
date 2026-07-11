@@ -1,0 +1,18 @@
+{
+  "version": "1.0",
+  "generatedAt": "2026-07-01T12:28:44.921Z",
+  "lessonsScanned": 122,
+  "lessonsExtracted": 122,
+  "knowledgeAtomsCount": 122,
+  "totalCodeBlocks": 728,
+  "totalMermaidDiagrams": 33,
+  "totalBestPractices": 180,
+  "totalCommonMistakes": 8,
+  "ignoredScaffolding": {
+    "summaryTables": 86,
+    "challengeWrappers": 206,
+    "quizzes": 111,
+    "genericWarnings": 142
+  },
+  "errorsCount": 0
+}

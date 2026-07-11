@@ -1,0 +1,205 @@
+﻿## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Understand the path to Automation Architect
+
+## The Verification Protocol
+
+This is the final step of the entire course. You will run a structured verification protocol to confirm that every component of your framework is working correctly.
+
+## Step 1: Environment Verification
+
+```bash
+# 13.2: Certification Claim
+node -e "
+const required = ['BASE_URL', 'ADMIN_USER', 'ADMIN_PASS', 'REVIEWER_USER', 'REVIEWER_PASS'];
+const missing = required.filter(k => !process.env[k]);
+if (missing.length > 0) {
+  console.error('Missing ENV vars:', missing);
+  process.exit(1);
+}
+console.log('✅ All environment variables are set');
+"
+```
+
+## Step 2: AST Full Audit
+
+```bash
+npx ts-node scripts/ast-audit.ts
+# Expected: 5/5 gates passed
+```
+
+## Step 3: Full Test Suite Execution
+
+```bash
+# Run the complete suite with all browsers and generate HTML report
+npx playwright test \
+  --reporter=html \
+  --reporter=list \
+  --workers=4
+
+# View results
+npx playwright show-report
+```
+
+**Target metrics for certification:**
+- ✅ 90%+ pass rate on first run
+- ✅ No tests failing due to hardcoded waits
+- ✅ Total execution time < 5 minutes
+- ✅ HTML report generated successfully
+
+## Step 4: Final Checklist Sign-Off
+
+Complete this checklist line by line:
+
+```
+CAPSTONE FINAL VERIFICATION CHECKLIST
+======================================
+
+ARCHITECTURE
+[ ] 4-layer folder structure exists (tests/pages/components/entities)
+[ ] All Page Objects are in /pages directory
+[ ] All shared UI components are in /components directory
+[ ] TypeScript interfaces defined in /entities directory
+[ ] Fixtures registered in /fixtures/baseTest.ts
+[ ] No raw `new PageObject()` calls in test files
+
+CODE QUALITY  
+[ ] All tests use `import { test, expect } from '../fixtures/baseTest'`
+[ ] Zero locators (`getByRole`, `locator`, etc.) in spec files
+[ ] Zero `waitForTimeout` calls in any test file
+[ ] Zero hardcoded credentials in any file
+[ ] Every test has a `test.describe()` wrapper
+
+TEST COVERAGE
+[ ] Login happy path test
+[ ] Login error handling test  
+[ ] Document upload test
+[ ] Document search/filter test
+[ ] Review workflow (approve) test
+[ ] Review workflow (reject) test
+[ ] E-Sign complete workflow test
+[ ] E-Sign wrong password test
+[ ] Audit trail verification test
+[ ] At least 5 API-level tests
+[ ] At least 3 hybrid API+UI tests
+
+CI/CD READINESS
+[ ] Tests run headlessly (no --headed flag required)
+[ ] All tests pass in GitHub Actions
+[ ] AST audit integrated in CI pipeline
+[ ] HTML report generated as CI artifact
+[ ] No manual setup required for fresh clone
+```
+
+## Claiming Your Certificate
+
+Once all items are checked:
+
+1. Submit a Pull Request to the `main` branch
+2. All CI checks must be green ✅
+3. A senior engineer reviews and approves the PR
+4. Your E-Signature is applied to the Certification document in the DMS
+5. You receive your digitally-signed **ASA Automation Engineer Certificate**
+
+The certificate includes:
+- Your name
+- The certification level (Junior / Senior / Expert)
+- The date of certification
+- A cryptographic HMAC-SHA256 signature
+- A QR code linking to the verification portal
+
+## What's Next?
+
+Congratulations! You have completed the entire Playwright Automation Engineer curriculum.
+
+**Where to go from here:**
+- **Extend the framework** with more modules (Accessibility testing, Performance monitoring)
+- **Mentor junior engineers** through their Capstone
+- **Contribute to the ASA OSS** repository on GitHub
+- **Study for Expert level** (Advanced CI/CD, Custom Reporters, Plugin Development)
+
+> [!TIP]
+> The best automation engineers never stop learning. The Playwright team releases updates frequently. Follow [playwright.dev](https://playwright.dev) and the official release notes on GitHub to stay current.
+
+
+
+
+## Claim & Verify Credentials
+<CertificateClaim />
+
+<CodeEditor
+  moduleId="109-capstone-verify"
+  taskIndex={0}
+  placeholder="// 🎓 CONGRATULATIONS! You have reached the end of the course.&#10;// Task: Write the final Playwright test command that:&#10;//   1. Uses the HTML reporter&#10;//   2. Runs with 4 parallel workers&#10;//&#10;// Write the complete npx command below:"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```bash
+npx playwright test --reporter=html --workers=4
+```
+
+</details>
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="109-capstone-verify"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="capstone-verify" />
+

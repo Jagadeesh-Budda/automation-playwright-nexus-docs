@@ -1,0 +1,107 @@
+import { ChapterHeader } from '@/components/ChapterHeader';
+import CodeEditor from '@/components/CodeEditor';
+import Quiz from '@/components/Quiz';
+import { Tabs, Tab } from '@/components/Tabs';
+import AlertBox from '@/components/AlertBox';
+
+# Module G: The Failure Academy
+
+<ChapterHeader
+  objective="Master the art of debugging flaky tests, race conditions, and environment drift using advanced Playwright tools."
+  time="120 mins"
+  type="Code"
+/>
+
+## Learning Objectives
+
+By the end of this module, you will be able to:
+- Diagnose root causes for intermittent test failures (flakiness).
+- Utilize the Playwright Trace Viewer to reconstruct the exact browser state at the moment of failure.
+- Resolve race conditions caused by network latency or rendering speeds.
+- Differentiate between application bugs, framework bugs, and environment drift.
+
+---
+
+## The Nature of Flakiness
+
+A "flaky" test is a test that sometimes passes and sometimes fails without any code changes. In an enterprise environment, **flakiness is a systemic poison**. If developers stop trusting the test suite, they will start ignoring failures, defeating the entire purpose of automation.
+
+### Root Causes of Failure
+
+<Tabs>
+  <Tab title="1. Race Conditions">
+    The test executes an action (like clicking "Save") and immediately tries to assert the result before the network request finishes processing.
+    
+    **Fix**: Rely on Web-First Assertions (`toBeVisible()`) which automatically poll until the condition is met or the timeout is reached.
+  </Tab>
+  <Tab title="2. Data Pollution">
+    Test A creates a record. Test B attempts to create the same record but fails because it already exists. 
+    
+    **Fix**: Ensure perfect isolation using dynamic data generation (Faker) and rigorous `afterEach` cleanup.
+  </Tab>
+  <Tab title="3. Environment Drift">
+    The Staging environment is updated with a new configuration that differs from the Development environment, causing selectors to vanish or behave differently.
+    
+    **Fix**: Implement robust locators (`getByRole`) that depend on the accessibility tree, not arbitrary CSS classes.
+  </Tab>
+</Tabs>
+
+---
+
+## The Debugging Arsenal
+
+When a test fails in CI/CD, you cannot simply "watch" it run. You must rely on telemetry.
+
+1. **Trace Viewer**: The most powerful tool. It records every network request, DOM snapshot, console log, and action. You can "time travel" through the test execution to see exactly what the browser saw.
+2. **Screenshots & Videos**: Capture the visual state precisely when the test crashed.
+3. **Playwright Inspector**: Best used locally to step through execution line-by-line.
+
+---
+
+## Challenge Exercise: The Final Sandbox
+
+**Business Context**:
+You have entered the Failure Academy. The `elite-test-bed` route contains intentional flaws that cause standard automation scripts to fail randomly.
+
+**Mission**:
+Write a test script that completely bypasses the chaos and succeeds 100% of the time.
+
+**Success Criteria**:
+- Do NOT use `page.waitForTimeout` to solve race conditions.
+- Correctly `await` all interactions.
+- Interact with the `page` safely.
+
+<CodeEditor
+  moduleId="203-failure-academy"
+  taskIndex={0}
+/>
+
+---
+
+## Summary
+
+| Concept | Enterprise Value |
+|---|---|
+| Trace Viewer | Reduces debugging time from hours to minutes |
+| Web-First Locators | Immune to 90% of UI framework race conditions |
+| Root Cause Analysis | Ensures we fix the actual bug, not just the symptom |
+
+<Quiz moduleId="203-failure-academy" />
+
+export const astRules = [
+  {
+    type: "ast_forbidden_callee",
+    value: "page.waitForTimeout",
+    message: "You must rely on intelligent waiting, not hardcoded timeouts."
+  },
+  {
+    type: "ast_node",
+    value: "AwaitExpression",
+    message: "You must properly await your asynchronous calls to prevent floating promises."
+  },
+  {
+    type: "contains",
+    value: "page.",
+    message: "You must retain page interactions in your solution."
+  }
+];

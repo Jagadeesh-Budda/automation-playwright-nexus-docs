@@ -1,0 +1,213 @@
+﻿# 8.4: Conflict Resolution
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Resolve environment synchronization issues
+
+## What is a Merge Conflict?
+
+A merge conflict happens when **two engineers change the same line of code** in the same file at the same time. Git cannot automatically decide which version to keep, so it stops and asks you to manually resolve it.
+
+In a professional team, conflicts happen constantly. Knowing how to resolve them quickly is a core engineering skill.
+
+## The ASA Git Workflow
+
+```
+main (protected)
+  │
+  └── feature/DMS-42-login-tests  ← your branch
+        │
+        └── You make commits here, then open a Pull Request to main
+```
+
+**Never push directly to `main`.** Always work on a feature branch.
+
+## Understanding Git Rebase vs Merge
+
+| Strategy | `git merge` | `git rebase` |
+|----------|-------------|--------------|
+| History | Creates a merge commit | Keeps history linear and clean |
+| Conflicts | Resolved once | May need to resolve per-commit |
+| When to use | When merging feature branches | When syncing with main daily |
+| **ASA Standard** | ❌ Avoid | ✅ Preferred |
+
+## The Daily Sync Workflow (Rebase)
+
+Every morning, sync your branch with the latest `main`:
+
+```bash
+# 1. Fetch the latest changes from GitHub
+git fetch origin
+
+# 2. Rebase your branch on top of the latest main
+git rebase origin/main
+
+# 3. If conflicts appear, Git will pause and show you:
+# CONFLICT (content): Merge conflict in tests/login.spec.ts
+```
+
+## Resolving a Conflict Step by Step
+
+When a conflict occurs, Git marks the file like this:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// tests/login.spec.ts
+test('should login as admin', async ({ page }) => {
+<<<<<<< HEAD (your changes)
+  await page.fill('#username', adminUser);
+=======
+  await page.fill('#email', adminEmail);
+>>>>>>> origin/main (team's changes)
+});
+```
+
+**How to read this:**
+- `<<<<<<< HEAD` = YOUR code
+- `=======` = the divider
+- `>>>>>>> origin/main` = THE TEAM'S code
+
+**To resolve:** Edit the file to keep the correct version, then remove the conflict markers:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Resolved: keep the team's change (use email field, not username)
+test('should login as admin', async ({ page }) => {
+  await page.fill('#email', adminEmail);
+});
+```
+
+Then tell Git you've resolved it:
+
+```bash
+# Mark the file as resolved
+git add tests/login.spec.ts
+
+# Continue the rebase
+git rebase --continue
+```
+
+## Handling Dependency Conflicts (`package.json`)
+
+When two engineers add different packages, `package.json` conflicts look like this:
+
+```json
+<<<<<<< HEAD
+  "dependencies": {
+    "lodash": "^4.17.21",
+=======
+  "dependencies": {
+    "date-fns": "^3.0.0",
+>>>>>>> origin/main
+```
+
+**Always keep BOTH** when it's a dependency conflict:
+
+```json
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "date-fns": "^3.0.0",
+```
+
+Then run `npm install` after resolving.
+
+## Escape Hatch: Abort and Start Over
+
+If a rebase goes wrong and you want to start fresh:
+
+```bash
+# Abort the current rebase (returns you to before it started)
+git rebase --abort
+
+# OR: Reset your branch to exactly match main (destructive!)
+git reset --hard origin/main
+```
+
+> [!CAUTION]
+> `git reset --hard` permanently deletes any uncommitted changes. Use with extreme care.
+
+## Quick Reference
+
+```bash
+git fetch origin          # Download latest remote changes
+git rebase origin/main    # Rebase your branch on main (ASA standard)
+git rebase --continue     # Continue after resolving conflicts
+git rebase --abort        # Cancel and go back
+git status                # See which files have conflicts
+git diff                  # See the actual differences
+```
+
+<CodeEditor
+  moduleId="43-fundamentals-debug"
+  taskIndex={0}
+  placeholder="// Task: Write the two commands to sync your branch with main using rebase&#10;git fetch origin&#10;git rebase origin/main"
+/>
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="43-fundamentals-debug"
+  taskIndex={1}
+  placeholder={`# Challenge: Complete the command line task
+# Write the correct command below:
+`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="fundamentals-debug" />
+

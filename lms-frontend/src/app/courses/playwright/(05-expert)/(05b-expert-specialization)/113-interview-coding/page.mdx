@@ -1,0 +1,75 @@
+# 21.1: Technical Phone Screen
+
+import { ChapterHeader } from '@/components/ChapterHeader';
+
+<ChapterHeader
+  objective="Master this critical concept to build robust, scalable Playwright automation."
+  time="15 mins"
+  type="Concept"
+/>
+
+## Learning Objectives
+- Understand the core architectural patterns
+- Identify and avoid common anti-patterns
+- Implement production-grade automation scripts
+
+
+If you are applying for a Senior SDET or Test Automation Architect position at a Tier-1 tech company, your first hurdle will not be Playwright. It will be a standard Software Engineering Coding Screen. You must prove you can write clean, efficient JavaScript/TypeScript under pressure.
+
+<div className="bg-slate-900 border border-slate-700 p-6 rounded-xl my-8">
+  <h3 className="text-cyan-400 font-bold m-0 mb-2 flex items-center gap-2">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    The Scenario
+  </h3>
+  <div className="text-slate-300 m-0">
+    You have joined a live-sharing session with a Staff Engineer. You have 45 minutes to solve three algorithmic problems without using testing frameworks.
+  </div>
+</div>
+
+## The Sandbox
+
+Implement your solutions in the editor below. Once you are done, read the architectural breakdowns in the Tabs.
+
+## Challenge Exercise
+
+**Business Context**:
+You have 45 minutes in a live interview setting for a Senior SDET role at a major pharma company.
+
+**Mission**:
+Design and implement a custom retry mechanism for an unstable third-party API that your tests rely on.
+
+**Constraints**:
+- Cannot use hardcoded `waitForTimeout`.
+- Must implement exponential backoff.
+
+**Deliverables**:
+- A robust polling utility function.
+- A sample test demonstrating its usage.
+
+**Success Criteria**:
+- The utility successfully retries 3 times before failing.
+- The implementation proves an advanced understanding of asynchronous JavaScript.
+
+**Hints**:
+- Hint 1: Utilize `try/catch` within a loop.
+- Hint 2: Use `Promise.resolve` appropriately.
+
+<CodeEditor
+  moduleId="113-interview-coding"
+  taskIndex={0}
+/>
+
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="interview-coding" />
+

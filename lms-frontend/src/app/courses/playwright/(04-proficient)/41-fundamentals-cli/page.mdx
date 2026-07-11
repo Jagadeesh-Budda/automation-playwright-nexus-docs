@@ -1,0 +1,217 @@
+﻿## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Master .env and playwright.config.js
+
+## What is the Playwright CLI?
+
+The Playwright CLI is the command-line interface that lets you **run, debug, generate, and configure** your entire test suite. Mastering it is the difference between a junior and a senior automation engineer.
+
+## Essential CLI Commands
+
+```bash
+# 8.2: CLI & Config Mastery
+npx playwright test
+
+# Run a specific file
+npx playwright test tests/login.spec.ts
+
+# Run with a specific browser
+npx playwright test --browser=firefox
+
+# Run in headed mode (you can see the browser)
+npx playwright test --headed
+
+# Run with the Trace Viewer enabled
+npx playwright test --trace=on
+
+# Debug a specific test interactively
+npx playwright test --debug
+
+# Generate code by recording browser actions
+npx playwright codegen https://example.com
+
+# Show the Playwright Inspector
+npx playwright test --ui
+
+# Open the last trace report
+npx playwright show-trace trace.zip
+```
+
+## Understanding `playwright.config.ts`
+
+This is the **brain** of your test suite. Every global setting lives here.
+
+```typescript
+// playwright.config.ts
+import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
+
+export default defineConfig({
+  // Directory where your test files live
+  testDir: './tests',
+
+  // Run all tests in parallel
+  fullyParallel: true,
+
+  // Retry failed tests twice in CI only
+  retries: process.env.CI ? 2 : 0,
+
+  // Global timeout for each test (30 seconds)
+  timeout: 30000,
+
+  // Global timeout for each assertion
+  expect: {
+    timeout: 5000,
+  },
+
+  // Global settings for every test
+  use: {
+    // The URL your tests navigate to by default
+    baseURL: process.env.BASE_URL,
+
+    // Collect traces on the first retry of a failed test
+    trace: 'on-first-retry',
+
+    // Take a screenshot on failure
+    screenshot: 'only-on-failure',
+
+    // Record a video on failure
+    video: 'on-first-retry',
+  },
+
+  // Define which browsers to test on
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'firefox',  use: { ...devices['Desktop Firefox'] } },
+    { name: 'webkit',   use: { ...devices['Desktop Safari'] } },
+  ],
+});
+```
+
+## The `.env` File: Storing Secrets Safely
+
+Never hardcode URLs, usernames, or passwords in your test files. Use a `.env` file instead.
+
+```bash
+# .env (NEVER commit this file to Git!)
+BASE_URL=https://staging.dms.AEGIS.com
+API_KEY=sk_live_abc123xyz
+ADMIN_USER=admin@example.com
+ADMIN_PASS=SuperSecret123
+```
+
+```typescript
+// In your test file, access variables like this:
+const url = process.env.BASE_URL!;
+const apiKey = process.env.API_KEY!;
+```
+
+> [!IMPORTANT]
+> Add `.env` to your `.gitignore` file immediately. Never push API keys or passwords to GitHub!
+
+```bash
+# .gitignore
+.env
+node_modules/
+test-results/
+playwright-report/
+```
+
+## Config Priority: Which Setting Wins?
+
+When the same setting is defined in multiple places, Playwright uses this priority order:
+
+```
+CLI Flag > test-level config > describe-level config > global config
+```
+
+**Example:** If your global config sets `timeout: 30000`, but you add `test.setTimeout(60000)` inside a specific test, that test gets 60 seconds while all others get 30.
+
+## Commonly Used CLI Flags
+
+| Flag | What it does |
+|------|-------------|
+| `--headed` | Opens a visible browser window |
+| `--debug` | Opens the Playwright Inspector |
+| `--trace=on` | Always record traces |
+| `--workers=4` | Run 4 tests in parallel |
+| `--retries=2` | Retry each failing test 2 times |
+| `--reporter=html` | Generate an HTML report |
+| `--grep "login"` | Only run tests whose name contains "login" |
+
+<CodeEditor
+  moduleId="41-fundamentals-cli"
+  taskIndex={0}
+  placeholder="// Task: Create a .env file snippet that contains BASE_URL and API_KEY&#10;BASE_URL=https://staging.example.com&#10;API_KEY=your_key_here"
+/>
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="41-fundamentals-cli"
+  taskIndex={1}
+  placeholder={`// Challenge: Write a script snippet that overrides Playwright configuration variables via command line.
+// npx playwright test --config=playwright.config.ts ...
+// Set: headed mode, run 3 workers, and run only tests tagged with '@smoke'
+// Write your command below:`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="fundamentals-cli" />
+

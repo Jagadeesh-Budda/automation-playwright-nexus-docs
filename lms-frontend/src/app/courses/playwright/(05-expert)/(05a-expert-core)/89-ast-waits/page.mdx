@@ -1,0 +1,242 @@
+﻿# 18.3: Zero Hardcoded Wait Gate
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Implement an automated gate for code reviews
+
+## The Wait Anti-Pattern Problem
+
+There are multiple ways engineers introduce waiting anti-patterns into Playwright code. Some are obvious, some are subtle. A naive linter only catches `waitForTimeout`. A sophisticated AST analyser catches all of them:
+
+| Anti-Pattern | Code | Severity |
+|---|---|---|
+| Hardcoded sleep | `page.waitForTimeout(3000)` | Critical |
+| Node.js sleep | `await new Promise(r => setTimeout(r, 2000))` | Critical |
+| Excessive timeout | `await locator.waitFor({ timeout: 60000 })` | Warning |
+| Polling loop | `while (!await el.isVisible()) { await page.waitForTimeout(100) }` | Critical |
+| Redundant waits | `await el.waitFor(); await el.click();` | Warning |
+
+## The Wait Pattern Analyser Rule
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// rules/waitPatternRule.ts
+import { LintRule, Violation } from '../utils/AstLinter';
+
+const BANNED_TIMEOUT_MS = 5000; // Timeouts longer than this trigger a warning
+
+export const waitPatternRule: LintRule = {
+  name: 'no-wait-antipatterns',
+  severity: 'error',
+  
+  check(ast, filePath) {
+    const violations: Violation[] = [];
+    
+    walk(ast, (node) => {
+      
+      // Pattern 1: page.waitForTimeout() or browser.waitForTimeout()
+      if (isMethodCall(node, 'waitForTimeout')) {
+        violations.push(createViolation(
+          'no-wait-antipatterns',
+          filePath,
+          node,
+          'waitForTimeout() is banned. Use web-first assertions: await expect(locator).toBeVisible()',
+          'error'
+        ));
+      }
+      
+      // Pattern 2: setTimeout wrapped in a Promise
+      if (
+        node.type === 'CallExpression' &&
+        node.callee?.name === 'setTimeout' &&
+        isInsideAwaitedPromise(node)
+      ) {
+        violations.push(createViolation(
+          'no-wait-antipatterns',
+          filePath,
+          node,
+          'Promisified setTimeout is a hardcoded sleep. Use Playwright waiting instead.',
+          'error'
+        ));
+      }
+      
+      // Pattern 3: waitFor() with excessive timeout
+      if (
+        isMethodCall(node, 'waitFor') &&
+        node.arguments?.[0]?.type === 'ObjectExpression'
+      ) {
+        const timeoutProp = node.arguments[0].properties?.find(
+          (p: any) => p.key?.name === 'timeout'
+        );
+        
+        if (timeoutProp?.value?.value > BANNED_TIMEOUT_MS) {
+          violations.push(createViolation(
+            'no-wait-antipatterns',
+            filePath,
+            node,
+            `waitFor() timeout of ${timeoutProp.value.value}ms exceeds limit of ${BANNED_TIMEOUT_MS}ms. Investigate why the element takes so long.`,
+            'warning'
+          ));
+        }
+      }
+      
+    });
+    
+    return violations;
+  }
+};
+
+function isMethodCall(node: any, methodName: string): boolean {
+  return (
+    node.type === 'CallExpression' &&
+    node.callee?.type === 'MemberExpression' &&
+    node.callee?.property?.name === methodName
+  );
+}
+
+// Helper: recursive AST walker with parent pointer attachment and circular reference protection
+function walk(node: any, visitor: (node: any) => void, parent?: any): void {
+  if (!node || typeof node !== 'object') return;
+  
+  if (parent) {
+    node.parent = parent;
+  }
+  
+  visitor(node);
+  
+  for (const key of Object.keys(node)) {
+    if (key === 'parent') continue; // Prevent circular stack overflow
+    if (Array.isArray(node[key])) {
+      node[key].forEach((child: any) => walk(child, visitor, node));
+    } else {
+      walk(node[key], visitor, node);
+    }
+  }
+}
+
+function isInsideAwaitedPromise(node: any): boolean {
+  // Walk up parent pointers to see if setTimeout is inside a NewExpression for Promise
+  let current = node.parent;
+  while (current) {
+    if (current.type === 'NewExpression' && current.callee?.name === 'Promise') {
+      return true;
+    }
+    current = current.parent;
+  }
+  return false;
+}
+
+function createViolation(
+  rule: string,
+  file: string,
+  node: any,
+  message: string,
+  severity: 'error' | 'warning'
+): Violation {
+  return {
+    rule,
+    file,
+    line: node.loc?.start?.line ?? 0,
+    column: node.loc?.start?.column ?? 0,
+    message,
+    severity,
+  };
+}
+```
+
+## What to Use Instead
+
+### Instead of `waitForTimeout`:
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ Banned
+await page.waitForTimeout(3000);
+
+// ✅ Wait for a specific UI condition
+await expect(page.getByText('Loading complete')).toBeVisible();
+await expect(page.getByRole('progressbar')).toBeHidden();
+await expect(page).toHaveURL('/dashboard');
+```
+
+### Instead of `Promise + setTimeout`:
+```typescript
+// ❌ Banned
+await new Promise(resolve => setTimeout(resolve, 2000));
+
+// ✅ Wait for a network request
+await page.waitForResponse(resp => resp.url().includes('/api/data'));
+```
+
+### Instead of a polling while-loop:
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ Banned
+while (!await page.getByText('Done').isVisible()) {
+  await page.waitForTimeout(500);
+}
+
+// ✅ Use expect.toPass for polling
+await expect(async () => {
+  await expect(page.getByText('Done')).toBeVisible();
+}).toPass({ timeout: 30_000, intervals: [500, 1000, 2000] });
+```
+
+<CodeEditor
+  moduleId="89-ast-waits"
+  taskIndex={0}
+  placeholder="// Task: The following code uses a critical anti-pattern (hardcoded wait).&#10;// Rewrite it to be flake-free using web-first assertions.&#10;//&#10;// BROKEN CODE:&#10;//   await page.waitForTimeout(2000);&#10;//   await page.click('#save');&#10;//&#10;// Write your corrected version below:"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+await page.getByRole('button', { name: 'Save' }).click();
+await expect(page.getByText('Saved successfully')).toBeVisible();
+```
+
+</details>
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** Your team wants to enforce the usage of `expect.toPass()` over polling while-loops, but developers keep creating custom retry functions instead.
+
+**Your Task:** Write an AST auditor rule that detects `while` loops containing a `waitForTimeout` call.
+
+**Constraints:**
+- ❌ You may NOT use `page.waitForTimeout` in your solution code
+- ✅ You MUST use the AST `walk` function
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="89-ast-waits"
+  taskIndex={1}
+  placeholder={`# Challenge: Complete the command line task
+# Write the correct command below:
+`}
+/>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Hardcoded Sleeps | `waitForTimeout` is flaky and slows down execution time |
+| Banning Sleeps | Using an AST linter guarantees no sleeps enter the codebase |
+| `toPass()` Polling | The robust, native Playwright alternative to custom while-loops |
+
+> [!TIP]
+> **Next Step:** Proceed to the AST Debug module to build on these concepts.
+
+<Quiz moduleId="ast-waits" />

@@ -1,0 +1,199 @@
+﻿# 16.3: Industrial Reporting
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Integrate Allure with Playwright
+
+## Why Reporting Matters
+
+A test that fails and produces no useful report is almost worthless. A well-configured report tells you:
+- Exactly which tests failed and why
+- A screenshot of what the browser showed at the moment of failure
+- The network request that caused the failure
+- How long each test took
+- Trends over time (is the suite getting better or worse?)
+
+## Built-in: Playwright HTML Report
+
+The Playwright HTML report is your first and most essential tool.
+
+```typescript
+// playwright.config.ts
+reporter: [
+  // Beautiful interactive HTML report
+  ['html', { 
+    open: 'never',  // Don't auto-open in CI
+    outputFolder: 'playwright-report',
+  }],
+  
+  // Terminal output during test run
+  ['list'],
+  
+  // Special reporter for GitHub Actions (shows failures inline in PR)
+  ...(process.env.CI ? [['github'] as any] : []),
+],
+```
+
+```bash
+# After running tests, view the report
+npx playwright show-report
+
+# Open a specific report folder
+npx playwright show-report path/to/playwright-report
+```
+
+**The HTML report includes:**
+- Pass/fail summary with filtering
+- For each failed test: error message, stack trace, screenshot, video, trace
+
+## Allure Report Integration
+
+Allure is an industry-standard, feature-rich reporting tool widely used in enterprise environments:
+
+```bash
+# Install Allure Playwright reporter
+npm install allure-playwright --save-dev
+npm install allure-commandline --save-dev
+```
+
+```typescript
+// playwright.config.ts
+reporter: [
+  ['allure-playwright', {
+    detail: true,
+    outputFolder: 'allure-results',
+    suiteTitle: false,
+  }],
+  ['html'],  // Keep HTML report too
+],
+```
+
+```typescript
+// Add Allure metadata to your tests for richer reports
+import { test, expect } from '../../fixtures/baseTest';
+import { allure } from 'allure-playwright';
+
+test.describe('E-Sign Compliance', () => {
+  test('reviewer signs with valid credentials', async ({ eSignPage }) => {
+    // Add metadata visible in the Allure report
+    await allure.epic('Compliance Testing');
+    await allure.feature('Electronic Signature');
+    await allure.story('Happy Path Signing');
+    await allure.severity('critical');
+    await allure.owner('qa-team@example.com');
+    
+    // Add step descriptions for the report
+    await allure.step('Open the document for signing', async () => {
+      await eSignPage.openDocument('DOC-001');
+    });
+    
+    await allure.step('Submit the signature', async () => {
+      await eSignPage.signDocument({ reason: 'Approved', password: process.env.REVIEWER_PASS! });
+    });
+    
+    await allure.step('Verify confirmation', async () => {
+      await expect(eSignPage.signatureConfirmation).toBeVisible();
+    });
+  });
+});
+```
+
+```bash
+# Generate and view the Allure report
+npx allure generate allure-results --clean
+npx allure open allure-report
+```
+
+## Custom Test Summary Reporter
+
+For Slack/email notifications, create a JSON summary:
+
+```typescript
+// reporters/summary-reporter.ts
+import { Reporter, FullResult, TestCase, TestResult } from '@playwright/test/reporter';
+import * as fs from 'fs';
+
+class SummaryReporter implements Reporter {
+  private summary = {
+    passed: 0, failed: 0, skipped: 0, startTime: 0, duration: 0,
+    failures: [] as Array<{ title: string; error: string }>,
+  };
+
+  onBegin() { this.summary.startTime = Date.now(); }
+
+  onTestEnd(test: TestCase, result: TestResult) {
+    if (result.status === 'passed') this.summary.passed++;
+    else if (result.status === 'failed') {
+      this.summary.failed++;
+      this.summary.failures.push({
+        title: test.title,
+        error: result.error?.message ?? 'Unknown error',
+      });
+    }
+    else this.summary.skipped++;
+  }
+
+  onEnd(result: FullResult) {
+    this.summary.duration = Date.now() - this.summary.startTime;
+    fs.writeFileSync('test-summary.json', JSON.stringify(this.summary, null, 2));
+    
+    const total = this.summary.passed + this.summary.failed + this.summary.skipped;
+    const passRate = Math.round((this.summary.passed / total) * 100);
+    
+    console.log(`\n📊 Test Summary:`);
+    console.log(`   ✅ Passed:  ${this.summary.passed}`);
+    console.log(`   ❌ Failed:  ${this.summary.failed}`);
+    console.log(`   ⏭️  Skipped: ${this.summary.skipped}`);
+    console.log(`   📈 Pass Rate: ${passRate}%`);
+    console.log(`   ⏱️  Duration: ${Math.round(this.summary.duration / 1000)}s`);
+  }
+}
+
+export default SummaryReporter;
+```
+
+```typescript
+// playwright.config.ts
+reporter: [
+  ['html'],
+  ['allure-playwright'],
+  ['./reporters/summary-reporter.ts'],
+],
+```
+
+## Trend Analysis: Tracking Results Over Time
+
+For long-running projects, save historical results:
+
+```bash
+# Save each run's results with a timestamp
+npx playwright test --reporter=json > reports/results-$(date +%Y%m%d-%H%M%S).json
+
+# Compare two runs to detect regressions
+diff reports/results-20240101-080000.json reports/results-20240102-080000.json
+```
+
+> [!TIP]
+> Consider integrating with **TestRail** or **Xray** for Jira to link your automated test results with your manual test case management system. This gives executives a complete view of test coverage across both automated and manual testing.
+
+## Challenge Exercise
+
+**Scenario**: Test failures are occurring in the nightly pipeline, but developers complain there isn't enough context to debug the issue.
+
+**Problem Statement**: The default reporter only outputs terminal text, missing the critical visual context of the failure.
+
+**Requirements**:
+- Configure the Playwright config to output a detailed HTML report.
+- Enable automatic trace viewer recording on test failure.
+
+**Success Criteria**:
+- The config successfully generates a zip artifact containing the trace.
+- Screenshots are attached to the report.
+
+<CodeEditor
+  moduleId="100-reporting"
+  taskIndex={0}
+/>
+
+

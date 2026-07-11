@@ -1,0 +1,339 @@
+﻿## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Follow a systematic approach to diagnose and fix test failures
+
+## The Debugging Mindset
+
+Every failing test has a root cause. The question is whether you find it in 5 minutes or 5 hours. This lesson gives you a systematic workflow that makes 5 minutes the norm.
+
+## Step 1: Reproduce the Failure
+
+```bash
+# 9.2: The Debugging Playbook
+npx playwright test tests/document-upload.spec.ts
+
+# Run it multiple times to check if it's flaky
+npx playwright test tests/document-upload.spec.ts --repeat-each=10
+
+# Run it headed (watch the browser)
+npx playwright test tests/document-upload.spec.ts --headed
+
+# Run it in slow motion
+npx playwright test tests/document-upload.spec.ts --headed --slow-mo=500
+```
+
+If the test fails locally → it's a real bug. If it only fails in CI → it's likely a timing/environment issue.
+
+## Step 2: Use Trace Viewer
+
+The Trace Viewer is your **most powerful debugging tool**. It records every action, network call, and DOM snapshot.
+
+```bash
+# Record a trace
+npx playwright test tests/document-upload.spec.ts --trace=on
+
+# Open the trace file
+npx playwright show-trace test-results/document-upload-spec/trace.zip
+```
+
+### What to look for in the Trace Viewer
+
+| Tab | What It Shows | What to Look For |
+|-----|--------------|------------------|
+| **Actions** | Timeline of every Playwright call | Actions that took too long or failed |
+| **Before/After** | DOM snapshot before and after each action | Elements missing or in wrong state |
+| **Network** | All HTTP requests and responses | Failed API calls, slow responses |
+| **Console** | Browser console output | JavaScript errors, warnings |
+| **Source** | Your test code with line highlighting | Which line triggered the failure |
+
+## Step 3: Interactive Debugging
+
+### `page.pause()` — Breakpoint in the Test
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('debug upload flow', async ({ page }) => {
+  await page.goto('/documents');
+  
+  await page.pause();  // ← Browser freezes here, Inspector opens
+  // Try locators in the Inspector console
+  // Step through remaining actions one by one
+  
+  await page.getByRole('button', { name: 'Upload' }).click();
+});
+```
+
+### `PWDEBUG=1` — Debug Without Modifying Code
+
+```bash
+# PowerShell
+$env:PWDEBUG=1; npx playwright test tests/document-upload.spec.ts
+
+# Bash
+PWDEBUG=1 npx playwright test tests/document-upload.spec.ts
+```
+
+Every action pauses automatically — step through with the Inspector UI.
+
+### `--ui` Mode — The Best of Both Worlds
+
+```bash
+npx playwright test --ui
+```
+
+Features:
+- Click any test to run it
+- Watch mode — auto-runs when files change
+- Click any step to see the DOM at that moment
+- Filter tests by status, file, or search
+- Built-in trace viewer
+
+## Step 4: Capture Console Errors
+
+JavaScript errors in the app can cause test failures without clear error messages:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('page has no JS errors', async ({ page }) => {
+  const errors: string[] = [];
+  
+  page.on('console', msg => {
+    if (msg.type() === 'error') errors.push(`Console: ${msg.text()}`);
+  });
+  
+  page.on('pageerror', error => {
+    errors.push(`Uncaught: ${error.message}`);
+  });
+  
+  await page.goto('/documents');
+  await page.getByRole('button', { name: 'Load All' }).click();
+  
+  if (errors.length > 0) {
+    console.log('Browser errors detected:');
+    errors.forEach(e => console.log(`  → ${e}`));
+  }
+  
+  expect(errors).toHaveLength(0);
+});
+```
+
+## Step 5: Screenshot Strategies
+
+### On-Failure Screenshots (Automatic)
+
+```typescript
+// playwright.config.ts
+export default defineConfig({
+  use: {
+    screenshot: 'only-on-failure',  // Auto-capture on any failure
+    // Other options: 'on', 'off'
+  },
+});
+```
+
+### Custom Screenshots with Context
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('document workflow', async ({ page }, testInfo) => {
+  await page.goto('/documents');
+  
+  // Capture at key checkpoints
+  await testInfo.attach('step-1-loaded', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
+  
+  await page.getByRole('button', { name: 'Upload' }).click();
+  
+  await testInfo.attach('step-2-upload-dialog', {
+    body: await page.screenshot(),
+    contentType: 'image/png',
+  });
+});
+```
+
+### Full-Page Screenshot
+
+```typescript
+const screenshot = await page.screenshot({
+  fullPage: true,  // Capture entire scrollable page
+  path: 'test-results/full-page.png',
+});
+```
+
+## Step 6: Rerunning Failures
+
+```bash
+# Run only tests that failed in the last run
+npx playwright test --last-failed
+
+# Retry with different retry counts
+npx playwright test --retries=3
+
+# Run specific test by line number
+npx playwright test tests/document.spec.ts:45
+```
+
+## VS Code Playwright Extension
+
+Install `ms-playwright.playwright` for the best debugging experience:
+
+| Feature | How to Use |
+|---------|------------|
+| **Run test** | Click the green play button next to `test()` |
+| **Debug test** | Right-click test → "Debug Test" → set breakpoints |
+| **Pick locator** | Click "Pick Locator" in the Testing sidebar |
+| **Record at cursor** | Click "Record" → actions insert code at your cursor |
+| **Show browser** | Check "Show Browser" → watch tests run headed |
+| **Watch mode** | Toggle "Watch" → tests re-run on file save |
+
+## Common Failure Patterns & Fixes
+
+### Pattern 1: "Element not found" but it's on the page
+
+**Cause:** The locator doesn't match because of a subtle difference (extra whitespace, different case, hidden characters).
+
+```bash
+# Use the Inspector to find the right locator
+$env:PWDEBUG=1; npx playwright test tests/failing.spec.ts
+# In the Inspector console, try your locator manually
+```
+
+### Pattern 2: Test passes locally, fails in CI
+
+**Causes:**
+- Different screen resolution → add `viewport` to config
+- Different timezone → add `timezoneId` to config  
+- Slower CI machine → increase `actionTimeout`
+- Missing browser dependencies → `npx playwright install --with-deps`
+
+### Pattern 3: Test is flaky (sometimes passes, sometimes fails)
+
+**Causes:**
+- Race condition between animation and click → add `await expect(el).toBeVisible()` before click
+- API response varies → mock with `page.route()`
+- Database state from previous tests → ensure cleanup in fixture teardown
+- Parallel test data collision → use unique IDs with `Date.now()`
+
+### Pattern 4: Timeout on `page.goto()`
+
+**Causes:**
+- Slow page load → increase `navigationTimeout`
+- Page never reaches "load" event → use `waitUntil: 'domcontentloaded'`
+- Network issue → check `page.on('requestfailed')` for blocked requests
+
+```typescript
+page.on('requestfailed', request => {
+  console.log(`FAILED: ${request.url()} - ${request.failure()?.errorText}`);
+});
+```
+
+## The Complete Debugging Checklist
+
+```
+□ Can I reproduce it locally?
+  → npx playwright test <file> --headed
+  
+□ What does the trace show?
+  → npx playwright test <file> --trace=on
+  → npx playwright show-trace test-results/<dir>/trace.zip
+  
+□ Are there JavaScript errors?
+  → page.on('console') + page.on('pageerror')
+  
+□ Is the locator correct?
+  → page.pause() or PWDEBUG=1
+  
+□ Is it a timing issue?
+  → Replace isVisible() with expect().toBeVisible()
+  → Replace waitForTimeout() with web-first assertion
+  
+□ Is it environment-specific?
+  → Check viewport, timezone, locale settings
+  → Check CI-specific configurations
+  
+□ Is the fix stable?
+  → npx playwright test <file> --repeat-each=50
+```
+
+<CodeEditor
+  moduleId="51-debugging-workflow"
+  taskIndex={0}
+  placeholder="// Task: Set up console error monitoring for a test.&#10;// Requirements:&#10;//   1. Collect all browser console errors into an array&#10;//   2. Collect all uncaught page errors into the same array&#10;//   3. After your test actions, assert that zero errors were found&#10;//&#10;// Hint: Use page.on('console') and page.on('pageerror')"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+const errors: string[] = [];
+page.on('console', msg => {
+  if (msg.type() === 'error') errors.push(msg.text());
+});
+page.on('pageerror', err => errors.push(err.message));
+// ... run test actions ...
+expect(errors).toHaveLength(0);
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="51-debugging-workflow"
+  taskIndex={1}
+  placeholder={`# Challenge: Complete the command line task
+# Write the correct command below:
+`}
+/>
+<Quiz moduleId="debugging-workflow" />
+

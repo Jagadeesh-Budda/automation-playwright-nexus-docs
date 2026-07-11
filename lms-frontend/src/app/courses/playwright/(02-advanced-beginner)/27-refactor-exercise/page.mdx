@@ -1,0 +1,119 @@
+﻿
+# 4.4: The Refactor Exercise
+
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Complete 4.4: The Refactor Exercise
+
+## Your Mission
+
+This is the most important exercise in the course so far. You are going to fix the "Duplication Nightmare."
+
+In your project, you have three test files that all test different parts of the application, but they all start by logging in.
+
+Currently, the login logic is duplicated in the `beforeEach` hook of every single file.
+
+### Step 1: Create the Page Object
+
+1. Look at the duplicated login code in your tests.
+2. Identify the 3 locators being used (Email, Password, Sign In).
+3. Identify the action (filling the fields and clicking).
+4. Create `pages/LoginPage.ts` and encapsulate this logic into a class.
+
+### Step 2: Refactor the Tests
+
+1. Open `dashboard.spec.ts`.
+2. Import your new `LoginPage`.
+3. In the `beforeEach` hook, delete the duplicated `getByLabel` code.
+4. Replace it by instantiating `LoginPage` and calling `.login()`.
+5. Repeat this for `settings.spec.ts` and `upload.spec.ts`.
+
+### Step 3: Verify
+
+Run your tests!
+
+```bash
+npx playwright test
+```
+
+If they all still pass, you have successfully refactored the codebase.
+
+## The "Aha!" Moment
+
+If you want to truly feel the power of what you just built, try this:
+
+1. Open `pages/LoginPage.ts`.
+2. Change the email locator from `getByLabel('Email')` to `getByLabel('Wrong Label')`.
+3. Run the tests. **Watch all 3 files fail.**
+4. Change it back to `'Email'`.
+5. Run the tests. **Watch all 3 files pass.**
+
+You just controlled the fate of an entire test suite from a single line of code.
+
+You are no longer just writing scripts. You are engineering a framework.
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="27-refactor-exercise"
+  taskIndex={0}
+  placeholder="// Challenge: Implement the workflow\n// Write your code here:"
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="27-refactor-exercise" />

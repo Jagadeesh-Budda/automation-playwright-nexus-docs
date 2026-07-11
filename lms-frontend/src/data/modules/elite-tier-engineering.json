@@ -1,0 +1,417 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T10:36:32.990Z",
+  "lessons": [
+    {
+      "id": "200-test-data-management",
+      "title": "Module D: Test Data Management",
+      "group": "💎 ELITE TIER: ENGINEERING",
+      "isPro": true,
+      "meta": {
+        "time": "45 mins",
+        "type": "Code",
+        "outcome": "API Seeding, Cleanup, Idempotency, Isolation, and Shared State."
+      },
+      "slug": "200-test-data-management",
+      "url": "courses/playwright/200-test-data-management",
+      "tasks": [
+        {
+          "id": "passes_monday_fails_friday",
+          "title": "Passes Monday, Fails Friday Challenge",
+          "hint": "Identify the shared state pollution and implement proper teardown.",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "afterEach"
+            },
+            {
+              "type": "contains",
+              "value": "apiContext.delete"
+            }
+          ]
+        }
+      ],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "A test registers a new user, but fails on the second execution because the email 'testuser@email.com' is already taken.",
+            "q": "What is the most basic strategy to resolve this data collision?",
+            "options": [
+              "Append a unique timestamp or UUID to the email string during test execution",
+              "Manually delete the user from the DB before running tests",
+              "Catch the error and ignore it",
+              "Run tests synchronously"
+            ],
+            "a": "Append a unique timestamp or UUID to the email string during test execution",
+            "explanation": "Generating dynamic, randomized identifiers ensures every test execution creates unique data, preventing state collisions."
+          },
+          {
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "const user = require('./test-data.json');\ntest('login', async ({ page }) => { ... });",
+            "q": "What is the limitation of using a static JSON file for test data?",
+            "options": [
+              "It cannot contain dynamic identifiers, leading to collisions if tests run in parallel or mutate the data",
+              "JSON files cannot be read by Node.js",
+              "It makes the test run incredibly slow",
+              "Playwright blocks file system access"
+            ],
+            "a": "It cannot contain dynamic identifiers, leading to collisions if tests run in parallel or mutate the data",
+            "explanation": "Static files share the exact same data payload across all tests. If one test mutates the user profile, the other tests using that static file will fail."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "Your test suite needs realistic user names, addresses, and credit card numbers.",
+            "q": "Which popular npm package is the industry standard for generating this realistic mock data on the fly?",
+            "options": [
+              "Faker.js (@faker-js/faker)",
+              "Axios",
+              "Playwright-mock",
+              "Lodash"
+            ],
+            "a": "Faker.js (@faker-js/faker)",
+            "explanation": "Faker generates highly realistic, randomized data for almost any category (names, dates, finances), making it perfect for dynamic test factories."
+          },
+          {
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "Your tests create database records using API calls in the `beforeEach` block.",
+            "q": "What are the core requirements for managing this data lifecycle safely? (Select all that apply)",
+            "options": [
+              "Store the generated record IDs in variables so they can be deleted later",
+              "Implement an `afterEach` or fixture teardown to clean up the records via API",
+              "Ensure the teardown block runs even if the test fails",
+              "Use direct SQL queries instead of the API"
+            ],
+            "a": [
+              "Store the generated record IDs in variables so they can be deleted later",
+              "Implement an `afterEach` or fixture teardown to clean up the records via API",
+              "Ensure the teardown block runs even if the test fails"
+            ],
+            "explanation": "Data cleanup requires tracking what was created and ensuring it gets deleted unconditionally. Using the API is generally preferred over direct SQL to ensure business logic triggers correctly."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You are testing a complex financial reporting dashboard. Creating the necessary 50,000 transaction records via API takes 2 minutes per test.",
+            "q": "What is the most architecturally sound way to provide this data without destroying test execution speed?",
+            "options": [
+              "Use a pre-seeded Database Dump / Snapshot that is rapidly loaded before the test suite begins",
+              "Use UI automation to create the records",
+              "Mock the network responses completely so the database isn't involved at all",
+              "Increase the test timeout to 3 minutes"
+            ],
+            "a": "Use a pre-seeded Database Dump / Snapshot that is rapidly loaded before the test suite begins",
+            "explanation": "When data creation is overwhelmingly slow, relying on pre-seeded infrastructure (or Docker volumes) is the fastest approach for E2E tests. (Mocking is also valid for component tests, but reduces E2E confidence)."
+          }
+        ]
+      },
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "enterprise",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET"
+    },
+    {
+      "id": "201-network-mocking-deep-dive",
+      "title": "Module E: Network Mocking Deep Dive",
+      "group": "💎 ELITE TIER: ENGINEERING",
+      "isPro": true,
+      "meta": {
+        "time": "45 mins",
+        "type": "Code",
+        "outcome": "Simulate 500s, Timeouts, Offline, Rate Limiting."
+      },
+      "slug": "201-network-mocking-deep-dive",
+      "url": "courses/playwright/201-network-mocking-deep-dive",
+      "tasks": [
+        {
+          "id": "network_edge_cases",
+          "title": "Network Scenarios",
+          "hint": "Use route.fulfill and route.abort",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "route.abort('failed')"
+            },
+            {
+              "type": "contains",
+              "value": "route.fulfill({ status: 500 })"
+            },
+            {
+              "type": "contains",
+              "value": "route.fulfill({ status: 429 })"
+            }
+          ]
+        }
+      ],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You are testing a UI that displays a list of users fetched from `/api/users`. The backend server is currently down.",
+            "q": "How can you run the test anyway?",
+            "options": [
+              "Use page.route('**/api/users', route => route.fulfill({ json: mockUsers }))",
+              "Use page.waitForResponse and hardcode the timeout",
+              "You must wait for the server to come back up",
+              "Comment out the assertion"
+            ],
+            "a": "Use page.route('**/api/users', route => route.fulfill({ json: mockUsers }))",
+            "explanation": "Mocking intercepts the request at the browser level and fulfills it instantly with your predefined JSON, removing backend dependency."
+          },
+          {
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "await page.route('**/*', route => route.abort());",
+            "q": "What happens if you run this line at the beginning of your test?",
+            "options": [
+              "It blocks all network requests, so the page will fail to load CSS, JS, and API data",
+              "It mocks the entire internet successfully",
+              "It ignores CORS errors",
+              "It aborts the test execution"
+            ],
+            "a": "It blocks all network requests, so the page will fail to load CSS, JS, and API data",
+            "explanation": "`route.abort()` completely kills the intercepted request. Routing `**/*` applies to literally everything the browser tries to fetch."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You want to mock a specific API response, but only if the request contains a specific header (e.g., `x-mock-test: true`).",
+            "q": "How do you achieve this conditional routing?",
+            "options": [
+              "Check the `route.request().headers()` inside the route callback. If the header exists, `fulfill()`. If not, call `route.fallback()` to let it go to the real server.",
+              "Pass the header requirement directly to the URL matching pattern string",
+              "It is impossible; you must mock all or nothing",
+              "Use page.evaluate to rewrite the headers"
+            ],
+            "a": "Check the `route.request().headers()` inside the route callback. If the header exists, `fulfill()`. If not, call `route.fallback()` to let it go to the real server.",
+            "explanation": "The `route` object provides access to the full `request()`. `route.fallback()` is critical for conditional mocking, allowing unmatched requests to proceed normally."
+          },
+          {
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "You are testing an error boundary in your React application.",
+            "q": "Which mocking strategies allow you to force the UI into an error state? (Select all that apply)",
+            "options": [
+              "route.fulfill({ status: 500, body: 'Internal Server Error' })",
+              "route.abort('failed')",
+              "route.fallback()",
+              "route.continue()"
+            ],
+            "a": [
+              "route.fulfill({ status: 500, body: 'Internal Server Error' })",
+              "route.abort('failed')"
+            ],
+            "explanation": "You can either fulfill the request with an HTTP error code (simulating a backend crash) or abort it with an error string (simulating a network failure/DNS issue)."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You want to test the real backend integration, but you need to modify one specific field in the JSON response as it comes back from the real server.",
+            "q": "How do you implement this 'Modify Response' pattern?",
+            "options": [
+              "Fetch the real response using `route.fetch()`, read the JSON, modify the field, and then call `route.fulfill({ response, json: modifiedJson })`",
+              "Call `route.continue()`, then intercept the response object and mutate it in memory",
+              "It cannot be done; you must either fully mock or fully hit the real server",
+              "Use a proxy server outside of Playwright"
+            ],
+            "a": "Fetch the real response using `route.fetch()`, read the JSON, modify the field, and then call `route.fulfill({ response, json: modifiedJson })`",
+            "explanation": "This is a highly advanced pattern. `route.fetch()` fires the request to the real server and captures the response. You then mutate the payload and fulfill the route using the mutated data."
+          }
+        ]
+      },
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "enterprise",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET"
+    },
+    {
+      "id": "202-refactor-bloathouse",
+      "title": "Module F: Refactor the Bloathouse",
+      "group": "💎 ELITE TIER: ENGINEERING",
+      "isPro": true,
+      "meta": {
+        "time": "120 mins",
+        "type": "Portfolio",
+        "outcome": "Refactor a monolithic 500-test framework into an optimized suite."
+      },
+      "slug": "202-refactor-bloathouse",
+      "url": "courses/playwright/202-refactor-bloathouse",
+      "tasks": [
+        {
+          "id": "bloathouse_refactor",
+          "title": "Optimization Report",
+          "hint": "Reduce execution time, duplication, and hidden waits.",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ],
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "enterprise",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET"
+    },
+    {
+      "id": "203-failure-academy",
+      "title": "Module G: The Failure Academy",
+      "group": "💎 ELITE TIER: ENGINEERING",
+      "isPro": true,
+      "meta": {
+        "time": "120 mins",
+        "type": "Code",
+        "outcome": "Solve Environment Drift, Race Conditions, Browser Layout Bugs, and Data Pollution."
+      },
+      "slug": "203-failure-academy",
+      "url": "courses/playwright/203-failure-academy",
+      "tasks": [
+        {
+          "id": "failure_academy_suite",
+          "title": "Failure Academy Test Suite",
+          "hint": "Analyze the elite-test-bed route and implement tests that overcome the intentionally inserted flaws.",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "Your test fails with a `strict mode violation` error on `page.locator('.submit-btn').click()`.",
+            "q": "What does this error fundamentally mean?",
+            "options": [
+              "Playwright found more than one element matching the selector, so it refused to click because it doesn't know which one you meant",
+              "The element is hidden and cannot be clicked",
+              "The selector is invalid CSS",
+              "The page has not finished loading"
+            ],
+            "a": "Playwright found more than one element matching the selector, so it refused to click because it doesn't know which one you meant",
+            "explanation": "Strict mode ensures test integrity. If a locator resolves to multiple nodes, Playwright throws an error rather than silently clicking the wrong one."
+          },
+          {
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "await page.locator('button').nth(3).click();",
+            "q": "Why is resolving strict mode errors by using `.nth()` considered a code smell?",
+            "options": [
+              "Because if a developer adds a new button earlier in the DOM, the index shifts and the test breaks. It is highly brittle.",
+              "Because nth() is deprecated",
+              "Because nth() only works on arrays",
+              "Because it is too slow"
+            ],
+            "a": "Because if a developer adds a new button earlier in the DOM, the index shifts and the test breaks. It is highly brittle.",
+            "explanation": "Index-based location assumes the DOM structure never changes. Using text or ARIA roles is significantly more resilient."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "Your test fails with `Element is intercepted by another element`.",
+            "q": "What is the physical reality happening in the browser?",
+            "options": [
+              "Playwright attempted to click the target, but an overlay, sticky header, or modal was covering the exact coordinates",
+              "The element has pointer-events: none",
+              "The element was deleted from the DOM just before the click",
+              "The element is outside the viewport"
+            ],
+            "a": "Playwright attempted to click the target, but an overlay, sticky header, or modal was covering the exact coordinates",
+            "explanation": "Playwright calculates the X/Y coordinates of the element's center. If it determines that another element (like a spinner or modal) is physically layered on top, it throws an interception error."
+          },
+          {
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "You are dealing with an incredibly flaky third-party animation that causes interception errors.",
+            "q": "Which strategies can you use to safely bypass this issue? (Select all that apply)",
+            "options": [
+              "Use `click({ force: true })` to bypass the actionability checks and dispatch the event directly to the element",
+              "Use a web-first assertion to wait for the overlay to be hidden before clicking",
+              "Use `page.waitForTimeout(5000)`",
+              "Use `page.evaluate` to trigger the click via JavaScript"
+            ],
+            "a": [
+              "Use `click({ force: true })` to bypass the actionability checks and dispatch the event directly to the element",
+              "Use a web-first assertion to wait for the overlay to be hidden before clicking",
+              "Use `page.evaluate` to trigger the click via JavaScript"
+            ],
+            "explanation": "Forcing the click or using JS bypasses the visual check. The *best* approach is waiting for the overlay to disappear. Hardcoding timeouts is an anti-pattern."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "A test randomly fails with a `TargetClosedError` or `Session closed` exception during navigation.",
+            "q": "What architectural issue most commonly triggers this class of fatal error?",
+            "options": [
+              "The test did not await a Promise correctly, causing the test block to finish and close the browser while an asynchronous operation was still running in the background",
+              "The internet connection dropped",
+              "The locator was wrong",
+              "The assertion failed"
+            ],
+            "a": "The test did not await a Promise correctly, causing the test block to finish and close the browser while an asynchronous operation was still running in the background",
+            "explanation": "Floating promises cause extreme havoc. The runner thinks the test is done, tears down the context, and then the orphaned promise attempts to execute against a destroyed page."
+          }
+        ]
+      },
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "enterprise",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET"
+    }
+  ]
+}

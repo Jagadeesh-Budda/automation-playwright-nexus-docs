@@ -1,0 +1,389 @@
+﻿# 14.6: Accessibility Testing
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Master accessibility assertions and ARIA snapshots
+
+## Why Accessibility Testing Matters
+
+Accessibility isn't optional — it's a **legal requirement** in many industries (ADA, Section 508, EU Accessibility Act). In regulated environments like pharmaceuticals, inaccessible software can block FDA compliance.
+
+Playwright has **first-class accessibility testing** built in — no plugins needed.
+
+## The Accessibility Tree
+
+Every web page has two representations:
+1. **DOM tree** — the HTML structure (`<div>`, `<button>`, `<input>`)
+2. **Accessibility tree** — the semantic structure that screen readers see (`button "Submit"`, `textbox "Email"`)
+
+Playwright's `getByRole()` locators query the **accessibility tree**, which is why they're the gold standard for locators.
+
+## Accessibility Assertions
+
+### `toHaveAccessibleName()`
+
+Checks the element's accessible name — what a screen reader announces:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Verify buttons have proper accessible names
+await expect(page.getByRole('button').first()).toHaveAccessibleName('Upload Document');
+
+// Works for images too
+await expect(page.getByRole('img').first()).toHaveAccessibleName('Company Logo');
+
+// Regex matching
+await expect(page.getByRole('link').first()).toHaveAccessibleName(/View Document/i);
+```
+
+### `toHaveAccessibleDescription()`
+
+Checks the element's `aria-describedby` or `aria-description`:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Verify form fields have helpful descriptions
+await expect(page.getByRole('textbox', { name: 'Password' }))
+  .toHaveAccessibleDescription('Must be at least 8 characters');
+
+// Verify error messages are linked to inputs
+await expect(page.getByRole('textbox', { name: 'Email' }))
+  .toHaveAccessibleDescription('Please enter a valid email address');
+```
+
+### `toHaveRole()`
+
+Verify elements have the correct ARIA role:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Navigation landmark
+await expect(page.locator('nav')).toHaveRole('navigation');
+
+// Alert region
+await expect(page.getByText('Document saved')).toHaveRole('alert');
+
+// Dialog
+await expect(page.locator('[data-testid="confirm-modal"]')).toHaveRole('dialog');
+```
+
+## ARIA Snapshot Testing
+
+Capture and compare the **entire accessibility tree** of a component:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('document table has correct accessibility structure', async ({ page }) => {
+  await page.goto('/documents');
+  
+  // Snapshot the accessibility tree of the table
+  await expect(page.getByRole('table')).toMatchAriaSnapshot(`
+    - table "Documents":
+      - rowgroup:
+        - row:
+          - columnheader "Title"
+          - columnheader "Status"
+          - columnheader "Actions"
+      - rowgroup:
+        - row:
+          - cell "Protocol v2.0"
+          - cell "Approved"
+          - cell:
+            - button "View"
+            - button "Export"
+  `);
+});
+```
+
+> [!TIP]
+> Generate the initial snapshot by running the test with `--update-snapshots`, then review the output to verify it matches your expectations.
+
+### Partial ARIA Snapshots with Regex
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+await expect(page.getByRole('navigation')).toMatchAriaSnapshot(`
+  - navigation "Main":
+    - link "Dashboard"
+    - link "Documents"
+    - link /Settings|Preferences/
+`);
+```
+
+## Inspecting the Accessibility Tree
+
+Use Playwright's accessibility API to inspect what the tree looks like:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('inspect accessibility tree', async ({ page }) => {
+  await page.goto('/documents');
+  
+  // Get the full accessibility tree snapshot
+  const snapshot = await page.accessibility.snapshot();
+  console.log(JSON.stringify(snapshot, null, 2));
+  
+  // Get the tree for a specific element
+  const button = page.getByRole('button', { name: 'Upload' });
+  const buttonNode = await page.accessibility.snapshot({ root: await button.elementHandle() });
+  console.log(buttonNode);
+});
+```
+
+## Common Accessibility Checks
+
+### 1. All images have alt text
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('all images have alt text', async ({ page }) => {
+  await page.goto('/documents');
+  
+  const images = await page.getByRole('img').all();
+  for (const img of images) {
+    const alt = await img.getAttribute('alt');
+    expect(alt, `Image missing alt text: ${await img.evaluate(el => el.outerHTML)}`).toBeTruthy();
+    expect(alt!.length, 'Alt text should be descriptive').toBeGreaterThan(3);
+  }
+});
+```
+
+### 2. Form fields have labels
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('all form fields have associated labels', async ({ page }) => {
+  await page.goto('/documents/new');
+  
+  const inputs = await page.locator('input:not([type="hidden"])').all();
+  for (const input of inputs) {
+    const name = await input.getAttribute('aria-label') 
+      || await input.getAttribute('aria-labelledby')
+      || await input.evaluate(el => {
+        const id = el.getAttribute('id');
+        return id ? document.querySelector(`label[for="${id}"]`)?.textContent : null;
+      });
+    
+    expect(name, `Input missing label: ${await input.evaluate(el => el.outerHTML)}`).toBeTruthy();
+  }
+});
+```
+
+### 3. Color contrast is sufficient
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('interactive elements have sufficient contrast', async ({ page }) => {
+  await page.goto('/documents');
+  
+  const buttons = await page.getByRole('button').all();
+  for (const button of buttons) {
+    const styles = await button.evaluate(el => {
+      const computed = getComputedStyle(el);
+      return {
+        color: computed.color,
+        backgroundColor: computed.backgroundColor,
+        fontSize: computed.fontSize,
+      };
+    });
+    
+    // Log for manual review — automated contrast calculation is complex
+    console.log(`Button: ${await button.textContent()} | Color: ${styles.color} | BG: ${styles.backgroundColor}`);
+  }
+});
+```
+
+### 4. Keyboard navigation works
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('all interactive elements are keyboard-navigable', async ({ page }) => {
+  await page.goto('/documents');
+  
+  // Tab through the page and verify focus reaches key elements
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: 'Dashboard' })).toBeFocused();
+  
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('link', { name: 'Documents' })).toBeFocused();
+  
+  await page.keyboard.press('Tab');
+  await expect(page.getByRole('button', { name: 'Upload' })).toBeFocused();
+  
+  // Press Enter to activate the focused button
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('dialog', { name: 'Upload Document' })).toBeVisible();
+  
+  // Escape should close the dialog
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog')).toBeHidden();
+});
+```
+
+## Integrating with axe-core
+
+For comprehensive WCAG audits, combine Playwright with `@axe-core/playwright`:
+
+```bash
+npm install --save-dev @axe-core/playwright
+```
+
+```typescript
+import { test, expect } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
+
+test('document page has no accessibility violations', async ({ page }) => {
+  await page.goto('/documents');
+  
+  let results = await new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+    .exclude('.third-party-widget')  // Exclude elements you can't control
+    .analyze();
+  
+  expect(results.violations).toEqual([]);
+});
+
+test('login form meets WCAG AA', async ({ page }) => {
+  await page.goto('/login');
+  
+  const results = await new AxeBuilder({ page })
+    .include('form')  // Only scan the login form
+    .analyze();
+  
+  // Log violations for debugging
+  if (results.violations.length > 0) {
+    console.log('Violations:');
+    results.violations.forEach(v => {
+      console.log(`  [${v.impact}] ${v.id}: ${v.description}`);
+      v.nodes.forEach(n => console.log(`    → ${n.html}`));
+    });
+  }
+  
+  expect(results.violations).toEqual([]);
+});
+```
+
+## Accessibility Testing in CI
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Create a reusable a11y test helper
+async function checkAccessibility(page: Page, options?: { exclude?: string[] }) {
+  const builder = new AxeBuilder({ page })
+    .withTags(['wcag2a', 'wcag2aa']);
+  
+  if (options?.exclude) {
+    for (const selector of options.exclude) {
+      builder.exclude(selector);
+    }
+  }
+  
+  const results = await builder.analyze();
+  
+  expect(
+    results.violations,
+    `${results.violations.length} accessibility violations found`
+  ).toEqual([]);
+}
+
+// Use in every page test
+test('dashboard is accessible', async ({ page }) => {
+  await page.goto('/dashboard');
+  await checkAccessibility(page);
+});
+
+test('document list is accessible', async ({ page }) => {
+  await page.goto('/documents');
+  await checkAccessibility(page, { exclude: ['.legacy-chart'] });
+});
+```
+
+<CodeEditor
+  moduleId="68-accessibility"
+  taskIndex={0}
+  placeholder="// Task: Write a test that verifies ALL buttons on a page have accessible names.&#10;// Requirements:&#10;//   1. Get all button elements on the page&#10;//   2. Loop through each button&#10;//   3. Assert each one has a non-empty accessible name&#10;//&#10;// Hint: Use getByRole('button').all() and toHaveAccessibleName()"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+const buttons = await page.getByRole('button').all();
+for (const button of buttons) {
+  await expect(button).toHaveAccessibleName(/.+/);
+}
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="68-accessibility"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('accessibility checks', async ({ page }) => {
+  await page.goto('https://accessible.org');
+  // Challenge: Retrieve all buttons and assert that every button has a non-empty accessible name
+  // Complete the script below:
+});`}
+/>
+<Quiz moduleId="accessibility" />
+

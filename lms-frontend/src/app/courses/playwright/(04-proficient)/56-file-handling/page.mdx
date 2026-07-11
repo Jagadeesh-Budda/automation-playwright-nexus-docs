@@ -1,0 +1,380 @@
+﻿# 10.5: File Upload & Download
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Master setInputFiles(), download handling, and file validation
+
+## File Uploads
+
+### Basic File Upload with `setInputFiles()`
+
+```typescript
+// Upload a single file
+await page.getByLabel('Upload Document').setInputFiles('tests/fixtures/report.pdf');
+
+// Upload multiple files
+await page.getByLabel('Upload Documents').setInputFiles([
+  'tests/fixtures/report.pdf',
+  'tests/fixtures/appendix.docx',
+  'tests/fixtures/data.xlsx',
+]);
+
+// Clear the file input (remove all files)
+await page.getByLabel('Upload Document').setInputFiles([]);
+```
+
+### Targeting Hidden File Inputs
+
+Most file upload UIs hide the native `<input type="file">` and show a styled button instead. Find the input and set files directly:
+
+```typescript
+// The visible "Upload" button triggers a hidden file input
+const fileInput = page.locator('input[type="file"]');
+await fileInput.setInputFiles('tests/fixtures/report.pdf');
+```
+
+### Creating Files on the Fly
+
+When you need a test file with specific content:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+import * as fs from 'fs';
+import * as path from 'path';
+
+test('upload a dynamically created CSV', async ({ page }) => {
+  // Create a temp file with test data
+  const csvContent = 'Name,Department,Status\nProtocol A,QA,Active\nProtocol B,Regulatory,Draft';
+  const csvPath = path.join('test-results', 'test-data.csv');
+  fs.writeFileSync(csvPath, csvContent);
+  
+  await page.getByLabel('Import CSV').setInputFiles(csvPath);
+  await page.getByRole('button', { name: 'Import' }).click();
+  
+  await expect(page.getByText('2 records imported')).toBeVisible();
+});
+```
+
+### Upload via Buffer (No File on Disk)
+
+```typescript
+// Create a file directly from a buffer — no temp file needed
+await page.getByLabel('Upload').setInputFiles({
+  name: 'test-document.txt',
+  mimeType: 'text/plain',
+  buffer: Buffer.from('This is a test document for automation'),
+});
+```
+
+### File Upload with Size Validation
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('rejects files larger than 10MB', async ({ page }) => {
+  // Create a large file buffer (11MB)
+  const largeBuffer = Buffer.alloc(11 * 1024 * 1024, 'x');
+  
+  await page.getByLabel('Upload').setInputFiles({
+    name: 'huge-file.pdf',
+    mimeType: 'application/pdf',
+    buffer: largeBuffer,
+  });
+  
+  await expect(page.getByRole('alert')).toContainText('File size exceeds 10MB limit');
+});
+```
+
+### File Type Validation
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('rejects non-PDF files', async ({ page }) => {
+  await page.getByLabel('Upload Document').setInputFiles({
+    name: 'malicious.exe',
+    mimeType: 'application/octet-stream',
+    buffer: Buffer.from('fake exe content'),
+  });
+  
+  await expect(page.getByRole('alert')).toContainText('Only PDF files are allowed');
+});
+```
+
+## Drag and Drop File Upload
+
+When the upload area uses drag-and-drop (no `<input type="file">`):
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('drag and drop file upload', async ({ page }) => {
+  // Create a file to drag
+  const dataTransfer = await page.evaluateHandle(() => new DataTransfer());
+  
+  // You still use setInputFiles if there's a hidden input behind the drop zone
+  // For true drag-drop without any input, use the filechooser event:
+  
+  const fileChooserPromise = page.waitForEvent('filechooser');
+  await page.getByText('Drop files here').click();
+  const fileChooser = await fileChooserPromise;
+  await fileChooser.setFiles('tests/fixtures/report.pdf');
+});
+```
+
+### Using the `filechooser` Event
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('handle OS file dialog', async ({ page }) => {
+  // Start waiting BEFORE triggering the file chooser
+  const fileChooserPromise = page.waitForEvent('filechooser');
+  
+  // Click the button that opens the OS file dialog
+  await page.getByRole('button', { name: 'Choose File' }).click();
+  
+  // Set the file(s) in the file chooser
+  const fileChooser = await fileChooserPromise;
+  
+  // Check if multiple files are accepted
+  console.log('Multiple:', fileChooser.isMultiple());
+  
+  await fileChooser.setFiles('tests/fixtures/report.pdf');
+});
+```
+
+---
+
+## File Downloads
+
+### Basic Download Handling
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('download the exported PDF', async ({ page }) => {
+  // Start waiting for the download BEFORE clicking
+  const downloadPromise = page.waitForEvent('download');
+  
+  await page.getByRole('button', { name: 'Export PDF' }).click();
+  
+  const download = await downloadPromise;
+  
+  // Get download info
+  console.log('Filename:', download.suggestedFilename());  // e.g., 'report-2024.pdf'
+  console.log('URL:', download.url());
+  
+  // Save to a specific path
+  await download.saveAs('./test-results/downloaded-report.pdf');
+});
+```
+
+### Validating Downloaded File Content
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+import * as fs from 'fs';
+
+test('downloaded CSV has correct data', async ({ page }) => {
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export CSV' }).click();
+  const download = await downloadPromise;
+  
+  // Save and read the file
+  const filePath = './test-results/export.csv';
+  await download.saveAs(filePath);
+  
+  const content = fs.readFileSync(filePath, 'utf-8');
+  
+  // Validate content
+  expect(content).toContain('Document Title');
+  expect(content).toContain('Protocol v2.0');
+  
+  const lines = content.split('\n');
+  expect(lines.length).toBeGreaterThan(1);  // Has data beyond the header
+});
+```
+
+### Download via Readable Stream
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('validate download without saving to disk', async ({ page }) => {
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export' }).click();
+  const download = await downloadPromise;
+  
+  // Read directly from stream (no file saved)
+  const stream = await download.createReadStream();
+  const chunks: Buffer[] = [];
+  
+  for await (const chunk of stream!) {
+    chunks.push(chunk as Buffer);
+  }
+  
+  const content = Buffer.concat(chunks).toString('utf-8');
+  expect(content).toContain('Expected data');
+});
+```
+
+### Handling Downloads that Open in New Tab
+
+Some download links open a new tab instead of downloading directly:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('download from new tab', async ({ page, context }) => {
+  // Listen for new pages (tabs)
+  const pagePromise = context.waitForEvent('page');
+  await page.getByRole('link', { name: 'View PDF' }).click();
+  
+  const newPage = await pagePromise;
+  await newPage.waitForLoadState();
+  
+  // If the new tab triggers a download
+  const downloadPromise = newPage.waitForEvent('download');
+  // ... or assert the PDF URL
+  await expect(newPage).toHaveURL(/\.pdf$/);
+});
+```
+
+### Configuring Download Behavior
+
+```typescript
+// playwright.config.ts
+export default defineConfig({
+  use: {
+    // Accept all downloads without prompt
+    acceptDownloads: true,
+  },
+});
+```
+
+### Download with Timeout
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('large file download completes', async ({ page }) => {
+  const downloadPromise = page.waitForEvent('download', { timeout: 60_000 });
+  await page.getByRole('button', { name: 'Export Full Dataset' }).click();
+  
+  const download = await downloadPromise;
+  
+  // Wait for download to finish (can take a while for large files)
+  const path = await download.path();
+  expect(path).toBeTruthy();
+  
+  const stats = fs.statSync(path!);
+  expect(stats.size).toBeGreaterThan(1024);  // At least 1KB
+});
+```
+
+## Upload → Download Round-Trip Test
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('uploaded file can be downloaded unchanged', async ({ page }) => {
+  const originalContent = 'Test document content for round-trip validation';
+  
+  // Upload
+  await page.getByLabel('Upload').setInputFiles({
+    name: 'round-trip-test.txt',
+    mimeType: 'text/plain',
+    buffer: Buffer.from(originalContent),
+  });
+  await page.getByRole('button', { name: 'Submit' }).click();
+  await expect(page.getByText('Upload complete')).toBeVisible();
+  
+  // Download
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Download' }).click();
+  const download = await downloadPromise;
+  
+  // Validate round-trip integrity
+  const stream = await download.createReadStream();
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream!) chunks.push(chunk as Buffer);
+  const downloadedContent = Buffer.concat(chunks).toString('utf-8');
+  
+  expect(downloadedContent).toBe(originalContent);
+});
+```
+
+<CodeEditor
+  moduleId="56-file-handling"
+  taskIndex={0}
+  placeholder="// Task: Upload a file from buffer and then download it to verify integrity&#10;await page.getByLabel('Upload').setInputFiles({&#10;  name: 'test.txt',&#10;  mimeType: 'text/plain',&#10;  buffer: Buffer.from('Hello Playwright'),&#10;});&#10;const download = await page.waitForEvent('download');&#10;await download.saveAs('./test-results/test.txt');"
+/>
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="56-file-handling"
+  taskIndex={1}
+  placeholder={`// Challenge: Download an exported test log and assert that the file is not empty.
+// Complete the download handler script below:`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="file-handling" />
+

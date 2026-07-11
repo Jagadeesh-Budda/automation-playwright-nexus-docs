@@ -1,0 +1,253 @@
+﻿# 8.7: Test Generator & Codegen
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Use npx playwright codegen to record and refactor tests
+
+## What is Codegen?
+
+Playwright Codegen is a **test recorder** that watches what you do in a browser and generates working test code automatically. It's the fastest way to:
+- Bootstrap new tests
+- Discover the correct locators for your app's elements
+- Learn Playwright's API by seeing what methods match your actions
+
+## Starting Codegen
+
+```bash
+# Open a blank browser and start recording
+npx playwright codegen
+
+# Open a specific URL and start recording
+npx playwright codegen https://dms.example.com
+
+# Record with a specific viewport
+npx playwright codegen --viewport-size=1280,720 https://dms.example.com
+
+# Record for a specific browser
+npx playwright codegen --browser=firefox https://dms.example.com
+```
+
+## What Happens When You Run Codegen?
+
+Two windows open:
+1. **Browser window** — interact with your app normally (click, type, navigate)
+2. **Inspector window** — shows the generated test code in real-time
+
+Every action you perform in the browser instantly generates a line of code in the Inspector.
+
+## Generating Code: Step by Step
+
+```bash
+npx playwright codegen https://dms.example.com/login
+```
+
+**You do this in the browser:**
+1. Click the Email field
+2. Type `admin@example.com`
+3. Click the Password field
+4. Type `secret123`
+5. Click the "Sign In" button
+6. See the Dashboard heading
+
+**Codegen generates this code:**
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('test', async ({ page }) => {
+  await page.goto('https://dms.example.com/login');
+  await page.getByLabel('Email').fill('admin@example.com');
+  await page.getByLabel('Password').fill('secret123');
+  await page.getByRole('button', { name: 'Sign In' }).click();
+  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+});
+```
+
+> [!TIP]
+> Codegen automatically chooses the **best locator strategy** — it prefers `getByRole`, `getByLabel`, and `getByText` over CSS selectors. This gives you resilient locators out of the box.
+
+## Recording with Authentication
+
+Save and reuse login state to avoid repeating login in every recording session:
+
+```bash
+# Step 1: Record a login and save the auth state
+npx playwright codegen --save-storage=auth.json https://dms.example.com/login
+
+# Step 2: Start recording with the saved auth state (already logged in!)
+npx playwright codegen --load-storage=auth.json https://dms.example.com/documents
+```
+
+## The Pick Locator Tool
+
+Inside the Codegen Inspector, click the **Pick Locator** button (crosshair icon) to:
+1. Hover over any element in the browser
+2. See the suggested locator in the Inspector
+3. Try multiple locator strategies for the same element
+4. Copy the locator directly
+
+This is incredibly useful when you're writing Page Objects and need the perfect locator for a complex element.
+
+## Generating in Different Languages
+
+```bash
+# Generate TypeScript (default)
+npx playwright codegen --target=javascript
+
+# Generate Python
+npx playwright codegen --target=python-pytest
+
+# Generate Java
+npx playwright codegen --target=java
+
+# Generate C#
+npx playwright codegen --target=csharp-mstest
+```
+
+## Generating with Device Emulation
+
+```bash
+# Record on a mobile viewport
+npx playwright codegen --device="iPhone 13" https://dms.example.com
+
+# Record on a tablet
+npx playwright codegen --device="iPad Pro 11" https://dms.example.com
+
+# See all available device names
+npx playwright codegen --device-list
+```
+
+## Editing Generated Code
+
+Codegen output is a **starting point**, not production-ready code. Always refactor:
+
+### Raw codegen output
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('test', async ({ page }) => {
+  await page.goto('https://dms.example.com/login');
+  await page.getByLabel('Email').fill('admin@example.com');
+  await page.getByLabel('Password').fill('secret123');
+  await page.getByRole('button', { name: 'Sign In' }).click();
+  await page.getByRole('button', { name: 'Upload Document' }).click();
+  await page.locator('input[type="file"]').setInputFiles('report.pdf');
+  await page.getByRole('button', { name: 'Upload' }).click();
+  await expect(page.getByText('Upload complete')).toBeVisible();
+});
+```
+
+### After refactoring into POM architecture
+```typescript
+import { test, expect } from '../fixtures/baseTest';
+
+test('admin can upload a document', async ({ documentPage }) => {
+  await documentPage.uploadFile('report.pdf');
+  await expect(documentPage.successBanner).toBeVisible();
+});
+```
+
+## Codegen Limitations
+
+| Limitation | Workaround |
+|-----------|------------|
+| No hover recording | Add `await locator.hover()` manually |
+| No drag-and-drop | Use `await locator.dragTo(target)` manually |
+| No keyboard shortcuts | Add `await page.keyboard.press('Control+S')` manually |
+| No iframe interactions | Wrap with `page.frameLocator()` manually |
+| No assertions beyond visibility | Add `expect()` assertions manually |
+| Generates flat tests | Refactor into Page Objects after recording |
+
+## When to Use Codegen
+
+| Scenario | Codegen? |
+|----------|:--------:|
+| Starting a brand new test from scratch | ✅ Yes |
+| Finding the right locator for a complex element | ✅ Yes |
+| Learning how Playwright maps your actions to code | ✅ Yes |
+| Writing production-grade Page Objects | ❌ No — use codegen as a starting point, then refactor |
+| Debugging a failing test | ❌ No — use `page.pause()` or `--ui` mode instead |
+
+## VS Code Integration
+
+If you use VS Code with the Playwright extension:
+1. Open the Testing sidebar
+2. Click **Record new** — Codegen opens directly inside VS Code
+3. Click **Record at cursor** — appends generated code at your cursor position
+4. Click **Pick locator** — hover over elements and get locators inline
+
+This is the fastest way to work with Codegen in practice.
+
+<CodeEditor
+  moduleId="46-codegen"
+  taskIndex={0}
+  placeholder="// Task: Refactor this codegen output into a clean test using a Page Object&#10;// Raw output:&#10;// await page.getByLabel('Email').fill('admin@example.com');&#10;// await page.getByRole('button', { name: 'Sign In' }).click();&#10;&#10;// Refactored:&#10;await loginPage.loginAs('admin@example.com', 'secret123');&#10;await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();"
+/>
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="46-codegen"
+  taskIndex={1}
+  placeholder={`// Challenge: Refactor this brittle raw codegen output into a clean POM script.
+// Raw: await page.locator('.login-form-input-email').fill('user');
+// Raw: await page.locator('.btn-submit-login').click();
+
+// Write your refactored Page Object method call and visibility assertion here:`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="codegen" />
+

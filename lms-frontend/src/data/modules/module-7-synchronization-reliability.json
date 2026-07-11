@@ -1,0 +1,423 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T10:36:32.990Z",
+  "lessons": [
+    {
+      "id": "36-auto-waiting",
+      "title": "7.1: Auto Waiting & Actionability",
+      "url": "courses/playwright/36-auto-waiting",
+      "group": "⏱️ MODULE 7: SYNCHRONIZATION & RELIABILITY",
+      "level": 0,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Concept",
+        "outcome": "Understand Playwright's built-in auto-waiting mechanisms."
+      },
+      "objectives": [
+        {
+          "id": "obj-1",
+          "text": "Define the 5 criteria Playwright checks before clicking"
+        },
+        {
+          "id": "obj-2",
+          "text": "Eliminate flaky, hardcoded sleep commands from your codebase"
+        },
+        {
+          "id": "obj-3",
+          "text": "Understand how Playwright automatically handles UI animations and loading states"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "task-1",
+          "rules": [
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "mcq",
+            "difficulty": "medium",
+            "q": "Which of the following is NOT an actionability check?",
+            "options": [
+              "Attached",
+              "Visible",
+              "Painted",
+              "Enabled"
+            ],
+            "a": "Painted",
+            "explanation": "Playwright checks if it receives events, not if it's painted."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "mcq",
+            "difficulty": "hard",
+            "q": "Why is waitForTimeout bad?",
+            "options": [
+              "It's deprecated",
+              "It introduces flakiness and artificial slowdowns",
+              "It doesn't work",
+              "It crashes the browser"
+            ],
+            "a": "It introduces flakiness and artificial slowdowns",
+            "explanation": "It makes tests run longer."
+          }
+        ]
+      },
+      "icon": "⏱️",
+      "slug": "36-auto-waiting",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "37-assertions-vs-waits",
+      "title": "7.2: Assertions vs Waits",
+      "url": "courses/playwright/37-assertions-vs-waits",
+      "group": "⏱️ MODULE 7: SYNCHRONIZATION & RELIABILITY",
+      "level": 0,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Code",
+        "outcome": "Learn when to use web-first assertions instead of explicit waits."
+      },
+      "objectives": [
+        {
+          "id": "obj-1",
+          "text": "Differentiate between manual waits and web-first assertions"
+        },
+        {
+          "id": "obj-2",
+          "text": "Use assertions to pause test execution until the UI reaches the desired state"
+        },
+        {
+          "id": "obj-3",
+          "text": "Eliminate explicit .waitFor() calls from test code"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "task-1",
+          "rules": [
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "mcq",
+            "difficulty": "medium",
+            "q": "How long does expect.toBeVisible wait by default?",
+            "options": [
+              "1000ms",
+              "5000ms",
+              "30000ms",
+              "It does not wait"
+            ],
+            "a": "5000ms",
+            "explanation": "Default expect timeout is 5 seconds."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "mcq",
+            "difficulty": "hard",
+            "q": "Can we use .waitFor() to assert state?",
+            "options": [
+              "Yes, it's recommended",
+              "No, use web-first assertions",
+              "Only for clicks",
+              "Yes, in tests"
+            ],
+            "a": "No, use web-first assertions",
+            "explanation": "Assertions have built-in retries."
+          }
+        ]
+      },
+      "icon": "⚖️",
+      "slug": "37-assertions-vs-waits",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "38-timeouts",
+      "title": "7.3: Timeouts & waitFor",
+      "url": "courses/playwright/38-timeouts",
+      "group": "⏱️ MODULE 7: SYNCHRONIZATION & RELIABILITY",
+      "level": 0,
+      "weight": 5,
+      "meta": {
+        "time": "20 mins",
+        "type": "Code",
+        "outcome": "Master the different timeout layers and how to explicitly wait for states."
+      },
+      "objectives": [
+        {
+          "id": "obj-1",
+          "text": "Identify the three layers of timeouts (Test, Action, Expect)"
+        },
+        {
+          "id": "obj-2",
+          "text": "Override the default expect timeout for specific slow assertions"
+        },
+        {
+          "id": "obj-3",
+          "text": "Use .waitFor() internally within Page Objects for strict synchronization"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "task-1",
+          "rules": [
+            {
+              "type": "ast_callee",
+              "value": "waitFor",
+              "required": true,
+              "min": 1
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_callee",
+              "value": "waitFor",
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Which configuration setting is responsible for killing tests that hang indefinitely?",
+            "options": [
+              "3000ms",
+              "5000ms",
+              "30000ms",
+              "60000ms"
+            ],
+            "a": "30000ms",
+            "explanation": "Global test timeout is 30s.",
+            "scenario": "A specific test usually takes 10 seconds to run. Suddenly, the backend database becomes extremely slow, and the test hangs for 45 seconds before Playwright kills it."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "mcq",
+            "difficulty": "hard",
+            "q": "When is .waitFor() appropriate?",
+            "options": [
+              "Inside tests",
+              "Inside Page Object internal methods",
+              "Never",
+              "For assertions"
+            ],
+            "a": "Inside Page Object internal methods",
+            "explanation": "For internal POM synchronization."
+          }
+        ]
+      },
+      "icon": "⌛",
+      "slug": "38-timeouts",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "39-network-sync",
+      "title": "7.4: Network Synchronization",
+      "url": "courses/playwright/39-network-sync",
+      "group": "⏱️ MODULE 7: SYNCHRONIZATION & RELIABILITY",
+      "level": 0,
+      "weight": 5,
+      "meta": {
+        "time": "20 mins",
+        "type": "Code",
+        "outcome": "Learn to defeat flakiness by waiting for API responses instead of UI elements."
+      },
+      "objectives": [
+        {
+          "id": "obj-1",
+          "text": "Identify scenarios where UI synchronization is fundamentally flaky"
+        },
+        {
+          "id": "obj-2",
+          "text": "Use page.waitForResponse() to intercept and wait for network traffic"
+        },
+        {
+          "id": "obj-3",
+          "text": "Implement the 'Trap and Trigger' promise pattern correctly"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "task-1",
+          "rules": [
+            {
+              "type": "ast_callee",
+              "value": "waitForResponse",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_callee",
+              "value": "waitForResponse",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "mcq",
+            "difficulty": "medium",
+            "q": "Why is waitForResponse better than UI waits for fast APIs?",
+            "options": [
+              "It's faster",
+              "It avoids race conditions",
+              "It looks cooler",
+              "It is typed"
+            ],
+            "a": "It avoids race conditions",
+            "explanation": "UI can disappear before checked."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "mcq",
+            "difficulty": "hard",
+            "q": "What happens if you await waitForResponse after clicking?",
+            "options": [
+              "It works fine",
+              "It hangs forever",
+              "It throws error instantly",
+              "It skips the wait"
+            ],
+            "a": "It hangs forever",
+            "explanation": "The trap must be set before the trigger."
+          }
+        ]
+      },
+      "icon": "🌐",
+      "slug": "39-network-sync",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    }
+  ]
+}

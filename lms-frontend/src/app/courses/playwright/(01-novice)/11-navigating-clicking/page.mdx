@@ -1,0 +1,168 @@
+﻿
+# 1.2: Navigating & Clicking
+
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Complete 1.2: Navigating & Clicking
+
+## Interacting with the Page
+
+In the last lesson, we navigated to a page and checked its title. But automation is really about *interacting* — clicking buttons, filling forms, and navigating through an application.
+
+Let's write a test that clicks a link and verifies that we ended up on the right page.
+
+Create a new file called `tests/navigation.spec.ts`:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('click the Get Started link', async ({ page }) => {
+  // 1. Start at the homepage
+  await page.goto('https://playwright.dev');
+
+  // 2. Find a link named "Get started" and click it
+  await page.getByRole('link', { name: 'Get started' }).click();
+
+  // 3. Check we landed on the right page by looking at the URL
+  await expect(page).toHaveURL(/.*intro/);
+});
+```
+
+## How Playwright Finds Things: `getByRole`
+
+To interact with an element, you first have to find it. The most powerful and reliable way to find elements in Playwright is `getByRole()`.
+
+```typescript
+await page.getByRole('link', { name: 'Get started' }).click();
+```
+
+Why `getByRole`? 
+- It finds elements the way **users** find them (by their purpose and text).
+- It finds elements the way **assistive technologies** (like screen readers) find them.
+
+> **Why not use CSS selectors?** Because `.button-primary` or `#submitBtn` often change during UI redesigns, but the role (`button`) and name (`"Submit"`) usually survive.
+
+Common roles you will use:
+- `'link'` — for `<a>` tags
+- `'button'` — for `<button>` tags
+- `'heading'` — for `<h1>`, `<h2>`, etc.
+- `'textbox'` — for `<input>` and `<textarea>`
+
+## The `.click()` Action
+
+Once you find an element, you tell Playwright what to do with it.
+
+Notice the `await` keyword. Clicking takes time. Playwright has to:
+1. Wait for the element to appear.
+2. Wait for it to stop moving (animations).
+3. Scroll it into view.
+4. Actually click it.
+
+Because of this, **every action in Playwright must have `await` in front of it.**
+
+## Checking the URL
+
+After clicking "Get started", the browser navigates to the documentation page. We need to prove that the navigation worked.
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+await expect(page).toHaveURL(/.*intro/);
+```
+
+We use a regular expression (`/.*intro/`) here, which means "the URL should contain the word 'intro' anywhere in it." This is safer than hardcoding the exact full URL (`https://playwright.dev/docs/intro`), which might change if you test against a staging server instead of production.
+
+## Challenge Exercise
+
+**Scenario**: You are automating the core checkout flow for a retail application. You must navigate through the product grid to the cart.
+
+**Task**: Use Playwright to load the store, search for an item, and click the 'Add to Cart' button.
+
+**Success Criteria**:
+- Script successfully navigates to the target URL.
+- Script interacts with the correct button without hardcoded timeouts.
+
+<CodeEditor
+  moduleId="11-navigating-clicking"
+  taskIndex={0}
+/>
+
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="11-navigating-clicking"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('checkout flow challenge', async ({ page }) => {
+  // BUG: Missing await on navigation
+  page.goto('https://store.example.com');
+
+  // BUG: Using a brittle CSS selector and missing await
+  page.locator('#search-input').fill('laptop');
+  page.locator('#search-btn').click();
+
+  // BUG: Using hardcoded sleep instead of web-first assertions
+  await page.waitForTimeout(3000);
+  
+  // BUG: Add to cart button click
+  await page.locator('.btn-primary').click();
+});`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="11-navigating-clicking" />

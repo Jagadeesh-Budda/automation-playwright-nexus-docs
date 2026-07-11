@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T10:36:32.990Z",
+  "lessons": [
+    {
+      "id": "33-the-brief",
+      "title": "6.1: The Challenge Brief",
+      "url": "courses/playwright/33-the-brief",
+      "group": "🏗️ MODULE 6: THE FRAMEWORK CHALLENGE",
+      "level": 0,
+      "weight": 5,
+      "meta": {
+        "time": "45 mins",
+        "type": "Exercise",
+        "outcome": "Design and implement a complete Playwright framework from scratch using POM and Fixtures."
+      },
+      "objectives": [
+        {
+          "id": "obj-1",
+          "text": "Architect a new Playwright project from an empty directory"
+        },
+        {
+          "id": "obj-2",
+          "text": "Abstract DOM interactions into Page Objects"
+        },
+        {
+          "id": "obj-3",
+          "text": "Inject Page Objects into tests using custom Fixtures"
+        },
+        {
+          "id": "obj-4",
+          "text": "Configure global settings like baseURL in the config"
+        }
+      ],
+      "tasks": [],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [],
+        "Hard": []
+      },
+      "icon": "🏗️",
+      "slug": "33-the-brief",
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "sandbox",
+      "optional": true,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET"
+    },
+    {
+      "id": "34-hints",
+      "title": "6.2: Challenge Hints",
+      "url": "courses/playwright/34-hints",
+      "group": "🏗️ MODULE 6: THE FRAMEWORK CHALLENGE",
+      "level": 0,
+      "weight": 5,
+      "meta": {
+        "time": "5 mins",
+        "type": "Concept",
+        "outcome": "Get unstuck if needed."
+      },
+      "objectives": [],
+      "tasks": [],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [],
+        "Hard": []
+      },
+      "icon": "💡",
+      "slug": "34-hints",
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "sandbox",
+      "optional": true,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET"
+    },
+    {
+      "id": "35-reference-solution",
+      "title": "6.3: Reference Solution",
+      "url": "courses/playwright/35-reference-solution",
+      "group": "🏗️ MODULE 6: THE FRAMEWORK CHALLENGE",
+      "level": 0,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Code",
+        "outcome": "Compare your architecture with a reference standard."
+      },
+      "objectives": [],
+      "tasks": [],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [],
+        "Hard": []
+      },
+      "icon": "✅",
+      "slug": "35-reference-solution",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "reference",
+      "optional": true,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET"
+    }
+  ]
+}

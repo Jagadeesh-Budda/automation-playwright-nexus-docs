@@ -1,0 +1,191 @@
+﻿# 16.1: The Automation Pyramid
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Understand UI vs API tradeoffs
+
+## The Test Pyramid
+
+The Test Pyramid is a framework for balancing your test investment. It tells you how many tests to write at each level.
+
+```
+         /\
+        /  \
+       / UI \        ← Few (10-20%) — Slow, expensive, high coverage
+      /------\
+     / API    \      ← More (30-40%) — Fast, reliable, targeted
+    /----------\
+   / Unit       \    ← Most (50-60%) — Blazing fast, isolated
+  /──────────────\
+```
+
+**Why not write everything as a UI test?**
+- UI tests take 10-60 seconds each
+- UI tests break when the design changes
+- UI tests depend on the full stack (browser + app + database)
+
+**The sweet spot:** Use API tests for complex business logic, and UI tests only to verify the user experience.
+
+## Playwright's API Testing Capability
+
+Playwright has a built-in HTTP client (`request`) that lets you make direct API calls — no browser, no UI, pure HTTP.
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// This test runs without opening any browser — just raw HTTP
+test('GET /api/documents returns paginated results', async ({ request }) => {
+  const response = await request.get('/api/documents', {
+    params: { page: 1, limit: 10 }
+  });
+  
+  expect(response.status()).toBe(200);
+  
+  const body = await response.json();
+  expect(body.data).toHaveLength(10);
+  expect(body.pagination.total).toBeGreaterThan(0);
+  expect(body.pagination.page).toBe(1);
+});
+```
+
+## When to Use API Tests vs UI Tests
+
+| Scenario | API Test | UI Test |
+|----------|----------|---------|
+| Business logic validation | ✅ Best | Too slow |
+| Data validation (field types, formats) | ✅ Best | Fragile |
+| Authentication/Authorization | ✅ Best | Too slow |
+| Error handling (400, 401, 403, 500) | ✅ Best | Hard to trigger |
+| Happy path user journey | ⚠️ Partial | ✅ Best |
+| Visual layout verification | ❌ Not possible | ✅ Only option |
+| Cross-browser compatibility | ❌ Not possible | ✅ Only option |
+
+## The Hybrid Strategy
+
+The most efficient test suites use **both layers strategically**:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Use API to set up state FAST, then UI to verify the user experience
+test('approved documents appear in the approved list', async ({ request, page }) => {
+  // Step 1: Create and approve a document via API (fast!)
+  const createResponse = await request.post('/api/documents', {
+    data: { title: 'Test Protocol', type: 'Protocol' }
+  });
+  const { id } = await createResponse.json();
+  
+  await request.post(`/api/documents/${id}/approve`, {
+    headers: { Authorization: `Bearer ${process.env.ADMIN_TOKEN}` }
+  });
+  
+  // Step 2: Verify the UI shows it correctly (can't do this via API)
+  await page.goto('/documents?status=approved');
+  await expect(page.getByRole('row').filter({ hasText: 'Test Protocol' })).toBeVisible();
+});
+```
+
+## The `apiRequest` Context
+
+Configure the global API request context:
+
+```typescript
+// playwright.config.ts
+use: {
+  // Base URL for all API requests
+  baseURL: process.env.BASE_URL,
+  
+  // Default headers sent with every API request
+  extraHTTPHeaders: {
+    'Accept': 'application/json',
+    'x-api-version': '2.0',
+  },
+}
+```
+
+<CodeEditor
+  moduleId="77-api-pyramid"
+  taskIndex={0}
+  placeholder="// Task: Write an API-only test (no browser needed).&#10;// Requirements:&#10;//   1. Send a GET request to /api/documents&#10;//   2. Assert the response status is 200&#10;//   3. Parse the JSON body&#10;//   4. Assert that body.data is an array&#10;//&#10;// Hint: Use the { request } fixture, not { page }"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('API returns documents', async ({ request }) => {
+  const response = await request.get('/api/documents');
+  expect(response.status()).toBe(200);
+  const body = await response.json();
+  expect(Array.isArray(body.data)).toBe(true);
+});
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="77-api-pyramid"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<Quiz moduleId="api-pyramid" />
+

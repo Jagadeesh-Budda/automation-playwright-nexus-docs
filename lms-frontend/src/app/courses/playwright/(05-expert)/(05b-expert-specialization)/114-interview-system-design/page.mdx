@@ -1,0 +1,152 @@
+# 21.2: SDET System Design
+
+import { ChapterHeader } from '@/components/ChapterHeader';
+
+<ChapterHeader
+  objective="Master this critical concept to build robust, scalable Playwright automation."
+  time="15 mins"
+  type="Concept"
+/>
+
+## Learning Objectives
+- Understand the core architectural patterns
+- Identify and avoid common anti-patterns
+- Implement production-grade automation scripts
+
+
+You passed the technical screen. You have now been handed a dry-erase marker and asked to stand in front of a whiteboard. The Principal Engineer expects you to design an E2E framework from scratch that can scale to thousands of tests per hour.
+
+<div className="bg-slate-900 border border-slate-700 p-6 rounded-xl my-8">
+  <h3 className="text-cyan-400 font-bold m-0 mb-2 flex items-center gap-2">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    The Architecture Prompt
+  </h3>
+  <div className="text-slate-300 m-0">
+    "Our current Selenium suite takes 8 hours to run overnight. It's flaky, and developers ignore the results. We want you to migrate us to Playwright. 
+    <br/><br/>
+    <strong>Your constraints:</strong><br/>
+    - 10,000 E2E tests.<br/>
+    - 200 Pull Requests merged per day.<br/>
+    - 50 active frontend engineers.<br/>
+    - 15 ephemeral staging environments.
+    <br/><br/>
+    Explain your Execution Strategy, Data Strategy, and Artifact Retention."
+  </div>
+</div>
+
+## The Whiteboard Evaluation
+
+<Tabs>
+  <Tab title="Execution Strategy">
+    **What Interviewers Look For**: Do you understand Sharding vs Parallelism? 
+    *   **Weak**: "I'll set `fullyParallel: true` in Playwright and run 50 workers on a single GitHub Actions runner." (Fails due to CPU bottleneck).
+    *   **Strong**: "I will use CI Sharding. We will spin up 20 parallel Linux containers in GitHub Actions, passing `--shard=x/20` to Playwright, dropping execution time from 8 hours to 24 minutes."
+  </Tab>
+
+  <Tab title="Data Strategy">
+    **What Interviewers Look For**: How do you prevent 200 parallel tests from modifying the same database record?
+    *   **Weak**: "I'll write an `afterAll` script to delete the data." (Fails because parallel tests will collide before teardown).
+    *   **Strong**: "I will use API Data Factories. Every `test.beforeEach` will make an API call to generate a unique, cryptographically random user (e.g., `user_8f3a@test.com`) so tests are hermetically isolated."
+  </Tab>
+
+  <Tab title="Artifact Strategy">
+    **What Interviewers Look For**: Do you understand storage costs?
+    *   **Weak**: "I will record a video and trace for every single test so we can debug easily." (Will consume terabytes of S3 storage per day and bankrupt the team).
+    *   **Strong**: "I will set `trace: 'retain-on-failure'`. We only pay storage for tests that actually fail. Successful tests are discarded."
+  </Tab>
+
+  <Tab title="Tradeoffs">
+    **What Interviewers Look For**: Senior engineers know there is no "perfect" solution, only tradeoffs.
+    *   **Sharding**: *Benefit*: Blazing fast execution. *Cost*: Drastically higher CI/CD infrastructure compute costs.
+    *   **API Factories**: *Benefit*: 100% data isolation. *Cost*: Requires deep dependency on backend APIs, making tests brittle to backend outages.
+    *   **Retain-on-failure**: *Benefit*: Cheap S3 storage. *Cost*: You lose the ability to review historical traces of successful runs for performance profiling.
+  </Tab>
+
+  <Tab title="Model Senior Configuration">
+    ```typescript
+    // The resulting config demonstrating the strategy
+    import { defineConfig } from '@playwright/test';
+
+    export default defineConfig({
+      fullyParallel: true,
+      workers: process.env.CI ? 4 : undefined,
+      retries: process.env.CI ? 2 : 0,
+      reporter: process.env.CI ? [['github'], ['blob']] : [['html']],
+      use: {
+        trace: 'retain-on-failure',
+        video: 'on-first-retry',
+        baseURL: process.env.STAGING_URL || 'http://localhost:3000',
+      },
+    });
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## The Sandbox
+
+Implement your configuration in the IDE below. The test runner will evaluate it.
+
+<CodeEditor
+  moduleId="114-interview-system-design"
+  taskIndex={0}
+/>
+
+<div className="bg-emerald-950/30 border border-emerald-500/30 p-6 rounded-xl my-8">
+  <h3 className="text-emerald-400 font-bold m-0 mb-2">✅ Interview Reality Check: System Design</h3>
+  <ul className="text-slate-300 m-0 pl-5 space-y-2">
+    <li><strong>Junior Level</strong>: Explains how to write a test, but doesn't understand Docker or CI/CD.</li>
+    <li><strong>Mid Level</strong>: Knows about `fullyParallel`, but struggles to explain how to isolate Database state across multiple workers.</li>
+    <li><strong>Senior Level</strong>: Immediately identifies Data Collision as the #1 risk and designs an API Factory strategy.</li>
+    <li><strong>Staff Level</strong>: Proposes a strategy to auto-scale AWS Fargate containers dynamically based on the PR queue depth to save infrastructure costs.</li>
+  </ul>
+</div>
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="114-interview-system-design"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="interview-system-design" />
+

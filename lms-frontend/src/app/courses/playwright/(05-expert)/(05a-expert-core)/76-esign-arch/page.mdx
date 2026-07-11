@@ -1,0 +1,253 @@
+﻿# 15.5: The Singleton Modal Pattern
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Master global component injection
+
+## The Compliance Testing Layer Map
+
+```
+tests/compliance/
+├── e-sign-authentication.spec.ts   (Part 11 §11.200 - Auth controls)
+├── e-sign-meaning.spec.ts          (Part 11 §11.50 - Reason requirements)
+├── audit-trail.spec.ts             (Part 11 §11.10(e) - Audit completeness)
+├── document-locking.spec.ts        (Part 11 §11.10(d) - Access controls)
+└── system-validation.spec.ts       (Part 11 §11.10(a) - Validation)
+
+pages/compliance/
+├── ESignPage.ts          (Signature workflow interactions)
+├── AuditTrailPage.ts     (Audit trail inspection)
+├── DocumentLockPage.ts   (Locked document verification)
+└── ComplianceDashboard.ts (Compliance reporting)
+
+components/
+├── ESignModal.ts         (The signature dialog)
+├── AuditEntry.ts         (Single audit trail record)
+└── ComplianceReport.ts   (Compliance summary widget)
+
+entities/
+├── Signature.ts          (Signature data interface)
+├── AuditEntry.ts         (Audit record interface)
+└── ComplianceStatus.ts   (System validation status)
+```
+
+## The AuditTrailPage Object
+
+```typescript
+// pages/compliance/AuditTrailPage.ts
+import { Page, Locator, expect } from '@playwright/test';
+import { AuditEntry } from '../../components/AuditEntry';
+
+export class AuditTrailPage {
+  readonly page: Page;
+  readonly auditTable: Locator;
+  readonly exportButton: Locator;
+  readonly filterByUser: Locator;
+  readonly filterByAction: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.auditTable = page.getByRole('table', { name: 'Audit Trail' });
+    this.exportButton = page.getByRole('button', { name: 'Export CSV' });
+    this.filterByUser = page.getByLabel('Filter by User');
+    this.filterByAction = page.getByLabel('Filter by Action');
+  }
+
+  async navigateTo(documentId: string) {
+    await this.page.goto(`/documents/${documentId}/audit`);
+    await expect(this.auditTable).toBeVisible();
+  }
+
+  getAllEntries(): Locator {
+    return this.auditTable.getByRole('row').filter({ hasText: /Signed|Submitted|Created/ });
+  }
+
+  getLatestEntry() {
+    return new AuditEntry(this.getAllEntries().first());
+  }
+
+  getEntryByUser(email: string) {
+    return new AuditEntry(
+      this.getAllEntries().filter({ hasText: email }).first()
+    );
+  }
+
+  async exportToCSV(): Promise<string> {
+    const [download] = await Promise.all([
+      this.page.waitForEvent('download'),
+      this.exportButton.click(),
+    ]);
+    const path = await download.path();
+    return path!;
+  }
+}
+```
+
+## The AuditEntry Component
+
+```typescript
+// components/AuditEntry.ts
+import { Locator } from '@playwright/test';
+
+export class AuditEntry {
+  readonly user: Locator;
+  readonly action: Locator;
+  readonly reason: Locator;
+  readonly timestamp: Locator;
+  readonly ipAddress: Locator;
+  readonly documentHash: Locator;
+
+  constructor(private readonly row: Locator) {
+    this.user = row.getByTestId('audit-user');
+    this.action = row.getByTestId('audit-action');
+    this.reason = row.getByTestId('audit-reason');
+    this.timestamp = row.getByTestId('audit-timestamp');
+    this.ipAddress = row.getByTestId('audit-ip');
+    this.documentHash = row.getByTestId('audit-hash');
+  }
+
+  async toObject() {
+    return {
+      user: await this.user.textContent(),
+      action: await this.action.textContent(),
+      reason: await this.reason.textContent(),
+      timestamp: await this.timestamp.textContent(),
+      ipAddress: await this.ipAddress.textContent(),
+      hash: await this.documentHash.textContent(),
+    };
+  }
+}
+```
+
+## Compliance Report Generation
+
+After running all compliance tests, generate a structured report:
+
+```typescript
+// utils/compliance-reporter.ts
+export async function generateComplianceReport(results: TestResult[]) {
+  const report = {
+    generated: new Date().toISOString(),
+    standard: '21 CFR Part 11',
+    
+    summary: {
+      total: results.length,
+      passed: results.filter(r => r.status === 'passed').length,
+      failed: results.filter(r => r.status === 'failed').length,
+      complianceScore: '0%',
+    },
+    
+    requirements: {
+      '§11.10(a) - Validation': 'COMPLIANT',
+      '§11.10(d) - Access Controls': 'COMPLIANT',
+      '§11.10(e) - Audit Trail': 'COMPLIANT',
+      '§11.50 - Signature Manifestations': 'COMPLIANT',
+      '§11.200 - Electronic Signature Components': 'COMPLIANT',
+    },
+  };
+  
+  const passed = report.summary.passed;
+  const total = report.summary.total;
+  report.summary.complianceScore = `${Math.round((passed / total) * 100)}%`;
+  
+  return report;
+}
+```
+
+<CodeEditor
+  moduleId="76-esign-arch"
+  taskIndex={0}
+  placeholder="// Task: Write a Page Object method that navigates to the audit trail for a specific document.&#10;// Requirements:&#10;//   1. Accept a documentId parameter (string)&#10;//   2. Navigate to the document's audit URL&#10;//   3. Wait until the audit table is visible before returning&#10;//&#10;// This method will be used in tests as: await auditPage.navigateTo('DOC-001')"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+async navigateTo(documentId: string) {
+  await this.page.goto(`/documents/${documentId}/audit`);
+  await expect(this.auditTable).toBeVisible();
+}
+```
+
+</details>
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="76-esign-arch"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="esign-arch" />
+

@@ -1,0 +1,90 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String   @default("Student")
+  role      String   @default("student")
+  otp       String?
+  otpExpiry DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userProgress  UserProgress[]
+  certificates  Certificate[]
+  events        MasteryEvent[]
+  refreshTokens RefreshToken[]
+}
+
+model Progress {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  state     String   
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model UserProgress {
+  id                String   @id @default(uuid())
+  user_id           String
+  module_id         String
+  score             Int      @default(0)
+  attempts          Int      @default(0)
+  failed_objectives String   
+  lockedUntil       DateTime?
+  version           String   @default("1.5.0")
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@unique([user_id, module_id])
+}
+
+model Certificate {
+  id                   String   @id @default(uuid())
+  certId               String   @unique
+  name                 String
+  path                 String   @default("all")
+  completionPercentage Int      @default(100)
+  signature            String
+  status               String   @default("ACTIVE")
+  issuedAt             DateTime @default(now())
+  user_id              String?
+  hash_signature       String?  @unique
+  validation_url       String?
+
+  user User? @relation(fields: [user_id], references: [id])
+}
+
+model IdempotencyKey {
+  key       String   @id
+  userId    String
+  createdAt DateTime @default(now())
+}
+
+model MasteryEvent {
+  id        String   @id @default(uuid())
+  type      String
+  userId    String
+  moduleId  String?
+  payload   String   
+  timestamp DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}

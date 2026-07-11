@@ -1,0 +1,136 @@
+﻿
+# 1.3: Writing Assertions
+
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Complete 1.3: Writing Assertions
+
+## What is an Assertion?
+
+An **assertion** is a statement that you expect to be true. If it is true, the test passes. If it is false, the test fails and stops.
+
+In Playwright, assertions start with the `expect()` function.
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Example: We expect the heading element to be visible on the screen
+await expect(page.getByRole('heading', { name: 'Playwright' })).toBeVisible();
+```
+
+## The Essential 5 Assertions
+
+Playwright has dozens of assertions, but as a beginner, you only need these five to write 90% of your tests.
+
+### 1. `toHaveTitle()`
+Verifies the text in the browser tab (the `<title>` tag).
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+await expect(page).toHaveTitle(/Playwright/);
+```
+
+### 2. `toHaveURL()`
+Verifies the current web address.
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+await expect(page).toHaveURL('https://playwright.dev/');
+// Or using a regex to match a part of the URL:
+await expect(page).toHaveURL(/.*intro/);
+```
+
+### 3. `toBeVisible()`
+Verifies that an element actually exists on the page and isn't hidden by CSS (like `display: none`).
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+const submitButton = page.getByRole('button', { name: 'Submit' });
+await expect(submitButton).toBeVisible();
+```
+
+### 4. `toHaveText()`
+Verifies that an element contains **exactly** this text, and nothing else.
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+const statusMessage = page.getByRole('alert');
+await expect(statusMessage).toHaveText('Success!');
+```
+
+### 5. `toContainText()`
+Verifies that an element contains this text, but allows other text to be there too.
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+const article = page.getByRole('article');
+// Passes if the article text is "Welcome to our new Playwright tutorial series"
+await expect(article).toContainText('Playwright tutorial');
+```
+
+## Auto-Retrying
+
+Playwright assertions are "smart." 
+
+If you say `await expect(button).toBeVisible()`, but the button takes 3 seconds to appear (maybe it's waiting for a network request), Playwright won't fail immediately.
+
+Instead, Playwright will **keep checking** over and over again, up to 5 seconds. If the button finally appears within that time, the test passes!
+
+This auto-retrying magic is why Playwright tests are so stable compared to older frameworks. It's also why you must **always remember to put `await` in front of `expect()`.**
+
+## Exercise
+
+Create a new file `tests/assertions.spec.ts` and write a test that:
+1. Navigates to `https://playwright.dev`
+2. Asserts the page title contains "Playwright"
+3. Asserts the main heading (`h1`) is visible
+4. Asserts the main heading contains the text "end-to-end"
+
+<Quiz moduleId="12-writing-assertions" />
+
+
+## Common Mistakes
+
+- **Hardcoding Waits**: Using `page.waitForTimeout()` instead of waiting for an element's state.
+- **Overly Broad Locators**: Using generic CSS selectors like `.button` that might break if multiple buttons are added. Always prefer user-facing attributes like `getByRole`.
+- **Ignoring Errors**: Catching errors in try/catch blocks without failing the test or logging the reason.
+
+
+## Challenge Exercise
+
+Given a shopping cart page, write the Playwright assertions to verify that: 1. The 'Checkout' button is visible. 2. The total price element contains the text '$99.99'.
+
+<CodeEditor
+  moduleId="12-writing-assertions"
+  taskIndex={0}
+/>
+
+## Summary
+
+In this module, we explored how to verify application state using Playwright's auto-retrying assertions. You learned how to use `expect(locator).toBeVisible()` and other web-first assertions to build robust tests that don't suffer from race conditions.
+
+
+export const astRules = [
+  {
+    type: "ast_callee",
+    value: "expect",
+    message: "You must use 'expect' to write web-first assertions."
+  },
+  {
+    type: "ast_forbidden_callee",
+    value: "page.waitForTimeout",
+    message: "Hardcoded waits are forbidden. Rely on auto-retrying assertions."
+  },
+  {
+    type: "ast_forbidden_callee",
+    value: "setTimeout",
+    message: "Native JS timeouts are forbidden. Rely on auto-retrying assertions."
+  }
+];

@@ -1,0 +1,370 @@
+# 23.2: Building the POM Foundation
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Design inter-dependent Page Objects
+
+## Implementation Order
+
+Build the Page Objects in this dependency order (from simplest to most complex):
+
+1. `LoginPage` — no dependencies
+2. `DocumentPage` — used by most other tests
+3. `UploadPage` — depends on being logged in
+4. `ReviewPage` — depends on a document existing
+5. `ESignPage` — depends on a document in Pending Review
+6. `AuditTrailPage` — depends on signing having occurred
+
+## Complete `LoginPage.ts`
+
+```typescript
+// pages/LoginPage.ts
+import { Page, Locator } from '@playwright/test';
+
+export class LoginPage {
+  readonly page: Page;
+  
+  // Form elements
+  readonly emailInput: Locator;
+  readonly passwordInput: Locator;
+  readonly loginButton: Locator;
+  
+  // Post-login elements
+  readonly dashboardHeading: Locator;
+  readonly navMenu: Locator;
+  readonly userAvatar: Locator;
+  readonly logoutButton: Locator;
+  
+  // Error states
+  readonly errorAlert: Locator;
+  readonly lockedAccountMessage: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.emailInput = page.getByLabel('Email address');
+    this.passwordInput = page.getByLabel('Password');
+    this.loginButton = page.getByRole('button', { name: 'Sign In' });
+    this.dashboardHeading = page.getByRole('heading', { name: 'Dashboard', level: 1 });
+    this.navMenu = page.getByRole('navigation', { name: 'Main navigation' });
+    this.userAvatar = page.getByRole('img', { name: 'User avatar' });
+    this.logoutButton = page.getByRole('button', { name: 'Logout' });
+    this.errorAlert = page.getByRole('alert').filter({ hasText: /Invalid|Error/ });
+    this.lockedAccountMessage = page.getByText('Account locked');
+  }
+
+  async navigate() {
+    await this.page.goto('/login');
+    await this.page.waitForLoadState('networkidle');
+  }
+
+  async loginAs(role: 'admin' | 'reviewer' | 'viewer' | 'auditor') {
+    const credentials: Record<string, { email: string; pass: string }> = {
+      admin:    { email: process.env.ADMIN_USER!, pass: process.env.ADMIN_PASS! },
+      reviewer: { email: process.env.REVIEWER_USER!, pass: process.env.REVIEWER_PASS! },
+      viewer:   { email: process.env.VIEWER_USER!, pass: process.env.VIEWER_PASS! },
+      auditor:  { email: process.env.AUDITOR_USER!, pass: process.env.AUDITOR_PASS! },
+    };
+    const creds = credentials[role];
+    await this.emailInput.fill(creds.email);
+    await this.passwordInput.fill(creds.pass);
+    await this.loginButton.click();
+    await this.page.waitForURL('**/dashboard');
+  }
+
+  async logout() {
+    await this.userAvatar.click();
+    await this.logoutButton.click();
+    await this.page.waitForURL('**/login');
+  }
+}
+```
+
+## Complete `DocumentPage.ts`
+
+```typescript
+// pages/DocumentPage.ts
+import { Page, Locator, expect } from '@playwright/test';
+
+export class DocumentPage {
+  readonly page: Page;
+  
+  // Navigation
+  readonly uploadButton: Locator;
+  readonly newDocumentButton: Locator;
+  
+  // Table
+  readonly documentTable: Locator;
+  readonly searchBox: Locator;
+  readonly statusFilter: Locator;
+  readonly loadingSpinner: Locator;
+  readonly emptyState: Locator;
+  
+  // Success/Error feedback
+  readonly successBanner: Locator;
+  readonly errorBanner: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.uploadButton = page.getByRole('button', { name: 'Upload Document' });
+    this.newDocumentButton = page.getByRole('button', { name: 'New Document' });
+    this.documentTable = page.getByRole('table', { name: 'Documents' });
+    this.searchBox = page.getByRole('searchbox', { name: 'Search documents' });
+    this.statusFilter = page.getByLabel('Filter by status');
+    this.loadingSpinner = page.getByRole('progressbar', { name: 'Loading' });
+    this.emptyState = page.getByText('No documents found');
+    this.successBanner = page.getByRole('alert').filter({ hasText: /success/i });
+    this.errorBanner = page.getByRole('alert').filter({ hasText: /error|failed/i });
+  }
+
+  async navigate() {
+    await this.page.goto('/documents');
+    await expect(this.documentTable).toBeVisible();
+  }
+
+  async navigateTo(docId: string) {
+    await this.page.goto(`/documents/${docId}`);
+  }
+
+  // Dynamic locators
+  getRow(docId: string): Locator {
+    return this.documentTable.getByRole('row').filter({ hasText: docId });
+  }
+  
+  getStatusBadge(docId: string): Locator {
+    return this.getRow(docId).getByRole('status');
+  }
+  
+  getActionButton(docId: string, action: string): Locator {
+    return this.getRow(docId).getByRole('button', { name: action });
+  }
+
+  async searchFor(query: string) {
+    await this.searchBox.fill(query);
+    await expect(this.loadingSpinner).toBeHidden();
+  }
+
+  async filterByStatus(status: string) {
+    await this.statusFilter.selectOption(status);
+    await expect(this.loadingSpinner).toBeHidden();
+  }
+
+  async submitForReview(docId: string) {
+    await this.getActionButton(docId, 'Submit for Review').click();
+    await this.page.getByRole('dialog').getByRole('button', { name: 'Confirm' }).click();
+    await expect(this.loadingSpinner).toBeHidden();
+  }
+
+  async createDocument(payload: { title: string; file: string; department: string; version: string }): Promise<string> {
+    await this.newDocumentButton.click();
+    await this.page.getByLabel('Document Title').fill(payload.title);
+    await this.page.getByLabel('Department').selectOption(payload.department);
+    await this.page.getByLabel('Version Number').fill(payload.version);
+    await this.page.locator('input[type="file"]').setInputFiles(payload.file);
+    await this.page.getByRole('button', { name: 'Submit for Review' }).click();
+    await expect(this.successBanner).toBeVisible();
+    const docIdDisplay = this.page.getByTestId('new-document-id');
+    return (await docIdDisplay.textContent())!.trim();
+  }
+}
+```
+
+## Complete `ESignPage.ts`
+
+```typescript
+// pages/ESignPage.ts
+import { Page, Locator, expect } from '@playwright/test';
+
+export class ESignPage {
+  readonly page: Page;
+  readonly documentTitle: Locator;
+  readonly documentContent: Locator;
+  readonly signButton: Locator;
+  readonly approvedBadge: Locator;
+  readonly signaturePanel: Locator;
+  
+  // Signature dialog (opened on click of signButton)
+  readonly dialog: Locator;
+  readonly reasonInput: Locator;
+  readonly passwordInput: Locator;
+  readonly confirmSignButton: Locator;
+  readonly cancelSignButton: Locator;
+  
+  // Post-sign elements
+  readonly signatureConfirmation: Locator;
+  readonly signatureError: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.documentTitle = page.getByRole('heading', { level: 1 });
+    this.documentContent = page.getByRole('article');
+    this.signButton = page.getByRole('button', { name: 'Sign Document' });
+    this.approvedBadge = page.getByRole('status', { name: 'Approved' });
+    this.signaturePanel = page.getByRole('region', { name: 'Signature Panel' });
+    
+    this.dialog = page.getByRole('dialog', { name: 'Electronic Signature' });
+    this.reasonInput = this.dialog.getByLabel('Reason for Signing');
+    this.passwordInput = this.dialog.getByLabel('Password');
+    this.confirmSignButton = this.dialog.getByRole('button', { name: 'Sign Document' });
+    this.cancelSignButton = this.dialog.getByRole('button', { name: 'Cancel' });
+    
+    this.signatureConfirmation = page.getByRole('alert').filter({ hasText: /signed successfully/i });
+    this.signatureError = this.dialog.getByRole('alert');
+  }
+
+  async openDocument(docId: string) {
+    await this.page.goto(`/documents/${docId}`);
+    await expect(this.documentTitle).toBeVisible();
+  }
+
+  async signDocument(options: { reason: string; password: string; comment?: string }) {
+    await this.signButton.click();
+    await expect(this.dialog).toBeVisible();
+    await this.reasonInput.fill(options.reason);
+    await this.passwordInput.fill(options.password);
+    await this.confirmSignButton.click();
+  }
+}
+```
+
+## Complete `UploadPage.ts`
+
+```typescript
+// pages/UploadPage.ts
+import { Page, Locator, expect } from '@playwright/test';
+
+export class UploadPage {
+  readonly page: Page;
+  readonly titleInput: Locator;
+  readonly departmentSelect: Locator;
+  readonly versionInput: Locator;
+  readonly fileInput: Locator;
+  readonly submitButton: Locator;
+  readonly successMessage: Locator;
+  readonly documentIdDisplay: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.titleInput = page.getByLabel('Document Title');
+    this.departmentSelect = page.getByLabel('Department');
+    this.versionInput = page.getByLabel('Version Number');
+    this.fileInput = page.locator('input[type="file"]');
+    this.submitButton = page.getByRole('button', { name: 'Submit for Review' });
+    this.successMessage = page.getByRole('alert').filter({ hasText: 'Submitted' });
+    this.documentIdDisplay = page.getByTestId('new-document-id');
+  }
+
+  async uploadDocument(payload: { title: string; file: string; department: string; version: string }): Promise<string> {
+    await this.titleInput.fill(payload.title);
+    await this.departmentSelect.selectOption(payload.department);
+    await this.versionInput.fill(payload.version);
+    await this.fileInput.setInputFiles(payload.file);
+    await this.submitButton.click();
+    await expect(this.successMessage).toBeVisible();
+    return (await this.documentIdDisplay.textContent())!.trim();
+  }
+}
+```
+
+## Complete `ReviewPage.ts`
+
+```typescript
+// pages/ReviewPage.ts
+import { Page, Locator, expect } from '@playwright/test';
+
+export class ReviewPage {
+  readonly page: Page;
+  readonly decisionSelect: Locator;
+  readonly commentInput: Locator;
+  readonly submitReviewButton: Locator;
+  readonly reviewConfirmation: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.decisionSelect = page.getByLabel('Review Decision');
+    this.commentInput = page.getByLabel('Review Comment');
+    this.submitReviewButton = page.getByRole('button', { name: 'Submit Review' });
+    this.reviewConfirmation = page.getByRole('heading', { name: 'Review Submitted' });
+  }
+
+  async navigateTo(documentId: string) {
+    await this.page.goto(`/review/${documentId}`);
+  }
+
+  async submitReview(decision: { decision: 'Approve' | 'Reject' | 'Request Changes'; comment: string }) {
+    await this.decisionSelect.selectOption(decision.decision);
+    await this.commentInput.fill(decision.comment);
+    await this.submitReviewButton.click();
+    await expect(this.reviewConfirmation).toBeVisible();
+  }
+}
+```
+
+## Complete `AuditTrailPage.ts`
+
+```typescript
+// pages/AuditTrailPage.ts
+import { Page, Locator } from '@playwright/test';
+
+export class AuditTrailPage {
+  readonly page: Page;
+  readonly auditTable: Locator;
+  readonly tableRows: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.auditTable = page.getByRole('table', { name: 'Audit Trail' });
+    this.tableRows = this.auditTable.getByRole('row');
+  }
+
+  async navigateTo(documentId: string) {
+    await this.page.goto(`/documents/${documentId}/audit`);
+  }
+
+  getLatestEntry() {
+    const latestRow = this.tableRows.nth(1); // Row 0 is the header, Row 1 is latest entry
+    return {
+      action: latestRow.locator('td.action-column'),
+      reason: latestRow.locator('td.reason-column'),
+      timestamp: latestRow.locator('td.timestamp-column'),
+    };
+  }
+}
+```
+
+## Challenge Exercise
+
+**Business Context**:
+Your organization is scaling the test suite for a massive online banking platform. The current script relies on inline locators, making it impossible to maintain when the UI changes.
+
+**Mission**:
+Design a maintainable Page Object Model (POM) architecture for the banking application.
+
+**Constraints**:
+- Must support the Login, Accounts, and Transfers pages.
+- Locators must be private and strictly typed.
+
+**Deliverables**:
+- A base Page Object class.
+- Specific implementations for the three required pages.
+
+**Success Criteria**:
+- A test script can successfully execute a transfer using ONLY the POM methods.
+- No Playwright `page.` calls exist directly within the test block.
+
+**Hints**:
+- Hint 1: Inject the Playwright `page` object into your POM constructor.
+- Hint 2: Keep assertions inside the test, not the POM.
+
+<CodeEditor
+  moduleId="95-capstone-pom"
+  taskIndex={0}
+/>
+
+export const astRules = [
+  {
+    type: "ast_node",
+    value: "ClassDeclaration",
+    message: "You must declare a class to implement the Page Object Model architecture."
+  }
+];

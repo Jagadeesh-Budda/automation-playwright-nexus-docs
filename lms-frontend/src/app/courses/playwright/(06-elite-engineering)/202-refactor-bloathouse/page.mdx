@@ -1,0 +1,128 @@
+import { ChapterHeader } from '@/components/ChapterHeader';
+import CodeEditor from '@/components/CodeEditor';
+import { Tabs, Tab } from '@/components/Tabs';
+import AlertBox from '@/components/AlertBox';
+
+# Module F: Refactor the Bloathouse
+
+<ChapterHeader
+  objective="Analyze and refactor a monolithic, fragile automation suite into an optimized enterprise architecture."
+  time="120 mins"
+  type="Portfolio"
+/>
+
+## Learning Objectives
+
+By the end of this module, you will be able to:
+- Identify code smells in automation frameworks.
+- Refactor duplicated logic into centralized Page Objects and Fixtures.
+- Eliminate magic strings and brittle CSS selectors.
+- Remove hardcoded waits and replace them with auto-retrying assertions.
+
+---
+
+## The Bloathouse Monolith
+
+Many automation teams start strong but eventually build a "Bloathouse" — a massive, monolithic test suite where every test file is 1000 lines long, copies logic from other tests, and uses brittle timeouts to survive flaky environments.
+
+### Code Smell Identification
+
+Before you can fix an enterprise framework, you must be able to diagnose it during a Code Review.
+
+<Tabs>
+  <Tab title="1. Magic Strings">
+    **Smell**: `await page.click('#nav > ul > li:nth-child(3) > a')`
+    
+    **Problem**: If the DOM changes slightly, this selector instantly breaks. It carries no semantic meaning.
+  </Tab>
+  <Tab title="2. Hardcoded Sleeps">
+    **Smell**: `await page.waitForTimeout(5000)`
+    
+    **Problem**: Adds 5 seconds to the test execution time even if the page loads in 100ms. It also fails if the page takes 5.1 seconds.
+  </Tab>
+  <Tab title="3. Duplication">
+    **Smell**: 50 different tests all writing `await page.fill('#username', 'admin')` and `await page.click('#login')`.
+    
+    **Problem**: When the login form changes, you have to update 50 different files.
+  </Tab>
+</Tabs>
+
+---
+
+## PR Review Challenge
+
+Review the following "Before" snippet. Identify the structural problems.
+
+```typescript
+// ❌ The Bloathouse Approach
+test('submit order', async ({ page }) => {
+  await page.goto('https://shop.com/login');
+  await page.fill('#user', 'test@test.com');
+  await page.fill('#pass', 'password123');
+  await page.click('.login-btn');
+  
+  await page.waitForTimeout(3000); // wait for load
+  
+  await page.click('text=Products');
+  await page.click('text=Buy Now');
+  
+  await page.waitForTimeout(2000);
+  
+  const success = await page.locator('.alert-success').innerText();
+  expect(success).toContain('Order placed');
+});
+```
+
+**What is wrong here?**
+1. **No Page Objects**: The test is tightly coupled to the DOM.
+2. **Hardcoded Waits**: Wastes 5 seconds total.
+3. **Weak Locators**: Relying on CSS classes (`.login-btn`, `.alert-success`) instead of accessible roles.
+4. **Poor Assertions**: Reading the innerText and asserting against a string is brittle. Playwright provides `toHaveText()` which auto-retries.
+
+---
+
+## Refactoring Challenge
+
+**Business Context**:
+You have just joined a team as the Senior SDET. The test suite takes 4 hours to run, and fails 30% of the time.
+
+**Mission**:
+Refactor the logic inside the editor to use enterprise best practices.
+
+**Success Criteria**:
+- Remove ALL instances of `page.waitForTimeout`.
+- Ensure all asynchronous actions are properly `await`ed.
+- The script must use `page.` actions (demonstrating you didn't just delete everything).
+
+<CodeEditor
+  moduleId="202-refactor-bloathouse"
+  taskIndex={0}
+/>
+
+---
+
+## Summary
+
+| Concept | Enterprise Value |
+|---|---|
+| Refactoring | Reduces maintenance overhead and prevents test rot |
+| Web-First Assertions | Eliminates flakiness caused by hardcoded waits |
+| Page Objects | Centralizes DOM selectors for easy updates |
+
+export const astRules = [
+  {
+    type: "ast_forbidden_callee",
+    value: "page.waitForTimeout",
+    message: "You must remove all hardcoded waits to pass this refactoring challenge."
+  },
+  {
+    type: "ast_node",
+    value: "AwaitExpression",
+    message: "You must properly await your asynchronous calls."
+  },
+  {
+    type: "contains",
+    value: "page.",
+    message: "You must retain page interactions in your refactored code."
+  }
+];

@@ -1,0 +1,16 @@
+{
+  "totalModules": 122,
+  "totalMdxFiles": 118,
+  "qualityChecks": {
+    "emptyLessons": [],
+    "boilerplateLessons": [],
+    "emptyQuizzes": []
+  },
+  "stats": {
+    "lessonsWithQuiz": 112,
+    "lessonsWithTasks": 91,
+    "totalQuizzesQuestionsCount": 1163,
+    "averageQuestionsPerQuiz": "10.4"
+  },
+  "readinessScore": 100
+}

@@ -1,0 +1,320 @@
+﻿# 10.6: Multi-Tab & Multi-Window
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Use popup events and multiple browser contexts
+
+## When Do Multi-Tab Scenarios Arise?
+
+- Links with `target="_blank"` open new tabs
+- OAuth/SSO login flows open popup windows
+- PDF/document previews open in new tabs
+- Print dialogs open new windows
+- Third-party integrations open popups
+
+## Handling `target="_blank"` Links
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('external link opens in new tab', async ({ page }) => {
+  await page.goto('/documents');
+  
+  // Start waiting for the popup BEFORE clicking
+  const popupPromise = page.waitForEvent('popup');
+  
+  await page.getByRole('link', { name: 'View in External System' }).click();
+  
+  // Get the new page (tab)
+  const newTab = await popupPromise;
+  
+  // Wait for it to load
+  await newTab.waitForLoadState();
+  
+  // Assert on the new tab
+  await expect(newTab).toHaveURL(/external-system\.com/);
+  await expect(newTab.getByRole('heading')).toContainText('Document Viewer');
+  
+  // Close the new tab when done
+  await newTab.close();
+});
+```
+
+## Working with Multiple Pages
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('multi-user approval workflow', async ({ browser }) => {
+  // Create two isolated contexts (like two different users)
+  const adminContext = await browser.newContext();
+  const reviewerContext = await browser.newContext();
+  
+  const adminPage = await adminContext.newPage();
+  const reviewerPage = await reviewerContext.newPage();
+  
+  // Admin submits a document
+  await adminPage.goto('/documents/DOC-001');
+  await adminPage.getByRole('button', { name: 'Submit for Review' }).click();
+  
+  // Reviewer sees and approves it (different user, different session)
+  await reviewerPage.goto('/review-queue');
+  await expect(reviewerPage.getByText('DOC-001')).toBeVisible();
+  await reviewerPage.getByRole('button', { name: 'Approve' }).click();
+  
+  // Admin sees the updated status
+  await adminPage.reload();
+  await expect(adminPage.getByTestId('status')).toContainText('Approved');
+  
+  // Clean up
+  await adminContext.close();
+  await reviewerContext.close();
+});
+```
+
+## Getting All Open Pages in a Context
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('track all open tabs', async ({ page, context }) => {
+  await page.goto('/dashboard');
+  
+  // Open a few links in new tabs
+  const popup1 = await openPopup(page, 'View Document A');
+  const popup2 = await openPopup(page, 'View Document B');
+  
+  // Get all pages in the context
+  const allPages = context.pages();
+  console.log(`Open tabs: ${allPages.length}`);  // 3 (original + 2 popups)
+  
+  // Find a specific page by URL
+  const docAPage = allPages.find(p => p.url().includes('document-a'));
+  await expect(docAPage!.getByRole('heading')).toContainText('Document A');
+});
+
+async function openPopup(page, linkName) {
+  const popupPromise = page.waitForEvent('popup');
+  await page.getByRole('link', { name: linkName }).click();
+  const popup = await popupPromise;
+  await popup.waitForLoadState();
+  return popup;
+}
+```
+
+## OAuth / SSO Login Popup
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('login via Google OAuth popup', async ({ page }) => {
+  await page.goto('/login');
+  
+  // Click "Sign in with Google" — opens OAuth popup
+  const popupPromise = page.waitForEvent('popup');
+  await page.getByRole('button', { name: 'Sign in with Google' }).click();
+  const oauthPopup = await popupPromise;
+  
+  // Interact with the OAuth popup
+  await oauthPopup.getByLabel('Email').fill('testuser@gmail.com');
+  await oauthPopup.getByRole('button', { name: 'Next' }).click();
+  await oauthPopup.getByLabel('Password').fill('test-password');
+  await oauthPopup.getByRole('button', { name: 'Sign in' }).click();
+  
+  // The popup closes automatically after auth — wait for it
+  await oauthPopup.waitForEvent('close');
+  
+  // Back in the original page — user should be logged in
+  await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
+});
+```
+
+## `window.open()` Interception
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('intercept window.open() calls', async ({ page, context }) => {
+  await page.goto('/dashboard');
+  
+  // Listen for ALL new pages opened in this context
+  context.on('page', async newPage => {
+    console.log(`New tab opened: ${newPage.url()}`);
+  });
+  
+  // Count total pages before and after
+  const pagesBefore = context.pages().length;
+  await page.getByRole('button', { name: 'Open Report' }).click();
+  
+  // Wait for the new page
+  const newPage = await context.waitForEvent('page');
+  await newPage.waitForLoadState();
+  
+  expect(context.pages().length).toBe(pagesBefore + 1);
+});
+```
+
+## Transferring Data Between Tabs
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('copy document ID from popup back to main page', async ({ page }) => {
+  await page.goto('/documents');
+  
+  // Open document details in new tab
+  const popupPromise = page.waitForEvent('popup');
+  await page.getByRole('link', { name: 'DOC-001' }).click();
+  const detailsTab = await popupPromise;
+  await detailsTab.waitForLoadState();
+  
+  // Extract data from the popup
+  const docTitle = await detailsTab.getByRole('heading').textContent();
+  const docStatus = await detailsTab.getByTestId('status').textContent();
+  
+  // Close the popup
+  await detailsTab.close();
+  
+  // Use the extracted data back in the main page
+  await page.getByRole('searchbox').fill(docTitle!);
+  await expect(page.getByRole('row').filter({ hasText: docStatus! })).toBeVisible();
+});
+```
+
+## Handling Multiple Browser Windows
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('side-by-side document comparison', async ({ browser }) => {
+  const context = await browser.newContext();
+  
+  // Open two pages (windows)
+  const page1 = await context.newPage();
+  const page2 = await context.newPage();
+  
+  // Navigate each to different documents
+  await page1.goto('/documents/DOC-001');
+  await page2.goto('/documents/DOC-002');
+  
+  // Compare content across windows
+  const title1 = await page1.getByRole('heading').textContent();
+  const title2 = await page2.getByRole('heading').textContent();
+  
+  expect(title1).not.toBe(title2);
+  
+  await context.close();
+});
+```
+
+## Popup Page Object Pattern
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// pages/DocumentPreviewPage.ts
+export class DocumentPreviewPage {
+  readonly page: Page;
+  readonly heading: Locator;
+  readonly downloadButton: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.heading = page.getByRole('heading');
+    this.downloadButton = page.getByRole('button', { name: 'Download' });
+  }
+
+  static async openFrom(parentPage: Page, docId: string): Promise<DocumentPreviewPage> {
+    const popupPromise = parentPage.waitForEvent('popup');
+    await parentPage.getByRole('link', { name: docId }).click();
+    const popup = await popupPromise;
+    await popup.waitForLoadState();
+    return new DocumentPreviewPage(popup);
+  }
+
+  async close() {
+    await this.page.close();
+  }
+}
+
+// In tests:
+test('preview document in new tab', async ({ page }) => {
+  await page.goto('/documents');
+  const preview = await DocumentPreviewPage.openFrom(page, 'DOC-001');
+  
+  await expect(preview.heading).toContainText('Protocol');
+  await preview.close();
+});
+```
+
+<CodeEditor
+  moduleId="57-multi-tab"
+  taskIndex={0}
+  placeholder="// Task: Open a link in a new tab and verify its content&#10;const popupPromise = page.waitForEvent('popup');&#10;await page.getByRole('link', { name: 'Preview' }).click();&#10;const newTab = await popupPromise;&#10;await newTab.waitForLoadState();&#10;await expect(newTab.getByRole('heading')).toContainText('Preview');"
+/>
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="57-multi-tab"
+  taskIndex={1}
+  placeholder={`// Challenge: Handle popup page events when clicking a link that opens a new tab
+// Complete the promise handler below:`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="multi-tab" />
+

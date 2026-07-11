@@ -1,0 +1,132 @@
+{
+  "module-0-js-ts": {
+    "lessonCount": 9,
+    "estimatedMinutes": 405,
+    "xp": 450
+  },
+  "module-1-first-test": {
+    "lessonCount": 5,
+    "estimatedMinutes": 225,
+    "xp": 250
+  },
+  "module-2-locators-assertions": {
+    "lessonCount": 4,
+    "estimatedMinutes": 180,
+    "xp": 200
+  },
+  "module-3-test-organization": {
+    "lessonCount": 4,
+    "estimatedMinutes": 180,
+    "xp": 200
+  },
+  "module-4-page-objects": {
+    "lessonCount": 5,
+    "estimatedMinutes": 225,
+    "xp": 250
+  },
+  "module-5-fixtures-di": {
+    "lessonCount": 5,
+    "estimatedMinutes": 225,
+    "xp": 250
+  },
+  "module-6-framework-challenge": {
+    "lessonCount": 3,
+    "estimatedMinutes": 135,
+    "xp": 150
+  },
+  "module-7-synchronization-reliability": {
+    "lessonCount": 4,
+    "estimatedMinutes": 180,
+    "xp": 200
+  },
+  "module-8-enterprise-practices": {
+    "lessonCount": 10,
+    "estimatedMinutes": 450,
+    "xp": 1400
+  },
+  "module-9-playwright-advanced-core": {
+    "lessonCount": 2,
+    "estimatedMinutes": 90,
+    "xp": 200
+  },
+  "module-10-advanced-locators": {
+    "lessonCount": 6,
+    "estimatedMinutes": 270,
+    "xp": 1250
+  },
+  "module-12-advanced-architecture": {
+    "lessonCount": 5,
+    "estimatedMinutes": 225,
+    "xp": 650
+  },
+  "module-14-advanced-features": {
+    "lessonCount": 9,
+    "estimatedMinutes": 405,
+    "xp": 1550
+  },
+  "module-15-e-signature-modals": {
+    "lessonCount": 5,
+    "estimatedMinutes": 225,
+    "xp": 1000
+  },
+  "module-16-api-testing-hybrid-flows": {
+    "lessonCount": 5,
+    "estimatedMinutes": 225,
+    "xp": 1000
+  },
+  "module-17-data-driven-engineering": {
+    "lessonCount": 5,
+    "estimatedMinutes": 225,
+    "xp": 1000
+  },
+  "module-18-framework-engineering-ast": {
+    "lessonCount": 6,
+    "estimatedMinutes": 270,
+    "xp": 1050
+  },
+  "module-11-war-room": {
+    "lessonCount": 1,
+    "estimatedMinutes": 45,
+    "xp": 80
+  },
+  "module-23-final-capstone-certification": {
+    "lessonCount": 4,
+    "estimatedMinutes": 180,
+    "xp": 1500
+  },
+  "module-16-orchestration": {
+    "lessonCount": 4,
+    "estimatedMinutes": 180,
+    "xp": 2700
+  },
+  "module-19-advanced-enterprise-topologies": {
+    "lessonCount": 6,
+    "estimatedMinutes": 270,
+    "xp": 300
+  },
+  "module-13-milestone-project": {
+    "lessonCount": 2,
+    "estimatedMinutes": 90,
+    "xp": 1100
+  },
+  "module-20-industry-tracks": {
+    "lessonCount": 3,
+    "estimatedMinutes": 135,
+    "xp": 150
+  },
+  "module-21-interview-prep": {
+    "lessonCount": 3,
+    "estimatedMinutes": 135,
+    "xp": 150
+  },
+  "module-22-enterprise-templates": {
+    "lessonCount": 3,
+    "estimatedMinutes": 135,
+    "xp": 150
+  },
+  "elite-tier-engineering": {
+    "lessonCount": 4,
+    "estimatedMinutes": 180,
+    "xp": 200
+  }
+}

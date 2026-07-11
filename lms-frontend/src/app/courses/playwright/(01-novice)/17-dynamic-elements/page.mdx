@@ -1,0 +1,164 @@
+﻿
+# 2.3: Dynamic Elements
+
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Complete 2.3: Dynamic Elements
+
+## The Problem with Lists
+
+So far, we've found single, unique elements like the main "Login" button.
+
+But what if you are looking at a shopping cart with 10 items? Or a data table with 50 rows?
+
+```html
+<!-- A typical repeating list -->
+<ul class="todo-list">
+  <li>
+    <span>Buy groceries</span>
+    <button>Delete</button>
+  </li>
+  <li>
+    <span>Wash the car</span>
+    <button>Delete</button>
+  </li>
+</ul>
+```
+
+If you just say `page.getByRole('button', { name: 'Delete' })`, Playwright will find **two** delete buttons and crash, because it doesn't know which one you want to click.
+
+## Solution 1: Chaining Locators
+
+You can chain locators together to narrow down where Playwright looks. Think of it like saying: *"Find the 'Wash the car' row, and then INSIDE THAT ROW, find the 'Delete' button."*
+
+But how do we find the specific row?
+
+## Solution 2: Filtering
+
+Playwright's `.filter()` method lets you take a list of elements and narrow it down based on what's inside them.
+
+```typescript
+// 1. Find all list items
+const allRows = page.getByRole('listitem');
+
+// 2. Filter down to only the row that contains the text "Wash the car"
+const specificRow = allRows.filter({ hasText: 'Wash the car' });
+
+// 3. Inside that specific row, find the Delete button and click it
+await specificRow.getByRole('button', { name: 'Delete' }).click();
+```
+
+This is the most robust way to interact with dynamic tables and lists. Even if the items change order, Playwright will always find the row that says "Wash the car."
+
+## Solution 3: Indexing (Use with Caution)
+
+Sometimes, elements are identical and there's no unique text to filter by. You just want to click the "first" one, or the "third" one.
+
+You can use:
+- `.first()` — Gets the first item in the list
+- `.last()` — Gets the last item in the list
+- `.nth(index)` — Gets the item at a specific index (0-based)
+
+```typescript
+const allDeleteButtons = page.getByRole('button', { name: 'Delete' });
+
+// Click the first delete button on the page
+await allDeleteButtons.first().click();
+
+// Click the second delete button (index 1)
+await allDeleteButtons.nth(1).click();
+```
+
+> [!WARNING]
+> Avoid using `.nth()` if possible! If a new item is added to the top of the list, your index will be wrong and the test will click the wrong thing. Always prefer `.filter({ hasText: ... })` when data is dynamic.
+
+## Putting It Together: The Table Pattern
+
+When working with enterprise apps, you'll deal with tables constantly. The pattern is always the same:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// 1. Locate the entire table body or row list
+const rows = page.getByRole('row');
+
+// 2. Filter for the specific row you care about
+const targetRow = rows.filter({ hasText: 'Invoice #9942' });
+
+// 3. Assert or interact within that row
+await expect(targetRow.getByRole('cell', { name: 'Paid' })).toBeVisible();
+await targetRow.getByRole('button', { name: 'Download PDF' }).click();
+```
+
+## Exercise
+
+Write a test that:
+1. Finds all rows in a hypothetical table.
+2. Filters for the row containing "User: Jane Doe".
+3. Asserts that the status cell within that row has the text "Active".
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="17-dynamic-elements"
+  taskIndex={0}
+  placeholder="// Challenge: Implement the workflow\n// Write your code here:"
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="17-dynamic-elements" />

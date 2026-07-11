@@ -1,0 +1,128 @@
+﻿
+# 1.5: Break It On Purpose
+
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Complete 1.5: Break It On Purpose
+
+## Fear of the Red X
+
+As a beginner, a failing test (a big red ❌) feels like you did something wrong. It's intimidating.
+
+But in automation engineering, **failing tests are the entire point.** If your tests always passed no matter what, they would be useless! A failing test means the framework successfully caught a bug or a change.
+
+Red is not scary. Red is just information. Let's get comfortable with it.
+
+## Intentionally Break a Test
+
+Create a new file `tests/failure.spec.ts` and write a test that you know will fail:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('this will fail on purpose', async ({ page }) => {
+  await page.goto('https://playwright.dev');
+  
+  // The real title contains "Playwright"
+  // We are going to assert something ridiculous:
+  await expect(page).toHaveTitle('Wrong Title On Purpose');
+});
+```
+
+Run the test:
+
+```bash
+npx playwright test tests/failure.spec.ts
+```
+
+## Reading the Error Message
+
+Playwright will output a block of red text. Don't panic — read it carefully. You are looking for two things: `Expected` and `Received`.
+
+```
+Error: expect(page).toHaveTitle(expected)
+
+Expected string: "Wrong Title On Purpose"
+Received string: "Fast and reliable end-to-end testing for modern web apps | Playwright"
+```
+
+Playwright is telling you exactly what went wrong. It says: "You told me to expect 'Wrong Title On Purpose', but when I looked at the page, I received 'Fast and reliable...'"
+
+The error message is your friend. It's the most helpful piece of text on your screen.
+
+## The HTML Report
+
+Run `npx playwright show-report`.
+
+Click on the failed test. Scroll down. 
+
+Notice that Playwright highlights the exact line of code that failed. If you set up traces (which we'll do later), you can even see a screenshot of the page at the exact millisecond the test failed.
+
+## The Fix Cycle
+
+Every automation engineer does this hundreds of times a week:
+1. **Break** (or find a break)
+2. **Read** (the error message)
+3. **Fix** (the code or the assertion)
+4. **Green** (run it again and see it pass)
+
+Change your assertion to `await expect(page).toHaveTitle(/Playwright/);`. Run it again. Watch it go green.
+
+You are now an automation engineer!
+
+---
+
+## Common Mistakes
+
+- **Hardcoding Waits**: Using `page.waitForTimeout()` instead of waiting for an element's state.
+- **Overly Broad Locators**: Using generic CSS selectors like `.button` that might break if multiple buttons are added. Always prefer user-facing attributes like `getByRole`.
+- **Ignoring Errors**: Catching errors in try/catch blocks without failing the test or logging the reason.
+
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="14-break-it"
+  taskIndex={0}
+  placeholder="// Challenge: Implement the workflow\n// Write your code here:"
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="14-break-it" />

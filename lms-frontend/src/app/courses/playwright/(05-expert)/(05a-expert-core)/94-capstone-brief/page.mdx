@@ -1,0 +1,209 @@
+﻿# 23.1: The Capstone Blueprint
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Master end-to-end scenario mapping
+
+## What is the Capstone?
+
+The Capstone project is the culmination of the entire course. You will build a **complete, production-quality automation framework** for a pharmaceutical Document Management System from scratch.
+
+By the end of the Capstone, your framework will:
+- Have a proper 4-layer folder structure
+- Implement POM + AAA pattern correctly
+- Include fixtures, entities, and a data factory
+- Cover the complete E-Sign workflow end-to-end
+- Have a hybrid API+UI test strategy
+- Pass all 5 AST quality gates
+- Generate a full HTML test report
+
+## The Target Application
+
+**Application:** PharmaDoc DMS (Document Management System)
+**Technology:** React + Node.js + PostgreSQL
+**URL:** `https://staging.pharmadoc.example.com`
+
+**Core modules:**
+1. Authentication (login, logout, role switching)
+2. Document Management (upload, search, filter, paginate)
+3. Review Workflow (submit → review → approve/reject)
+4. E-Sign (sign with reason + password, audit trail)
+5. Admin Panel (user management, system configuration)
+
+## Capstone Acceptance Criteria
+
+Your automation framework passes the Capstone when ALL of these are true:
+
+| Criterion | Enterprise Hardening Requirement |
+|-----------|-------------|
+| Architecture | 4-layer structure with tests, pages, components, entities |
+| Page Objects | All pages have dedicated POM files, no raw locators in specs |
+| Fixtures | All POMs injected via `test.extend()`, not `new PageObject()` |
+| **API Seeding** | **Tests MUST use API Controllers (request.post) to seed state. UI state building is prohibited.** |
+| **Virtualization** | **Must implement `page.route` to mock out the flaky 3rd-party Analytics server.** |
+| **DB Integrity** | **Post-UI action, execute a direct DB query assertion to prove true data commit.** |
+| **Quality Gates** | **Submission fails if `waitForTimeout` or `test.describe.serial` bypasses are detected.** |
+| **Dockerized** | **Must include a `Dockerfile` proving the suite runs flawlessly in Linux CI.** |
+| Assertions | Only web-first `expect()` assertions, no custom sleeps |
+| Report | HTML / Allure report generated with traces on failure |
+
+## Capstone Project Structure (Target)
+
+```
+capstone-dms-automation/
+├── tests/
+│   ├── auth/
+│   │   └── login.spec.ts
+│   ├── documents/
+│   │   ├── upload.spec.ts
+│   │   ├── search.spec.ts
+│   │   └── workflow.spec.ts
+│   ├── e-sign/
+│   │   └── signature-workflow.spec.ts
+│   ├── api/
+│   │   ├── documents-api.spec.ts
+│   │   └── auth-api.spec.ts
+│   └── compliance/
+│       └── audit-trail.spec.ts
+├── pages/
+│   ├── LoginPage.ts
+│   ├── DocumentPage.ts
+│   ├── UploadPage.ts
+│   ├── ReviewPage.ts
+│   ├── ESignPage.ts
+│   └── AuditTrailPage.ts
+├── components/
+│   ├── Modal.ts
+│   ├── DataTable.ts
+│   └── ESignModal.ts
+├── entities/
+│   ├── User.ts
+│   ├── Document.ts
+│   └── Signature.ts
+├── fixtures/
+│   └── baseTest.ts
+├── utils/
+│   ├── ApiClient.ts
+│   ├── DataFactory.ts
+│   └── AstAuditor.ts
+├── data/
+│   └── testDocuments.json
+├── .env.example
+├── playwright.config.ts
+└── global-setup.ts
+```
+
+## Planning Your Capstone
+
+Before writing any code, answer these questions:
+
+1. **What are the riskiest test scenarios?** (The ones most likely to fail or have bugs)
+2. **Which tests should run in CI every push?** (Smoke tests)
+3. **Which tests are too slow for CI but important?** (Nightly regression suite)
+4. **What test data do you need?** (Users, documents, departments)
+5. **What is the failure recovery plan?** (How do you clean up if a test crashes mid-way?)
+
+## Day-by-Day Capstone Plan
+
+| Day | Task |
+|-----|------|
+| Day 1 | Project scaffolding: folder structure, `playwright.config.ts`, `.env` |
+| Day 2 | Implement all Page Objects and Entities |
+| Day 3 | Write all spec files (tests) |
+| Day 4 | API tests + Hybrid tests + Data Factory |
+| Day 5 | AST audit, HTML report, CI configuration, PR |
+
+<CodeEditor
+  moduleId="94-capstone-brief"
+  taskIndex={0}
+  placeholder="// Task: List the 4 layers of the Capstone architecture from memory.&#10;// For each layer, specify:&#10;//   - The folder name&#10;//   - What belongs in that layer&#10;//&#10;// Write your answer as comments below:"
+/>
+
+<SolutionGate moduleId="capstone-brief">
+
+```
+// Layer 1: tests/ (what to test)
+// Layer 2: pages/ (how to interact with each page)
+// Layer 3: components/ (shared UI elements)
+// Layer 4: entities/ (TypeScript interfaces and data shapes)
+```
+
+</SolutionGate>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="94-capstone-brief"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="capstone-brief" />
+

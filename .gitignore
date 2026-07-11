@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.*
+
+# Environment variables & Secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Databases
+*.db
+*.db-journal
+*.db-wal
+
+# Build outputs
+.next/
+out/
+build/
+dist/
+
+# System files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log

@@ -1,0 +1,120 @@
+import { ChapterHeader } from '@/components/ChapterHeader';
+import CodeEditor from '@/components/CodeEditor';
+import Quiz from '@/components/Quiz';
+import { Tabs, Tab } from '@/components/Tabs';
+import AlertBox from '@/components/AlertBox';
+
+# Module D: Test Data Management
+
+<ChapterHeader
+  objective="Master enterprise test data strategies including factories, parallel safety, and cleanup patterns."
+  time="45 mins"
+  type="Code"
+/>
+
+## Learning Objectives
+
+By the end of this module, you will be able to:
+- Design dynamic, isolated test data strategies using Faker.
+- Implement robust teardown logic using `apiContext`.
+- Ensure parallel execution safety by avoiding shared state mutations.
+- Understand the tradeoffs between seeding, API factories, and UI data creation.
+
+---
+
+## Enterprise Test Data Strategy
+
+In enterprise automation, **test data is often the #1 cause of flaky tests**. If multiple parallel workers attempt to modify the same database record, or if a test fails to delete a user account it created, subsequent test runs will fail inconsistently.
+
+> [!CAUTION]
+> **The Golden Rule:** Tests must create their own state and clean up after themselves, leaving the environment exactly as they found it.
+
+### Dynamic Test Data with Faker
+
+Never hardcode values like `testuser1@example.com`. Instead, generate dynamic values using libraries like `Faker.js`.
+
+```typescript
+import { faker } from '@faker-js/faker';
+
+const generateUser = () => ({
+  username: faker.internet.userName(),
+  email: faker.internet.email(),
+  password: faker.internet.password()
+});
+```
+
+### The Data Lifecycle
+
+<Tabs>
+  <Tab title="1. Setup (beforeEach)">
+    Use the `request` fixture (API context) to rapidly seed data before the test begins. Do not use the UI for setup unless you are explicitly testing the registration flow.
+  </Tab>
+  <Tab title="2. Execution (test)">
+    Perform the actual business logic validation. The test interacts with the data seeded in the setup phase.
+  </Tab>
+  <Tab title="3. Teardown (afterEach)">
+    Critically, you must clean up the data. If the test creates an order, the `afterEach` block must delete that order. This ensures idempotency.
+  </Tab>
+</Tabs>
+
+---
+
+## Common Mistakes: The "Passes Monday, Fails Friday" Anti-Pattern
+
+```typescript
+// ❌ ANTI-PATTERN: Hardcoded State
+test('create user profile', async ({ page, request }) => {
+  // If this test runs twice, it fails the second time (email already exists)
+  await request.post('/api/users', { data: { email: 'admin@company.com' } });
+  
+  await page.goto('/profile');
+  await expect(page.getByText('admin@company.com')).toBeVisible();
+});
+```
+
+---
+
+## Challenge Exercise: Implement Proper Teardown
+
+**Business Context**: 
+Your team's CI pipeline fails on Friday afternoons because the staging database fills up with leftover test accounts. 
+
+**Mission**:
+Refactor the provided test to guarantee that the generated user account is deleted via API, regardless of whether the test passes or fails.
+
+**Success Criteria**:
+- Use `afterEach` to handle the teardown.
+- Use `apiContext.delete` (or `request.delete`) to remove the user.
+
+**Hints**:
+- Hint 1: Store the dynamic user ID in a variable scoped outside the `test` block, or use Playwright's test execution context.
+
+<CodeEditor
+  moduleId="200-test-data-management"
+  taskIndex={0}
+/>
+
+---
+
+## Summary
+
+| Concept | Enterprise Value |
+|---|---|
+| Dynamic Generation | Prevents parallel test collisions |
+| API Factories | Speeds up test setup by bypassing the UI |
+| Idempotency | Ensures tests can run infinitely without degrading the environment |
+
+<Quiz moduleId="200-test-data-management" />
+
+export const astRules = [
+  {
+    type: "contains",
+    value: "afterEach",
+    message: "You must implement an afterEach block to ensure cleanup runs even if the test fails."
+  },
+  {
+    type: "contains",
+    value: "apiContext.delete",
+    message: "You must use the API context to delete the record in the teardown."
+  }
+];

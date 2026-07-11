@@ -1,0 +1,341 @@
+[
+  {
+    "name": "Page Object Model (POM)",
+    "description": "Encapsulates page UI details and selectors into classes to promote code reuse and simplify maintenance.",
+    "sourceLessons": [
+      "24-what-are-poms",
+      "25-first-pom",
+      "26-multi-page",
+      "27-refactor-exercise"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/24-what-are-poms/page.mdx",
+        "heading": "A Basic Page Object",
+        "lineRange": "55-80"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/24-what-are-poms/page.mdx",
+        "heading": "How Tests Use Page Objects",
+        "lineRange": "89-105"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/24-what-are-poms/page.mdx",
+        "heading": "The Answer to Our Pain",
+        "lineRange": "47-49"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/24-what-are-poms/page.mdx",
+        "heading": "A Basic Page Object",
+        "lineRange": "82-83"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/24-what-are-poms/page.mdx",
+        "heading": "Summary",
+        "lineRange": "177-178"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/25-first-pom/page.mdx",
+        "heading": "Hands-On: Building the Page Object",
+        "lineRange": "22-24"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/25-first-pom/page.mdx",
+        "heading": "Hands-On: Building the Page Object",
+        "lineRange": "34-62"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/25-first-pom/page.mdx",
+        "heading": "Hands-On: Using the Page Object",
+        "lineRange": "73-92"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/25-first-pom/page.mdx",
+        "heading": "Hands-On: Using the Page Object",
+        "lineRange": "96-98"
+      },
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/25-first-pom/page.mdx",
+        "heading": "Hands-On: Building the Page Object",
+        "lineRange": "64-65"
+      }
+    ]
+  },
+  {
+    "name": "Dependency Injection (Fixtures)",
+    "description": "Playwright engine fixture environment injector. Decouples test code execution setups using extends.",
+    "sourceLessons": [
+      "29-what-are-fixtures",
+      "30-custom-fixtures",
+      "31-fixture-dependencies",
+      "32-basetest-pattern"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(03-competent)/29-what-are-fixtures/page.mdx",
+        "heading": "The Final Duplication",
+        "lineRange": "16-34"
+      },
+      {
+        "file": "src/app/courses/playwright/(03-competent)/29-what-are-fixtures/page.mdx",
+        "heading": "Enter Fixtures",
+        "lineRange": "50-54"
+      },
+      {
+        "file": "src/app/courses/playwright/(03-competent)/29-what-are-fixtures/page.mdx",
+        "heading": "The Magic of Custom Fixtures",
+        "lineRange": "79-91"
+      },
+      {
+        "file": "src/app/courses/playwright/(03-competent)/29-what-are-fixtures/page.mdx",
+        "heading": "The Magic of Custom Fixtures",
+        "lineRange": "94-101"
+      },
+      {
+        "file": "src/app/courses/playwright/(03-competent)/29-what-are-fixtures/page.mdx",
+        "heading": "The Magic of Custom Fixtures",
+        "lineRange": "107-108"
+      },
+      {
+        "file": "src/app/courses/playwright/(03-competent)/29-what-are-fixtures/page.mdx",
+        "heading": "Summary",
+        "lineRange": "164-165"
+      },
+      {
+        "file": "src/app/courses/playwright/(03-competent)/30-custom-fixtures/page.mdx",
+        "heading": "Using the Fixture in a Test",
+        "lineRange": "51-65"
+      },
+      {
+        "file": "src/app/courses/playwright/(03-competent)/30-custom-fixtures/page.mdx",
+        "heading": "The Magic of the `use` Callback",
+        "lineRange": "43-45"
+      },
+      {
+        "file": "src/app/courses/playwright/(03-competent)/31-fixture-dependencies/page.mdx",
+        "heading": "The Problem: Complex Setup",
+        "lineRange": "18-26"
+      },
+      {
+        "file": "src/app/courses/playwright/(03-competent)/31-fixture-dependencies/page.mdx",
+        "heading": "Fixtures Depending on Fixtures",
+        "lineRange": "38-65"
+      }
+    ]
+  },
+  {
+    "name": "4-Layer Architecture",
+    "description": "Strategic directory scaffolding separating tests, page objects, UI components, and data shape entities.",
+    "sourceLessons": [
+      "58-arch-layers",
+      "59-arch-interface",
+      "60-arch-debug",
+      "61-arch-entity"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/58-arch-layers/page.mdx",
+        "heading": "Layer 1: Tests — \"What\"",
+        "lineRange": "71-91"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/58-arch-layers/page.mdx",
+        "heading": "The Page Object Solution",
+        "lineRange": "107-130"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/58-arch-layers/page.mdx",
+        "heading": "Layer 3: Components — Shared UI Pieces",
+        "lineRange": "136-159"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/58-arch-layers/page.mdx",
+        "heading": "Layer 3: Components — Shared UI Pieces",
+        "lineRange": "161-173"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/58-arch-layers/page.mdx",
+        "heading": "Layer 4: Entities — Data Types",
+        "lineRange": "177-196"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/58-arch-layers/page.mdx",
+        "heading": "The Data Flow",
+        "lineRange": "200-205"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/58-arch-layers/page.mdx",
+        "heading": "The Data Flow",
+        "lineRange": "224-229"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/58-arch-layers/page.mdx",
+        "heading": "Layer Diagram",
+        "lineRange": "63-65"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/58-arch-layers/page.mdx",
+        "heading": "The Data Flow",
+        "lineRange": "209-213"
+      },
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/58-arch-layers/page.mdx",
+        "heading": "Summary",
+        "lineRange": "243-244"
+      }
+    ]
+  },
+  {
+    "name": "AST Verification Quality Gates",
+    "description": "Abstract Syntax Tree linter validating framework rules (e.g. banning timeouts, enforcing await checks).",
+    "sourceLessons": [
+      "87-ast-concept",
+      "88-ast-linter",
+      "89-ast-waits",
+      "90-ast-debug",
+      "91-ast-gate"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/87-ast-concept/page.mdx",
+        "heading": "What Happens When Your Code is Parsed?",
+        "lineRange": "12-34"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/87-ast-concept/page.mdx",
+        "heading": "The Parser: `acorn`",
+        "lineRange": "42-54"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/87-ast-concept/page.mdx",
+        "heading": "The Parser: `acorn`",
+        "lineRange": "58-66"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/87-ast-concept/page.mdx",
+        "heading": "Walking the AST",
+        "lineRange": "72-93"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/87-ast-concept/page.mdx",
+        "heading": "Gate 1 Implementation: Detecting `waitForTimeout`",
+        "lineRange": "97-116"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/87-ast-concept/page.mdx",
+        "heading": "Gate 3 Implementation: Detecting Missing `await`",
+        "lineRange": "120-167"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/87-ast-concept/page.mdx",
+        "heading": "The Full Audit Pipeline",
+        "lineRange": "171-191"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/87-ast-concept/page.mdx",
+        "heading": "Summary",
+        "lineRange": "248-250"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/87-ast-concept/page.mdx",
+        "heading": "Summary",
+        "lineRange": "224-225"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/88-ast-linter/page.mdx",
+        "heading": "Building a Complete AST Linter",
+        "lineRange": "16-178"
+      }
+    ]
+  },
+  {
+    "name": "MFA SMS Gateway Mocking",
+    "description": "Mocking dynamic OTP authentication flows using route intercepts and mock fulfill handlers.",
+    "sourceLessons": [
+      "73-esign-modal",
+      "110-industry-banking"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/73-esign-modal/page.mdx",
+        "heading": "The Core Strategy: Scope All Locators to the Dialog",
+        "lineRange": "21-28"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/73-esign-modal/page.mdx",
+        "heading": "Complete E-Sign Modal Page Object",
+        "lineRange": "32-93"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/73-esign-modal/page.mdx",
+        "heading": "Multi-Step Modal Workflow",
+        "lineRange": "99-124"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/73-esign-modal/page.mdx",
+        "heading": "Handling Browser Native Dialogs (`alert`, `confirm`, `prompt`)",
+        "lineRange": "130-148"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/73-esign-modal/page.mdx",
+        "heading": "Preventing Animation Interference",
+        "lineRange": "154-164"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/73-esign-modal/page.mdx",
+        "heading": "Preventing Animation Interference",
+        "lineRange": "175-183"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/73-esign-modal/page.mdx",
+        "heading": "Summary",
+        "lineRange": "197-198"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05b-expert-specialization)/110-industry-banking/page.mdx",
+        "heading": "Summary",
+        "lineRange": "86-87"
+      }
+    ]
+  },
+  {
+    "name": "Data Factory Pattern",
+    "description": "Generates isolated dynamic database state payloads and handles execution data cleanups.",
+    "sourceLessons": [
+      "86-data-factory"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/86-data-factory/page.mdx",
+        "heading": "The Complete Data Factory",
+        "lineRange": "19-53"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/86-data-factory/page.mdx",
+        "heading": "The API Data Factory (Creates Records in DB)",
+        "lineRange": "57-121"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/86-data-factory/page.mdx",
+        "heading": "Using the Factory in Tests",
+        "lineRange": "125-172"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/86-data-factory/page.mdx",
+        "heading": "Using the Factory in Tests",
+        "lineRange": "183-192"
+      },
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/86-data-factory/page.mdx",
+        "heading": "Summary",
+        "lineRange": "206-207"
+      }
+    ]
+  }
+]

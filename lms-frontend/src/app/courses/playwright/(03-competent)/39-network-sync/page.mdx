@@ -1,0 +1,183 @@
+# 7.4: Network Synchronization
+
+import { ChapterHeader } from '@/components/ChapterHeader';
+
+<ChapterHeader
+  objective="Eliminate flaky UI waits by synchronizing tests directly against backend API responses."
+  time="15 mins"
+  type="Concept"
+/>
+
+## Learning Objectives
+- Identify scenarios where UI synchronization is fundamentally flaky
+- Use `page.waitForResponse()` to intercept and wait for network traffic
+- Implement the "Trap and Trigger" promise pattern correctly
+
+## The Limits of UI Waiting
+
+Even with Playwright's auto-waiting and `.waitFor()`, you will eventually encounter a scenario that is completely flaky.
+
+Imagine a "Save" button that triggers an API call.
+1. You click "Save".
+2. A loading spinner appears.
+3. The loading spinner disappears.
+4. A green "Saved" toast notification appears.
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// A brittle UI-based synchronization approach
+await this.saveButton.click();
+await this.loadingSpinner.waitFor({ state: 'visible' }); // Fails if API is too fast!
+await this.loadingSpinner.waitFor({ state: 'hidden' });
+await expect(this.toast).toBeVisible();
+```
+
+If the API is incredibly fast, the spinner might appear and disappear in 5 milliseconds—before Playwright even reaches line 2! The test will crash waiting for a spinner that already came and went.
+
+## Waiting for the Network
+
+The most bulletproof way to synchronize a UI automation test is to **stop looking at the UI** and look at the underlying network traffic instead.
+
+When you click "Save", the browser sends a `POST /api/users` request. 
+
+We can tell Playwright to wait for that specific HTTP request to finish!
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// 1. Tell Playwright to start listening for a specific response
+// We must do this BEFORE we click the button!
+const responsePromise = page.waitForResponse('**/api/users');
+
+// 2. Perform the action that triggers the network request
+await this.saveButton.click();
+
+// 3. Wait for the response to come back
+const response = await responsePromise;
+
+// 4. (Optional) We can even assert on the HTTP status code!
+expect(response.status()).toBe(200);
+```
+
+### Why is this better?
+
+1. **Immune to UI Speed:** It doesn't matter if the loading spinner was fast or slow. We only care that the server received the data and responded.
+2. **True Verification:** Sometimes the UI says "Saved successfully" even if the API failed with a 500 error (due to a bug in the frontend code). By waiting for the network, we can verify the actual backend response.
+
+## The Promise Pattern
+
+Notice the structure of the code above. 
+
+We declare the promise *before* the action, and `await` the promise *after* the action. 
+
+If you put `await page.waitForResponse()` before clicking the button, the test will hang forever because nothing triggered the API call! 
+
+Always set the trap, spring the trap, and then check what you caught.
+
+```typescript
+// The Trap
+const trap = page.waitForResponse('**/endpoint');
+
+// The Action
+await button.click();
+
+// The Check
+await trap;
+```
+
+This pattern is the secret weapon of senior automation engineers. Whenever a UI interaction is flaky, ask yourself: *"Can I wait for the network instead?"*
+
+---
+
+## Practice Exercise
+
+<CodeEditor
+  moduleId="39-network-sync"
+  taskIndex={0}
+  placeholder={`// Practice: Wait for the login API to finish.\n// The endpoint is /api/v1/login\n\n// 1. Set the trap\n\n// 2. Click the login button\nawait page.getByRole('button', { name: 'Login' }).click();\n\n// 3. Wait for the trap\n`}
+/>
+
+---
+
+## Common Mistakes
+
+- **Hardcoding Waits**: Using `page.waitForTimeout()` instead of waiting for an element's state.
+- **Overly Broad Locators**: Using generic CSS selectors like `.button` that might break if multiple buttons are added. Always prefer user-facing attributes like `getByRole`.
+- **Ignoring Errors**: Catching errors in try/catch blocks without failing the test or logging the reason.
+
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** You are testing an e-commerce checkout. Clicking "Submit Order" fires a POST request to `**/api/checkout`. If it succeeds, the response status will be `201 Created`.
+
+**Your Task:** Write a test that submits the order, waits for the network response, and asserts that the status code is exactly 201.
+
+**Constraints:**
+- ❌ You may NOT use any `.waitFor()` calls on UI elements
+- ✅ You MUST use `page.waitForResponse`
+- ✅ You MUST assert the response status code
+
+<CodeEditor
+  moduleId="39-network-sync"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('network synchronization', async ({ page }) => {
+  await page.goto('https://analytics.com');
+
+  // BUG: Clicking the refresh button triggers a background API fetch.
+  // Synchronize using waitForResponse to catch the target request before asserting!
+  await page.getByRole('button', { name: 'Refresh' }).click();
+  
+  await expect(page.getByText('Data Synced')).toBeVisible();
+});`}
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('checkout network verification', async ({ page }) => {
+  // 1. Set the trap for the checkout endpoint
+  const responsePromise = page.waitForResponse('**/api/checkout');
+  
+  // 2. Trigger the action
+  await page.getByRole('button', { name: 'Submit Order' }).click();
+  
+  // 3. Wait for the response
+  const response = await responsePromise;
+  
+  // 4. Assert the status code
+  expect(response.status()).toBe(201);
+});
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Network vs UI | The DOM can be faster than Playwright can poll it, leading to flakiness |
+| `waitForResponse` | Pauses test execution until a specific HTTP response is received |
+| Trap Pattern | Promises must be created *before* the action that triggers them is executed |
+
+> [!TIP]
+> **Next Step:** You have completed the Competent tier! Proceed to the Proficient tier to learn about CI/CD pipelines and advanced test architecture.
+
+<Quiz moduleId="39-network-sync" />
+
+export const astRules = [
+  {
+    type: "ast_callee",
+    value: "page.waitForResponse",
+    message: "You must synchronize the test using page.waitForResponse as taught in this module."
+  }
+];

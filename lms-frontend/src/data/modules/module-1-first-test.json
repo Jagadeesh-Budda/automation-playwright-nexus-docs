@@ -1,0 +1,813 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T10:36:32.990Z",
+  "lessons": [
+    {
+      "id": "10-first-test",
+      "title": "1.1: Your First Test",
+      "url": "courses/playwright/10-first-test",
+      "group": "🚀 MODULE 1: YOUR FIRST TEST",
+      "level": 1,
+      "weight": 5,
+      "meta": {
+        "time": "40 mins",
+        "type": "Code",
+        "outcome": "Run a Playwright test."
+      },
+      "objectives": [
+        {
+          "id": "01a_first_test_obj",
+          "title": "Complete 1.1: Your First Test"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "task-1",
+          "rules": [
+            {
+              "type": "ast_import",
+              "value": "@playwright/test",
+              "required": true
+            },
+            {
+              "type": "ast_callee",
+              "value": "page.goto",
+              "required": true
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_import",
+              "value": "@playwright/test",
+              "required": true
+            },
+            {
+              "type": "ast_callee",
+              "value": "page.goto",
+              "required": true
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "01a_first_test_obj",
+          "weight": 100
+        }
+      ],
+      "quizPool": {
+        "Easy": [
+          {
+            "objective": "test_execution",
+            "type": "scenario",
+            "difficulty": "easy",
+            "q": "Which command must be added to the pipeline configuration to trigger the test suite execution?",
+            "options": [
+              "npx playwright run",
+              "npx playwright test",
+              "npm start tests",
+              "playwright execute"
+            ],
+            "a": "npx playwright test",
+            "explanation": "`npx playwright test` is the default CLI command that triggers the Playwright Test runner, automatically searching for and executing files matching the `*.spec.ts` or `*.test.ts` patterns.",
+            "scenario": "A Jenkins pipeline executes successfully but the QA manager notices that no Playwright tests actually ran during the build."
+          },
+          {
+            "objective": "test_execution",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You want to run a specific test file named `login.spec.ts` rather than the entire suite.",
+            "q": "How do you modify the CLI command to achieve this?",
+            "options": [
+              "npx playwright test login.spec.ts",
+              "npx playwright test --file=login.spec.ts",
+              "npx playwright test -f login.spec.ts",
+              "npm run login.spec.ts"
+            ],
+            "a": "npx playwright test login.spec.ts",
+            "explanation": "You can pass the file name (or a partial path/regex) directly as an argument to the test runner. Playwright will filter the execution to only include files that match that string."
+          },
+          {
+            "objective": "test_execution",
+            "type": "multi-select",
+            "difficulty": "easy",
+            "scenario": "Your tests are running, but the console output is difficult to read because it lacks a clear, step-by-step breakdown.",
+            "q": "Which of the following built-in reporters can be used to improve the output format? (Select all that apply)",
+            "options": [
+              "line",
+              "list",
+              "html",
+              "pdf"
+            ],
+            "a": [
+              "line",
+              "list",
+              "html"
+            ],
+            "explanation": "Playwright includes several built-in reporters. `list` prints every test name. `line` prints a single updating line (good for CI). `html` generates a rich web report. There is no native `pdf` reporter."
+          },
+          {
+            "objective": "test_execution",
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "test('verify header', async ({ page }) => {\n  await page.goto('/');\n  await expect(page.locator('h1')).toHaveText('Welcome');\n});",
+            "q": "If you run this code using `npx playwright test`, what visual output will you see on your monitor by default?",
+            "options": [
+              "A Chromium browser will open and briefly flash the 'Welcome' text.",
+              "Nothing visual. The test runs completely headless in the background, printing only text to the terminal.",
+              "The Playwright Inspector will open and pause execution.",
+              "An HTML report will pop up immediately."
+            ],
+            "a": "Nothing visual. The test runs completely headless in the background, printing only text to the terminal.",
+            "explanation": "By default, Playwright runs tests in 'headless' mode for maximum speed and CI compatibility. You must explicitly pass the `--headed` flag if you want to watch the browser execute."
+          },
+          {
+            "objective": "test_execution",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You have a suite of 10 tests, but you only want to run the 3 tests that have the word '@smoke' in their title.",
+            "q": "Which CLI flag enables this title-based filtering?",
+            "options": [
+              "--grep @smoke",
+              "--title @smoke",
+              "--filter @smoke",
+              "--tag @smoke"
+            ],
+            "a": "--grep @smoke",
+            "explanation": "The `--grep` (or `-g`) flag acts as a regular expression filter against the titles of the `test()` blocks. It will only execute tests whose title strings match the pattern."
+          }
+        ],
+        "Medium": [
+          {
+            "objective": "test_execution",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "test.describe('Checkout', () => {\n  test.beforeEach(async ({ page }) => { await page.goto('/cart'); });\n  test('Add Item', async ({ page }) => { /* ... */ });\n  test('Remove Item', async ({ page }) => { /* ... */ });\n});",
+            "q": "How many times does the `beforeEach` block execute in this suite?",
+            "options": [
+              "Once. It runs before the `describe` block starts.",
+              "Twice. It runs immediately before 'Add Item', and then again before 'Remove Item'.",
+              "Never, because it is missing the `await` keyword on the block definition.",
+              "Three times."
+            ],
+            "a": "Twice. It runs immediately before 'Add Item', and then again before 'Remove Item'.",
+            "explanation": "A `beforeEach` hook executes prior to *every single test* within its lexical scope (the describe block). If there are two tests, it runs two separate times, ensuring isolated setup for each test."
+          },
+          {
+            "objective": "test_execution",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "A developer runs `npx playwright test --project=chromium`. The test passes. They then run it again without the `--project` flag, and it fails.",
+            "q": "What is the most likely architectural reason for this behavior?",
+            "options": [
+              "Playwright deletes the configuration file after the first run.",
+              "Without the `--project` flag, Playwright reads the config and likely runs the test across multiple projects (e.g., Firefox, WebKit, Mobile Safari) concurrently. The test is likely failing on a non-Chromium engine.",
+              "The test lacks a `beforeAll` hook.",
+              "The `--project` flag automatically disables timeouts."
+            ],
+            "a": "Without the `--project` flag, Playwright reads the config and likely runs the test across multiple projects (e.g., Firefox, WebKit, Mobile Safari) concurrently. The test is likely failing on a non-Chromium engine.",
+            "explanation": "By default, if the `projects` array is defined in `playwright.config.ts`, the CLI executes the test against *all* defined projects in parallel. Specifying `--project=chromium` filters execution to just that engine. A failure without the flag usually indicates a cross-browser compatibility issue."
+          },
+          {
+            "objective": "test_execution",
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "You are organizing a massive test file and want to logically group related tests together.",
+            "q": "Which of the following are valid reasons to use `test.describe()` blocks? (Select all that apply)",
+            "options": [
+              "To visually group related tests in the reporter output.",
+              "To scope `beforeEach` and `afterEach` hooks so they only apply to a specific subset of tests in the file.",
+              "To run tests sequentially instead of in parallel.",
+              "To force Playwright to launch a new browser process."
+            ],
+            "a": [
+              "To visually group related tests in the reporter output.",
+              "To scope `beforeEach` and `afterEach` hooks so they only apply to a specific subset of tests in the file."
+            ],
+            "explanation": "`test.describe` creates logical suites. It helps organize reports visually and provides lexical scoping for setup hooks. It does not control parallelization (that is done via `test.describe.configure`) or browser process lifecycle."
+          },
+          {
+            "objective": "test_execution",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "test.skip('broken payment gateway', async ({ page }) => {\n  await page.click('#pay');\n});",
+            "q": "What is the result of using `test.skip` instead of just commenting out the code?",
+            "options": [
+              "The code is ignored by the TypeScript compiler.",
+              "Playwright will run the test but ignore any assertion failures.",
+              "The test is not executed, but it is still parsed and explicitly reported as 'Skipped' in the final HTML/CLI report, maintaining visibility that the test exists but is currently disabled.",
+              "The test will only run if the `--run-skipped` flag is passed."
+            ],
+            "a": "The test is not executed, but it is still parsed and explicitly reported as 'Skipped' in the final HTML/CLI report, maintaining visibility that the test exists but is currently disabled.",
+            "explanation": "Commenting out code makes it invisible to reports and prone to rotting. Using `test.skip()` ensures the test remains in the architecture, gets type-checked, and appears in QA reports as a known, tracked gap in coverage."
+          },
+          {
+            "objective": "test_execution",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "Your CI pipeline generates an HTML report after the tests run. The pipeline fails, and the developer wants to see the report. However, the report contains a massive folder of assets and an `index.html` file.",
+            "q": "How can the developer easily view this report locally without setting up a web server?",
+            "options": [
+              "Just double-click the `index.html` file.",
+              "Run the command `npx playwright show-report`.",
+              "Upload it to Google Drive.",
+              "Convert the HTML to a PDF."
+            ],
+            "a": "Run the command `npx playwright show-report`.",
+            "explanation": "Playwright's HTML reports use strict CORS policies to load traces and assets safely. Double-clicking `index.html` via the `file://` protocol usually results in a blank page or errors. `npx playwright show-report <folder>` boots a tiny local server to view the report flawlessly."
+          }
+        ],
+        "Hard": [
+          {
+            "objective": "test_execution",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "test.describe.serial('Database Transaction Flow', () => {\n  test('Create Order', async ({ db }) => { /* ... */ });\n  test('Process Payment', async ({ db }) => { /* ... */ });\n  test('Fulfill Order', async ({ db }) => { /* ... */ });\n});",
+            "q": "If the 'Process Payment' test fails due to a network timeout, what mathematically happens to the 'Fulfill Order' test in this specific architecture?",
+            "options": [
+              "It runs normally.",
+              "It is automatically marked as 'Skipped' because `test.describe.serial` enforces a strict dependency chain; if one test fails, all subsequent tests in the serial block abort to prevent cascading state failures.",
+              "It is retried 3 times.",
+              "The worker crashes."
+            ],
+            "a": "It is automatically marked as 'Skipped' because `test.describe.serial` enforces a strict dependency chain; if one test fails, all subsequent tests in the serial block abort to prevent cascading state failures.",
+            "explanation": "`test.describe.serial` disables parallelization *and* enforces a fail-fast dependency. Because the tests rely on the state mutated by the previous test, a failure in step 2 means step 3 is guaranteed to fail. Playwright smartly skips step 3 to save time and prevent noisy logs."
+          },
+          {
+            "objective": "test_execution",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "Your enterprise config has `fullyParallel: true`. You have 10 test files, each containing 5 tests. You run the suite on a CI server with 4 CPU cores.",
+            "q": "What is the exact concurrency and worker distribution model utilized by Playwright?",
+            "options": [
+              "Playwright spawns 50 workers simultaneously.",
+              "Playwright spawns 4 worker processes. Because `fullyParallel: true` is set, all 50 individual test blocks are distributed across the 4 workers dynamically, regardless of which file they belong to.",
+              "Playwright spawns 10 worker processes, one for each file.",
+              "Playwright ignores `fullyParallel` in CI."
+            ],
+            "a": "Playwright spawns 4 worker processes. Because `fullyParallel: true` is set, all 50 individual test blocks are distributed across the 4 workers dynamically, regardless of which file they belong to.",
+            "explanation": "By default, Playwright limits workers to a percentage of CPU cores to prevent thrashing. Without `fullyParallel`, it distributes *files* to workers (tests inside a file run sequentially). With `fullyParallel: true`, it shatters the file boundaries, treating all 50 tests as independent units and aggressively feeding them into the 4 available workers."
+          },
+          {
+            "objective": "test_execution",
+            "type": "multi-select",
+            "difficulty": "hard",
+            "scenario": "A test suite is reporting memory leaks (OOM errors) on the CI server. The SDET decides to use `test.describe.parallel` to speed up execution.",
+            "q": "Why is using `test.describe.parallel` architecturally dangerous in a memory-constrained CI environment? (Select all that apply)",
+            "options": [
+              "It forces Playwright to spawn a new worker process for every single test in the block simultaneously, ignoring the global worker limit.",
+              "It runs all tests inside a single Node.js process concurrently using `Promise.all()`, which causes the single V8 heap to explode.",
+              "If the tests share global state or fixtures, parallel execution causes race conditions.",
+              "It bypasses the garbage collector."
+            ],
+            "a": [
+              "If the tests share global state or fixtures, parallel execution causes race conditions."
+            ],
+            "explanation": "Playwright *never* runs tests concurrently in the same Node.js process (which would explode the heap via `Promise.all`). It uses OS-level isolation (Worker processes). The danger is purely architectural: if tests inside the describe block mutate the same database row or write to the same `state.json`, running them in parallel across different workers will cause race conditions and locks."
+          },
+          {
+            "objective": "test_execution",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "import { test } from '@playwright/test';\n\ntest.beforeAll(async () => { await seedDatabase(); });\n\ntest('A', async () => {});\ntest('B', async () => {});",
+            "q": "If the `fullyParallel: true` config is enabled, how many times will the `beforeAll` hook mathematically execute if the tests are picked up by two different worker processes?",
+            "options": [
+              "Once. `beforeAll` always runs globally exactly one time.",
+              "Twice. `beforeAll` executes once per Worker process that picks up a test from this file, meaning the database will be seeded twice concurrently, causing a massive race condition.",
+              "Never.",
+              "It will throw an error."
+            ],
+            "a": "Twice. `beforeAll` executes once per Worker process that picks up a test from this file, meaning the database will be seeded twice concurrently, causing a massive race condition.",
+            "explanation": "This is a critical, advanced 'gotcha' in Playwright. `beforeAll` is not 'Global Setup'. It is 'Worker Setup'. If `fullyParallel` shatters your file across 4 workers, each worker creates its own isolated sandbox and runs the `beforeAll` hook independently. Mutating external databases in `beforeAll` during parallel runs guarantees corruption."
+          },
+          {
+            "objective": "test_execution",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You are debugging a test failure on CI. You download the Trace file (`trace.zip`). When you open it in the Playwright Trace Viewer, you notice that the network panel shows an API request taking 15 seconds, but the Playwright action (e.g., `page.click`) timed out after 5 seconds.",
+            "q": "How does the architectural layout of the Trace Viewer natively help you prove to the backend team that the failure is a performance issue, not a test flake?",
+            "options": [
+              "The Trace Viewer includes a built-in terminal to run curl commands.",
+              "The Trace Viewer aligns the DOM Snapshots, Console Logs, and Network Requests on a unified timeline. You can visually demonstrate that the 'click' action occurred, the exact millisecond the network request fired, and the exact millisecond the timeout exception was thrown while the network request is visibly still pending.",
+              "The Trace Viewer automatically generates a JIRA ticket.",
+              "The Trace Viewer proves the test was flaky."
+            ],
+            "a": "The Trace Viewer aligns the DOM Snapshots, Console Logs, and Network Requests on a unified timeline. You can visually demonstrate that the 'click' action occurred, the exact millisecond the network request fired, and the exact millisecond the timeout exception was thrown while the network request is visibly still pending.",
+            "explanation": "The primary enterprise value of Traces is ending 'works on my machine' arguments. Because Traces map every network packet, console log, and DOM mutation to a master timeline, SDETs can mathematically prove that the automation framework executed perfectly, but the backend infrastructure failed to respond within the SLA."
+          }
+        ]
+      },
+      "icon": "🚀",
+      "slug": "10-first-test",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "11-navigating-clicking",
+      "title": "1.2: Navigating & Clicking",
+      "url": "courses/playwright/11-navigating-clicking",
+      "group": "🚀 MODULE 1: YOUR FIRST TEST",
+      "level": 1,
+      "weight": 5,
+      "meta": {
+        "time": "20 mins",
+        "type": "Code",
+        "outcome": "Interact with a page."
+      },
+      "objectives": [
+        {
+          "id": "01b_navigating_clicking_obj",
+          "title": "Complete 1.2: Navigating & Clicking"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Navigate and Verify",
+          "hint": "await page.goto(url); await page.getByRole(...).click();",
+          "rules": [
+            {
+              "type": "ast_import",
+              "value": "@playwright/test",
+              "required": true
+            },
+            {
+              "type": "ast_callee",
+              "value": "page.goto",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_callee",
+              "value": "page.getByRole",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true,
+              "min": 2
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_import",
+              "value": "@playwright/test",
+              "required": true
+            },
+            {
+              "type": "ast_callee",
+              "value": "page.goto",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_callee",
+              "value": "page.getByRole",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true,
+              "min": 2
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "Why is awaiting navigation correctly an important architectural pattern for preventing race conditions?",
+            "options": [
+              "To prevent test flakiness",
+              "Because Playwright requires it",
+              "To make tests slower",
+              "It is optional"
+            ],
+            "a": "To prevent test flakiness",
+            "explanation": "Architecture prevents flakiness at scale.",
+            "scenario": "During a code review for this specific module's concepts, a developer questions the approach."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "q": "Which navigation anti-pattern reliably triggers 'TargetClosedError' exceptions?",
+            "options": [
+              "Using global state across tests",
+              "Using test.beforeEach",
+              "Using web-first assertions",
+              "Using page.goto"
+            ],
+            "a": "Using global state across tests",
+            "explanation": "Global state ruins parallelization.",
+            "scenario": "You are auditing a failing test suite focused on this module's core topic."
+          }
+        ]
+      },
+      "icon": "🚀",
+      "slug": "11-navigating-clicking",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "12-writing-assertions",
+      "title": "1.3: Writing Assertions",
+      "url": "courses/playwright/12-writing-assertions",
+      "group": "🚀 MODULE 1: YOUR FIRST TEST",
+      "level": 1,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Code",
+        "outcome": "Verify page state."
+      },
+      "objectives": [
+        {
+          "id": "01c_writing_assertions_obj",
+          "title": "Complete 1.3: Writing Assertions"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Challenge",
+          "hint": "Complete the code implementation",
+          "rules": [
+            {
+              "type": "ast_import",
+              "value": "@playwright/test",
+              "required": true
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_callee",
+              "value": "toBeVisible",
+              "required": true,
+              "min": 1
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        }
+      ],
+      "quizMapping": [],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "await expect(page.locator('.alert')).toBeVisible();",
+            "q": "What does this specific assertion natively do if the alert is not immediately visible?",
+            "options": [
+              "It automatically retries for a default timeout (usually 5 seconds) waiting for it to appear",
+              "It fails the test instantly",
+              "It throws a warning but continues execution",
+              "It pauses the test forever"
+            ],
+            "a": "It automatically retries for a default timeout (usually 5 seconds) waiting for it to appear",
+            "explanation": "Playwright's `expect` matchers connected to locators (like `toBeVisible`) are auto-retrying, making them resilient to minor network/rendering delays."
+          },
+          {
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You need to verify that a greeting element contains the text 'Welcome'.",
+            "q": "Which assertion correctly implements a partial text match?",
+            "options": [
+              "await expect(locator).toContainText('Welcome');",
+              "await expect(locator).toHaveText('Welcome');",
+              "await expect(locator).toBe('Welcome');",
+              "await expect(locator).toHaveValue('Welcome');"
+            ],
+            "a": "await expect(locator).toContainText('Welcome');",
+            "explanation": "`toContainText` performs a substring match, whereas `toHaveText` requires an exact, full-string match by default."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You are testing an input field. After typing 'Jane', you want to assert that the input field actually reflects that state.",
+            "q": "Which assertion is appropriate for validating the state of an `<input>` element?",
+            "options": [
+              "await expect(locator).toHaveValue('Jane');",
+              "await expect(locator).toHaveText('Jane');",
+              "await expect(locator).toContainText('Jane');",
+              "await expect(locator).toBeChecked();"
+            ],
+            "a": "await expect(locator).toHaveValue('Jane');",
+            "explanation": "Input fields store their content in the `value` property, not in the innerText/textContent DOM nodes, so `toHaveValue` must be used."
+          },
+          {
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "expect(await page.locator('.title').textContent()).toBe('Dashboard');",
+            "q": "Why is this considered a brittle anti-pattern compared to web-first assertions?",
+            "options": [
+              "It extracts the text string first and runs a static assertion, completely losing the auto-retrying capability",
+              "It requires too much RAM",
+              "textContent() always returns null in Playwright",
+              "It throws a syntax error"
+            ],
+            "a": "It extracts the text string first and runs a static assertion, completely losing the auto-retrying capability",
+            "explanation": "By fetching the text manually, the check happens instantly. If the UI hasn't fully rendered the text in that exact millisecond, it fails. Web-first assertions evaluate *inside* the retry loop."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You need to verify that a dynamically generating success message explicitly ends with 'has been saved'.",
+            "q": "How can you enforce this strict pattern match using Playwright assertions?",
+            "options": [
+              "Pass a Regular Expression to the assertion: await expect(locator).toHaveText(/has been saved$/);",
+              "Use a wildcard string: await expect(locator).toHaveText('*has been saved');",
+              "You must use a Custom Matcher plugin",
+              "Loop through the text until it matches"
+            ],
+            "a": "Pass a Regular Expression to the assertion: await expect(locator).toHaveText(/has been saved$/);",
+            "explanation": "Playwright assertions fully support JavaScript Regular Expressions, allowing you to build highly complex pattern-matching logic (like `$` for end-of-string)."
+          }
+        ]
+      },
+      "icon": "🚀",
+      "slug": "12-writing-assertions",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "13-running-reading",
+      "title": "1.4: Running & Reading Results",
+      "url": "courses/playwright/13-running-reading",
+      "group": "🚀 MODULE 1: YOUR FIRST TEST",
+      "level": 1,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Code",
+        "outcome": "Understand CLI and reports."
+      },
+      "objectives": [
+        {
+          "id": "01d_running_reading_obj",
+          "title": "Complete 1.4: Running & Reading Results"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "01d_running_reading_obj",
+          "weight": 100
+        }
+      ],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "mcq",
+            "difficulty": "easy",
+            "q": "Which Playwright CLI flag is used to open the interactive UI mode?",
+            "options": [
+              "--ui",
+              "--interactive",
+              "--headed",
+              "--debug"
+            ],
+            "a": "--ui",
+            "explanation": "The --ui flag opens Playwright's interactive UI mode, allowing you to explore, run, and debug tests."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You are running a CI pipeline that fails intermittently. You want to execute the tests 3 times and only keep the trace if the test fails.",
+            "q": "Which CLI flag combination achieves this?",
+            "options": [
+              "npx playwright test --retries=3 --trace=retain-on-failure",
+              "npx playwright test --repeat-each=3 --trace=on",
+              "npx playwright test --retries=2 --trace=on-first-retry",
+              "npx playwright test --debug"
+            ],
+            "a": "npx playwright test --retries=3 --trace=retain-on-failure",
+            "explanation": "The --retries flag determines how many times a failing test is rerun, and --trace=retain-on-failure ensures trace files are only saved when the test definitively fails, saving CI storage space."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "q": "If a developer runs `npx playwright test --workers=1`, how does this impact the underlying execution architecture compared to the default behavior?",
+            "options": [
+              "It forces Playwright to run all tests sequentially within a single worker process, effectively disabling parallel execution across files.",
+              "It disables the V8 engine garbage collector to speed up tests.",
+              "It limits the browser to opening only 1 tab at a time, but multiple browsers can still run.",
+              "It forces Playwright to use Promise.all() instead of OS processes."
+            ],
+            "a": "It forces Playwright to run all tests sequentially within a single worker process, effectively disabling parallel execution across files.",
+            "explanation": "Playwright typically spins up multiple OS-level worker processes (based on CPU cores) to run different test files in parallel. Setting --workers=1 forces everything into a single sequential pipeline, which is extremely useful for debugging race conditions."
+          }
+        ]
+      },
+      "icon": "🚀",
+      "slug": "13-running-reading",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    },
+    {
+      "id": "14-break-it",
+      "title": "1.5: Break It On Purpose",
+      "url": "courses/playwright/14-break-it",
+      "group": "🚀 MODULE 1: YOUR FIRST TEST",
+      "level": 1,
+      "weight": 5,
+      "meta": {
+        "time": "15 mins",
+        "type": "Code",
+        "outcome": "Understand failure and error reading."
+      },
+      "objectives": [
+        {
+          "id": "01e_break_it_obj",
+          "title": "Complete 1.5: Break It On Purpose"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "01e_break_it_obj",
+          "weight": 100
+        }
+      ],
+      "quizPool": {
+        "Easy": [
+          {
+            "type": "mcq",
+            "difficulty": "easy",
+            "q": "When a Playwright test fails, what is the best way to determine the cause of the failure?",
+            "options": [
+              "Review the HTML report or trace",
+              "Re-run the test until it passes",
+              "Restart the IDE",
+              "Delete the test"
+            ],
+            "a": "Review the HTML report or trace",
+            "explanation": "Playwright's HTML report and trace viewer provide comprehensive details on why a test failed."
+          }
+        ],
+        "Medium": [
+          {
+            "type": "scenario",
+            "difficulty": "medium",
+            "q": "A test fails with `locator.click: Target closed`. What does this error typically indicate?",
+            "options": [
+              "The page or browser context was closed or navigated away before the click action could complete.",
+              "The element was hidden by CSS display: none.",
+              "The locator matched multiple elements.",
+              "The element is disabled."
+            ],
+            "a": "The page or browser context was closed or navigated away before the click action could complete.",
+            "explanation": "'Target closed' means the underlying CDP connection to the page/browser was severed, usually because the test triggered a navigation or closed the page manually while an action was still waiting to resolve."
+          }
+        ],
+        "Hard": [
+          {
+            "type": "multi-select",
+            "difficulty": "hard",
+            "scenario": "When analyzing a `trace.zip` file.",
+            "q": "Which of the following actions can you perform directly within the Playwright Trace Viewer? (Select all that apply)",
+            "options": [
+              "Inspect the DOM tree at the exact moment before and after an action.",
+              "View the raw HTTP Request and Response payloads for network calls made by the browser.",
+              "Modify the test code and re-execute it from within the viewer.",
+              "See the exact mouse path and click coordinates during execution."
+            ],
+            "a": [
+              "Inspect the DOM tree at the exact moment before and after an action.",
+              "View the raw HTTP Request and Response payloads for network calls made by the browser.",
+              "See the exact mouse path and click coordinates during execution."
+            ],
+            "explanation": "The Trace Viewer is a read-only historical artifact. It captures the DOM, Network, Console, and Action coordinates, but it is not an IDE—you cannot execute or modify code from within it."
+          }
+        ]
+      },
+      "icon": "🚀",
+      "slug": "14-break-it",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations"
+    }
+  ]
+}

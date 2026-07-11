@@ -1,0 +1,147 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T10:36:32.990Z",
+  "lessons": [
+    {
+      "id": "113-interview-coding",
+      "title": "21.1: Technical Phone Screen",
+      "group": "🎤 MODULE 21: INTERVIEW PREP",
+      "isPro": false,
+      "meta": {
+        "time": "25 mins"
+      },
+      "slug": "113-interview-coding",
+      "url": "courses/playwright/113-interview-coding",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations",
+      "tasks": [
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "114-interview-system-design",
+      "title": "21.2: SDET System Design",
+      "group": "🎤 MODULE 21: INTERVIEW PREP",
+      "isPro": false,
+      "meta": {
+        "time": "25 mins"
+      },
+      "slug": "114-interview-system-design",
+      "url": "courses/playwright/114-interview-system-design",
+      "learningPaths": [
+        "enterprise"
+      ],
+      "category": "enterprise",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Enterprise SDET",
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Practice",
+          "hint": "Complete the practice task",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "115-interview-behavioral",
+      "title": "21.3: QA Behavioral Scenarios",
+      "group": "🎤 MODULE 21: INTERVIEW PREP",
+      "isPro": false,
+      "meta": {
+        "time": "25 mins"
+      },
+      "slug": "115-interview-behavioral",
+      "url": "courses/playwright/115-interview-behavioral",
+      "learningPaths": [
+        "foundations",
+        "enterprise"
+      ],
+      "category": "core",
+      "optional": false,
+      "industryTags": [],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Playwright Foundations",
+      "tasks": [
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

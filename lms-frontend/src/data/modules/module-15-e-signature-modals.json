@@ -1,0 +1,1625 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-06-26T10:36:32.990Z",
+  "lessons": [
+    {
+      "id": "72-esign-compliance",
+      "title": "15.1: 21 CFR Part 11 Compliance",
+      "url": "courses/playwright/72-esign-compliance",
+      "group": "✍️ MODULE 15: E-SIGNATURE & MODALS",
+      "level": 11,
+      "weight": 5,
+      "meta": {
+        "time": "20 mins",
+        "type": "Concept",
+        "outcome": "Understand regulatory requirements for digital signatures"
+      },
+      "objectives": [
+        {
+          "id": "compliance_logic",
+          "title": "Master the Intent, Identity, and Integrity triad"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "task-1",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_callee",
+              "value": "expect",
+              "required": true,
+              "min": 1
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "compliance_logic",
+          "weight": 100
+        }
+      ],
+      "spec": {
+        "regulation": "21 CFR Part 11",
+        "standard": "FDA Compliance"
+      },
+      "quizPool": {
+        "Easy": [
+          {
+            "objective": "esign_compliance",
+            "type": "scenario",
+            "difficulty": "easy",
+            "q": "What is the primary regulatory focus of FDA 21 CFR Part 11 that your tests must validate?",
+            "options": [
+              "It regulates how fast a website must load.",
+              "It establishes the criteria under which Electronic Records and Electronic Signatures are considered legally equivalent to paper records and handwritten signatures.",
+              "It dictates which programming language must be used.",
+              "It requires all software to be open-source."
+            ],
+            "a": "It establishes the criteria under which Electronic Records and Electronic Signatures are considered legally equivalent to paper records and handwritten signatures.",
+            "explanation": "In life sciences (Pharma, Medical Devices), if a lab technician approves a drug batch by clicking a button, that click carries immense legal weight. Part 11 ensures that the software mathematically proves exactly WHO clicked the button, exactly WHEN, and exactly WHAT they approved.",
+            "scenario": "You are automating tests for a clinical trial software system. The FDA auditor asks for proof that your electronic records cannot be tampered with."
+          },
+          {
+            "objective": "esign_compliance",
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "test('E-Sign Approval', async ({ page }) => {\n  await page.click('#approve-btn');\n  await page.fill('#password-prompt', 'userSecret123');\n  await page.click('#confirm-esign');\n});",
+            "q": "Why does a compliant E-Signature require the user to re-enter their password (or biometric) at the exact moment of approval, even if they are already logged in?",
+            "options": [
+              "Because the session expired.",
+              "To guarantee 'Non-Repudiation'. It proves that the human sitting at the keyboard at that exact second intentionally authorized the action. It prevents a user from walking away and someone else clicking 'Approve' on their unlocked computer.",
+              "To slow the user down.",
+              "To test the database connection."
+            ],
+            "a": "To guarantee 'Non-Repudiation'. It proves that the human sitting at the keyboard at that exact second intentionally authorized the action. It prevents a user from walking away and someone else clicking 'Approve' on their unlocked computer.",
+            "explanation": "This is a core pillar of Part 11. An electronic signature must be linked to a continuous, intentional act of identity verification at the specific moment of execution."
+          },
+          {
+            "objective": "esign_compliance",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "A user edits the dosage of a medication in the system from 10mg to 20mg.",
+            "q": "According to Part 11, how must the software log this action in its 'Audit Trail'?",
+            "options": [
+              "It only needs to save the new value (20mg).",
+              "It must record a secure, computer-generated, time-stamped audit trail that independently records the date and time of operator entries and actions. It must show the old value (10mg), the new value (20mg), the user ID, and optionally the reason for the change.",
+              "It sends an email to the admin.",
+              "It deletes the old record."
+            ],
+            "a": "It must record a secure, computer-generated, time-stamped audit trail that independently records the date and time of operator entries and actions. It must show the old value (10mg), the new value (20mg), the user ID, and optionally the reason for the change.",
+            "explanation": "Audit Trails must be immutable (un-editable) and comprehensive. The system must always be able to historically reconstruct exactly how a record reached its current state."
+          },
+          {
+            "objective": "esign_compliance",
+            "type": "multi-select",
+            "difficulty": "easy",
+            "scenario": "You are writing automated Playwright tests to verify 21 CFR Part 11 compliance.",
+            "q": "Which of the following scenarios MUST be rigorously tested? (Select all that apply)",
+            "options": [
+              "Attempting to approve a document with an incorrect password (must fail).",
+              "Verifying that the Audit Trail UI displays the correct timestamp and user immediately after a change is made.",
+              "Testing if the application looks good on a mobile phone.",
+              "Verifying that standard users cannot delete entries from the Audit Trail."
+            ],
+            "a": [
+              "Attempting to approve a document with an incorrect password (must fail).",
+              "Verifying that the Audit Trail UI displays the correct timestamp and user immediately after a change is made.",
+              "Verifying that standard users cannot delete entries from the Audit Trail."
+            ],
+            "explanation": "Compliance testing is security testing. You are testing negative paths (unauthorized access, mutation attempts) just as heavily as the happy path."
+          },
+          {
+            "objective": "esign_compliance",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "An Electronic Signature is applied to a digital document (like a PDF report).",
+            "q": "What physical information must be visibly embedded in the signature manifestation on the document?",
+            "options": [
+              "Just the user's name.",
+              "The printed name of the signer, the date and time the signature was executed, and the meaning of the signature (e.g., 'Reviewed', 'Approved', 'Authored').",
+              "The user's password.",
+              "A barcode."
+            ],
+            "a": "The printed name of the signer, the date and time the signature was executed, and the meaning of the signature (e.g., 'Reviewed', 'Approved', 'Authored').",
+            "explanation": "Part 11 explicitly dictates the visual requirements of an e-signature. It must mathematically bind the 'Who', 'When', and 'Why' directly to the record so that if the document is printed, the signature context remains intact."
+          }
+        ],
+        "Medium": [
+          {
+            "objective": "esign_compliance",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "test('Audit Trail Validation', async ({ page, db }) => {\n  await page.fill('#dosage', '50');\n  await page.click('#save');\n  // ... how do you assert the audit trail?\n});",
+            "q": "Why is testing the Audit Trail via the UI often insufficient, requiring direct database assertion (`expect(dbAudit.oldValue).toBe(...)`)?",
+            "options": [
+              "Because the UI is too slow.",
+              "Because the UI might have a bug that masks data corruption. Part 11 requires the fundamental data layer to be immutable. Testing the API or Database directly proves that the backend architecture successfully securely recorded the event, independent of the frontend rendering logic.",
+              "Because Playwright cannot read tables.",
+              "Because databases don't have UIs."
+            ],
+            "a": "Because the UI might have a bug that masks data corruption. Part 11 requires the fundamental data layer to be immutable. Testing the API or Database directly proves that the backend architecture successfully securely recorded the event, independent of the frontend rendering logic.",
+            "explanation": "Compliance heavily relies on Backend validation. A frontend test only proves the UI showed a record. A backend fixture test proves the record was actually physically committed to the immutable ledger."
+          },
+          {
+            "objective": "esign_compliance",
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "You are testing the 'Meaning of Signature' requirement.",
+            "q": "What architectural validations must your test framework perform regarding the signature meaning? (Select all that apply)",
+            "options": [
+              "Verify the user is forced to select a meaning (e.g., a dropdown for 'Approved' or 'Rejected') before the system accepts the password.",
+              "Verify that the selected meaning is permanently permanently attached to the audit record.",
+              "Verify that the user can change the meaning of the signature after it has been applied.",
+              "Verify that the system deletes the record if 'Rejected' is selected."
+            ],
+            "a": [
+              "Verify the user is forced to select a meaning (e.g., a dropdown for 'Approved' or 'Rejected') before the system accepts the password.",
+              "Verify that the selected meaning is permanently permanently attached to the audit record."
+            ],
+            "explanation": "A signature without intent is legally meaningless. The system must enforce intent selection, and once applied, that intent (like the signature itself) is completely immutable."
+          },
+          {
+            "objective": "esign_compliance",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "A system implements a 'Continuous Session' where a user logs in, and the system allows them to sign 5 different documents over 2 hours without re-entering their password.",
+            "q": "Why does this architecture violate 21 CFR Part 11 criteria for Non-continuous sessions?",
+            "options": [
+              "Because 2 hours is too long.",
+              "Part 11 requires that for a series of signings during a continuous period of controlled system access, the first signature requires ALL identification components (ID + Password), and subsequent signatures require at least ONE component (e.g., just the password). Zero-component subsequent signatures are illegal.",
+              "Because documents must be signed simultaneously.",
+              "It doesn't violate the criteria."
+            ],
+            "a": "Part 11 requires that for a series of signings during a continuous period of controlled system access, the first signature requires ALL identification components (ID + Password), and subsequent signatures require at least ONE component (e.g., just the password). Zero-component subsequent signatures are illegal.",
+            "explanation": "Automation frameworks must rigorously test these authentication decay loops. You must write tests that prove the system actively challenges the user for their password on the 2nd, 3rd, and 4th document."
+          },
+          {
+            "objective": "esign_compliance",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "await page.locator('#document-text').fill('New corrupted data');",
+            "q": "If a record has already been Electronically Signed, how must the application react to this code execution?",
+            "options": [
+              "It must save the data.",
+              "The system must architecturally lock the record. The locator should either be disabled, or the API must reject the mutation. Signed records are legally frozen; any required changes must result in a completely new version of the document with a new signature cycle.",
+              "It must ask for a password.",
+              "It must delete the signature."
+            ],
+            "a": "The system must architecturally lock the record. The locator should either be disabled, or the API must reject the mutation. Signed records are legally frozen; any required changes must result in a completely new version of the document with a new signature cycle.",
+            "explanation": "This is 'Record Protection'. An automated test must explicitly attempt to hack the UI (e.g., using `page.evaluate` to remove the `disabled` attribute from an input and submitting) to prove the backend violently rejects mutations to signed data."
+          },
+          {
+            "objective": "esign_compliance",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You are validating the 'Time-stamp' requirement of the Audit Trail.",
+            "q": "Why is it insufficient to just test that a date appears? What specific architectural synchronization must be tested?",
+            "options": [
+              "The date must be in color.",
+              "The time-stamp must be strictly synchronized to a secure, centralized network time server, NOT the local user's workstation clock. If a user changes their Windows clock, the audit trail must ignore it and use the trusted server time.",
+              "The time must be in military format.",
+              "The time must include seconds."
+            ],
+            "a": "The time-stamp must be strictly synchronized to a secure, centralized network time server, NOT the local user's workstation clock. If a user changes their Windows clock, the audit trail must ignore it and use the trusted server time.",
+            "explanation": "This is a classic compliance vulnerability. A test should use Playwright's Clock Emulation to drastically alter the local browser time, execute an action, and then assert that the backend Audit Trail recorded the true server time, ignoring the local spoofing."
+          }
+        ],
+        "Hard": [
+          {
+            "objective": "esign_compliance",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "test('Session Timeout Security', async ({ page }) => {\n  await page.clock.install();\n  await login(page);\n  await page.clock.fastForward('15:01'); // 15 min timeout\n  await page.click('#sensitive-data');\n  // Assert redirect to login\n});",
+            "q": "Why is rigorous, mathematical testing of session timeouts a critical pillar of Part 11 compliance?",
+            "options": [
+              "To save server memory.",
+              "To prevent unauthorized access to an unattended terminal. The regulation demands systems mitigate the risk of someone walking up to an unlocked PC and forging an electronic signature. Precise timeout enforcement is a legal requirement.",
+              "To annoy the user.",
+              "To reset the database."
+            ],
+            "a": "To prevent unauthorized access to an unattended terminal. The regulation demands systems mitigate the risk of someone walking up to an unlocked PC and forging an electronic signature. Precise timeout enforcement is a legal requirement.",
+            "explanation": "Playwright's clock emulation allows you to test these security boundaries down to the millisecond, proving to auditors that the system mathematically locks out idle sessions exactly when configured."
+          },
+          {
+            "objective": "esign_compliance",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "A database administrator (DBA) logs directly into the SQL server and uses a raw SQL query to alter an approved record, bypassing the application UI.",
+            "q": "While Playwright UI tests cannot prevent this, how does the underlying system architecture maintain Part 11 compliance against DBA tampering?",
+            "options": [
+              "It doesn't.",
+              "The database itself must implement low-level triggers or CDC (Change Data Capture) that independently generate an immutable audit log of raw SQL mutations. Compliance extends beyond the application layer into the infrastructure layer.",
+              "By changing the DBA password.",
+              "By using NoSQL."
+            ],
+            "a": "The database itself must implement low-level triggers or CDC (Change Data Capture) that independently generate an immutable audit log of raw SQL mutations. Compliance extends beyond the application layer into the infrastructure layer.",
+            "explanation": "QA Architects must understand that UI automation only validates the Application Layer. True Part 11 compliance requires holistic system design where even database administrators cannot quietly alter the truth."
+          },
+          {
+            "objective": "esign_compliance",
+            "type": "multi-select",
+            "difficulty": "hard",
+            "scenario": "You are writing a test framework to validate the 'Unique Signature' requirement.",
+            "q": "What complex scenarios must your Playwright tests actively attempt to execute to prove uniqueness and non-transferability? (Select all that apply)",
+            "options": [
+              "Attempt to create a new user account using an ID or Username that was previously assigned to a different user who has since been deactivated.",
+              "Attempt to apply Alice's signature using Bob's credentials.",
+              "Verify that users can share passwords if they are in the same department.",
+              "Verify that the system allows blank passwords."
+            ],
+            "a": [
+              "Attempt to create a new user account using an ID or Username that was previously assigned to a different user who has since been deactivated.",
+              "Attempt to apply Alice's signature using Bob's credentials."
+            ],
+            "explanation": "Part 11 dictates that an electronic signature must be totally unique to one individual and can NEVER be reused by or reassigned to anyone else, forever. The test suite must actively try to recycle deleted usernames to ensure the backend violently rejects it."
+          },
+          {
+            "objective": "esign_compliance",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "await page.route('/api/audit', route => route.abort('failed'));",
+            "q": "You intentionally sever the connection to the Audit Logging microservice. A user then attempts to save a medical record.",
+            "options": [
+              "The system should save the record and log it later.",
+              "The system MUST completely abort the transaction. If the system cannot guarantee that the audit trail is securely recorded, it is legally forbidden from altering the primary data. This test proves 'Fail-Closed' architectural integrity.",
+              "The system should show a warning.",
+              "The system should crash the browser."
+            ],
+            "a": "The system MUST completely abort the transaction. If the system cannot guarantee that the audit trail is securely recorded, it is legally forbidden from altering the primary data. This test proves 'Fail-Closed' architectural integrity.",
+            "explanation": "This is Chaos Engineering applied to Compliance. By mathematically breaking the audit subsystem, you prove that the primary application refuses to operate in an unlogged, non-compliant state."
+          },
+          {
+            "objective": "esign_compliance",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "During an FDA inspection, an auditor demands to see the automated test results that prove your software is Part 11 compliant.",
+            "q": "Why is the Playwright HTML report itself subject to rigorous compliance standards, and how do you ensure its integrity?",
+            "options": [
+              "The report doesn't matter.",
+              "The automated test results are considered 'Quality Records'. You cannot just have a loose HTML file. The pipeline architecture must securely archive the test execution logs, traces, and results into a read-only, version-controlled repository to prevent engineers from tampering with the QA evidence.",
+              "You must print the report on paper.",
+              "You must rewrite it in Word."
+            ],
+            "a": "The automated test results are considered 'Quality Records'. You cannot just have a loose HTML file. The pipeline architecture must securely archive the test execution logs, traces, and results into a read-only, version-controlled repository to prevent engineers from tampering with the QA evidence.",
+            "explanation": "Quis custodiet ipsos custodes? (Who watches the watchers?) The system that tests the compliant software must itself generate compliant, immutable records of its testing activities to satisfy regulatory scrutiny."
+          }
+        ]
+      },
+      "icon": "📜",
+      "slug": "72-esign-compliance",
+      "learningPaths": [
+        "enterprise",
+        "regulated"
+      ],
+      "category": "industry-specific",
+      "optional": true,
+      "industryTags": [
+        "Healthcare",
+        "Pharma",
+        "Regulated Systems"
+      ],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Regulated Industry Automation"
+    },
+    {
+      "id": "73-esign-modal",
+      "title": "15.2: The ESignModal Component",
+      "url": "courses/playwright/73-esign-modal",
+      "group": "✍️ MODULE 15: E-SIGNATURE & MODALS",
+      "level": 11,
+      "weight": 15,
+      "meta": {
+        "time": "25 mins",
+        "type": "Code",
+        "outcome": "Automate interactions with the global signature component"
+      },
+      "objectives": [
+        {
+          "id": "modal_mastery",
+          "title": "Handle async modal transitions"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "esign_call",
+          "title": "Invoke E-Signature",
+          "hint": "Use eSignModal.sign()",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "sign"
+            },
+            {
+              "type": "contains",
+              "value": "await"
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "sign"
+            },
+            {
+              "type": "contains",
+              "value": "await"
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "modal_mastery",
+          "weight": 100
+        }
+      ],
+      "spec": {
+        "component": "ESignModal",
+        "method": "sign(user, pass, reason)"
+      },
+      "quizPool": {
+        "Easy": [
+          {
+            "objective": "esign_modal",
+            "type": "mcq",
+            "difficulty": "easy",
+            "q": "Why is the E-Signature Modal often architected as a highly reusable, isolated Page Object Component in enterprise frameworks?",
+            "options": [
+              "Because modals cannot be tested with normal locators.",
+              "Because the exact same E-Signature verification process is required across dozens of different workflows (Approving a document, releasing a batch, deleting a record). Consolidating it into a single `ESignModal` component guarantees DRY code.",
+              "Because modals use iframes.",
+              "Because it runs on a separate server."
+            ],
+            "a": "Because the exact same E-Signature verification process is required across dozens of different workflows (Approving a document, releasing a batch, deleting a record). Consolidating it into a single `ESignModal` component guarantees DRY code.",
+            "explanation": "If you write `page.fill('#password')` in 50 different test files to handle the E-Sign modal, and the ID changes to `#pwd`, you have to fix 50 files. Centralizing the modal into a component class makes the framework maintainable."
+          },
+          {
+            "objective": "esign_modal",
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "export class ESignModal {\n  private readonly modal = this.page.getByRole('dialog', { name: 'Electronic Signature' });\n  private readonly passwordInput = this.modal.getByLabel('Password');\n  // ...\n}",
+            "q": "What is the primary advantage of chaining `this.modal.getByLabel` instead of `this.page.getByLabel` for the password input?",
+            "options": [
+              "It makes Playwright run faster.",
+              "It scopes the search explicitly to the modal. If the main page behind the modal also has a 'Password' field, `page.getByLabel` would fail due to strict mode violation (finding 2 elements). Scoping guarantees we only interact with the modal's input.",
+              "It ignores the shadow DOM.",
+              "It clicks the input automatically."
+            ],
+            "a": "It scopes the search explicitly to the modal. If the main page behind the modal also has a 'Password' field, `page.getByLabel` would fail due to strict mode violation (finding 2 elements). Scoping guarantees we only interact with the modal's input.",
+            "explanation": "Modals sit *on top* of the existing page. The existing page's DOM is still fully present. You must always scope locators inside a modal component to prevent accidental interaction with the background application."
+          },
+          {
+            "objective": "esign_modal",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You click the 'Approve' button, which triggers the E-Sign modal to slide down from the top of the screen via a CSS animation.",
+            "q": "What assertion should you write immediately after the click to ensure the test doesn't fail trying to type the password too early?",
+            "options": [
+              "await page.waitForTimeout(1000);",
+              "await expect(this.modal).toBeVisible();",
+              "await expect(this.modal).toBeEnabled();",
+              "await this.modal.click();"
+            ],
+            "a": "await expect(this.modal).toBeVisible();",
+            "explanation": "Modals often have entry animations. `toBeVisible()` forces Playwright's auto-polling engine to wait until the CSS animation finishes and the modal is physically stable and fully rendered in the viewport before attempting to interact with its child inputs."
+          },
+          {
+            "objective": "esign_modal",
+            "type": "multi-select",
+            "difficulty": "easy",
+            "scenario": "You are designing the `sign()` method for the `ESignModal` component.",
+            "q": "What core parameters should this method logically accept? (Select all that apply)",
+            "options": [
+              "The user's password string.",
+              "The 'Meaning of Signature' string (e.g., 'Approved', 'Reviewed'), if the system requires it.",
+              "The database connection string.",
+              "The `page` object."
+            ],
+            "a": [
+              "The user's password string.",
+              "The 'Meaning of Signature' string (e.g., 'Approved', 'Reviewed'), if the system requires it."
+            ],
+            "explanation": "A component method should be a pure execution engine. It takes the required business data (Password, Meaning) and blindly performs the UI actions. It should not be responsible for fetching its own data or managing external connections."
+          },
+          {
+            "objective": "esign_modal",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "The E-Sign Modal has a 'Cancel' button. You click it, and the modal disappears via a fade-out animation.",
+            "q": "What is the safest assertion to prove the modal is completely gone before the test continues to interact with the main page?",
+            "options": [
+              "await expect(this.modal).not.toBeVisible();",
+              "await expect(this.modal).toBeHidden();",
+              "await page.waitForLoadState('networkidle');",
+              "Both A and B (they are mathematically identical in Playwright)."
+            ],
+            "a": "Both A and B (they are mathematically identical in Playwright).",
+            "explanation": "To prevent Actionability Race Conditions (where Playwright tries to click a background button but hits the invisible fading modal overlay instead), you must explicitly assert that the modal has completely relinquished its z-index control by verifying it is hidden."
+          }
+        ],
+        "Medium": [
+          {
+            "objective": "esign_modal",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "async function signRecord(password: string) {\n  await this.passwordInput.fill(password);\n  await this.submitBtn.click();\n  // What goes here?\n}",
+            "q": "After clicking submit, the modal verifies the password against the backend API and then closes. What synchronization barrier must exist at the end of this method?",
+            "options": [
+              "await page.waitForTimeout(5000);",
+              "await expect(this.modal).toBeHidden(); This proves the backend accepted the signature and the UI successfully completed the transaction lifecycle before returning control to the main test script.",
+              "await expect(this.submitBtn).toBeVisible();",
+              "await page.reload();"
+            ],
+            "a": "await expect(this.modal).toBeHidden(); This proves the backend accepted the signature and the UI successfully completed the transaction lifecycle before returning control to the main test script.",
+            "explanation": "A Page Object method must never return control to the caller until its specific responsibility is 100% complete. If `signRecord` returns while the modal is still 'spinning' and authenticating, the next step in the test will inevitably crash."
+          },
+          {
+            "objective": "esign_modal",
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "The E-Sign modal uses a third-party biometric authentication service (like Okta or Ping) hosted inside a Cross-Origin iframe.",
+            "q": "How must you architect your locators inside the `ESignModal` class to interact with inputs inside this iframe? (Select all that apply)",
+            "options": [
+              "You must use `page.evaluate()` to hack the iframe.",
+              "You must chain the `frameLocator` API: `this.authFrame = this.modal.frameLocator('iframe[title=\"Auth\"]');`",
+              "Inputs inside the frame must be scoped to the frame: `this.passwordInput = this.authFrame.getByLabel('Password');`",
+              "Playwright automatically pierces iframes natively."
+            ],
+            "a": [
+              "You must chain the `frameLocator` API: `this.authFrame = this.modal.frameLocator('iframe[title=\"Auth\"]');`",
+              "Inputs inside the frame must be scoped to the frame: `this.passwordInput = this.authFrame.getByLabel('Password');`"
+            ],
+            "explanation": "Iframes are hard security boundaries. Playwright cannot 'see' inside them using standard `getBy` locators. You must explicitly construct a `frameLocator` tunnel through the security boundary, and then append standard locators onto that tunnel."
+          },
+          {
+            "objective": "esign_modal",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "Your `sign()` method works perfectly. However, occasionally the backend API is slow, and the E-Sign modal displays a 'Verification Timeout' error instead of closing.",
+            "q": "How should the `sign()` method architecturally handle this negative UI state?",
+            "options": [
+              "It shouldn't; let the test fail with a timeout.",
+              "The method should use `Promise.race()` to wait for EITHER the modal to hide OR an error message to appear. If the error appears, it should cleanly throw a descriptive Node.js error (`throw new Error('E-Sign API Timeout')`), drastically improving CI debuggability.",
+              "It should retry the password 5 times.",
+              "It should refresh the page."
+            ],
+            "a": "The method should use `Promise.race()` to wait for EITHER the modal to hide OR an error message to appear. If the error appears, it should cleanly throw a descriptive Node.js error (`throw new Error('E-Sign API Timeout')`), drastically improving CI debuggability.",
+            "explanation": "Advanced Page Objects are state machines. They don't just blindly click. They monitor the DOM for divergent paths (Success vs Error). Translating a silent UI error into a loud Terminal error is the hallmark of senior automation engineering."
+          },
+          {
+            "objective": "esign_modal",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "export class ESignModal {\n  constructor(private readonly page: Page) {}\n  async getModal() { return this.page.locator('.modal-backdrop'); }\n}",
+            "q": "A junior developer uses the CSS class `.modal-backdrop` to locate the E-Sign modal. Why is this an accessibility and robustness anti-pattern?",
+            "options": [
+              "It uses too much memory.",
+              "CSS classes are implementation details used for styling, not semantic meaning. The class might change to `.backdrop-dark` tomorrow, breaking the test. Using `page.getByRole('dialog')` hooks into the browser's accessibility tree, ensuring the test mimics a screen reader and survives CSS refactors.",
+              "Classes cannot be awaited.",
+              "It ignores the shadow DOM."
+            ],
+            "a": "CSS classes are implementation details used for styling, not semantic meaning. The class might change to `.backdrop-dark` tomorrow, breaking the test. Using `page.getByRole('dialog')` hooks into the browser's accessibility tree, ensuring the test mimics a screen reader and survives CSS refactors.",
+            "explanation": "Never bind tests to CSS classes unless absolutely forced. Relying on W3C standard ARIA roles (`dialog`, `alertdialog`) creates incredibly resilient locators that validate the application's accessibility layer as a free byproduct."
+          },
+          {
+            "objective": "esign_modal",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "A test script needs to interact with the E-Sign Modal on the 'Settings' page and the 'Checkout' page. Both pages import the `ESignModal` class.",
+            "q": "How do you instantiate the `ESignModal` class to ensure it correctly binds to the current page execution context?",
+            "options": [
+              "Use a global variable.",
+              "Pass the current `page` object into the constructor during instantiation: `const esign = new ESignModal(page);`. This mathematically links the Component Object to the specific browser tab currently executing the test.",
+              "It automatically finds the page.",
+              "Use `test.extend`."
+            ],
+            "a": "Pass the current `page` object into the constructor during instantiation: `const esign = new ESignModal(page);`. This mathematically links the Component Object to the specific browser tab currently executing the test.",
+            "explanation": "Dependency Injection (DI). Page Objects do not 'own' the browser. The `test` engine owns the browser (the `page` fixture). You must pass that active, living reference into your classes so they know which tab to manipulate."
+          }
+        ],
+        "Hard": [
+          {
+            "objective": "esign_modal",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "await eSignModal.sign('secret123');\nawait expect(page.locator('.success-toast')).toBeVisible();",
+            "q": "The `sign` method correctly waits for the modal to hide (`expect(modal).toBeHidden()`). However, the main page `success-toast` assertion still randomly fails because it appears and disappears very quickly. Why did the modal's internal synchronization fail to protect the external script?",
+            "options": [
+              "The toast is not in the DOM.",
+              "Because hiding the modal and rendering the toast are two separate React renders. The modal hid, unblocking the script, but the toast animation hasn't fired yet. The test script must implement its own explicit wait, or the `sign` method must return the Promise of the API response so the script can accurately track the backend state.",
+              "Playwright cannot read toasts.",
+              "The password was wrong."
+            ],
+            "a": "Because hiding the modal and rendering the toast are two separate React renders. The modal hid, unblocking the script, but the toast animation hasn't fired yet. The test script must implement its own explicit wait, or the `sign` method must return the Promise of the API response so the script can accurately track the backend state.",
+            "explanation": "This exposes the 'Micro-Gap' in single-page applications. When Component A (Modal) finishes, it dispatches an event. Component B (Toast) listens and renders. Playwright is often faster than the event bus. The boundaries between components require rigorous polling."
+          },
+          {
+            "objective": "esign_modal",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "The E-Sign modal implements a 'Lockout' feature. If you enter the wrong password 3 times, the entire account is locked.",
+            "q": "When writing an automated negative test to verify this lockout, how must you architect the test to prevent it from destroying the environment for parallel test runs?",
+            "options": [
+              "Use `test.serial`.",
+              "The test must NEVER use a global or shared account (like `admin@test.com`). The test MUST use a Data Generation Fixture to create a brand-new, mathematically isolated 'throwaway' user exclusively for this specific test, lock that specific user out, and then discard them.",
+              "Use a `try/catch` to unlock the account.",
+              "Ask the developers to disable the lockout."
+            ],
+            "a": "The test must NEVER use a global or shared account (like `admin@test.com`). The test MUST use a Data Generation Fixture to create a brand-new, mathematically isolated 'throwaway' user exclusively for this specific test, lock that specific user out, and then discard them.",
+            "explanation": "Destructive testing (locking accounts, deleting data) is the ultimate cause of CI pipeline flakiness if executed against shared state. Enterprise architecture mandates complete Data Isolation for negative security tests."
+          },
+          {
+            "objective": "esign_modal",
+            "type": "multi-select",
+            "difficulty": "hard",
+            "scenario": "The E-Sign modal is rendered at the absolute top of the `<body>` element, completely separate from the React component tree of the page that triggered it (using a React Portal).",
+            "q": "Why is this Portal architecture actually highly beneficial for Playwright automation? (Select all that apply)",
+            "options": [
+              "It guarantees the modal is never clipped or hidden by parent CSS `overflow: hidden` rules, preventing 'Element Not Intersecting Viewport' errors in Playwright.",
+              "It forces the modal to have the highest Z-Index by default, preventing 'Element Intercepted' errors where another `div` blocks Playwright's click.",
+              "It breaks the Page Object Model.",
+              "It requires `page.evaluate()` to access."
+            ],
+            "a": [
+              "It guarantees the modal is never clipped or hidden by parent CSS `overflow: hidden` rules, preventing 'Element Not Intersecting Viewport' errors in Playwright.",
+              "It forces the modal to have the highest Z-Index by default, preventing 'Element Intercepted' errors where another `div` blocks Playwright's click."
+            ],
+            "explanation": "React Portals are the developer's solution to CSS layout nightmares. They physically eject the modal HTML from the deep DOM tree and append it directly to `document.body`. This makes it pristine and universally accessible to Playwright's actionability engine."
+          },
+          {
+            "objective": "esign_modal",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "const response = await page.waitForResponse(res => res.url().includes('/api/esign') && res.status() === 200);\nawait expect(this.modal).toBeHidden();",
+            "q": "A senior engineer adds this `waitForResponse` explicitly into the `sign()` method. What incredibly complex 'Race Condition' does this completely eliminate?",
+            "options": [
+              "The frontend loading too fast.",
+              "The 'False Positive Hide'. Sometimes a modal hides because of a JS crash, or a secondary click, NOT because the API succeeded. By explicitly intercepting the HTTP 200 OK from the network layer, you mathematically guarantee the modal hid *because* the backend accepted the signature.",
+              "It bypasses the API.",
+              "It makes the test synchronous."
+            ],
+            "a": "The 'False Positive Hide'. Sometimes a modal hides because of a JS crash, or a secondary click, NOT because the API succeeded. By explicitly intercepting the HTTP 200 OK from the network layer, you mathematically guarantee the modal hid *because* the backend accepted the signature.",
+            "explanation": "UI Assertions are assumptions. Network Assertions are facts. The highest tier of automation merges them: The UI behaved correctly, AND the exact underlying network packet succeeded. This eliminates all ambiguity."
+          },
+          {
+            "objective": "esign_modal",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "Your tests run headless in CI, but the developers complain the E-Sign modal is technically accessible via the `Tab` key even when it is visually hidden (`opacity: 0; pointer-events: none`).",
+            "q": "How does Playwright's `toBeVisible()` assertion evaluate `opacity: 0` elements, and why does this catch the developers' accessibility bug?",
+            "options": [
+              "Playwright ignores CSS.",
+              "Playwright's actionability engine calculates the computed CSS. If `opacity` is `0` or `display` is `none`, `toBeVisible()` evaluates to FALSE. However, the element is still physically in the DOM, meaning it can be tabbed into. You must assert `toBeHidden()` or ensure the developers physically remove it from the DOM or apply `aria-hidden=\"true\"`.",
+              "It automatically deletes hidden elements.",
+              "It presses the Tab key."
+            ],
+            "a": "Playwright's actionability engine calculates the computed CSS. If `opacity` is `0` or `display` is `none`, `toBeVisible()` evaluates to FALSE. However, the element is still physically in the DOM, meaning it can be tabbed into. You must assert `toBeHidden()` or ensure the developers physically remove it from the DOM or apply `aria-hidden=\"true\"`.",
+            "explanation": "Visually hiding an element is not the same as removing it. A screen reader (or a keyboard navigator) can still interact with an `opacity: 0` modal, creating a massive security and accessibility vulnerability. Playwright's strict visibility rules force developers to build structurally sound DOMs."
+          }
+        ]
+      },
+      "icon": "🪟",
+      "slug": "73-esign-modal",
+      "learningPaths": [
+        "enterprise",
+        "regulated"
+      ],
+      "category": "industry-specific",
+      "optional": true,
+      "industryTags": [
+        "Healthcare",
+        "Pharma",
+        "Regulated Systems"
+      ],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Regulated Industry Automation"
+    },
+    {
+      "id": "74-esign-exec",
+      "title": "15.3: Multi-Step Approval Flows",
+      "url": "courses/playwright/74-esign-exec",
+      "group": "✍️ MODULE 15: E-SIGNATURE & MODALS",
+      "level": 11,
+      "weight": 50,
+      "meta": {
+        "time": "50 mins",
+        "type": "Execution",
+        "outcome": "Automate a complete regulatory approval workflow"
+      },
+      "objectives": [
+        {
+          "id": "approval_automation",
+          "title": "Verify end-to-end status transitions with signatures"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "approve_flow",
+          "title": "Execute Approval",
+          "hint": "Requires: click, sign, verify status",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "sign"
+            },
+            {
+              "type": "contains",
+              "value": "verify"
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "sign"
+            },
+            {
+              "type": "contains",
+              "value": "verify"
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "approval_automation",
+          "weight": 100
+        }
+      ],
+      "spec": {
+        "flow": "Workflow Status Change",
+        "pattern": "Action -> Sign -> Assert"
+      },
+      "quizPool": {
+        "Easy": [
+          {
+            "objective": "esign_exec",
+            "type": "mcq",
+            "difficulty": "easy",
+            "q": "What defines a 'Multi-Step Approval Flow' in an enterprise application?",
+            "options": [
+              "A user clicking a button 5 times.",
+              "A business process where a single document or record must be sequentially reviewed and electronically signed by multiple distinct users (e.g., Author -> Reviewer -> QA Approver) before it becomes finalized.",
+              "A form with multiple input fields.",
+              "A test suite with multiple files."
+            ],
+            "a": "A business process where a single document or record must be sequentially reviewed and electronically signed by multiple distinct users (e.g., Author -> Reviewer -> QA Approver) before it becomes finalized.",
+            "explanation": "This is the backbone of regulated industries. Data cannot just be 'saved'. It must traverse a strict, linear state machine governed by separate individuals to ensure absolute quality control and prevent unilateral tampering."
+          },
+          {
+            "objective": "esign_exec",
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "test('QA Review', async ({ page }) => {\n  // 1. Login as Author, create document, sign it.\n  // 2. Logout.\n  // 3. Login as QA, find document, sign it.\n});",
+            "q": "Why is performing this entire multi-role workflow through the UI inside a single test considered a severe anti-pattern?",
+            "options": [
+              "Because the UI is too colorful.",
+              "It makes the test incredibly slow, brittle, and monolithic. Logging in and out takes massive amounts of time. The UI should only be used to test the *specific* role under evaluation. The preceding steps should be bypassed.",
+              "Because you cannot log out in Playwright.",
+              "Because QA cannot sign documents."
+            ],
+            "a": "It makes the test incredibly slow, brittle, and monolithic. Logging in and out takes massive amounts of time. The UI should only be used to test the *specific* role under evaluation. The preceding steps should be bypassed.",
+            "explanation": "UI testing is the most expensive operation in automation. If your goal is to test the 'QA Approval' button, wasting 30 seconds driving the browser through the 'Author Creation' phase is a catastrophic waste of CI resources."
+          },
+          {
+            "objective": "esign_exec",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You need to test the 'Final Approver' step of a 5-step workflow.",
+            "q": "How do you architect the test to instantly place the application into 'Step 5' state so the UI test can begin immediately?",
+            "options": [
+              "Click through Steps 1-4 very fast.",
+              "Use a custom `test.extend` Fixture that executes raw API calls directly to the backend database to instantly spawn a document, forge the first 4 signatures via API, and return the `documentId`. The test then simply navigates to `/doc/123`.",
+              "Use a pre-existing document from yesterday.",
+              "Ask a developer to change the database."
+            ],
+            "a": "Use a custom `test.extend` Fixture that executes raw API calls directly to the backend database to instantly spawn a document, forge the first 4 signatures via API, and return the `documentId`. The test then simply navigates to `/doc/123`.",
+            "explanation": "This is Data Seeding via API. You use the fast, reliable backend API to mathematically force the system into the exact prerequisite state required for the UI test. This reduces a 2-minute test to 5 seconds."
+          },
+          {
+            "objective": "esign_exec",
+            "type": "multi-select",
+            "difficulty": "easy",
+            "scenario": "You are writing the API Fixture to seed a document in 'Pending QA' state.",
+            "q": "Which of the following must be securely handled by the API Fixture? (Select all that apply)",
+            "options": [
+              "Acquiring the correct Auth Token for the 'Author' API request.",
+              "Constructing the exact JSON payload expected by the backend to simulate a signature.",
+              "Rendering the CSS of the document.",
+              "Clicking the UI buttons."
+            ],
+            "a": [
+              "Acquiring the correct Auth Token for the 'Author' API request.",
+              "Constructing the exact JSON payload expected by the backend to simulate a signature."
+            ],
+            "explanation": "API Fixtures are completely headless. They don't care about CSS or buttons. They exist purely to negotiate with the backend server via HTTP, establishing the mathematical state required for the subsequent UI test."
+          },
+          {
+            "objective": "esign_exec",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "A test validates that an 'Author' CANNOT approve their own document (Segregation of Duties).",
+            "q": "If the API successfully seeds the document, how should the UI test verify the Author is blocked?",
+            "options": [
+              "Wait for the browser to crash.",
+              "Navigate to the document as the Author and assert that the 'Approve' button is either completely missing from the DOM (`not.toBeVisible()`) or is physically disabled (`toBeDisabled()`).",
+              "Check the console logs.",
+              "Look at the database."
+            ],
+            "a": "Navigate to the document as the Author and assert that the 'Approve' button is either completely missing from the DOM (`not.toBeVisible()`) or is physically disabled (`toBeDisabled()`).",
+            "explanation": "Testing role-based access control (RBAC) requires proving negative space. You must explicitly assert the absence of capability. If an Author can see the QA Approve button, the application is fundamentally non-compliant."
+          }
+        ],
+        "Medium": [
+          {
+            "objective": "esign_exec",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "test('QA Reject Route', async ({ page, api }) => {\n  const docId = await api.seedDocument('Pending QA');\n  await page.goto(`/doc/${docId}`);\n  await page.click('#reject');\n  // ...\n});",
+            "q": "After clicking Reject, the document should transition back to 'Draft' state. What is the most resilient way to assert this transition?",
+            "options": [
+              "await expect(page.locator('.status-label')).toHaveText('Draft');",
+              "Combine a UI assertion with a Backend assertion: Verify the UI badge says 'Draft', AND execute an API call (`const state = await api.getDocState(docId); expect(state).toBe('Draft')`) to prove the backend state machine actually transitioned.",
+              "Wait 10 seconds.",
+              "Refresh the page."
+            ],
+            "a": "Combine a UI assertion with a Backend assertion: Verify the UI badge says 'Draft', AND execute an API call (`const state = await api.getDocState(docId); expect(state).toBe('Draft')`) to prove the backend state machine actually transitioned.",
+            "explanation": "UI text can lie. The frontend might optimistically update the label to 'Draft' before the backend database actually commits the transaction. In compliance environments, you must mathematically verify the source of truth (the database)."
+          },
+          {
+            "objective": "esign_exec",
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "Your Multi-Step Flow requires 3 unique users (Author, Reviewer, Approver).",
+            "q": "How should you architect your Playwright configuration to cleanly handle these multiple personas? (Select all that apply)",
+            "options": [
+              "Use a single `storageState.json` file for all tests.",
+              "Configure Project Dependencies to generate 3 separate `storageState` files (`author.json`, `reviewer.json`, `approver.json`).",
+              "Use `test.use({ storageState: 'reviewer.json' })` at the top of the specific test file that evaluates the Reviewer's workflow.",
+              "Hardcode the passwords in the test file."
+            ],
+            "a": [
+              "Configure Project Dependencies to generate 3 separate `storageState` files (`author.json`, `reviewer.json`, `approver.json`).",
+              "Use `test.use({ storageState: 'reviewer.json' })` at the top of the specific test file that evaluates the Reviewer's workflow."
+            ],
+            "explanation": "This perfectly aligns with the `storageState` architecture. By pre-baking the authentication state for every persona, your tests can instantly jump into the browser as the exact role needed for that specific slice of the workflow."
+          },
+          {
+            "objective": "esign_exec",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "The application sends an automated email to the QA Approver when the Author signs the document.",
+            "q": "How do you architecturally test this asynchronous email notification without logging into a physical Gmail account?",
+            "options": [
+              "It is impossible to test emails.",
+              "Use a programmable email testing service (like Mailtrap or Mailosaur). Your API fixture creates the document using a dynamic `@mailosaur.io` address. Your test then uses the Mailosaur API to query the virtual inbox and assert the email arrived with the correct link.",
+              "Use `page.goto('gmail.com')`.",
+              "Ask the developers to turn off emails."
+            ],
+            "a": "Use a programmable email testing service (like Mailtrap or Mailosaur). Your API fixture creates the document using a dynamic `@mailosaur.io` address. Your test then uses the Mailosaur API to query the virtual inbox and assert the email arrived with the correct link.",
+            "explanation": "Never script third-party UIs (like Gmail). They have captchas, 2FA, and they change constantly. Enterprise testing uses dedicated API-driven email catchers to mathematically parse email payloads as JSON data."
+          },
+          {
+            "objective": "esign_exec",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "test('Approver sees correct signature', async ({ page, api }) => {\n  const doc = await api.seedDocument('Approved');\n  await page.goto(`/doc/${doc.id}`);\n  const sigBlock = page.locator('.signature-block');\n  await expect(sigBlock).toContainText('Alice Smith');\n});",
+            "q": "If the `api.seedDocument` method dynamically generates random user names for isolation, why is hardcoding 'Alice Smith' here an architectural failure?",
+            "options": [
+              "Alice Smith doesn't exist.",
+              "It breaks data determinism. The assertion MUST use the dynamically generated data returned by the fixture: `await expect(sigBlock).toContainText(doc.authorName)`. This guarantees the assertion perfectly matches the mathematical truth of the generated entity.",
+              "It needs to be uppercase.",
+              "It doesn't use regex."
+            ],
+            "a": "It breaks data determinism. The assertion MUST use the dynamically generated data returned by the fixture: `await expect(sigBlock).toContainText(doc.authorName)`. This guarantees the assertion perfectly matches the mathematical truth of the generated entity.",
+            "explanation": "Hardcoded strings are poison. When fixtures generate dynamic, isolated data (which they must do for parallel execution), the test script must consume that generated data object to drive its assertions."
+          },
+          {
+            "objective": "esign_exec",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "A document requires 5 approvals. You want to test the UI for the 5th approval.",
+            "q": "What is the most efficient way to seed the 4 prerequisite signatures via the API?",
+            "options": [
+              "Write 4 separate API calls in the test.",
+              "The API Fixture should abstract the complexity. You should just call `await api.seedDocument({ signaturesRequired: 4 })`. The fixture internally handles the loop and the 4 API POST requests, returning the fully primed document ID to the test.",
+              "Click the button 4 times in the UI.",
+              "Use a SQL script."
+            ],
+            "a": "The API Fixture should abstract the complexity. You should just call `await api.seedDocument({ signaturesRequired: 4 })`. The fixture internally handles the loop and the 4 API POST requests, returning the fully primed document ID to the test.",
+            "explanation": "Fixtures encapsulate complexity. The test file should read like a high-level business requirement. All the dirty, multi-step API orchestration loops belong hidden inside the Fixture class."
+          }
+        ],
+        "Hard": [
+          {
+            "objective": "esign_exec",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "test('Concurrent Approvals', async ({ page1, page2 }) => {\n  // What goes here?\n});",
+            "q": "Two reviewers must sign the document. If both log in simultaneously and try to sign at the exact same millisecond, how do you architecturally simulate this Race Condition using Playwright?",
+            "options": [
+              "It is impossible to test race conditions.",
+              "Initialize two separate `BrowserContexts` (one for Alice, one for Bob). Load the document in both. Use `Promise.all([alicePage.click('#sign'), bobPage.click('#sign')])` to fire the network requests simultaneously, testing the backend's database lock mechanics.",
+              "Use a very fast `for` loop.",
+              "Use multiple computers."
+            ],
+            "a": "Initialize two separate `BrowserContexts` (one for Alice, one for Bob). Load the document in both. Use `Promise.all([alicePage.click('#sign'), bobPage.click('#sign')])` to fire the network requests simultaneously, testing the backend's database lock mechanics.",
+            "explanation": "Multi-context testing is Playwright's superpower. It allows a single test script to puppet two completely isolated browser sessions simultaneously. Firing actions via `Promise.all` guarantees parallel execution, brutally exposing optimistic concurrency bugs in the backend."
+          },
+          {
+            "objective": "esign_exec",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "The workflow is: Submit -> Wait 24 Hours -> Review. The UI physically disables the 'Review' button until the 24-hour mandatory holding period expires.",
+            "q": "How can you architect an automated UI test for this without pausing the CI pipeline for a day?",
+            "options": [
+              "You cannot; it must be tested manually.",
+              "The API Fixture that seeds the document must accept an override parameter (e.g., `api.seedDocument({ createdAt: '2020-01-01' })`) to manipulate the backend database timestamp, forcing the system to believe the 24 hours have already passed.",
+              "Use `page.clock.fastForward()`.",
+              "Use `page.evaluate()` to remove the disabled attribute."
+            ],
+            "a": "The API Fixture that seeds the document must accept an override parameter (e.g., `api.seedDocument({ createdAt: '2020-01-01' })`) to manipulate the backend database timestamp, forcing the system to believe the 24 hours have already passed.",
+            "explanation": "Browser clock emulation (`page.clock`) only fools the frontend JavaScript. If the 24-hour lock is enforced by the backend database (as it should be for compliance), you must manipulate the backend data state directly during the seeding phase."
+          },
+          {
+            "objective": "esign_exec",
+            "type": "multi-select",
+            "difficulty": "hard",
+            "scenario": "You are designing the Data Models for your E-Sign workflow tests.",
+            "q": "Why is it architecturally critical to define strict TypeScript Interfaces for the different workflow states (e.g., `interface DraftDoc`, `interface ApprovedDoc`)? (Select all that apply)",
+            "options": [
+              "Because TypeScript requires interfaces.",
+              "It forces the API Fixture to return mathematically precise objects. If `seedDocument('Draft')` returns a `DraftDoc`, TypeScript knows it does not have a `signatureDate` property, preventing the test writer from accidentally asserting against non-existent state data.",
+              "It acts as a compile-time contract between the Test layer and the Fixture layer.",
+              "It makes the browser run faster."
+            ],
+            "a": [
+              "It forces the API Fixture to return mathematically precise objects. If `seedDocument('Draft')` returns a `DraftDoc`, TypeScript knows it does not have a `signatureDate` property, preventing the test writer from accidentally asserting against non-existent state data.",
+              "It acts as a compile-time contract between the Test layer and the Fixture layer."
+            ],
+            "explanation": "State Machines demand State Typing. A document in 'Draft' has a fundamentally different shape than a document in 'Approved'. Using Discriminated Unions and strict interfaces prevents developers from writing logically impossible assertions."
+          },
+          {
+            "objective": "esign_exec",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "const response = await page.waitForResponse('/api/workflow/transition');\nexpect(response.status()).toBe(409); // Conflict",
+            "q": "If the test explicitly expects a `409 Conflict`, what sophisticated architectural scenario is likely being tested?",
+            "options": [
+              "A simple typo.",
+              "A State Machine transition violation. For example, the test is attempting to 'Approve' a document that was already 'Rejected' by someone else 2 seconds ago. The backend correctly identifies the illegal state transition and throws a 409, proving the compliance safety net works.",
+              "A broken server.",
+              "An offline browser."
+            ],
+            "a": "A State Machine transition violation. For example, the test is attempting to 'Approve' a document that was already 'Rejected' by someone else 2 seconds ago. The backend correctly identifies the illegal state transition and throws a 409, proving the compliance safety net works.",
+            "explanation": "The most important tests are the ones that prove the system refuses to do illegal things. 409 Conflicts are the hallmark of a robust, optimistic-concurrency-controlled REST API protecting its state machine."
+          },
+          {
+            "objective": "esign_exec",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "Your E-Sign modal uses a complex cryptographic challenge-response protocol. It sends a 'challenge' string to the browser, the browser signs it with a private key in `localStorage`, and sends the 'response' back.",
+            "q": "Because this requires the physical browser execution environment, your API Fixture cannot easily forge it via a simple Node.js POST request. How do you bypass this to seed data?",
+            "options": [
+              "You must abandon the API Fixture and use the UI.",
+              "The Backend API should provide a dedicated, secure 'Testing Backdoor' (e.g., an endpoint that accepts a static super-token and instantly bypasses cryptography to mutate state). This backdoor MUST be strictly disabled in Production environments.",
+              "Disable cryptography globally.",
+              "Use a Python script."
+            ],
+            "a": "The Backend API should provide a dedicated, secure 'Testing Backdoor' (e.g., an endpoint that accepts a static super-token and instantly bypasses cryptography to mutate state). This backdoor MUST be strictly disabled in Production environments.",
+            "explanation": "Testability is an architectural requirement. If a system is so secure that you cannot seed data for automated testing, the system is fundamentally flawed. Dedicated, environment-gated backdoor APIs are standard practice to enable high-velocity CI."
+          }
+        ]
+      },
+      "icon": "✒️",
+      "slug": "74-esign-exec",
+      "learningPaths": [
+        "enterprise",
+        "regulated"
+      ],
+      "category": "industry-specific",
+      "optional": true,
+      "industryTags": [
+        "Healthcare",
+        "Pharma",
+        "Regulated Systems"
+      ],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Regulated Industry Automation"
+    },
+    {
+      "id": "75-esign-debug",
+      "title": "15.4: Modal Interception Errors",
+      "url": "courses/playwright/75-esign-debug",
+      "group": "✍️ MODULE 15: E-SIGNATURE & MODALS",
+      "level": 11,
+      "weight": 15,
+      "meta": {
+        "time": "20 mins",
+        "type": "Debug",
+        "outcome": "Resolve 'Element is not clickable' errors caused by modals"
+      },
+      "objectives": [
+        {
+          "id": "interception_debug",
+          "title": "Identify and fix overlay issues"
+        }
+      ],
+      "tasks": [
+        {
+          "id": "fix_interception",
+          "title": "Overlay Fix",
+          "hint": "Ensure modal is closed before next action",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "waitFor"
+            },
+            {
+              "type": "contains",
+              "value": "hidden"
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "contains",
+              "value": "waitFor"
+            },
+            {
+              "type": "contains",
+              "value": "hidden"
+            },
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "interception_debug",
+          "weight": 100
+        }
+      ],
+      "spec": {
+        "error": "ElementClickIntercepted",
+        "solution": "Visibility/Hidden Checks"
+      },
+      "quizPool": {
+        "Easy": [
+          {
+            "objective": "esign_debug",
+            "type": "scenario",
+            "difficulty": "easy",
+            "q": "Which specific error does Playwright throw to indicate that a different element absorbed the click event?",
+            "options": [
+              "Target closed.",
+              "Locator.click: Target closed.",
+              "Error: locator.click: Error: Element is not attached to the DOM.",
+              "Error: locator.click: Target intercepted by another element."
+            ],
+            "a": "Error: locator.click: Target intercepted by another element.",
+            "explanation": "This is the 'Element Intercepted' error. Playwright's actionability engine refuses to click a button if a different HTML element (like a modal backdrop or a sticky header) is physically covering it on the screen.",
+            "scenario": "A loading spinner appears over the 'Submit' button. Playwright tries to click the button but fails."
+          },
+          {
+            "objective": "esign_debug",
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "await eSignModal.sign('password');\nawait page.click('#next-step-btn'); // Fails with Element Intercepted",
+            "q": "Why did the click on the `#next-step-btn` fail?",
+            "options": [
+              "The button is broken.",
+              "The `sign` method likely did not wait for the E-Sign modal's fade-out animation to completely finish. The modal is logically 'done', but visually its invisible `opacity: 0` backdrop is still covering the `#next-step-btn`.",
+              "The password was wrong.",
+              "Playwright is too fast."
+            ],
+            "a": "The `sign` method likely did not wait for the E-Sign modal's fade-out animation to completely finish. The modal is logically 'done', but visually its invisible `opacity: 0` backdrop is still covering the `#next-step-btn`.",
+            "explanation": "CSS animations are the leading cause of Interception errors. Even if an element is transparent, if its CSS `pointer-events` are still active, it forms a physical shield over the page."
+          },
+          {
+            "objective": "esign_debug",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You get an 'Element Intercepted' error. You open the Trace Viewer and look at the Action tab.",
+            "q": "What specific diagnostic tool inside the Trace Viewer instantly proves which element is causing the interception?",
+            "options": [
+              "The console logs.",
+              "The 'Log' tab under the Action details. Playwright explicitly prints the exact HTML string (e.g., `<div class=\"modal-backdrop fade-out\"></div>`) of the element that 'stole' the click.",
+              "The network tab.",
+              "The source code."
+            ],
+            "a": "The 'Log' tab under the Action details. Playwright explicitly prints the exact HTML string (e.g., `<div class=\"modal-backdrop fade-out\"></div>`) of the element that 'stole' the click.",
+            "explanation": "You don't need to guess. The internal actionability engine logs its mathematical collision detection. It will literally tell you the exact CSS class of the offending overlay."
+          },
+          {
+            "objective": "esign_debug",
+            "type": "multi-select",
+            "difficulty": "easy",
+            "scenario": "You are trying to click a button inside a newly opened Modal.",
+            "q": "Why might Playwright throw an 'Element is not attached to the DOM' error? (Select all that apply)",
+            "options": [
+              "Because the modal is using React, and React completely destroyed and recreated the button DOM node (re-rendering) just milliseconds before Playwright tried to click it.",
+              "Because the locator was defined using a stale reference.",
+              "Because Playwright disables the DOM.",
+              "Because the CSS is red."
+            ],
+            "a": [
+              "Because the modal is using React, and React completely destroyed and recreated the button DOM node (re-rendering) just milliseconds before Playwright tried to click it.",
+              "Because the locator was defined using a stale reference."
+            ],
+            "explanation": "This is the 'Stale Element' problem. Modals are highly dynamic. If you capture a locator, and the framework immediately re-renders the component, your locator points to a ghost node. Strict locators and auto-polling solve this."
+          },
+          {
+            "objective": "esign_debug",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "A developer gets an Interception Error because a spinning loading overlay covers the screen. They 'fix' it by using `await page.click('#btn', { force: true })`.",
+            "q": "Why is this considered a destructive anti-pattern?",
+            "options": [
+              "It makes the test too slow.",
+              "`force: true` bypasses the actionability checks entirely. It fires the JavaScript click event directly at the button, ignoring the overlay. This means the test passes, even if a real human user physically could not click the button. It hides a legitimate bug.",
+              "It crashes the browser.",
+              "It requires sudo access."
+            ],
+            "a": "`force: true` bypasses the actionability checks entirely. It fires the JavaScript click event directly at the button, ignoring the overlay. This means the test passes, even if a real human user physically could not click the button. It hides a legitimate bug.",
+            "explanation": "Forcing a click is lying to the framework. Playwright's actionability checks exist to guarantee that if the script can click it, a human can click it. Bypassing them destroys the integrity of the E2E test."
+          }
+        ],
+        "Medium": [
+          {
+            "objective": "esign_debug",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "await page.locator('.save-btn').click();\nawait expect(page.locator('.modal')).toBeVisible();\nawait page.locator('.save-btn').click(); // Trying to double-click",
+            "q": "Why might the second click succeed even if the modal is currently covering the screen?",
+            "options": [
+              "Playwright ignores modals on the second click.",
+              "If the `.save-btn` is physically located OUTSIDE the bounds of the modal (e.g., in a header), and the modal does NOT use a full-screen backdrop, the button remains actionable. Interception is purely a calculation of X/Y coordinate geometry.",
+              "The first click disabled the button.",
+              "Modals cannot intercept clicks."
+            ],
+            "a": "If the `.save-btn` is physically located OUTSIDE the bounds of the modal (e.g., in a header), and the modal does NOT use a full-screen backdrop, the button remains actionable. Interception is purely a calculation of X/Y coordinate geometry.",
+            "explanation": "Interception is not logical; it is geographical. The engine calculates the center point of the target element and fires a mathematical ray. If the ray hits the modal overlay first, it fails. If the button is exposed, it succeeds."
+          },
+          {
+            "objective": "esign_debug",
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "The application uses an invisible `div` to trap focus inside the modal for accessibility reasons.",
+            "q": "How do you correctly wait for this invisible focus-trap to disappear before interacting with the main page? (Select all that apply)",
+            "options": [
+              "Use `await expect(page.locator('.focus-trap')).toHaveCount(0)` if the React component is completely removed from the DOM.",
+              "Use `await expect(page.locator('.focus-trap')).toBeHidden()` if the element remains in the DOM but has `display: none`.",
+              "Use `await page.waitForTimeout(5000)`.",
+              "Use `force: true`."
+            ],
+            "a": [
+              "Use `await expect(page.locator('.focus-trap')).toHaveCount(0)` if the React component is completely removed from the DOM.",
+              "Use `await expect(page.locator('.focus-trap')).toBeHidden()` if the element remains in the DOM but has `display: none`."
+            ],
+            "explanation": "You must understand the frontend framework's lifecycle. Does React unmount the component (destroying the HTML), or does it just toggle a CSS class? Your synchronization assertion must perfectly match the physical DOM behavior."
+          },
+          {
+            "objective": "esign_debug",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "A test consistently fails with an Interception Error only in headless CI runs, never locally.",
+            "q": "What environment difference usually causes this?",
+            "options": [
+              "CI doesn't support modals.",
+              "Viewport size. Headless CI often defaults to a smaller viewport (e.g., 1280x720). A responsive header might become 'sticky' or collapse into a 'hamburger' menu overlay on the smaller screen, intercepting the click. The local headed browser was physically wider.",
+              "Headless mode is faster.",
+              "Headless mode ignores CSS."
+            ],
+            "a": "Viewport size. Headless CI often defaults to a smaller viewport (e.g., 1280x720). A responsive header might become 'sticky' or collapse into a 'hamburger' menu overlay on the smaller screen, intercepting the click. The local headed browser was physically wider.",
+            "explanation": "Geometry dictates actionability. If the geometry changes due to screen width, the interception matrix changes. Always hardcode your viewport size in `playwright.config.ts` to ensure local/CI parity."
+          },
+          {
+            "objective": "esign_debug",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "const modal = page.locator('.modal');\nawait expect(modal).toBeVisible();\nawait modal.locator('button').click();",
+            "q": "If the modal is animating (sliding in from the right), why might `toBeVisible()` pass, but the `click()` immediately fail?",
+            "options": [
+              "Because the button is broken.",
+              "Because `toBeVisible()` only requires the element to be structurally visible (opacity > 0, display != none) AND intersecting the viewport. If the modal has just entered the right edge of the screen, it is 'visible'. However, the button might still be outside the bounds or moving, causing the click coordinate calculation to miss.",
+              "Because animations disable buttons.",
+              "Because `click` is synchronous."
+            ],
+            "a": "Because `toBeVisible()` only requires the element to be structurally visible (opacity > 0, display != none) AND intersecting the viewport. If the modal has just entered the right edge of the screen, it is 'visible'. However, the button might still be outside the bounds or moving, causing the click coordinate calculation to miss.",
+            "explanation": "Visibility does not guarantee Stability. Playwright's auto-waiting `click` automatically waits for the element to stop moving (stable). If you don't await the stability implicitly via the click, you must orchestrate the animation timings."
+          },
+          {
+            "objective": "esign_debug",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "You get an 'Element is outside of the viewport' error when clicking a modal button.",
+            "q": "What is the native Playwright behavior that usually prevents this, and why did it fail?",
+            "options": [
+              "It doesn't scroll.",
+              "Playwright automatically scrolls elements into view before clicking them. However, if the modal uses complex CSS like `overflow: hidden` on a parent container, or if the modal is a fixed overlay that cannot be scrolled, Playwright cannot physically bring the element into the viewport.",
+              "It only scrolls vertically.",
+              "It requires `force: true`."
+            ],
+            "a": "Playwright automatically scrolls elements into view before clicking them. However, if the modal uses complex CSS like `overflow: hidden` on a parent container, or if the modal is a fixed overlay that cannot be scrolled, Playwright cannot physically bring the element into the viewport.",
+            "explanation": "Scrollability is a CSS capability. If the frontend developers built a poorly structured modal that clips its own children and prevents scrolling, Playwright will violently expose that UX defect by failing to reach the button."
+          }
+        ],
+        "Hard": [
+          {
+            "objective": "esign_debug",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "await page.locator('#submit').click({ position: { x: 0, y: 0 } });",
+            "q": "A senior engineer adds a specific `{ position: { x: 0, y: 0 } }` coordinate to fix an interception error. What architectural layout hack are they exploiting?",
+            "options": [
+              "They are clicking outside the screen.",
+              "Playwright calculates the click coordinate at the exact center (50%, 50%) of the bounding box. If a circular \"info\" icon or a small tooltip happens to overlap the exact center of a massive `#submit` button, the center click is intercepted. By explicitly commanding Playwright to click the top-left corner (0,0), they surgically bypass the overlapping element.",
+              "They are bypassing CSS.",
+              "They are forcing the click."
+            ],
+            "a": "Playwright calculates the click coordinate at the exact center (50%, 50%) of the bounding box. If a circular \"info\" icon or a small tooltip happens to overlap the exact center of a massive `#submit` button, the center click is intercepted. By explicitly commanding Playwright to click the top-left corner (0,0), they surgically bypass the overlapping element.",
+            "explanation": "This is advanced geometric debugging. When overlapping elements are unavoidable, manipulating the laser-point of the click coordinate preserves the integrity of the actionability engine without resorting to `force: true`."
+          },
+          {
+            "objective": "esign_debug",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You are testing a complex Drag-and-Drop operation inside a modal. It fails intermittently.",
+            "q": "Why do high-level APIs like `locator.dragTo()` often fail in complex layered UIs, and what is the low-level solution?",
+            "options": [
+              "Drag and drop is deprecated.",
+              "High-level APIs attempt to interpolate a smooth mouse path. If that path crosses an iframe boundary or a sudden CSS Z-Index change, the event dispatching gets confused. You must drop down to the low-level `mouse` API: `mouse.move()`, `mouse.down()`, calculate raw geometry, `mouse.move()`, `mouse.up()`.",
+              "You must use Selenium.",
+              "You must use `evaluate`."
+            ],
+            "a": "High-level APIs attempt to interpolate a smooth mouse path. If that path crosses an iframe boundary or a sudden CSS Z-Index change, the event dispatching gets confused. You must drop down to the low-level `mouse` API: `mouse.move()`, `mouse.down()`, calculate raw geometry, `mouse.move()`, `mouse.up()`.",
+            "explanation": "The `page.mouse` API is God-Mode. It fires raw CDP commands to the Chromium host, completely ignoring the DOM topology. It is the ultimate fallback for complex UI interactions that confuse the standard heuristic algorithms."
+          },
+          {
+            "objective": "esign_debug",
+            "type": "multi-select",
+            "difficulty": "hard",
+            "scenario": "The E-Sign Modal uses a `<dialog>` element. A developer writes `await expect(page.locator('dialog')).toBeVisible()`.",
+            "q": "Why is the native HTML5 `<dialog>` element uniquely problematic for Playwright visibility assertions? (Select all that apply)",
+            "options": [
+              "The `<dialog>` element has native browser behaviors. Even if it has `opacity: 0`, if it was invoked via `dialog.showModal()`, the browser engine considers it 'open' and renders a native top-layer pseudo-element (`::backdrop`) that drastically alters Z-Index and interception mechanics.",
+              "Playwright cannot locate `<dialog>` elements.",
+              "You must use `page.evaluate(() => document.querySelector('dialog').open)` to rigorously check its internal state.",
+              "Dialogs crash Chromium."
+            ],
+            "a": [
+              "The `<dialog>` element has native browser behaviors. Even if it has `opacity: 0`, if it was invoked via `dialog.showModal()`, the browser engine considers it 'open' and renders a native top-layer pseudo-element (`::backdrop`) that drastically alters Z-Index and interception mechanics.",
+              "You must use `page.evaluate(() => document.querySelector('dialog').open)` to rigorously check its internal state."
+            ],
+            "explanation": "Native browser APIs (like `<dialog>`) operate outside standard CSS rendering logic. They exist in the 'Top Layer'. Standard visibility checks often misinterpret them. You must deeply understand the W3C spec and sometimes drop into the DOM state to evaluate them correctly."
+          },
+          {
+            "objective": "esign_debug",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "const button = page.locator('#submit');\nawait button.waitFor({ state: 'visible' });\nconst box = await button.boundingBox();\nif (box) {\n  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);\n}",
+            "q": "This code manually calculates the center of an element and fires a raw mouse click. What native Playwright protection does this entirely bypass?",
+            "options": [
+              "It bypasses the network.",
+              "It bypasses the 'Interception' check. `page.mouse.click(x, y)` fires a raw hardware-level event at a specific pixel. It does not care what HTML element is currently residing at that pixel. If a modal is covering the button, this code will silently click the modal instead of the button, creating a catastrophic false positive.",
+              "It bypasses strict mode.",
+              "It bypasses timeouts."
+            ],
+            "a": "It bypasses the 'Interception' check. `page.mouse.click(x, y)` fires a raw hardware-level event at a specific pixel. It does not care what HTML element is currently residing at that pixel. If a modal is covering the button, this code will silently click the modal instead of the button, creating a catastrophic false positive.",
+            "explanation": "Raw mouse events are dangerous. `locator.click()` is a complex transaction that guarantees the target element is the one actually receiving the click event. `mouse.click()` is just dropping a bomb on a coordinate."
+          },
+          {
+            "objective": "esign_debug",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You have a massive enterprise SPA. Clicking 'Save' triggers a 5-second loading spinner overlay. You get random interception errors on the *next* step.",
+            "q": "Instead of waiting for the spinner to hide in every single test, what is the most robust architectural solution?",
+            "options": [
+              "Use `force: true` everywhere.",
+              "Create a custom Web-First Assertion or a custom locator method (e.g., `locator.safeClick()`) that natively integrates a loop: wait for the global `.spinner-overlay` to have `count === 0`, THEN execute the standard click. This centralizes the synchronization logic into the core framework.",
+              "Disable the spinner.",
+              "Use a 10-second timeout everywhere."
+            ],
+            "a": "Create a custom Web-First Assertion or a custom locator method (e.g., `locator.safeClick()`) that natively integrates a loop: wait for the global `.spinner-overlay` to have `count === 0`, THEN execute the standard click. This centralizes the synchronization logic into the core framework.",
+            "explanation": "If a UI component (like a global spinner) consistently disrupts the entire testing graph, you must abstract the handling of that component into the framework's core primitives. Every action in the framework should become inherently 'spinner-aware'."
+          }
+        ]
+      },
+      "icon": "🧩",
+      "slug": "75-esign-debug",
+      "learningPaths": [
+        "enterprise",
+        "regulated"
+      ],
+      "category": "industry-specific",
+      "optional": true,
+      "industryTags": [
+        "Healthcare",
+        "Pharma",
+        "Regulated Systems"
+      ],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Regulated Industry Automation"
+    },
+    {
+      "id": "76-esign-arch",
+      "title": "15.5: The Singleton Modal Pattern",
+      "url": "courses/playwright/76-esign-arch",
+      "group": "✍️ MODULE 15: E-SIGNATURE & MODALS",
+      "level": 11,
+      "weight": 15,
+      "meta": {
+        "time": "25 mins",
+        "type": "Architecture",
+        "outcome": "Implement centralized modal management"
+      },
+      "objectives": [
+        {
+          "id": "modal_arch",
+          "title": "Master global component injection"
+        }
+      ],
+      "tasks": [
+        {
+          "title": "Sandbox: Interactive Practice",
+          "hint": "Complete the practice task",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        },
+        {
+          "title": "Sandbox: Challenge Exercise",
+          "hint": "Complete the challenge exercise",
+          "rules": [
+            {
+              "type": "ast_forbidden_callee",
+              "value": "page.waitForTimeout"
+            },
+            {
+              "type": "ast_node",
+              "value": "AwaitExpression",
+              "required": true
+            },
+            {
+              "type": "contains",
+              "value": "page."
+            }
+          ]
+        }
+      ],
+      "quizMapping": [
+        {
+          "objective": "modal_arch",
+          "weight": 100
+        }
+      ],
+      "spec": {
+        "pattern": "Singleton / Global Component",
+        "implementation": "BasePage injection"
+      },
+      "quizPool": {
+        "Easy": [
+          {
+            "objective": "esign_arch",
+            "type": "scenario",
+            "difficulty": "easy",
+            "q": "Which design pattern ensures only one instance of the connection pool exists globally?",
+            "options": [
+              "A pattern where an object has exactly one property.",
+              "A pattern that restricts the instantiation of a class to one single instance across the entire execution environment, providing a global point of access to that instance.",
+              "A pattern used only for writing single-line functions.",
+              "A pattern where every test file uses exactly one Fixture."
+            ],
+            "a": "A pattern that restricts the instantiation of a class to one single instance across the entire execution environment, providing a global point of access to that instance.",
+            "explanation": "In complex applications, there is only ONE E-Sign modal that ever exists in the DOM at any given time. Modeling this in your test framework as a Singleton ensures you don't accidentally create 5 different conflicting references to the same UI component.",
+            "scenario": "You are building a Database Connection manager. You notice that running 4 worker processes spawns 400 separate database connections, crashing the DB."
+          },
+          {
+            "objective": "esign_arch",
+            "type": "code-analysis",
+            "difficulty": "easy",
+            "code": "class ESignModal {\n  private static instance: ESignModal;\n  private constructor(public readonly page: Page) {}\n  \n  public static getInstance(page: Page): ESignModal {\n    if (!ESignModal.instance) ESignModal.instance = new ESignModal(page);\n    return ESignModal.instance;\n  }\n}",
+            "q": "Why is the constructor marked as `private` in this Singleton implementation?",
+            "options": [
+              "Because TypeScript requires it.",
+              "To mathematically prevent developers from typing `new ESignModal()`. They are forced to call `ESignModal.getInstance()`, which allows the class to strictly control and return the single shared instance.",
+              "Because the class is abstract.",
+              "To hide the modal from the DOM."
+            ],
+            "a": "To mathematically prevent developers from typing `new ESignModal()`. They are forced to call `ESignModal.getInstance()`, which allows the class to strictly control and return the single shared instance.",
+            "explanation": "The `private` constructor is the enforcing mechanism of the Singleton pattern. It creates a hard architectural boundary that protects the structural integrity of the object memory space."
+          },
+          {
+            "objective": "esign_arch",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "You have 5 different Page Objects: `DocumentPage`, `BatchPage`, `UserPage`. They all have a button that opens the exact same E-Sign Modal.",
+            "q": "Should each of these 5 classes internally define their own Locators for the E-Sign Modal's password input?",
+            "options": [
+              "Yes, to keep the classes isolated.",
+              "No. This violates the DRY (Don't Repeat Yourself) principle. They should all import and utilize the centralized `ESignModal` component. If the modal's DOM structure changes, you only update the locators in one single file, not 5.",
+              "Only if they use different passwords.",
+              "Yes, because Page Objects cannot import other Page Objects."
+            ],
+            "a": "No. This violates the DRY (Don't Repeat Yourself) principle. They should all import and utilize the centralized `ESignModal` component. If the modal's DOM structure changes, you only update the locators in one single file, not 5.",
+            "explanation": "This is Composition over Inheritance. A `DocumentPage` HAS A `ESignModal`. By composing complex pages out of small, single-responsibility components, the framework becomes infinitely scalable."
+          },
+          {
+            "objective": "esign_arch",
+            "type": "multi-select",
+            "difficulty": "easy",
+            "scenario": "You want to make the `ESignModal` accessible to every test file without manually importing and instantiating it in every single test.",
+            "q": "How do you inject the Singleton (or standard component) globally into the Playwright framework? (Select all that apply)",
+            "options": [
+              "Use a global variable `global.eSign = new ESignModal()`.",
+              "Use Playwright's `test.extend` API to create a Custom Fixture. E.g., `test.extend({ eSign: async ({ page }, use) => { await use(new ESignModal(page)); } })`.",
+              "The test file then just destructures it: `test('My test', async ({ page, eSign }) => { ... })`.",
+              "Put it in the `playwright.config.ts`."
+            ],
+            "a": [
+              "Use Playwright's `test.extend` API to create a Custom Fixture. E.g., `test.extend({ eSign: async ({ page }, use) => { await use(new ESignModal(page)); } })`.",
+              "The test file then just destructures it: `test('My test', async ({ page, eSign }) => { ... })`."
+            ],
+            "explanation": "Fixtures are the Dependency Injection engine of Playwright. They are vastly superior to static Singletons because Playwright automatically manages their lifecycle, setup, and teardown perfectly across isolated worker threads."
+          },
+          {
+            "objective": "esign_arch",
+            "type": "scenario",
+            "difficulty": "easy",
+            "scenario": "The `ESignModal` has an `approve()` method. After approval, the modal disappears.",
+            "q": "Should the `ESignModal.approve()` method contain an assertion to verify that the `DocumentPage` behind it displays a 'Success' banner?",
+            "options": [
+              "Yes, to ensure the test passes.",
+              "No. This violates the Single Responsibility Principle. The Modal component does not know or care what page is behind it. It is only responsible for the modal itself. The test script must orchestrate the cross-component assertions.",
+              "Yes, because modals control the page.",
+              "Yes, but only if the test is short."
+            ],
+            "a": "No. This violates the Single Responsibility Principle. The Modal component does not know or care what page is behind it. It is only responsible for the modal itself. The test script must orchestrate the cross-component assertions.",
+            "explanation": "If the Modal asserts something about the Document Page, the Modal becomes permanently coupled to the Document Page. It can never be reused on the Batch Page. Components must be completely agnostic of their surrounding environment."
+          }
+        ],
+        "Medium": [
+          {
+            "objective": "esign_arch",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "class DocumentPage {\n  public eSign = new ESignModal(this.page);\n  // ...\n}",
+            "q": "Why is instantiating the Component directly inside the Page Object's class definition considered a tight-coupling anti-pattern in Enterprise architecture?",
+            "options": [
+              "It uses too much memory.",
+              "It physically hardcodes the dependency. If the `ESignModal` constructor later requires a new parameter (like an API Client), you must open and modify every single Page Object that instantiates it. Dependency Injection (passing the instance into the constructor) is vastly superior.",
+              "It breaks Playwright.",
+              "It makes the variables global."
+            ],
+            "a": "It physically hardcodes the dependency. If the `ESignModal` constructor later requires a new parameter (like an API Client), you must open and modify every single Page Object that instantiates it. Dependency Injection (passing the instance into the constructor) is vastly superior.",
+            "explanation": "Tight coupling destroys maintainability. In rigorous systems, objects do not build their own dependencies. They ask for them. Playwright Fixtures perfectly orchestrate this Dependency Injection."
+          },
+          {
+            "objective": "esign_arch",
+            "type": "multi-select",
+            "difficulty": "medium",
+            "scenario": "You are migrating a legacy framework to Playwright. The old framework used a massive `BasePage` class containing 500 methods, including `signDocument()`, `logout()`, `verifyHeader()`. Every other page inherited from `BasePage`.",
+            "q": "Why is the Component Object Model (COM) structurally superior to the `BasePage` Inheritance Model? (Select all that apply)",
+            "options": [
+              "Inheritance creates 'God Classes'. A `LoginPage` inheriting from `BasePage` suddenly has access to `signDocument()`, which makes absolutely no logical sense and pollutes the IDE's intellisense with completely irrelevant methods.",
+              "COM uses Composition. You build small, focused classes (`HeaderComponent`, `ESignModal`). A page only instantiates the components it physically contains, creating mathematically precise logical boundaries.",
+              "Inheritance is banned in TypeScript.",
+              "COM makes tests run faster."
+            ],
+            "a": [
+              "Inheritance creates 'God Classes'. A `LoginPage` inheriting from `BasePage` suddenly has access to `signDocument()`, which makes absolutely no logical sense and pollutes the IDE's intellisense with completely irrelevant methods.",
+              "COM uses Composition. You build small, focused classes (`HeaderComponent`, `ESignModal`). A page only instantiates the components it physically contains, creating mathematically precise logical boundaries."
+            ],
+            "explanation": "Favor Composition over Inheritance. Deep inheritance trees are the leading cause of unmaintainable legacy test automation codebases. Flat, composable structures are the Enterprise standard."
+          },
+          {
+            "objective": "esign_arch",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "Your `ESignModal` component needs to wait for a specific API response before clicking submit.",
+            "q": "How do you pass the Playwright `request` (APIRequestContext) fixture into the Component safely?",
+            "options": [
+              "Use a global variable.",
+              "It must be injected via the constructor: `class ESignModal { constructor(private page: Page, private request: APIRequestContext) {} }`. The Playwright `test.extend` fixture layer manages the complex task of resolving both fixtures and injecting them into the constructor.",
+              "Use `require('playwright')`.",
+              "Components cannot use APIs."
+            ],
+            "a": "It must be injected via the constructor: `class ESignModal { constructor(private page: Page, private request: APIRequestContext) {} }`. The Playwright `test.extend` fixture layer manages the complex task of resolving both fixtures and injecting them into the constructor.",
+            "explanation": "Constructors define contracts. If a component requires the network, it must explicitly demand the `request` fixture in its constructor. Playwright's Fixture DI engine automatically satisfies these demands at runtime."
+          },
+          {
+            "objective": "esign_arch",
+            "type": "code-analysis",
+            "difficulty": "medium",
+            "code": "test('Approve', async ({ documentPage, eSignModal }) => {\n  await documentPage.clickApproveButton();\n  await eSignModal.sign('password');\n});",
+            "q": "Why is this specific execution flow inside the `.spec.ts` file highly preferred over hiding the `eSignModal.sign()` call *inside* the `documentPage.clickApproveButton()` method?",
+            "options": [
+              "It saves lines of code.",
+              "It makes the test script declarative and transparent. The test reads like a human story: 'Click approve, THEN sign the modal'. If the modal logic is hidden deep inside a page object method, the test writer cannot easily alter the flow or test negative scenarios (like closing the modal).",
+              "It prevents the modal from crashing.",
+              "It forces strict mode."
+            ],
+            "a": "It makes the test script declarative and transparent. The test reads like a human story: 'Click approve, THEN sign the modal'. If the modal logic is hidden deep inside a page object method, the test writer cannot easily alter the flow or test negative scenarios (like closing the modal).",
+            "explanation": "Test scripts should be the 'Directors' of the movie. Page Objects are the 'Actors'. The Actors shouldn't tell each other what to do. The Director (the test script) explicitly calls the commands, making the execution graph explicitly visible in the test file."
+          },
+          {
+            "objective": "esign_arch",
+            "type": "scenario",
+            "difficulty": "medium",
+            "scenario": "The application architecture changes. The E-Sign Modal is replaced by a completely new, dedicated 'Signing Page' that the user is redirected to.",
+            "q": "If you used the Component Object Model, what is the architectural impact of this change?",
+            "options": [
+              "You must rewrite all tests.",
+              "The impact is minimal. You rename `ESignModal` to `ESignPage`. Because the `sign('password')` method signature remains identical, the 500 test files that call `eSign.sign()` do not need to be modified. Only the internal locators and `toBeVisible` assertions inside the single component class change.",
+              "You must use a new browser.",
+              "You must delete the database."
+            ],
+            "a": "The impact is minimal. You rename `ESignModal` to `ESignPage`. Because the `sign('password')` method signature remains identical, the 500 test files that call `eSign.sign()` do not need to be modified. Only the internal locators and `toBeVisible` assertions inside the single component class change.",
+            "explanation": "This is the ultimate test of framework architecture: Survivability. A well-designed Page Object Model creates an abstraction layer that completely insulates the business-logic test scripts from catastrophic DOM refactors."
+          }
+        ],
+        "Hard": [
+          {
+            "objective": "esign_arch",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "class ESignModal {\n  public get passwordInput() { return this.page.locator('#pwd'); }\n  public async sign() { await this.passwordInput.fill('x'); }\n}",
+            "q": "Why is exposing the `passwordInput` locator as `public` considered a critical violation of Encapsulation in Enterprise architecture?",
+            "options": [
+              "It is not a violation.",
+              "It allows the `.spec.ts` file to bypass the `sign()` method and manipulate the DOM directly: `eSignModal.passwordInput.fill('hack')`. The Page Object must forcefully hide its internal locators (`private`) and only expose high-level behavioral methods (`public async sign()`) to maintain a strict API boundary.",
+              "It causes Playwright to run slowly.",
+              "It disables auto-polling."
+            ],
+            "a": "It allows the `.spec.ts` file to bypass the `sign()` method and manipulate the DOM directly: `eSignModal.passwordInput.fill('hack')`. The Page Object must forcefully hide its internal locators (`private`) and only expose high-level behavioral methods (`public async sign()`) to maintain a strict API boundary.",
+            "explanation": "If a test script can see the raw locators, a developer WILL eventually use them to write a dirty, undocumented interaction. Encapsulation (`private` / `protected`) is the only way an Architect can mathematically guarantee developers use the framework correctly."
+          },
+          {
+            "objective": "esign_arch",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "You have a `test.extend` fixture that initializes the `ESignModal`. However, you realize that if you run a test in `mode: 'parallel'` with 10 workers, using a classic TypeScript `static instance` Singleton will cause catastrophic failure.",
+            "q": "Why does the static Singleton pattern violently collide with Playwright's parallel execution model?",
+            "options": [
+              "Singletons use too much RAM.",
+              "Because a `static` variable is shared across the entire Node.js memory space. If Playwright used a single shared process, Worker A would overwrite Worker B's modal instance. However, Playwright physically spins up isolated OS processes. The Singleton pattern is redundant and confusing because memory is inherently isolated per worker anyway.",
+              "Singletons disable the browser.",
+              "Playwright deletes static variables."
+            ],
+            "a": "Because a `static` variable is shared across the entire Node.js memory space. If Playwright used a single shared process, Worker A would overwrite Worker B's modal instance. However, Playwright physically spins up isolated OS processes. The Singleton pattern is redundant and confusing because memory is inherently isolated per worker anyway.",
+            "explanation": "This is a profound realization. The GoF (Gang of Four) Singleton pattern is largely obsolete in modern distributed execution. Playwright's Fixtures act as 'Worker-Scoped Singletons', providing the exact same architectural benefits without the memory-leak risks of static variables."
+          },
+          {
+            "objective": "esign_arch",
+            "type": "multi-select",
+            "difficulty": "hard",
+            "scenario": "You need to architect a robust multi-stage state machine for the E-Sign flow: `Invoked -> Authenticating -> Submitting -> Success/Error`.",
+            "q": "How can you leverage TypeScript to strictly enforce these transitional states inside the `ESignModal` Component? (Select all that apply)",
+            "options": [
+              "Use a `console.log()`.",
+              "Define a TypeScript Enum or Union Type: `type ModalState = 'Invoked' | 'Authenticating' | 'Success' | 'Error';`",
+              "Implement a `getState()` method that mathematically evaluates the DOM (e.g., checking for the presence of the spinner, the success checkmark, or the error text) and strictly returns one of the `ModalState` types.",
+              "Use a global boolean."
+            ],
+            "a": [
+              "Define a TypeScript Enum or Union Type: `type ModalState = 'Invoked' | 'Authenticating' | 'Success' | 'Error';`",
+              "Implement a `getState()` method that mathematically evaluates the DOM (e.g., checking for the presence of the spinner, the success checkmark, or the error text) and strictly returns one of the `ModalState` types."
+            ],
+            "explanation": "Advanced testing is State Evaluation. By wrapping the chaotic, asynchronous DOM inside a strict TypeScript state machine, the test script can elegantly switch its logic: `if (await eSign.getState() === 'Error') { ... }`. This provides ultimate execution control."
+          },
+          {
+            "objective": "esign_arch",
+            "type": "code-analysis",
+            "difficulty": "hard",
+            "code": "class ESignModal<T> {\n  constructor(private page: Page, private parentPage: T) {}\n  async close() { return this.parentPage; }\n}",
+            "q": "What highly advanced architectural pattern is this generic `<T>` enabling?",
+            "options": [
+              "It connects to React.",
+              "The 'Fluent Page Object' pattern. By passing the parent page (e.g., `DocumentPage`) into the generic Modal constructor, the `close()` method can mathematically return the typed instance of the parent page. This allows the test script to chain method calls infinitely: `await documentPage.openModal().sign().close().clickNext();`",
+              "It forces the modal to load faster.",
+              "It bypasses the API."
+            ],
+            "a": "The 'Fluent Page Object' pattern. By passing the parent page (e.g., `DocumentPage`) into the generic Modal constructor, the `close()` method can mathematically return the typed instance of the parent page. This allows the test script to chain method calls infinitely: `await documentPage.openModal().sign().close().clickNext();`",
+            "explanation": "Fluent interfaces create beautiful, highly readable test DSLs (Domain Specific Languages). Using Generics (`<T>`) solves the typing problem, ensuring that returning to the parent page perfectly restores the IDE's intellisense for that specific page."
+          },
+          {
+            "objective": "esign_arch",
+            "type": "scenario",
+            "difficulty": "hard",
+            "scenario": "Your framework is used by 3 different product teams. Team A's E-Sign modal requires a fingerprint biometric. Team B's requires a standard password. Team C's requires an SSO redirect.",
+            "q": "How do you architect the `ESignModal` component to support all three without filling the class with massive, brittle `if/else` blocks?",
+            "options": [
+              "You must write 3 completely different frameworks.",
+              "Use the 'Strategy Pattern' combined with an Abstract Interface. Define `interface IESignStrategy { sign(credentials: any): Promise<void> }`. Team A implements `BiometricStrategy`, Team B implements `PasswordStrategy`. The `ESignModal` constructor accepts the specific strategy object via Dependency Injection and executes it blindly.",
+              "Use a giant `switch` statement.",
+              "Use `page.evaluate()`."
+            ],
+            "a": "Use the 'Strategy Pattern' combined with an Abstract Interface. Define `interface IESignStrategy { sign(credentials: any): Promise<void> }`. Team A implements `BiometricStrategy`, Team B implements `PasswordStrategy`. The `ESignModal` constructor accepts the specific strategy object via Dependency Injection and executes it blindly.",
+            "explanation": "This is SOLID architectural design (Open/Closed Principle). The Modal component is closed for modification but open for extension. When Team D invents 'Retina Scan' authentication next year, you just pass in a new Strategy object without altering a single line of the core `ESignModal` class."
+          }
+        ]
+      },
+      "icon": "🏛️",
+      "slug": "76-esign-arch",
+      "learningPaths": [
+        "enterprise",
+        "regulated"
+      ],
+      "category": "industry-specific",
+      "optional": true,
+      "industryTags": [
+        "Healthcare",
+        "Pharma",
+        "Regulated Systems"
+      ],
+      "estimatedMinutes": 45,
+      "certificateTrack": "Regulated Industry Automation"
+    }
+  ]
+}

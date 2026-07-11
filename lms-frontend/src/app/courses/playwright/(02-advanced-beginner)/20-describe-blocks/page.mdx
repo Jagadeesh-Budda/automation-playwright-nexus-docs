@@ -1,0 +1,119 @@
+﻿
+# 3.2: Describe Blocks
+
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Complete 3.2: Describe Blocks
+
+## Grouping Tests
+
+If you have 10 tests in `checkout.spec.ts`, you might realize that 5 of them are about the "Guest Checkout" flow, and 5 are about the "Logged-in Checkout" flow.
+
+Playwright gives you a way to group these together using `test.describe()`.
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Group 1
+test.describe('Guest Checkout', () => {
+  
+  test('can checkout with valid credit card', async ({ page }) => {
+    // ...
+  });
+
+  test('declines expired credit card', async ({ page }) => {
+    // ...
+  });
+
+});
+
+// Group 2
+test.describe('Logged-in Checkout', () => {
+
+  test('auto-fills saved shipping address', async ({ page }) => {
+    // ...
+  });
+
+  test('allows applying loyalty points', async ({ page }) => {
+    // ...
+  });
+
+});
+```
+
+## Why use `describe`?
+
+### 1. Better Reporting
+When you look at the HTML report (or terminal output), the test names will be prefixed with their group name. 
+For example: `Guest Checkout › declines expired credit card`. This makes it instantly clear what failed.
+
+### 2. Targeted Execution (`--grep`)
+You learned earlier that you can run a specific test using `--grep`. 
+You can also use `--grep` to run an entire `describe` block!
+
+```bash
+# This runs ALL tests inside the "Guest Checkout" describe block
+npx playwright test --grep "Guest Checkout"
+```
+
+This is incredibly useful when you are writing code for a specific feature and only want to run the tests related to that feature, without waiting for the whole suite to finish.
+
+### 3. Shared Setup
+The most powerful feature of `describe` blocks is that they allow you to set up conditions that apply *only* to the tests inside that group. We'll learn exactly how to do that in the next lesson using Hooks.
+
+---
+
+## Common Mistakes
+
+- **Hardcoding Waits**: Using `page.waitForTimeout()` instead of waiting for an element's state.
+- **Overly Broad Locators**: Using generic CSS selectors like `.button` that might break if multiple buttons are added. Always prefer user-facing attributes like `getByRole`.
+- **Ignoring Errors**: Catching errors in try/catch blocks without failing the test or logging the reason.
+
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="20-describe-blocks"
+  taskIndex={0}
+  placeholder="// Challenge: Implement the workflow\n// Write your code here:"
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="20-describe-blocks" />

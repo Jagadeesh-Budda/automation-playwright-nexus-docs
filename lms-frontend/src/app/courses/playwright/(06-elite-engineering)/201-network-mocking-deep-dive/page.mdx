@@ -1,0 +1,125 @@
+import { ChapterHeader } from '@/components/ChapterHeader';
+import CodeEditor from '@/components/CodeEditor';
+import Quiz from '@/components/Quiz';
+import { Tabs, Tab } from '@/components/Tabs';
+import AlertBox from '@/components/AlertBox';
+
+# Module E: Network Mocking Deep Dive
+
+<ChapterHeader
+  objective="Master network interception to simulate edge cases, outages, and API virtualization."
+  time="45 mins"
+  type="Code"
+/>
+
+## Learning Objectives
+
+By the end of this module, you will be able to:
+- Intercept and modify network traffic using `page.route()`.
+- Simulate fatal network errors like offline states or timeouts.
+- Virtualize third-party API dependencies to prevent flaky tests.
+- Test frontend error handling by forcing `500 Internal Server Error` and `429 Too Many Requests`.
+
+---
+
+## The Power of Network Mocking
+
+UI automation is traditionally brittle because it relies on the entire stack functioning perfectly. If a third-party analytics provider goes down, your UI test fails. This is a false positive.
+
+By utilizing Playwright's network interception, you can mock out unstable dependencies or simulate scenarios that are extremely difficult to create physically (like forcing a database to crash).
+
+### Interception Methods
+
+<Tabs>
+  <Tab title="1. route.fulfill()">
+    Instantly returns a mocked response to the browser.
+    ```typescript
+    await page.route('**/api/users', route => {
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([{ id: 1, name: 'Alice' }])
+      });
+    });
+    ```
+  </Tab>
+  <Tab title="2. route.abort()">
+    Kills the request immediately. Excellent for blocking analytics tracking or simulating a DNS failure.
+    ```typescript
+    // Block all tracking scripts
+    await page.route('**/*analytics*', route => route.abort());
+    
+    // Simulate a network failure
+    await page.route('**/api/data', route => route.abort('failed'));
+    ```
+  </Tab>
+  <Tab title="3. route.continue()">
+    Allows the request to proceed to the real server, but allows you to modify the headers (like adding an auth token) before it leaves the browser.
+    ```typescript
+    await page.route('**/api/*', route => {
+      const headers = { ...route.request().headers(), 'Authorization': 'Bearer 123' };
+      route.continue({ headers });
+    });
+    ```
+  </Tab>
+</Tabs>
+
+---
+
+## Common Mistakes: Over-Mocking
+
+> [!WARNING]
+> If you mock every single API call, you are no longer writing an End-to-End test. You are writing a glorified Component test. Only mock **external, uncontrollable dependencies** or specific **error states**.
+
+---
+
+## Challenge Exercise: Simulate Chaos
+
+**Business Context**: 
+Your application has a new Error Boundary that displays custom UI depending on the HTTP error code returned by the backend. You need to write a test suite that proves these error messages render correctly.
+
+**Mission**:
+Use `page.route` to mock the `/api/payment` endpoint and simulate three different failure states.
+
+**Success Criteria**:
+- Use `route.abort('failed')` to simulate a total network loss.
+- Use `route.fulfill({ status: 500 })` to simulate a backend crash.
+- Use `route.fulfill({ status: 429 })` to simulate a rate-limiting scenario.
+
+**Hints**:
+- Hint 1: You can call `page.route()` multiple times inside a single test file to handle different scenarios.
+
+<CodeEditor
+  moduleId="201-network-mocking-deep-dive"
+  taskIndex={0}
+/>
+
+---
+
+## Summary
+
+| Concept | Enterprise Value |
+|---|---|
+| `route.fulfill()` | Virtualizes APIs and isolates the UI from backend flakiness |
+| `route.abort()` | Speeds up tests by blocking heavy images/analytics |
+| Error Simulation | Proves that the frontend handles chaotic failures gracefully |
+
+<Quiz moduleId="201-network-mocking-deep-dive" />
+
+export const astRules = [
+  {
+    type: "contains",
+    value: "route.abort('failed')",
+    message: "You must simulate a network failure using route.abort('failed')."
+  },
+  {
+    type: "contains",
+    value: "route.fulfill({ status: 500 })",
+    message: "You must simulate a 500 server error."
+  },
+  {
+    type: "contains",
+    value: "route.fulfill({ status: 429 })",
+    message: "You must simulate a 429 rate limit error."
+  }
+];

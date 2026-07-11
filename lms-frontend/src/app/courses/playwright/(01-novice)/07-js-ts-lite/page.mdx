@@ -1,0 +1,162 @@
+﻿# 0.7: TypeScript Lite
+
+In this course, we use **TypeScript**. If you are new to programming, you might be wondering why we aren't just using plain JavaScript.
+
+JavaScript is incredibly flexible, which is great for building web applications quickly. However, this flexibility means JavaScript lets you make silent mistakes. It won't warn you if you misspell a variable or pass the wrong type of data into a function until you actually *run* the code and it crashes.
+
+TypeScript fixes this. It is a "wrapper" around JavaScript that adds **Type Safety**.
+
+---
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Complete 0.7: TypeScript Lite
+
+## 1. Catching Bugs Before You Run
+
+The primary benefit of TypeScript in Playwright is that your code editor (like VS Code) acts as a real-time spellchecker. 
+
+If you try to call `page.clck()` instead of `page.click()`, TypeScript will immediately draw a red squiggly line under it and tell you the method does not exist. This saves you from running a 5-minute test suite just to discover a typo.
+
+---
+
+## 2. Basic Type Annotations
+
+When you create a variable or a function parameter, you can use a colon `:` to explicitly tell TypeScript what kind of data it should hold.
+
+```typescript
+// Explicitly stating this is a string
+const testEnvironment: string = "staging";
+
+// Explicitly stating this is a number
+const maxRetries: number = 3;
+
+// Explicitly stating this is a boolean
+const isHeadless: boolean = true;
+```
+
+> [!TIP]
+> **Type Inference:** You don't *always* have to write the types out. If you write `const username = "admin"`, TypeScript is smart enough to infer that `username` is a string. You only need explicit types when the type is ambiguous.
+
+---
+
+## 3. Function Parameters
+
+The most important place to use TypeScript is in your functions. If a function requires a user ID (which is a number), you don't want someone passing a string by mistake.
+
+```typescript
+// ❌ Pure JavaScript: No warnings if you pass a string
+function setupUser(userId) {
+  // ...
+}
+
+// ✅ TypeScript: Explicitly requires a number
+function setupUser(userId: number) {
+  // ...
+}
+
+setupUser("123"); // TypeScript throws an error here before the test even starts!
+```
+
+---
+
+## 4. Interfaces (Defining Object Shapes)
+
+In Lesson 0.4, we learned about Objects. TypeScript allows you to define a "blueprint" for what an object should look like using an `interface` or `type`. 
+
+This is incredibly useful for defining the shape of Test Data or API responses.
+
+```typescript
+// Defining the blueprint
+interface UserCredentials {
+  email: string;
+  password: string;
+  isAdmin: boolean;
+}
+
+// Creating an object that MUST follow the blueprint
+const adminUser: UserCredentials = {
+  email: "admin@corp.com",
+  password: "SuperSecretPassword123",
+  isAdmin: true
+};
+
+// If we forget a property, or use the wrong type, TypeScript warns us immediately!
+```
+
+---
+
+## 5. The Playwright `Page` Type
+
+When writing reusable functions outside of your main test blocks, you will frequently need to pass the Playwright `page` object. To get all the glorious autocomplete features for `page.locator()` and `page.click()`, you must tell TypeScript that the parameter is a `Page`.
+
+```typescript
+import { Page } from '@playwright/test';
+
+// Passing the Page object into a helper function
+async function loginAndNavigate(page: Page, url: string) {
+  await page.goto(url);
+  await page.getByRole('button', { name: 'Sign In' }).click();
+}
+```
+
+---
+
+## 6. Interactive Challenge: Typing an API Response
+
+In automation, you will often intercept or fetch API responses. Let's make sure our API response matches our expected blueprint.
+
+**Your Task:**
+1. Create an `interface` named `ServerConfig` that requires:
+   - `status` (number)
+   - `region` (string)
+2. Apply the `ServerConfig` type to the `mockResponse` object (e.g. `const mockResponse: ServerConfig = ...`)
+3. Fix the typo in `mockResponse` so TypeScript is happy.
+
+<CodeEditor
+  moduleId="07-js-ts-lite"
+  taskIndex={0}
+  placeholder={`// 1. Define your ServerConfig interface here\n\n\n// 2. Apply the type to this object\nconst mockResponse = {\n  stat: 200, // BUG: The property should be 'status'\n  region: "us-east-1"\n};\n\nconsole.log(mockResponse.status);`}
+/>
+
+---
+
+## Common Mistakes
+
+- **Hardcoding Waits**: Using `page.waitForTimeout()` instead of waiting for an element's state.
+- **Overly Broad Locators**: Using generic CSS selectors like `.button` that might break if multiple buttons are added. Always prefer user-facing attributes like `getByRole`.
+- **Ignoring Errors**: Catching errors in try/catch blocks without failing the test or logging the reason.
+
+
+## Challenge Exercise
+
+**Scenario**: Your team is migrating an old Puppeteer script to Playwright. The old script uses plain JavaScript to handle a complex multi-user workflow payload.
+
+**Task**: Refactor the data parsing function to use strict TypeScript interfaces.
+
+**Success Criteria**:
+- All parameters must have explicit types.
+- The return value must be typed.
+
+<CodeEditor
+  moduleId="07-js-ts-lite"
+  taskIndex={1}
+  placeholder={`// Challenge: Refactor and correct the code below
+// 1. Declare variables using let or const (avoid var)
+// 2. Ensure syntax is valid and logic is clean
+
+var status = "active";
+console.log("Status: " + status);`}
+/>
+
+
+## Summary
+
+1. **TypeScript** is JavaScript with type checking.
+2. It catches errors in your editor *before* you run your tests.
+3. Use `: type` to annotate variables (e.g., `let count: number`).
+4. Use `interface` to define the shape of objects (like test data).
+5. Always type the Playwright `page` object as `Page` when passing it to helper functions.
+
+<Quiz moduleId="07-js-ts-lite" />

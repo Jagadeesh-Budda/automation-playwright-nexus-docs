@@ -1,0 +1,148 @@
+﻿# 8.6: AST Quality Gates
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Understand AST-based quality enforcement
+
+## What is an AST?
+
+**AST** stands for **Abstract Syntax Tree**. It is a tree-shaped data structure that represents the structure of your code.
+
+When you write `await page.click('#btn')`, the JavaScript engine doesn't see raw text — it parses it into a tree of nodes: an `AwaitExpression` containing a `CallExpression` (`page.click`) with an `Argument` (`'#btn'`).
+
+The AST Auditor reads this tree programmatically to check whether your code follows the required standards — **without actually running the tests**.
+
+## Why Use an AST Auditor?
+
+A traditional linter (like ESLint) checks code style. An AST Auditor goes deeper — it checks **architectural correctness**:
+
+| Regular Linter | AST Auditor |
+|----------------|-------------|
+| Checks formatting (indentation, quotes) | Checks patterns (anti-patterns, structure) |
+| "Missing semicolon" | "You used `waitForTimeout` which is banned" |
+| Style rules | Business rules |
+| Optional | **Mandatory** in ASA |
+
+## The 5 AST Quality Gates
+
+Every piece of automation code must pass these 5 gates before a PR can be merged:
+
+### Gate 1: No Hardcoded Sleeps
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ BANNED — fails AST Gate 1
+await page.waitForTimeout(3000);
+
+// ✅ CORRECT — use web-first assertions instead
+await expect(page.getByText('Document Saved')).toBeVisible();
+```
+
+### Gate 2: No Hardcoded Credentials
+```typescript
+// ❌ BANNED — fails AST Gate 2
+await page.fill('#username', 'admin@AEGIS.com');
+
+// ✅ CORRECT — use environment variables
+await page.fill('#username', process.env.ADMIN_USER!);
+```
+
+### Gate 3: Await All Async Operations
+```typescript
+// ❌ BANNED — missing await, fails Gate 3
+page.click('#submit');  // This is a floating promise!
+
+// ✅ CORRECT
+await page.click('#submit');
+```
+
+### Gate 4: No Direct `page.locator()` in Spec Files
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ BANNED — locator in spec file, fails Gate 4
+test('upload doc', async ({ page }) => {
+  await page.locator('#upload-btn').click();
+});
+
+// ✅ CORRECT — locator belongs in the Page Object
+test('upload doc', async ({ documentPage }) => {
+  await documentPage.uploadButton.click();
+});
+```
+
+### Gate 5: Every Test Must Have a `test.describe` Block
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ BANNED — no describe block
+test('login works', async ({ page }) => { ... });
+
+// ✅ CORRECT
+test.describe('Authentication', () => {
+  test('login works', async ({ page }) => { ... });
+});
+```
+
+## Running the AST Auditor
+
+```bash
+# Run the AST audit in standard mode
+npx ts-node utils/ast-auditor.ts --path=tests/
+
+# Run in strict mode (required before PR)
+npx ts-node utils/ast-auditor.ts --path=tests/ --strict
+
+# Expected output when passing:
+# ✅ Gate 1: No hardcoded sleeps — PASSED
+# ✅ Gate 2: No hardcoded credentials — PASSED
+# ✅ Gate 3: All async operations awaited — PASSED
+# ✅ Gate 4: No locators in spec files — PASSED
+# ✅ Gate 5: All tests have describe blocks — PASSED
+# 
+# AST Audit Complete: 5/5 Gates Passed ✨
+```
+
+## How the Auditor Works (Simplified)
+
+```typescript
+// Under the hood, the auditor uses 'acorn' to parse your code
+import { parse } from 'acorn';
+
+const code = `await page.waitForTimeout(3000);`;
+const ast = parse(code, { ecmaVersion: 2020 });
+
+// Then it walks the tree looking for banned patterns
+// If it finds a CallExpression with callee "waitForTimeout", it fails Gate 1
+```
+
+> [!IMPORTANT]
+> The AST audit runs automatically in GitHub Actions on every Push. You cannot merge a PR if the audit fails. Run it locally **before** pushing.
+
+## Challenge Exercise
+
+**Scenario**: Your CI/CD pipeline is blocking a pull request because the AST linter flagged a hardcoded wait.
+
+**Problem Statement**: The developer used `page.waitForTimeout(5000)` because the reporting dashboard was flaky.
+
+**Requirements**:
+- Refactor the code to remove the forbidden AST violation.
+- Implement an auto-retrying web-first assertion instead.
+
+**Success Criteria**:
+- The script passes the AST validation rules.
+- The assertion successfully waits for the dashboard state.
+
+**Hints**:
+- Hint 1: Consider using `expect(locator).toBeVisible()`.
+
+<CodeEditor
+  moduleId="45-quality-gates"
+  taskIndex={0}
+/>
+
+
+## Summary
+
+This module covered the implementation of automated quality gates. You saw how to integrate custom AST rules into your CI pipeline to enforce coding standards and prevent anti-patterns from being merged.

@@ -1,0 +1,282 @@
+﻿# 12.2: The ValidatedPage Interface
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Implement ValidatedPage correctly
+
+## Why TypeScript in Test Automation?
+
+Playwright is built in TypeScript. Using TypeScript properly in your test framework gives you:
+- **Auto-complete** in VS Code — no more typos in field names
+- **Compile-time errors** — catch bugs before tests even run
+- **Self-documenting code** — interfaces describe the shape of your data
+- **Refactoring confidence** — rename a field, TypeScript tells you every place to update
+
+## Defining Data Interfaces
+
+```typescript
+// entities/User.ts
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: 'admin' | 'reviewer' | 'viewer' | 'auditor';
+  department: string;
+  isActive: boolean;
+}
+
+// entities/Document.ts
+export interface Document {
+  id: string;
+  title: string;
+  version: string;
+  status: DocumentStatus;
+  uploadedBy: string;
+  uploadedAt: Date;
+  fileSize: number;
+  fileType: 'pdf' | 'docx' | 'xlsx';
+}
+
+// Use a type alias for the status union
+export type DocumentStatus = 
+  | 'Draft' 
+  | 'Pending Review' 
+  | 'Approved' 
+  | 'Rejected'
+  | 'Archived';
+
+// entities/SignatureOptions.ts
+export interface SignatureOptions {
+  reason: string;
+  password: string;
+  comment?: string;  // Optional field
+}
+```
+
+## Using Interfaces in Page Objects
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// pages/DocumentPage.ts
+import { Document, DocumentStatus } from '../entities/Document';
+
+export class DocumentPage {
+  // Method signature uses the interface — self-documenting!
+  async createDocument(doc: Partial<Document>): Promise<string> {
+    await this.newDocumentButton.click();
+    
+    if (doc.title) await this.titleInput.fill(doc.title);
+    if (doc.version) await this.versionInput.fill(doc.version);
+    if (doc.fileType) await this.fileTypeSelect.selectOption(doc.fileType);
+    
+    await this.saveButton.click();
+    
+    // Return the newly created document ID
+    const idText = await this.documentIdDisplay.textContent();
+    return idText!.trim();
+  }
+
+  async filterByStatus(status: DocumentStatus) {
+    // TypeScript ensures only valid status values can be passed
+    await this.statusFilter.selectOption(status);
+    await expect(this.loadingSpinner).toBeHidden();
+  }
+}
+```
+
+## Using Interfaces in Test Data
+
+```typescript
+// data/testDocuments.ts
+import { Document } from '../entities/Document';
+
+export const testDocuments: Partial<Document>[] = [
+  {
+    title: 'Clinical Trial Protocol v3.1',
+    version: '3.1',
+    status: 'Pending Review',
+    fileType: 'pdf'
+  },
+  {
+    title: 'Safety Data Sheet Q3',
+    version: '1.0',
+    status: 'Draft',
+    fileType: 'docx'
+  },
+];
+```
+
+## Interface vs Type: When to Use Each
+
+```typescript
+// Use interface for objects you might extend/merge
+interface PageObject {
+  page: Page;
+  navigate(): Promise<void>;
+}
+
+// Extend an interface
+interface AuthenticatedPage extends PageObject {
+  currentUser: User;
+  logout(): Promise<void>;
+}
+
+// Use type for unions, primitives, and computed types
+type BrowserName = 'chromium' | 'firefox' | 'webkit';
+type TestStatus = 'passed' | 'failed' | 'skipped';
+type FixtureMap<T> = { [K in keyof T]: T[K] };
+```
+
+## Generic Utility Types in Test Code
+
+```typescript
+// Partial<T> — make all fields optional (useful for test data)
+const partialDoc: Partial<Document> = { title: 'Test Doc' };
+
+// Required<T> — make all fields required
+const fullDoc: Required<Document> = { /* all fields must be provided */ };
+
+// Pick<T, K> — select specific fields
+type DocumentSummary = Pick<Document, 'id' | 'title' | 'status'>;
+
+// Omit<T, K> — exclude specific fields
+type DocumentInput = Omit<Document, 'id' | 'uploadedAt' | 'uploadedBy'>;
+```
+
+## Type-Safe Fixture Definitions
+
+```typescript
+// fixtures/baseTest.ts
+import { test as base } from '@playwright/test';
+import { LoginPage } from '../pages/LoginPage';
+import { DocumentPage } from '../pages/DocumentPage';
+
+// Define the exact shape of your fixtures
+interface AppFixtures {
+  loginPage: LoginPage;
+  documentPage: DocumentPage;
+  testUser: User;        // Inject test data as a fixture
+  cleanupIds: string[];  // Track created resources for cleanup
+}
+
+export const test = base.extend<AppFixtures>({
+  loginPage: async ({ page }, use) => { await use(new LoginPage(page)); },
+  documentPage: async ({ page }, use) => { await use(new DocumentPage(page)); },
+  
+  // Inject a test user based on config
+  testUser: async ({}, use) => {
+    const user: User = {
+      id: 'test-user-1',
+      email: process.env.ADMIN_USER!,
+      name: 'Test Admin',
+      role: 'admin',
+      department: 'QA',
+      isActive: true,
+    };
+    await use(user);
+  },
+  
+  // Shared cleanup tracker
+  cleanupIds: async ({}, use) => {
+    const ids: string[] = [];
+    await use(ids);
+    // Teardown: delete all created resources
+    for (const id of ids) {
+      await fetch(`${process.env.BASE_URL}/api/documents/${id}`, { method: 'DELETE' });
+    }
+  },
+});
+```
+
+<CodeEditor
+  moduleId="59-arch-interface"
+  taskIndex={0}
+  placeholder="// Task: Define a TypeScript interface for a Signature entity&#10;export interface Signature {&#10;  id: string;&#10;  documentId: string;&#10;  signedBy: string;&#10;  reason: string;&#10;  timestamp: Date;&#10;}"
+/>
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="59-arch-interface"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="arch-interface" />
+
+
+
+export const astRules = [
+  {
+    type: "ast_forbidden_callee",
+    value: "page.waitForTimeout",
+    message: "Use auto-retrying assertions or web-first locators instead of hardcoded waits."
+  }
+];

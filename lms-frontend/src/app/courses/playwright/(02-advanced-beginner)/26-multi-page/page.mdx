@@ -1,0 +1,159 @@
+﻿
+# 4.3: Multi-Page Tests
+
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Complete 4.3: Multi-Page Tests
+
+## The Real World is Multi-Page
+
+Most automated tests do not start and stop on a single page. A real end-to-end test models a user journey:
+
+1. User logs in. (Login Page)
+2. User navigates to the dashboard. (Dashboard Page)
+3. User adds an item to their cart. (Product Page)
+4. User checks out. (Checkout Page)
+
+To write this test, we simply initialize multiple Page Objects and use them one after the other.
+
+## Chaining Page Objects
+
+Let's assume we have two page objects: `LoginPage` and `DashboardPage`.
+
+Here is how you use them together in a single test:
+
+```typescript
+import { test, expect } from '@playwright/test';
+import { LoginPage } from '../pages/LoginPage';
+import { DashboardPage } from '../pages/DashboardPage';
+
+test('admin can upload a new document', async ({ page }) => {
+  // 1. Initialize all needed Page Objects at the top
+  const loginPage = new LoginPage(page);
+  const dashboardPage = new DashboardPage(page);
+
+  // 2. Perform Login Flow
+  await page.goto('/login');
+  await loginPage.login('admin', 'secret123');
+
+  // 3. Perform Dashboard Flow
+  await dashboardPage.openUploadModal();
+  await dashboardPage.uploadFile('report.pdf');
+
+  // 4. Assert Success
+  await expect(dashboardPage.successBanner).toBeVisible();
+});
+```
+
+This reads incredibly well. Anyone on your team (even a non-programmer product manager) could read this test and understand exactly what it is doing.
+
+## Page Objects Returning Page Objects (Advanced)
+
+Sometimes, clicking a button on one page *automatically* takes you to another page. 
+
+In advanced frameworks, methods on a Page Object can actually return an instance of the *next* Page Object! This allows for "fluent chaining".
+
+```typescript
+// pages/LoginPage.ts
+import { DashboardPage } from './DashboardPage';
+
+export class LoginPage {
+  // ... locators ...
+
+  // Notice the return type!
+  async login(email: string, pass: string): Promise<DashboardPage> {
+    await this.emailInput.fill(email);
+    await this.passwordInput.fill(pass);
+    await this.signInButton.click();
+    
+    // Return the next page automatically!
+    return new DashboardPage(this.page);
+  }
+}
+```
+
+If you do this, your tests become even shorter:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('fluent login', async ({ page }) => {
+  const loginPage = new LoginPage(page);
+  await page.goto('/login');
+  
+  // login() returns the dashboardPage, so we can use it immediately!
+  const dashboardPage = await loginPage.login('admin', 'secret123');
+  
+  await dashboardPage.openUploadModal();
+});
+```
+
+> [!TIP]
+> **"Advanced" doesn't always mean "Better".** 
+> Most teams never use fluent chaining. The standard approach (initializing `DashboardPage` explicitly in the test file) is perfectly fine and preferred by many teams for its simplicity and readability. Don't feel forced to use fluent chaining just because it exists.
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="26-multi-page"
+  taskIndex={0}
+  placeholder="// Challenge: Implement the workflow\n// Write your code here:"
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="26-multi-page" />

@@ -1,0 +1,291 @@
+﻿# 12.4: Entity-Page Relationships
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Create and use Entity models for test data
+
+## What is the Entity Layer?
+
+The **Entity Layer** (Layer 4) is the data foundation of your test framework. It defines:
+1. **Data shapes** (TypeScript interfaces) — what fields exist
+2. **Data factories** — how to generate valid test data
+3. **Data builders** — fluent APIs for building complex objects
+
+Think of it as your test framework's **schema layer**.
+
+## Complete Entity Definitions for a DMS
+
+```typescript
+// entities/User.ts
+export type UserRole = 'admin' | 'reviewer' | 'viewer' | 'auditor' | 'qa-lead';
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: UserRole;
+  department: string;
+  isActive: boolean;
+  createdAt: Date;
+}
+
+// entities/Document.ts
+export type DocumentStatus = 'Draft' | 'Pending Review' | 'Approved' | 'Rejected' | 'Archived';
+export type DocumentType = 'Protocol' | 'Report' | 'SOP' | 'Specification' | 'Form';
+
+export interface Document {
+  id: string;
+  title: string;
+  version: string;
+  type: DocumentType;
+  status: DocumentStatus;
+  department: string;
+  uploadedBy: string;
+  reviewedBy?: string;
+  approvedBy?: string;
+  effectiveDate?: Date;
+}
+
+// entities/Signature.ts
+export interface ESignature {
+  id: string;
+  documentId: string;
+  signedBy: string;
+  role: UserRole;
+  reason: string;
+  timestamp: Date;
+  ipAddress: string;
+  hash: string;  // Cryptographic hash of document at time of signing
+}
+```
+
+## The Builder Pattern for Test Data
+
+For complex objects, the Builder Pattern lets you construct test data fluently:
+
+```typescript
+// entities/DocumentBuilder.ts
+import { Document, DocumentType, DocumentStatus } from './Document';
+
+export class DocumentBuilder {
+  private doc: Partial<Document> = {
+    version: '1.0',
+    status: 'Draft',
+    type: 'Protocol',
+    department: 'QA',
+  };
+
+  withTitle(title: string): this {
+    this.doc.title = title;
+    return this;
+  }
+
+  withStatus(status: DocumentStatus): this {
+    this.doc.status = status;
+    return this;
+  }
+
+  withType(type: DocumentType): this {
+    this.doc.type = type;
+    return this;
+  }
+
+  withDepartment(department: string): this {
+    this.doc.department = department;
+    return this;
+  }
+
+  pendingReview(): this {
+    this.doc.status = 'Pending Review';
+    return this;
+  }
+
+  approved(): this {
+    this.doc.status = 'Approved';
+    this.doc.reviewedBy = 'reviewer@example.com';
+    this.doc.approvedBy = 'admin@example.com';
+    return this;
+  }
+
+  build(): Partial<Document> {
+    if (!this.doc.title) {
+      this.doc.title = `Test Document ${Date.now()}`;
+    }
+    return { ...this.doc };
+  }
+}
+```
+
+## Using the Builder in Tests
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+import { DocumentBuilder } from '../../entities/DocumentBuilder';
+
+test('approved documents cannot be deleted', async ({ documentPage }) => {
+  let doc = new DocumentBuilder()
+    .withTitle('Locked Approved Protocol')
+    .withType('Protocol')
+    .approved()
+    .build();
+
+  const docId = await documentPage.createDocument(doc);
+  
+  // Attempt to delete
+  await documentPage.navigateTo(docId);
+  
+  // The delete button should not exist for approved documents
+  await expect(documentPage.deleteButton).not.toBeVisible();
+});
+
+test('regulatory SOPs require two signatures', async ({ eSignPage }) => {
+  const doc = new DocumentBuilder()
+    .withType('SOP')
+    .withDepartment('Regulatory')
+    .pendingReview()
+    .build();
+
+  // Build and upload the doc...
+  // Then verify two-signature workflow is enforced
+});
+```
+
+## Static Test Data: JSON Files
+
+For data that doesn't change between runs:
+
+```json
+// data/departments.json
+{
+  "regulatory": {
+    "name": "Regulatory Affairs",
+    "code": "REG",
+    "requiredApprovers": 2
+  },
+  "clinical": {
+    "name": "Clinical Operations",
+    "code": "CLN",
+    "requiredApprovers": 1
+  }
+}
+```
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Using static data in a test
+import departments from '../../data/departments.json';
+
+test('regulatory documents require 2 approvers', async ({ documentPage }) => {
+  const dept = departments.regulatory;
+  // Use dept.requiredApprovers in assertion
+  const approverCount = await documentPage.getRequiredApproverCount('Regulatory');
+  expect(approverCount).toBe(dept.requiredApprovers);
+});
+```
+
+<CodeEditor
+  moduleId="61-arch-entity"
+  taskIndex={0}
+  placeholder="// Task: Create a DocumentBuilder using the Builder pattern.&#10;// Requirements:&#10;//   1. Chain a .withTitle() method to set the title&#10;//   2. Chain a .pendingReview() method to set status&#10;//   3. Call .build() to get the final Document object&#10;//&#10;// The resulting usage should look like:&#10;//   const doc = new DocumentBuilder().withTitle('Test').pendingReview().build();"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+const doc = new DocumentBuilder()
+  .withTitle('Test Protocol')
+  .pendingReview()
+  .build();
+```
+
+</details>
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="61-arch-entity"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="arch-entity" />
+
+
+
+export const astRules = [
+  {
+    type: "ast_forbidden_callee",
+    value: "page.waitForTimeout",
+    message: "Use auto-retrying assertions or web-first locators instead of hardcoded waits."
+  }
+];

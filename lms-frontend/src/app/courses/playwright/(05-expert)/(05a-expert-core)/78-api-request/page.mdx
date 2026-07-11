@@ -1,0 +1,289 @@
+# 16.2: The Request Fixture
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Master POST, GET, and DELETE methods
+
+## The `request` Fixture
+
+Playwright provides a built-in `request` fixture that gives you a fully-featured HTTP client. It's automatically available in every test — no extra imports needed.
+
+## All HTTP Methods
+
+```typescript
+// GET — Retrieve data
+let response = await request.get('/api/documents');
+let response = await request.get('/api/documents/DOC-001');
+let response = await request.get('/api/documents', {
+  params: { status: 'Approved', page: 1, limit: 25 }
+});
+
+// POST — Create data
+let response = await request.post('/api/documents', {
+  data: {
+    title: 'New Protocol',
+    type: 'Protocol',
+    department: 'Regulatory',
+    version: '1.0'
+  }
+});
+
+// PUT — Replace entire resource
+let response = await request.put('/api/documents/DOC-001', {
+  data: { title: 'Updated Title', version: '2.0' }
+});
+
+// PATCH — Partial update
+let response = await request.patch('/api/documents/DOC-001', {
+  data: { status: 'Approved' }
+});
+
+// DELETE — Remove resource
+const response = await request.delete('/api/documents/DOC-001');
+```
+
+## Reading the Response
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('validate full API response', async ({ request }) => {
+  const response = await request.get('/api/documents/DOC-001');
+  
+  // Status code
+  expect(response.status()).toBe(200);
+  expect(response.ok()).toBeTruthy();  // true if status is 2xx
+  
+  // Headers
+  expect(response.headers()['content-type']).toContain('application/json');
+  
+  // Body as JSON
+  const body = await response.json();
+  expect(body.id).toBe('DOC-001');
+  expect(body.title).toBeDefined();
+  expect(body.status).toBe('Approved');
+  
+  // Body as text
+  const text = await response.text();
+  expect(text).toContain('DOC-001');
+});
+```
+
+## Sending Headers and Auth Tokens
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('authorized API call with bearer token', async ({ request }) => {
+  // Get an auth token first
+  const authResponse = await request.post('/api/auth/login', {
+    data: {
+      email: process.env.ADMIN_USER,
+      password: process.env.ADMIN_PASS
+    }
+  });
+  const { token } = await authResponse.json();
+  
+  // Use the token in subsequent requests
+  const response = await request.get('/api/admin/users', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'x-tenant-id': 'AEGIS'
+    }
+  });
+  
+  expect(response.status()).toBe(200);
+});
+```
+
+## Creating a Reusable API Client
+
+Instead of making raw `request` calls in every test, wrap them in an API Client class:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// utils/ApiClient.ts
+import { APIRequestContext } from '@playwright/test';
+
+export class ApiClient {
+  private token: string | null = null;
+
+  constructor(
+    private readonly request: APIRequestContext,
+    private readonly baseURL: string
+  ) {}
+
+  async authenticate(email: string, password: string): Promise<void> {
+    let response = await this.request.post(`${this.baseURL}/api/auth/login`, {
+      data: { email, password }
+    });
+    const { token } = await response.json();
+    this.token = token;
+  }
+
+  private get authHeaders() {
+    return this.token ? { Authorization: `Bearer ${this.token}` } : {};
+  }
+
+  async getDocuments(params?: Record<string, any>) {
+    let response = await this.request.get(`${this.baseURL}/api/documents`, {
+      params,
+      headers: this.authHeaders
+    });
+    return response.json();
+  }
+
+  async createDocument(data: { title: string; type: string; department: string }) {
+    let response = await this.request.post(`${this.baseURL}/api/documents`, {
+      data,
+      headers: this.authHeaders
+    });
+    expect(response.status()).toBe(201);
+    return response.json();
+  }
+
+  async deleteDocument(id: string) {
+    let response = await this.request.delete(`${this.baseURL}/api/documents/${id}`, {
+      headers: this.authHeaders
+    });
+    expect(response.status()).toBe(204);
+  }
+
+  async approveDocument(id: string, reason: string) {
+    const response = await this.request.post(`${this.baseURL}/api/documents/${id}/approve`, {
+      data: { reason },
+      headers: this.authHeaders
+    });
+    return response.json();
+  }
+}
+```
+
+## File Upload via API
+
+```typescript
+import { test, expect } from '@playwright/test';
+import * as fs from 'fs';
+
+test('upload a PDF via API', async ({ request }) => {
+  // Login to retrieve the authorization token
+  const authResponse = await request.post('/api/auth/login', {
+    data: {
+      email: process.env.ADMIN_USER,
+      password: process.env.ADMIN_PASS
+    }
+  });
+  const { token: adminToken } = await authResponse.json();
+
+  const response = await request.post('/api/documents/upload', {
+    multipart: {
+      file: {
+        name: 'clinical-protocol.pdf',
+        mimeType: 'application/pdf',
+        buffer: fs.readFileSync('./test-fixtures/sample.pdf'),
+      },
+      metadata: JSON.stringify({ department: 'Clinical', version: '1.0' }),
+    },
+    headers: { Authorization: `Bearer ${adminToken}` }
+  });
+  
+  expect(response.status()).toBe(201);
+  const body = await response.json();
+  expect(body.fileUrl).toContain('.pdf');
+});
+```
+
+<CodeEditor
+  moduleId="78-api-request"
+  taskIndex={0}
+  placeholder="// Task: Write a POST request to create a new document via the API.&#10;// Requirements:&#10;//   1. POST to /api/documents with a JSON body containing title, type, and department&#10;//   2. Assert the response status is 201 (Created)&#10;//   3. Parse the response body&#10;//   4. Assert the returned object has an 'id' field&#10;//&#10;// Hint: Use request.post() with a { data: {...} } argument"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+const response = await request.post('/api/documents', {
+  data: { title: 'Test Doc', type: 'Protocol', department: 'QA' }
+});
+expect(response.status()).toBe(201);
+const body = await response.json();
+expect(body.id).toBeDefined();
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="78-api-request"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<Quiz moduleId="api-request" />
+
+export const astRules = [
+  {
+    type: "ast_callee_any",
+    values: ["request.get", "request.post", "request.put", "request.delete", "request.patch"],
+    message: "You must use the Playwright APIRequestContext methods (e.g., request.get)."
+  }
+];

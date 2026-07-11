@@ -1,0 +1,191 @@
+
+# 6.3: Reference Solution
+
+import { ChapterHeader } from '@/components/ChapterHeader';
+
+<ChapterHeader
+  objective="Compare your implementation against a production-grade Playwright reference architecture."
+  time="15 mins"
+  type="Concept"
+/>
+
+## Learning Objectives
+- Analyze a clean separation of concerns between config, fixtures, POMs, and specs
+- Identify common architectural anti-patterns in your own submission
+- Understand how `test.extend` creates zero-setup test environments
+Did you finish? Did your tests pass? 
+
+If so, great job! You are officially capable of building a Playwright framework from an empty repository.
+
+Review the reference solution below. Your code does not have to match this exactly. The goal is to compare your architectural choices with ours, and then grade yourself using the rubric from Lesson 6.1.
+
+## 1. The Configuration
+
+**`playwright.config.ts`**
+A minimal configuration focusing just on the target directory and the base URL.
+
+```typescript
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  testDir: './tests',
+  fullyParallel: true,
+  retries: process.env.CI ? 2 : 0,
+  workers: process.env.CI ? 1 : undefined,
+  reporter: 'html',
+  
+  use: {
+    // 💡 ARCHITECTURE NOTE: Setting baseURL globally means tests only need to say goto('/')
+    baseURL: 'https://demo.playwright.dev/todomvc/',
+    trace: 'on-first-retry',
+  },
+
+  projects: [
+    { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+  ],
+});
+```
+
+## 2. The Page Object
+
+**`pages/TodoPage.ts`**
+Encapsulates all locators and business actions for the TodoMVC app. Notice the use of `.filter({ hasText })` to find specific items in the list!
+
+```typescript
+import { Page, Locator } from '@playwright/test';
+
+export class TodoPage {
+  readonly newTodoInput: Locator;
+  readonly todoList: Locator;
+
+  constructor(public readonly page: Page) {
+    // 💡 ARCHITECTURE NOTE: Locators are defined once in the constructor. 
+    // If the UI changes, you only update this one file, not 50 tests.
+    this.newTodoInput = page.getByPlaceholder('What needs to be done?');
+    this.todoList = page.getByTestId('todo-item');
+  }
+
+  async goto() {
+    await this.page.goto('/');
+  }
+
+  async addTodo(text: string) {
+    await this.newTodoInput.fill(text);
+    await this.newTodoInput.press('Enter');
+  }
+
+  async markComplete(text: string) {
+    // 💡 ARCHITECTURE NOTE: filter() is incredibly powerful for lists.
+    // It scopes the locator down to just the li element containing our text.
+    let item = this.todoList.filter({ hasText: text });
+    await item.getByRole('checkbox').check();
+  }
+
+  async deleteTodo(text: string) {
+    const item = this.todoList.filter({ hasText: text });
+    // The destroy button is hidden until hover
+    await item.hover();
+    await item.getByLabel('Delete').click();
+  }
+}
+```
+
+## 3. The Fixture
+
+**`fixtures/baseTest.ts`**
+Injects the `TodoPage` so tests don't have to instantiate it.
+
+```typescript
+import { test as base } from '@playwright/test';
+import { TodoPage } from '../pages/TodoPage';
+
+type AppFixtures = {
+  todoPage: TodoPage;
+};
+
+export const test = base.extend<AppFixtures>({
+  todoPage: async ({ page }, use) => {
+    // 💡 ARCHITECTURE NOTE: The fixture instantiates the POM and navigates.
+    // This removes 3 lines of boilerplate from every single test block.
+    const todoPage = new TodoPage(page);
+    await todoPage.goto();
+    await use(todoPage);
+  }
+});
+
+export { expect } from '@playwright/test';
+```
+
+## 4. The Tests
+
+**`tests/todo.spec.ts`**
+Beautiful, clean tests that read exactly like the business requirements, completely free of locators and setup boilerplate.
+
+```typescript
+import { test, expect } from '../fixtures/baseTest';
+
+test.describe('Todo MVC Scenarios', () => {
+  
+  test('user can add a todo', async ({ todoPage }) => {
+    await todoPage.addTodo('Buy groceries');
+    await expect(todoPage.todoList).toHaveText(['Buy groceries']);
+  });
+
+  test('user can complete a todo', async ({ todoPage }) => {
+    await todoPage.addTodo('Wash the car');
+    await todoPage.markComplete('Wash the car');
+    
+    const item = todoPage.todoList.filter({ hasText: 'Wash the car' });
+    await expect(item).toHaveClass(/completed/);
+  });
+
+  test('user can delete a todo', async ({ todoPage }) => {
+    await todoPage.addTodo('Read a book');
+    await todoPage.deleteTodo('Read a book');
+    
+    await expect(todoPage.todoList).toHaveCount(0);
+  });
+
+});
+```
+
+## Grade Yourself
+
+Go back to Lesson 6.1 and look at the rubric. How many points did you score?
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Hardcoding URLs in Tests**  
+> **Wrong:** `await page.goto('https://demo.playwright.dev/todomvc/');` inside the test.  
+> **Correct:** Use `baseURL` in `playwright.config.ts`.  
+> **Why:** If the URL changes (e.g., testing against staging vs prod), you would have to update hundreds of tests manually.
+
+> [!WARNING]
+> **Mistake 2: Locators Inside the Spec File**  
+> **Wrong:** `await page.getByPlaceholder('What needs to be done?').fill('Task');`  
+> **Correct:** Abstract this into `todoPage.addTodo('Task');`  
+> **Why:** Tests should read like business requirements, completely decoupled from the underlying DOM selectors.
+
+> [!WARNING]
+> **Mistake 3: Skipping Fixtures**  
+> **Wrong:** Manually instantiating `const todoPage = new TodoPage(page);` in a `beforeEach` hook.  
+> **Correct:** Use `test.extend` to inject the POM directly into the test arguments.  
+> **Why:** Fixtures are the modern Playwright way. They support automatic cleanup, lazy loading, and parallel execution isolation natively.
+
+---
+
+## What To Do Next
+
+If you scored over 80 points, you are ready to move on. You have mastered the fundamentals. Everything from this point forward is about scaling this architecture for massive, complex enterprise applications. 
+
+Welcome to the big leagues.
+
+<Quiz moduleId="35-reference-solution" />
+
+
+## Summary
+
+This reference solution demonstrated the ideal architecture for a Playwright framework. We reviewed the layer separation, Page Object Model implementation, and fixture usage, providing a standard for comparison.

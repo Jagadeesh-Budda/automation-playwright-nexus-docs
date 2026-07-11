@@ -1,0 +1,120 @@
+
+# 6.2: Challenge Hints
+
+import { ChapterHeader } from '@/components/ChapterHeader';
+
+<ChapterHeader
+  objective="Master this critical concept to build robust, scalable Playwright automation."
+  time="15 mins"
+  type="Concept"
+/>
+
+## Learning Objectives
+- Understand the core architectural patterns
+- Identify and avoid common anti-patterns
+- Implement production-grade automation scripts
+
+
+
+> [!WARNING]
+> **Are you sure you want to be here?**
+> If you haven't struggled for at least 30 minutes, go back! Getting stuck is normal. Re-read the previous modules first.
+
+If you are genuinely stuck on a specific syntax or step, use these hints. They are designed to jog your memory, not give you the final answer.
+
+## Hint 1: Starting the Project
+
+Forgot the command to initialize Playwright?
+
+```bash
+npm init playwright@latest
+```
+Press Enter to accept all defaults (use TypeScript, etc).
+
+## Hint 2: The Configuration File
+
+Can't remember how to set the `baseURL`? 
+
+Open `playwright.config.ts`. Look for the `use: { ... }` block. 
+
+```typescript
+// playwright.config.ts
+export default defineConfig({
+  testDir: './tests', // Tells Playwright where your tests live
+  // ...
+  use: {
+    baseURL: 'https://demo.playwright.dev/todomvc/',
+    trace: 'on-first-retry',
+  },
+});
+```
+If you set `baseURL`, your `page.goto()` calls in your tests or fixtures only need to be `await page.goto('/')`.
+
+## Hint 3: Locating Todo Elements
+
+Struggling to find the right `getByRole` for the Todo app?
+
+- **The main input:** It has a placeholder. Try `getByPlaceholder('What needs to be done?')`.
+- **The list items:** Try `getByTestId('todo-item')`.
+- **The checkbox:** Inside a specific list item, look for `getByRole('checkbox')`.
+
+## Hint 4: The Fixture Syntax
+
+Forgot how to extend the base test? 
+
+You need two things: a type definition, and the `base.extend<T>` function.
+
+```typescript
+import { test as base } from '@playwright/test';
+import { TodoPage } from './pages/TodoPage';
+
+type MyFixtures = {
+  todoPage: TodoPage;
+};
+
+export const test = base.extend<MyFixtures>({
+  todoPage: async ({ page }, use) => {
+    // 1. Setup
+    // 2. use()
+    // 3. Teardown
+  }
+});
+
+export { expect } from '@playwright/test';
+```
+
+## Hint 5: Using the Fixture
+
+Remember, if you create custom fixtures, your test file MUST import `test` from your new fixture file, **not** from `@playwright/test`.
+
+```typescript
+// tests/todo.spec.ts
+
+// ✅ DO THIS:
+import { test, expect } from '../fixtures/baseTest';
+
+// ❌ DO NOT DO THIS:
+// import { test, expect } from '@playwright/test';
+```
+
+---
+
+## Common Mistakes
+
+- **Hardcoding Waits**: Using `page.waitForTimeout()` instead of waiting for an element's state.
+- **Overly Broad Locators**: Using generic CSS selectors like `.button` that might break if multiple buttons are added. Always prefer user-facing attributes like `getByRole`.
+- **Ignoring Errors**: Catching errors in try/catch blocks without failing the test or logging the reason.
+
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="34-hints" />

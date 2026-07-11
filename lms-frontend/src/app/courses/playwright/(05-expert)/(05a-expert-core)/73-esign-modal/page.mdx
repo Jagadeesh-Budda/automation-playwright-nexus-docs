@@ -1,0 +1,249 @@
+﻿# 15.2: The ESignModal Component
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Handle async modal transitions
+
+## Why Modals Are Tricky
+
+Modals are deceptively complex to test:
+- They render outside the normal DOM flow (often appended to `<body>`)
+- They use `aria-modal` which traps focus
+- They may have animations that interfere with interactions
+- Multiple modals can stack on top of each other
+- The wrong modal may accidentally receive interactions
+
+## The Core Strategy: Scope All Locators to the Dialog
+
+Always scope your interactions to the `getByRole('dialog')` locator. This prevents accidentally clicking outside the modal.
+
+```typescript
+// ❌ Wrong — might click the wrong button outside the modal
+await page.getByRole('button', { name: 'Cancel' }).click();
+
+// ✅ Correct — scoped to the dialog
+const modal = page.getByRole('dialog');
+await modal.getByRole('button', { name: 'Cancel' }).click();
+```
+
+## Complete E-Sign Modal Page Object
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// components/ESignModal.ts
+import { Page, Locator } from '@playwright/test';
+
+export class ESignModal {
+  private readonly dialog: Locator;
+  
+  // Locators scoped to the dialog
+  readonly title: Locator;
+  readonly reasonInput: Locator;
+  readonly passwordInput: Locator;
+  readonly commentInput: Locator;
+  readonly signButton: Locator;
+  readonly cancelButton: Locator;
+  readonly errorMessage: Locator;
+  readonly successState: Locator;
+
+  constructor(page: Page) {
+    this.dialog = page.getByRole('dialog', { name: 'Electronic Signature' });
+    
+    this.title = this.dialog.getByRole('heading');
+    this.reasonInput = this.dialog.getByLabel('Reason for Signing');
+    this.passwordInput = this.dialog.getByLabel('Password');
+    this.commentInput = this.dialog.getByLabel('Additional Comment');
+    this.signButton = this.dialog.getByRole('button', { name: 'Sign Document' });
+    this.cancelButton = this.dialog.getByRole('button', { name: 'Cancel' });
+    this.errorMessage = this.dialog.getByRole('alert');
+    this.successState = this.dialog.getByRole('img', { name: 'Success' });
+  }
+
+  async waitForOpen() {
+    await expect(this.dialog).toBeVisible();
+    await expect(this.title).toContainText('Electronic Signature');
+  }
+
+  async fill(options: { reason: string; password: string; comment?: string }) {
+    await this.reasonInput.fill(options.reason);
+    await this.passwordInput.fill(options.password);
+    if (options.comment) {
+      await this.commentInput.fill(options.comment);
+    }
+  }
+
+  async sign(options: { reason: string; password: string; comment?: string }) {
+    await this.waitForOpen();
+    await this.fill(options);
+    await this.signButton.click();
+  }
+
+  async cancel() {
+    await this.cancelButton.click();
+    await expect(this.dialog).toBeHidden();
+  }
+
+  async expectError(message: string) {
+    await expect(this.errorMessage).toBeVisible();
+    await expect(this.errorMessage).toContainText(message);
+  }
+}
+```
+
+## Multi-Step Modal Workflow
+
+Some workflows involve multiple sequential modals. Handle them in order:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('two-approver workflow for regulatory SOPs', async ({ page, eSignModal }) => {
+  await page.goto('/documents/SOP-REG-001');
+  
+  // STEP 1: First approver signs
+  await page.getByRole('button', { name: 'Approve' }).click();
+  await eSignModal.sign({
+    reason: 'Section owner approval',
+    password: process.env.REVIEWER_PASS!
+  });
+  await expect(page.getByTestId('approval-status-1')).toContainText('Approved');
+  
+  // STEP 2: Second approver signs (modal appears again)
+  await page.getByRole('button', { name: 'Final Approve' }).click();
+  await eSignModal.sign({
+    reason: 'QA Lead final approval',
+    password: process.env.QA_LEAD_PASS!
+  });
+  await expect(page.getByTestId('approval-status-2')).toContainText('Approved');
+  
+  // STEP 3: Document is now fully approved
+  await expect(page.getByRole('status')).toContainText('Approved');
+});
+```
+
+## Handling Browser Native Dialogs (`alert`, `confirm`, `prompt`)
+
+Browser native dialogs are different from HTML modals. They're triggered by `alert()`, `confirm()`, and `prompt()` in JavaScript.
+
+```typescript
+// Handle a window.confirm() dialog BEFORE clicking the button that triggers it
+page.on('dialog', async (dialog) => {
+  console.log(`Dialog type: ${dialog.type()}`);
+  console.log(`Dialog message: ${dialog.message()}`);
+  
+  // Accept the dialog (click OK / Confirm)
+  await dialog.accept();
+  
+  // OR: Dismiss it (click Cancel)
+  // await dialog.dismiss();
+  
+  // OR: For prompt dialogs, provide a value
+  // await dialog.accept('my input value');
+});
+
+// Now trigger the action that shows the dialog
+await page.getByRole('button', { name: 'Delete All' }).click();
+```
+
+## Preventing Animation Interference
+
+CSS animations can cause `element not visible` errors if they're playing. Disable them in your base setup:
+
+```typescript
+// In your baseTest.ts beforeEach or global setup
+await page.addStyleTag({ 
+  content: `*, *::before, *::after {
+    animation-duration: 0ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0ms !important;
+    transition-delay: 0ms !important;
+  }` 
+});
+```
+
+<CodeEditor
+  moduleId="73-esign-modal"
+  taskIndex={0}
+  placeholder="// Task: Write a test that opens an E-Sign modal and then CANCELS it.&#10;// Requirements:&#10;//   1. Click the 'Sign' button to open the modal&#10;//   2. Assert the modal dialog is visible&#10;//   3. Click the 'Cancel' button inside the modal&#10;//   4. Assert the modal is now hidden&#10;//&#10;// Hint: Use getByRole('dialog') to scope interactions within the modal"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+await page.getByRole('button', { name: 'Sign' }).click();
+const modal = page.getByRole('dialog', { name: 'Electronic Signature' });
+await expect(modal).toBeVisible();
+await modal.getByRole('button', { name: 'Cancel' }).click();
+await expect(modal).toBeHidden();
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="73-esign-modal"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<Quiz moduleId="esign-modal" />
+

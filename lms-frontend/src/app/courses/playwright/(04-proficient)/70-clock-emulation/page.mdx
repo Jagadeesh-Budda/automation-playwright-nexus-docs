@@ -1,0 +1,355 @@
+﻿# 14.8: Clock & Device Emulation
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Use Clock API and device emulation for edge case testing
+
+## Clock API — Controlling Time
+
+Playwright's Clock API lets you **freeze, advance, and manipulate time** inside the browser. Perfect for testing countdowns, session timeouts, scheduled events, and time-dependent UI.
+
+### Installing a Fake Clock
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('session timeout shows warning after 25 minutes', async ({ page }) => {
+  // Install fake clock — freezes Date.now(), setTimeout, setInterval
+  await page.clock.install({ time: new Date('2024-06-15T10:00:00') });
+  
+  await page.goto('/dashboard');
+  
+  // Fast-forward 25 minutes
+  await page.clock.fastForward('25:00');
+  
+  // Session timeout warning should appear
+  await expect(page.getByRole('alert')).toContainText('Session expires in 5 minutes');
+});
+```
+
+### Clock Methods
+
+```typescript
+// Install with a specific start time
+await page.clock.install({ time: new Date('2024-01-15T09:00:00Z') });
+
+// Fast-forward by duration
+await page.clock.fastForward('05:00');      // 5 minutes
+await page.clock.fastForward(30_000);       // 30 seconds (milliseconds)
+
+// Jump to a specific time (skips timers — doesn't fire them)
+await page.clock.setFixedTime(new Date('2024-01-15T17:00:00Z'));
+
+// Set system time without affecting timers
+await page.clock.setSystemTime(new Date('2024-12-31T23:59:50Z'));
+
+// Resume real-time behavior
+await page.clock.resume();
+
+// Advance by ticks (fires timers that would have triggered)
+await page.clock.runFor(5000);  // Advance 5 seconds, firing all timers
+```
+
+### Testing a Countdown Timer
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('countdown timer reaches zero', async ({ page }) => {
+  await page.clock.install({ time: new Date('2024-06-15T10:00:00') });
+  
+  await page.goto('/exam');
+  await expect(page.getByTestId('timer')).toContainText('30:00');
+  
+  // Fast-forward 15 minutes
+  await page.clock.fastForward('15:00');
+  await expect(page.getByTestId('timer')).toContainText('15:00');
+  
+  // Fast-forward to the end
+  await page.clock.fastForward('15:00');
+  await expect(page.getByTestId('timer')).toContainText('00:00');
+  await expect(page.getByText('Time expired')).toBeVisible();
+});
+```
+
+### Testing Date-Dependent UI
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('shows New Year banner on December 31st', async ({ page }) => {
+  await page.clock.install({ time: new Date('2024-12-31T23:59:50Z') });
+  
+  await page.goto('/dashboard');
+  await expect(page.getByText('New Year')).not.toBeVisible();
+  
+  // Cross midnight
+  await page.clock.fastForward('00:15');
+  await expect(page.getByText('Happy New Year 2025!')).toBeVisible();
+});
+```
+
+---
+
+## Device Emulation
+
+Playwright can emulate mobile devices, tablets, specific viewports, and system preferences.
+
+### Viewport Emulation
+
+```typescript
+// playwright.config.ts
+import { devices } from '@playwright/test';
+
+export default defineConfig({
+  projects: [
+    { name: 'Desktop', use: { viewport: { width: 1920, height: 1080 } } },
+    { name: 'Tablet', use: { ...devices['iPad Pro 11'] } },
+    { name: 'Mobile', use: { ...devices['iPhone 14'] } },
+  ],
+});
+```
+
+### Per-Test Viewport Override
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('responsive layout collapses navbar on mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 375, height: 812 });
+  await page.goto('/dashboard');
+  
+  // Desktop nav should be hidden
+  await expect(page.getByRole('navigation', { name: 'Main' })).toBeHidden();
+  
+  // Hamburger menu should be visible
+  await expect(page.getByRole('button', { name: 'Menu' })).toBeVisible();
+});
+```
+
+### Geolocation Emulation
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('shows nearest office based on location', async ({ page, context }) => {
+  // Grant geolocation permission
+  await context.grantPermissions(['geolocation']);
+  
+  // Set geolocation to New York
+  await context.setGeolocation({ latitude: 40.7128, longitude: -74.0060 });
+  
+  await page.goto('/offices');
+  await expect(page.getByText('New York Office')).toBeVisible();
+  
+  // Move to London
+  await context.setGeolocation({ latitude: 51.5074, longitude: -0.1278 });
+  await page.reload();
+  await expect(page.getByText('London Office')).toBeVisible();
+});
+```
+
+### Color Scheme (Dark Mode)
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('dark mode renders correctly', async ({ page }) => {
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await page.goto('/dashboard');
+  
+  // Verify dark mode styling
+  const bgColor = await page.evaluate(() =>
+    getComputedStyle(document.body).backgroundColor
+  );
+  expect(bgColor).toBe('rgb(18, 18, 18)');  // Dark background
+  
+  // Switch to light mode
+  await page.emulateMedia({ colorScheme: 'light' });
+  const lightBg = await page.evaluate(() =>
+    getComputedStyle(document.body).backgroundColor
+  );
+  expect(lightBg).toBe('rgb(255, 255, 255)');
+});
+```
+
+### Reduced Motion
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('respects prefers-reduced-motion', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/dashboard');
+  
+  // Animations should be disabled
+  const animationDuration = await page.evaluate(() =>
+    getComputedStyle(document.querySelector('.animated-card')!).animationDuration
+  );
+  expect(animationDuration).toBe('0s');
+});
+```
+
+### Offline Mode
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('app works offline after initial load', async ({ page, context }) => {
+  await page.goto('/dashboard');
+  await expect(page.getByRole('heading')).toBeVisible();
+  
+  // Go offline
+  await context.setOffline(true);
+  
+  // Try to navigate — should show cached content or offline message
+  await page.getByRole('link', { name: 'Documents' }).click();
+  await expect(page.getByText(/offline|cached/i)).toBeVisible();
+  
+  // Go back online
+  await context.setOffline(false);
+  await page.reload();
+  await expect(page.getByRole('heading')).toBeVisible();
+});
+```
+
+### Locale and Timezone
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('displays dates in German format', async ({ browser }) => {
+  const context = await browser.newContext({
+    locale: 'de-DE',
+    timezoneId: 'Europe/Berlin',
+  });
+  
+  const page = await context.newPage();
+  await page.goto('/documents');
+  
+  // German date format: DD.MM.YYYY
+  await expect(page.getByTestId('created-date')).toContainText(/\d{2}\.\d{2}\.\d{4}/);
+  
+  await context.close();
+});
+```
+
+### Permission Emulation
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('camera permission dialog', async ({ page, context }) => {
+  // Grant camera permission
+  await context.grantPermissions(['camera', 'microphone']);
+  
+  await page.goto('/video-call');
+  // Camera should start without permission prompt
+  await expect(page.getByTestId('video-feed')).toBeVisible();
+  
+  // Revoke and test denied state
+  await context.clearPermissions();
+  await page.reload();
+  await expect(page.getByText('Camera access required')).toBeVisible();
+});
+```
+
+## Combining Clock + Emulation
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('session expires at 5pm in user timezone', async ({ browser }) => {
+  const context = await browser.newContext({
+    timezoneId: 'America/New_York',
+  });
+  const page = await context.newPage();
+  
+  await page.clock.install({ time: new Date('2024-06-15T16:55:00-04:00') });
+  await page.goto('/dashboard');
+  
+  // Fast-forward to 5pm
+  await page.clock.fastForward('05:00');
+  await expect(page.getByText('Session ended. Office hours are 9am-5pm EST.')).toBeVisible();
+  
+  await context.close();
+});
+```
+
+<CodeEditor
+  moduleId="70-clock-emulation"
+  taskIndex={0}
+  placeholder="// Task: Test a 30-minute session timeout WITHOUT waiting 30 real minutes.&#10;// Requirements:&#10;//   1. Install a fake clock set to a specific date/time&#10;//   2. Navigate to the dashboard&#10;//   3. Fast-forward time by 30 minutes&#10;//   4. Assert that a 'Session expired' message appears&#10;//&#10;// Hint: Use page.clock.install() and page.clock.fastForward()"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+await page.clock.install({ time: new Date('2024-01-15T10:00:00') });
+await page.goto('/dashboard');
+await page.clock.fastForward('30:00');
+await expect(page.getByText('Session expired')).toBeVisible();
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="70-clock-emulation"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('clock emulation', async ({ page }) => {
+  // Challenge: Install a fake clock and fast-forward 30 minutes to verify session timeout
+  // Complete the emulation calls below:
+});`}
+/>
+<Quiz moduleId="clock-emulation" />
+

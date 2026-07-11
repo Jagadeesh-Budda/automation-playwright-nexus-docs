@@ -1,0 +1,173 @@
+﻿
+# 4.2: Your First Page Object
+
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Complete 4.2: Your First Page Object
+
+## Dissecting a Real Page Object
+
+Before you write your own, let's look at how a professional Page Object is structured. Click the **Beginner Walkthrough** button to explore the `LoginPage` class line-by-line.
+
+<CodeExplainer preset="login-page-ts" />
+
+## Hands-On: Building the Page Object
+
+Now it's your turn. We are going to build a Page Object for the Playwright Search feature.
+
+**Step 1:** In your project folder, create a new directory called `pages`.
+
+```bash
+mkdir pages
+```
+
+**Step 2:** Inside the `pages` directory, create a file called `SearchPage.ts`.
+
+**Step 3:** Write the Page Object class. Follow the pattern:
+1. Export the class.
+2. Declare the properties.
+3. Write the constructor.
+4. Write the action methods.
+
+```typescript
+// pages/SearchPage.ts
+import { Page, Locator } from '@playwright/test';
+
+export class SearchPage {
+  readonly searchButton: Locator;
+  readonly searchInput: Locator;
+  readonly searchResults: Locator;
+
+  constructor(private readonly page: Page) {
+    // The search button on the top nav bar
+    this.searchButton = this.page.getByRole('button', { name: 'Search' });
+    
+    // The actual input box that appears in the modal
+    this.searchInput = this.page.getByPlaceholder('Search docs');
+    
+    // The list of results
+    this.searchResults = this.page.locator('.DocSearch-Hit');
+  }
+
+  async searchFor(term: string) {
+    await this.searchButton.click();
+    await this.searchInput.fill(term);
+    
+    // Wait for at least one result to be visible before finishing the action
+    await this.searchResults.first().waitFor({ state: 'visible' });
+  }
+}
+```
+
+> [!TIP]
+> Notice the `.waitFor()` at the end of the method? This is a pro-tip. Action methods should often wait until the action has actually "settled" before returning. This prevents the test from rushing ahead too quickly.
+
+## Hands-On: Using the Page Object
+
+**Step 4:** Create a new test file: `tests/search.spec.ts`.
+
+**Step 5:** Import your Page Object and use it!
+
+```typescript
+// tests/search.spec.ts
+import { test, expect } from '@playwright/test';
+import { SearchPage } from '../pages/SearchPage';
+
+test('user can search for locators', async ({ page }) => {
+  // 1. Initialize the Page Object
+  const searchPage = new SearchPage(page);
+
+  // 2. Navigate
+  await page.goto('https://playwright.dev');
+
+  // 3. Perform the action
+  await searchPage.searchFor('locators');
+
+  // 4. Assert the result
+  // We expect the first search result to contain the word "Locators"
+  await expect(searchPage.searchResults.first()).toContainText('Locators');
+});
+```
+
+Run your test! 
+
+```bash
+npx playwright test tests/search.spec.ts --headed
+```
+
+If it passes, congratulations! You have successfully implemented the Page Object Model.
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="25-first-pom"
+  taskIndex={0}
+  placeholder="// Challenge: Implement the workflow\n// Write your code here:"
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="25-first-pom" />
+
+
+export const astRules = [
+  {
+    type: "ast_node",
+    value: "ClassDeclaration",
+    message: "You must declare a class to implement the Page Object Model."
+  }
+];

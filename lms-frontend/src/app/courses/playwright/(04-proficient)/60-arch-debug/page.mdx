@@ -1,0 +1,236 @@
+﻿# 12.3: Finding Leaky Abstractions
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Detect UI logic bleeding into test specs
+
+## Architectural Debt: How It Accumulates
+
+Architectural violations start small. An engineer is in a hurry and puts a selector directly in a test file. Another engineer copies that pattern. Six months later, the test suite is unmaintainable.
+
+The AST Auditor prevents this by catching violations automatically. But you still need to understand how to recognize and fix them manually.
+
+## Red Flag: Selectors in Test Files
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ VIOLATION — locators in spec file
+test('admin deletes a document', async ({ page }) => {
+  // These locators belong in DocumentPage.ts
+  await page.getByRole('row').filter({ hasText: 'DOC-001' })
+    .getByRole('button', { name: 'Delete' })
+    .click();
+    
+  await page.getByRole('button', { name: 'Confirm' }).click();
+  await expect(page.getByText('Document deleted')).toBeVisible();
+});
+```
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ✅ CORRECT — locators extracted to Page Object
+test('admin deletes a document', async ({ documentPage }) => {
+  await documentPage.deleteDocument('DOC-001');
+  await expect(documentPage.deletionSuccessMessage).toBeVisible();
+});
+```
+
+## Red Flag: Test Logic in Page Objects
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ VIOLATION — assertion in Page Object
+export class DocumentPage {
+  async approveDocument(docId: string) {
+    await this.getActionButton(docId, 'Approve').click();
+    
+    // DON'T put expect() in a Page Object!
+    await expect(this.getStatusBadge(docId)).toContainText('Approved'); // Wrong!
+  }
+}
+```
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ✅ CORRECT — assertion stays in the test
+export class DocumentPage {
+  async approveDocument(docId: string) {
+    await this.getActionButton(docId, 'Approve').click();
+    await this.modal.confirm();
+    // No assertion here — return a value if needed
+  }
+}
+
+// In the test:
+await documentPage.approveDocument('DOC-001');
+await expect(documentPage.getStatusBadge('DOC-001')).toContainText('Approved');
+```
+
+## Red Flag: Layer Leaking
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ VIOLATION — test imports a component directly (skips Page Object layer)
+import { Modal } from '../../components/Modal';
+
+test('modal closes on cancel', async ({ page }) => {
+  const modal = new Modal(page);  // Shouldn't create components directly in tests!
+  await modal.cancel();
+});
+```
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ✅ CORRECT — access components through the Page Object
+test('modal closes on cancel', async ({ documentPage }) => {
+  await documentPage.deleteButton.click();
+  await documentPage.modal.cancel();
+  await expect(documentPage.documentRow).toBeVisible();
+});
+```
+
+## Debugging Architecture with the AST Auditor
+
+```bash
+# Check a specific file for violations
+npx ts-node utils/ast-auditor.ts --path=tests/admin/delete.spec.ts
+
+# Check the entire test directory
+npx ts-node utils/ast-auditor.ts --path=tests/
+
+# Output when a violation is found:
+# ❌ Gate 4 FAILED: page.locator() call found in spec file
+#    File: tests/admin/delete.spec.ts
+#    Line: 8
+#    Code: await page.getByRole('button', { name: 'Delete' }).click();
+```
+
+## Refactoring Pattern: Extract and Delegate
+
+When you find a violation, the fix is always the same pattern:
+
+1. **Identify** the UI interaction in the test
+2. **Create a method** in the Page Object that wraps it
+3. **Replace** the raw interaction in the test with the Page Object method
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Before: Test has too much knowledge
+test('search filters results', async ({ page }) => {
+  await page.getByRole('searchbox').fill('Clinical');
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('progressbar')).toBeHidden();
+  const count = await page.getByRole('row').count();
+  expect(count).toBeLessThan(10);
+});
+
+// After: Properly delegated
+// Page Object:
+async searchDocuments(query: string) {
+  await this.searchBox.fill(query);
+  await this.page.keyboard.press('Enter');
+  await expect(this.loadingSpinner).toBeHidden();
+}
+
+// Test:
+test('search filters results', async ({ documentPage }) => {
+  await documentPage.searchDocuments('Clinical');
+  await expect(documentPage.tableRows).not.toHaveCount(0);
+});
+```
+
+<CodeEditor
+  moduleId="60-arch-debug"
+  taskIndex={0}
+  placeholder="// Task: Refactor the test below so that NO locators appear in the spec file.&#10;// Move the interaction into a Page Object method.&#10;//&#10;// CURRENT TEST (with locator in spec — anti-pattern):&#10;//   test('clicks delete', async ({ page }) => {&#10;//     await page.getByRole('button', { name: 'Delete' }).click();&#10;//   });&#10;//&#10;// Write BOTH:&#10;//   1. The Page Object method&#10;//   2. The refactored test using a fixture"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// In Page Object:
+async clickDelete() {
+  await this.page.getByRole('button', { name: 'Delete' }).click();
+}
+
+// In test:
+test('clicks delete', async ({ documentPage }) => {
+  await documentPage.clickDelete();
+});
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="60-arch-debug"
+  taskIndex={1}
+  placeholder={`# Challenge: Complete the command line task
+# Write the correct command below:
+`}
+/>
+<Quiz moduleId="arch-debug" />
+
+
+
+export const astRules = [
+  {
+    type: "ast_forbidden_callee",
+    value: "page.waitForTimeout",
+    message: "Use auto-retrying assertions or web-first locators instead of hardcoded waits."
+  }
+];

@@ -1,0 +1,201 @@
+﻿## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Achieve 0 Critical Violations
+
+## The Peer Review Checklist
+
+Before submitting your Capstone for review, go through this checklist yourself first. This is what a senior engineer will verify:
+
+## Architectural Audit
+
+```bash
+# 23.4: The Final Quality Gate
+ls tests/ pages/ components/ entities/
+
+# 2. Check that NO test file imports a Page Object directly (must use fixtures)
+grep -r "new LoginPage\|new DocumentPage\|new ESignPage" tests/
+# Expected output: (nothing)
+
+# 3. Check that NO spec file contains page.locator() calls
+grep -r "page\.locator\|page\.getByRole\|page\.getByText" tests/
+# Expected output: (nothing — all locators should be in pages/)
+
+# 4. Verify every spec file imports from fixtures/baseTest, not @playwright/test
+grep -r "from '@playwright/test'" tests/
+# Expected output: (nothing in spec files)
+grep -r "from '.*fixtures/baseTest'" tests/
+# Expected output: all spec files
+```
+
+## AST Quality Gate Audit
+
+```bash
+# Run the full AST audit
+npx ts-node scripts/ast-audit.ts
+
+# Expected output when passing:
+# 🔍 Running AST Audit...
+# 
+# ✅ Gate 1: No hardcoded sleeps — PASSED (0 violations)
+# ✅ Gate 2: No hardcoded credentials — PASSED (0 violations)
+# ✅ Gate 3: All async operations awaited — PASSED (0 violations)
+# ✅ Gate 4: No locators in spec files — PASSED (0 violations)
+# ✅ Gate 5: All tests have describe blocks — PASSED (0 violations)
+# 
+# ✅ AST Audit passed! All 5 gates cleared.
+```
+
+## Test Quality Audit
+
+Check each test against these quality criteria:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// For each test, verify:
+
+// ✅ 1. Has a describe block
+test.describe('Module Name', () => { ... });
+
+// ✅ 2. Has a clear, readable name
+test('admin can upload and submit a Protocol document', async () => { ... });
+
+// ✅ 3. Follows AAA pattern
+test('example', async ({ documentPage }) => {
+  // Arrange
+  const doc = DocumentFactory({ type: 'Protocol' });
+  
+  // Act
+  const id = await documentPage.createDocument(doc);
+  
+  // Assert
+  await expect(documentPage.getStatusBadge(id)).toContainText('Draft');
+});
+
+// ✅ 4. Cleans up after itself
+test.afterEach(async ({ apiClient }) => {
+  if (testDocId) await apiClient.delete(testDocId);
+});
+
+// ✅ 5. Does NOT depend on other tests' data
+// Every test creates its own data
+```
+
+## Coverage Audit
+
+Verify you have tests for all critical paths:
+
+| Feature | Happy Path ✅ | Error Path ✅ | Security ✅ |
+|---------|-------------|-------------|------------|
+| Login | ✅ Valid login | ✅ Wrong password | ✅ Role-based access |
+| Document Upload | ✅ PDF upload | ✅ File too large | ✅ Unauthorized upload |
+| Review Workflow | ✅ Approve | ✅ Reject | ✅ Wrong role can't approve |
+| E-Sign | ✅ Valid signature | ✅ Wrong password | ✅ Can't re-sign |
+| API | ✅ CRUD operations | ✅ 404 / 403 | ✅ JWT token validation |
+
+## Performance Baseline
+
+Run the suite and record the baseline execution time:
+
+```bash
+# Run with JSON reporter to get exact timings
+npx playwright test --reporter=json > test-results.json
+
+# Check total duration
+cat test-results.json | jq '.stats.duration'
+```
+
+Your Capstone suite should complete in **under 5 minutes** when run with `workers: 4`.
+
+## Common Audit Failures and Fixes
+
+| Audit Failure | Fix |
+|---|---|
+| Locators found in spec files | Extract to Page Object |
+| `new PageObject()` in test | Use fixture |
+| `waitForTimeout` found | Replace with web-first assertion |
+| Test with no describe block | Wrap in `test.describe()` |
+| No cleanup in afterEach | Add `apiClient.delete(docId)` |
+
+<CodeEditor
+  moduleId="97-capstone-audit"
+  taskIndex={0}
+  placeholder="// Task: Write a COMPLETE 5-gate bash audit script.&#10;//&#10;// Each gate must output PASS or FAIL:&#10;//   Gate 1: No spec file imports from '@playwright/test' directly&#10;//   Gate 2: No waitForTimeout anywhere in tests/&#10;//   Gate 3: No page.locator() calls in spec files&#10;//   Gate 4: All spec files contain test.describe&#10;//   Gate 5: afterEach or afterAll cleanup present in every spec&#10;//&#10;// Use grep -r commands. Echo 'PASS' or 'FAIL' for each gate."
+/>
+
+<SolutionGate moduleId="97-capstone-audit">
+
+```bash
+grep -r "from '@playwright/test'" tests/
+# Expected output: (nothing — all spec files should import from fixtures/baseTest)
+```
+
+</SolutionGate>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="97-capstone-audit"
+  taskIndex={1}
+  placeholder={`# Challenge: Complete the command line task
+# Write the correct command below:
+`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+<Quiz moduleId="capstone-audit" />
+

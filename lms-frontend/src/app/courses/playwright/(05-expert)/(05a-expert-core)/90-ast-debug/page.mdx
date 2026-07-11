@@ -1,0 +1,204 @@
+﻿# 18.4: Analyzing Parsing Errors
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Resolve 'Unexpected Token' in audits
+
+## When Your AST Rules Produce False Positives
+
+A **false positive** is when the linter flags code as a violation, even though it's actually correct. This erodes trust in the linter and causes engineers to ignore it.
+
+## Debug Step 1: Visualize the AST
+
+Before writing an AST rule, always visualize the tree structure of the code you're targeting.
+
+```typescript
+import { parse } from '@typescript-eslint/typescript-estree';
+
+const code = `
+  await page.waitForTimeout(3000);
+`;
+
+const ast = parse(code, { loc: true, range: true });
+console.log(JSON.stringify(ast.body, null, 2));
+```
+
+**Online tool:** Use [AST Explorer](https://astexplorer.net/) to interactively visualize any code's AST tree. Select `@typescript-eslint/typescript-estree` as the parser.
+
+## Debug Step 2: Log Node Types During Walking
+
+```typescript
+function debugWalk(node: any, depth = 0): void {
+  if (!node || typeof node !== 'object' || !node.type) return;
+  
+  // Print the node type and relevant properties
+  const indent = '  '.repeat(depth);
+  const info = node.name ? ` (${node.name})` : 
+               node.value !== undefined ? ` (${node.value})` : '';
+  console.log(`${indent}${node.type}${info}`);
+  
+  for (const key of Object.keys(node)) {
+    if (['loc', 'range', 'parent'].includes(key)) continue;
+    if (Array.isArray(node[key])) {
+      node[key].forEach((child: any) => debugWalk(child, depth + 1));
+    } else if (typeof node[key] === 'object') {
+      debugWalk(node[key], depth + 1);
+    }
+  }
+}
+
+// Usage
+debugWalk(ast);
+```
+
+**Output for `await page.click('#btn')`:**
+```
+ExpressionStatement
+  AwaitExpression
+    CallExpression
+      MemberExpression
+        Identifier (page)
+        Identifier (click)
+      Literal (#btn)
+```
+
+## Debug Step 3: Unit Test Your Rules
+
+Write unit tests for your AST rules before deploying them:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// tests/unit/ast-rules.test.ts
+import { AstLinter, noHardcodedSleepRule } from '../../utils/AstLinter';
+
+function lint(code: string) {
+  const linter = new AstLinter().addRule(noHardcodedSleepRule);
+  // Parse the code string directly
+  return linter.lintCode(code, 'test.ts');
+}
+
+test('detects waitForTimeout violation', () => {
+  let violations = lint(`await page.waitForTimeout(3000);`);
+  expect(violations).toHaveLength(1);
+  expect(violations[0].rule).toBe('no-hardcoded-sleep');
+});
+
+test('does NOT flag waitForSelector (different method name)', () => {
+  let violations = lint(`await page.waitForSelector('#btn');`);
+  expect(violations).toHaveLength(0);
+});
+
+test('does NOT flag expect.toPass with polling', () => {
+  const violations = lint(`
+    await expect(async () => {
+      await expect(page.getByText('Done')).toBeVisible();
+    }).toPass({ timeout: 30000 });
+  `);
+  expect(violations).toHaveLength(0);
+});
+```
+
+## Common Rule Bugs and Fixes
+
+### Bug 1: Rule matches too broadly
+```typescript
+// ❌ Bug: Flags ANY call to waitForTimeout, even in helper files
+if (isMethodCall(node, 'waitForTimeout')) { ... }
+
+// ✅ Fix: Only flag in spec files, not utility files
+if (isMethodCall(node, 'waitForTimeout') && filePath.includes('.spec.')) { ... }
+```
+
+### Bug 2: Null reference in AST walking
+```typescript
+// ❌ Bug: node.callee might be null for some CallExpression types
+if (node.callee.property.name === 'waitForTimeout') { ... }  // TypeError!
+
+// ✅ Fix: Use optional chaining
+if (node.callee?.property?.name === 'waitForTimeout') { ... }
+```
+
+### Bug 3: Missing array iteration
+```typescript
+// ❌ Bug: Only walks the direct children, misses nested nodes
+function walk(node: any, visitor: Function) {
+  visitor(node);
+  for (const key of Object.keys(node)) {
+    walk(node[key], visitor);  // Doesn't handle arrays!
+  }
+}
+
+// ✅ Fix: Handle arrays and prevent circular parent references
+function walk(node: any, visitor: Function) {
+  if (!node || typeof node !== 'object') return;
+  visitor(node);
+  for (const key of Object.keys(node)) {
+    if (key === 'parent') continue; // Prevent circular stack overflow
+    if (Array.isArray(node[key])) {
+      node[key].forEach((child: any) => walk(child, visitor));  // ✅
+    } else {
+      walk(node[key], visitor);
+    }
+  }
+}
+```
+
+<CodeEditor
+  moduleId="90-ast-debug"
+  taskIndex={0}
+  placeholder="// Task: Write a UNIT TEST for the no-hardcoded-sleep AST rule.&#10;// Requirements:&#10;//   1. Feed the linter a string containing waitForTimeout&#10;//   2. Assert exactly 1 violation is detected&#10;//   3. Assert the violation's rule name is 'no-hardcoded-sleep'&#10;//&#10;// Hint: Call lint() with the code string, then check the violations array"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('detects waitForTimeout', () => {
+  const violations = lint('await page.waitForTimeout(3000);');
+  expect(violations).toHaveLength(1);
+  expect(violations[0].rule).toBe('no-hardcoded-sleep');
+});
+```
+
+</details>
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** You wrote an AST rule to ban `page.$eval`, but a developer points out a false positive: the linter is failing when they write `jQuery('.item').$eval()`, which is a different library!
+
+**Your Task:** Write a unit test that verifies your AST rule does NOT flag `$eval` if it's called on an object other than `page`.
+
+**Constraints:**
+- ❌ Do NOT parse `page.$eval` in this test
+- ✅ You MUST assert that the violations array is empty
+
+<CodeEditor
+  moduleId="90-ast-debug"
+  taskIndex={1}
+  placeholder={`# Challenge: Complete the command line task
+# Write the correct command below:
+`}
+/>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| AST Visualization | Seeing the tree makes writing rules 10x faster |
+| False Positives | Flagging correct code destroys trust in the linter |
+| Unit Testing Rules | Ensures your linter code is reliable before deployment |
+
+> [!TIP]
+> **Next Step:** Proceed to the AST Gate module to see how this integrates into a CI pipeline.
+
+<Quiz moduleId="ast-debug" />

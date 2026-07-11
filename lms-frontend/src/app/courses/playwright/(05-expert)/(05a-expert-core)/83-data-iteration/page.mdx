@@ -1,0 +1,267 @@
+﻿# 17.2: Iterating over Data Sets
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Master test.describe loop patterns
+
+## Iterating Over UI Data
+
+### Pattern 1: Count-Based Loop
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('all document rows have a valid ID format', async ({ page }) => {
+  await page.goto('/documents');
+  
+  const rows = page.getByRole('row').filter({ hasText: /DOC-/ });
+  const count = await rows.count();
+  
+  expect(count).toBeGreaterThan(0);
+  
+  for (let i = 0; i < count; i++) {
+    const idCell = rows.nth(i).getByTestId('doc-id');
+    const id = await idCell.textContent();
+    
+    // Every ID must match the format DOC-YYYY-NNNNN
+    expect(id?.trim()).toMatch(/^DOC-\d{4}-\d{5}$/);
+  }
+});
+```
+
+### Pattern 2: `allTextContents()` for Bulk Reading
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('all status badges show valid states', async ({ page }) => {
+  await page.goto('/documents');
+  
+  // Get ALL status badge texts at once (much faster than looping with textContent())
+  const statuses = await page.getByRole('status').allTextContents();
+  
+  const validStatuses = ['Draft', 'Pending Review', 'Approved', 'Rejected', 'Archived'];
+  
+  for (const status of statuses) {
+    expect(validStatuses).toContain(status.trim());
+  }
+});
+```
+
+### Pattern 3: `allInnerTexts()` for Table Columns
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('document version numbers are in ascending order', async ({ page }) => {
+  await page.goto('/documents?sort=version');
+  
+  // Get all version numbers as an array of strings
+  const versionTexts = await page
+    .getByRole('cell', { name: /^\d+\.\d+$/ })  // Cells that look like "1.0", "2.1"
+    .allInnerTexts();
+  
+  const versions = versionTexts.map(v => parseFloat(v));
+  
+  // Verify ascending order
+  for (let i = 1; i < versions.length; i++) {
+    expect(versions[i]).toBeGreaterThanOrEqual(versions[i - 1]);
+  }
+});
+```
+
+## Iterating Over API Response Data
+
+### Pattern 4: Validate Every Item in an API List
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('all documents in API response have required fields', async ({ request }) => {
+  const response = await request.get('/api/documents', {
+    params: { limit: 50 },
+    headers: { Authorization: `Bearer ${adminToken}` }
+  });
+  
+  const { data } = await response.json();
+  expect(data.length).toBeGreaterThan(0);
+  
+  for (const doc of data) {
+    // Every document must have these fields
+    expect(doc.id).toBeDefined();
+    expect(doc.id).toMatch(/^DOC-/);
+    expect(doc.title).toBeDefined();
+    expect(doc.title.length).toBeGreaterThan(0);
+    expect(['Draft', 'Pending Review', 'Approved', 'Rejected']).toContain(doc.status);
+    expect(doc.uploadedBy).toBeDefined();
+    expect(new Date(doc.uploadedAt).getTime()).not.toBeNaN();
+  }
+});
+```
+
+### Pattern 5: Cross-Reference API and UI Data
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('UI table matches API data exactly', async ({ request, page }) => {
+  // Get the data from the API
+  const apiResponse = await request.get('/api/documents?page=1&limit=10', {
+    headers: { Authorization: `Bearer ${adminToken}` }
+  });
+  const apiData = (await apiResponse.json()).data;
+
+  // Navigate to the UI
+  await page.goto('/documents?page=1');
+
+  // Compare each row
+  const uiRows = page.getByRole('row').filter({ hasText: /DOC-/ });
+  const uiCount = await uiRows.count();
+  
+  expect(uiCount).toBe(apiData.length);
+
+  for (let i = 0; i < uiCount; i++) {
+    const apiDoc = apiData[i];
+    const uiRow = uiRows.nth(i);
+    
+    await expect(uiRow.getByTestId('doc-id')).toHaveText(apiDoc.id);
+    await expect(uiRow.getByTestId('doc-title')).toContainText(apiDoc.title);
+    await expect(uiRow.getByRole('status')).toHaveText(apiDoc.status);
+  }
+});
+```
+
+## Parallel Data Iteration with `Promise.all`
+
+When you need to perform async operations on multiple items simultaneously:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('batch create and verify 5 documents', async ({ request }) => {
+  const headers = { Authorization: `Bearer ${adminToken}` };
+  
+  // Create 5 documents in parallel (not sequentially)
+  const createPromises = Array.from({ length: 5 }, (_, i) =>
+    request.post('/api/documents', {
+      data: { title: `Batch Test Document ${i + 1}`, type: 'Report', department: 'QA' },
+      headers,
+    }).then(r => r.json())
+  );
+  
+  const documents = await Promise.all(createPromises);
+  
+  expect(documents).toHaveLength(5);
+  
+  // Verify all were created
+  for (const doc of documents) {
+    expect(doc.id).toBeDefined();
+    expect(doc.status).toBe('Draft');
+  }
+  
+  // Cleanup in parallel
+  const deletePromises = documents.map(doc =>
+    request.delete(`/api/documents/${doc.id}`, { headers })
+  );
+  await Promise.all(deletePromises);
+});
+```
+
+<CodeEditor
+  moduleId="83-data-iteration"
+  taskIndex={0}
+  placeholder="// Task: Verify that every status badge on the page shows a valid status.&#10;// Requirements:&#10;//   1. Get ALL status badge text contents from the page&#10;//   2. Define an array of valid statuses: Draft, Pending Review, Approved, Rejected&#10;//   3. Loop through each badge text and assert it's in the valid list&#10;//&#10;// Hint: Use .allTextContents() to get an array of all matching texts"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+const statuses = await page.getByRole('status').allTextContents();
+const validStatuses = ['Draft', 'Pending Review', 'Approved', 'Rejected'];
+for (const status of statuses) {
+  expect(validStatuses).toContain(status.trim());
+}
+```
+
+</details>
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="83-data-iteration"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="data-iteration" />
+

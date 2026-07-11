@@ -1,0 +1,346 @@
+﻿# 14.7: Test Tags & Annotations
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Use @tags, test.skip(), test.fixme(), and test.slow()
+
+## Why Tags Matter
+
+In a suite of 500+ tests, you need to answer questions like:
+- "Run only smoke tests before deploying"
+- "Skip flaky tests in this CI run"
+- "Mark this test as slow so it gets more timeout"
+- "This test is broken — don't run it but don't delete it"
+
+Tags and annotations solve all of these.
+
+## Adding Tags to Tests
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Tag individual tests
+test('upload document @smoke @critical', async ({ documentPage }) => {
+  await documentPage.uploadFile('report.pdf');
+  await expect(documentPage.successBanner).toBeVisible();
+});
+
+test('export CSV @regression', async ({ documentPage }) => {
+  await documentPage.exportAsCSV();
+});
+
+test('visual comparison @visual @slow', async ({ page }) => {
+  await expect(page).toHaveScreenshot();
+});
+```
+
+### Tag entire describe blocks
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test.describe('Document CRUD @smoke', () => {
+  test('create document', async ({ documentPage }) => { /* ... */ });
+  test('read document', async ({ documentPage }) => { /* ... */ });
+  test('update document', async ({ documentPage }) => { /* ... */ });
+  test('delete document', async ({ documentPage }) => { /* ... */ });
+});
+```
+
+### Structured tags (Playwright v1.42+)
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('upload document', {
+  tag: ['@smoke', '@critical'],
+}, async ({ documentPage }) => {
+  // ...
+});
+
+test.describe('E-Sign Workflow', {
+  tag: '@compliance',
+}, () => {
+  test('sign document', async ({ eSignPage }) => { /* ... */ });
+  test('verify audit trail', async ({ auditPage }) => { /* ... */ });
+});
+```
+
+## Running Tagged Tests from CLI
+
+```bash
+# Run only smoke tests
+npx playwright test --grep @smoke
+
+# Run only critical tests
+npx playwright test --grep @critical
+
+# Run tests that are BOTH smoke AND critical
+npx playwright test --grep "(?=.*@smoke)(?=.*@critical)"
+
+# Run everything EXCEPT flaky tests
+npx playwright test --grep-invert @flaky
+
+# Run everything EXCEPT visual tests
+npx playwright test --grep-invert @visual
+
+# Combine: smoke tests on Chrome only
+npx playwright test --grep @smoke --project=Chrome
+```
+
+## `test.skip()` — Conditionally Skip Tests
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Skip unconditionally
+test.skip('feature not yet implemented', async ({ page }) => {
+  // This test is ignored entirely
+});
+
+// Skip based on a condition
+test('admin panel features', async ({ page, browserName }) => {
+  test.skip(browserName === 'firefox', 'Admin panel not supported on Firefox');
+  // Test only runs on Chromium and WebKit
+});
+
+// Skip based on environment
+test('production-only test', async ({ page }) => {
+  test.skip(!process.env.CI, 'Only runs in CI');
+});
+```
+
+## `test.fixme()` — Known Broken Tests
+
+Mark tests that are currently broken but shouldn't be deleted:
+
+```typescript
+test.fixme('document versioning shows diff', async ({ page }) => {
+  // Fix after JIRA-4521 is resolved
+  // This test is visible in reports as "fixme" but doesn't run
+});
+```
+
+The difference between `skip` and `fixme`:
+- `test.skip()` = "This test doesn't apply in this context"
+- `test.fixme()` = "This test is broken and needs fixing"
+
+## `test.slow()` — Extra Timeout for Heavy Tests
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('generate comprehensive compliance report', async ({ page }) => {
+  test.slow();  // Triples the test timeout (30s → 90s)
+  
+  await page.getByRole('button', { name: 'Generate Full Report' }).click();
+  await expect(page.getByText('Report ready')).toBeVisible({ timeout: 60_000 });
+});
+```
+
+## `test.fail()` — Expected Failure
+
+Mark a test that is **expected** to fail (passes when it fails, fails when it passes):
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('known bug: date picker resets on blur', async ({ page }) => {
+  test.fail();  // This test is expected to fail
+  
+  await page.getByLabel('Start Date').fill('2024-01-15');
+  await page.getByLabel('End Date').click();
+  
+  // Bug: the start date resets — this assertion currently fails
+  await expect(page.getByLabel('Start Date')).toHaveValue('2024-01-15');
+});
+```
+
+When the bug is fixed, the test will start "passing" — which means `test.fail()` will make it **fail**, reminding you to remove `test.fail()`.
+
+## `test.describe.skip()` and `test.describe.fixme()`
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Skip an entire group
+test.describe.skip('PDF Generation', () => {
+  test('generate PDF', async () => { /* ... */ });
+  test('validate PDF content', async () => { /* ... */ });
+});
+
+// Mark an entire group as broken
+test.describe.fixme('WebSocket Features', () => {
+  test('real-time updates', async () => { /* ... */ });
+  test('connection recovery', async () => { /* ... */ });
+});
+```
+
+## Custom Annotations with Metadata
+
+Attach metadata to tests for reporting and tracking:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('upload compliance document', {
+  tag: ['@smoke', '@compliance'],
+  annotation: [
+    { type: 'jira', description: 'https://jira.example.com/PROJ-123' },
+    { type: 'owner', description: 'QA Team' },
+    { type: 'severity', description: 'critical' },
+  ],
+}, async ({ documentPage }) => {
+  // ...
+});
+```
+
+### Runtime annotations
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('document search performance', async ({ page }, testInfo) => {
+  const startTime = Date.now();
+  
+  await page.goto('/documents');
+  await page.getByRole('searchbox').fill('Protocol');
+  await expect(page.getByRole('row').first()).toBeVisible();
+  
+  const duration = Date.now() - startTime;
+  
+  // Add annotation at runtime
+  testInfo.annotations.push({
+    type: 'performance',
+    description: `Search completed in ${duration}ms`,
+  });
+});
+```
+
+## Configuring Tags in `playwright.config.ts`
+
+```typescript
+// playwright.config.ts
+export default defineConfig({
+  // Only run @smoke tests by default
+  grep: /@smoke/,
+  
+  // Never run @flaky tests
+  grepInvert: /@flaky/,
+  
+  projects: [
+    {
+      name: 'smoke',
+      grep: /@smoke/,
+      retries: 0,
+    },
+    {
+      name: 'regression',
+      grep: /@regression/,
+      retries: 2,
+    },
+    {
+      name: 'all',
+      // No grep filter — runs everything
+    },
+  ],
+});
+```
+
+## Tagging Strategy for Enterprise Projects
+
+| Tag | Purpose | When to Run |
+|-----|---------|-------------|
+| `@smoke` | Core happy paths | Every PR, every deploy |
+| `@regression` | Full feature coverage | Nightly or weekly |
+| `@critical` | Business-critical flows | Every PR |
+| `@visual` | Screenshot comparisons | Nightly (slower, flakier) |
+| `@compliance` | Regulatory requirement tests | Before releases |
+| `@flaky` | Known unstable tests | Excluded from CI, fixed periodically |
+| `@slow` | Long-running tests | Nightly only |
+| `@api` | API-only tests (no browser) | Every PR (fast) |
+
+<CodeEditor
+  moduleId="69-tags-annotations"
+  taskIndex={0}
+  placeholder="// Task: Write a test with the following requirements:&#10;//   1. Tag the test with @smoke and @critical in the test name&#10;//   2. Skip the test on Firefox with a descriptive message&#10;//   3. Add the test logic placeholder&#10;//&#10;// Hint: Use test.skip(condition, message) inside the test body"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('upload document @smoke @critical', async ({ page, browserName }) => {
+  test.skip(browserName === 'firefox', 'Not supported on Firefox');
+  // test logic here...
+});
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="69-tags-annotations"
+  taskIndex={1}
+  placeholder={`import { test, expect } from '@playwright/test';
+
+test('challenge exercise', async ({ page }) => {
+  // Challenge: Refactor this code to follow industry best practices
+  // 1. Avoid hardcoded sleeps (waitForTimeout)
+  // 2. Use web-first assertions (expect().toBeVisible)
+  // 3. Ensure all asynchronous calls are properly awaited
+  
+  page.goto('https://example.com');
+  await page.waitForTimeout(2000);
+  const element = page.locator('.submit-btn');
+  element.click();
+});`}
+/>
+<Quiz moduleId="tags-annotations" />
+

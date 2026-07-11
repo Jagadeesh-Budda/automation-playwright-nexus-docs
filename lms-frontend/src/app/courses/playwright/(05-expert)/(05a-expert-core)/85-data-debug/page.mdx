@@ -1,0 +1,214 @@
+﻿# 17.4: Handling Partial Failures
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Identify problematic data rows in CI
+
+## The "Data State Problem"
+
+The most common source of mysterious, intermittent test failures is **data state**. A test fails not because the code is wrong, but because the test data is in an unexpected state.
+
+## Problem 1: Stale Data From a Previous Run
+
+**Symptom:** A test that creates a unique document fails with "Document already exists".
+
+**Root cause:** A previous test run crashed before the cleanup step, leaving orphaned data in the database.
+
+**Fix: Add a pre-test cleanup step:**
+```typescript
+test.beforeEach(async ({ apiClient }) => {
+  // Clean up any leftover test data before the test starts
+  const existing = await apiClient.findByTitle('My Test Document');
+  if (existing) {
+    await apiClient.delete(existing.id);
+  }
+});
+
+// OR: Use unique timestamps to make every test's data unique
+const title = `Test Document ${Date.now()}`;
+```
+
+## Problem 2: Tests Sharing Mutable State
+
+**Symptom:** Tests pass when run individually but fail when run together.
+
+**Root cause:** Two tests share the same database record. Test A changes it, breaking Test B's expectations.
+
+**Fix: Each test owns its own data:**
+```typescript
+import { test, expect } from '@playwright/test';
+
+// ❌ Tests share the same document ID
+const SHARED_DOC_ID = 'DOC-TEST-001';
+
+test('can view document', async ({ documentPage }) => {
+  await documentPage.navigateTo(SHARED_DOC_ID);
+  // ...
+});
+
+test('can delete document', async ({ documentPage }) => {
+  await documentPage.delete(SHARED_DOC_ID);  // Deletes the document Test 1 needs!
+  // ...
+});
+
+// ✅ Each test creates its own data
+test('can view document', async ({ documentPage }) => {
+  const id = await documentPage.createDocument({ title: 'View Test' });
+  await documentPage.navigateTo(id);
+  // ...
+});
+```
+
+## Problem 3: Missing Test Fixtures
+
+**Symptom:** Test fails with "404 Not Found" when trying to navigate to a document.
+
+**Root cause:** The test assumes a document exists (created in a `beforeAll`) but the `beforeAll` failed.
+
+**Fix: Always verify setup succeeded using a beforeEach hook with a run-once guard:**
+```typescript
+import { test, expect } from '@playwright/test';
+
+let sharedDocId: string;
+
+test.beforeEach(async ({ documentPage }) => {
+  // Run-once guard to prevent recreation on subsequent tests
+  if (sharedDocId) return;
+
+  sharedDocId = await documentPage.createDocument({ title: 'Shared Doc' });
+  
+  // Explicitly verify the document was created
+  expect(sharedDocId).toBeDefined();
+  expect(sharedDocId).toMatch(/^DOC-/);
+});
+```
+
+## Problem 4: Race Condition in Parallel Data Creation
+
+**Symptom:** When running parallel tests, document counts are wrong.
+
+**Root cause:** Two tests both create a document at the same millisecond, generating the same "unique" ID or the same timestamp-based title.
+
+**Fix: Use true uniqueness:**
+```typescript
+import { randomUUID } from 'crypto';
+
+// ✅ UUID is guaranteed unique across parallel workers
+const title1 = `Test-${randomUUID()}`;
+
+// ✅ Or use a combination of worker ID + timestamp via environment variables
+const title2 = `Test-${process.env.TEST_WORKER_INDEX}-${Date.now()}`;
+```
+
+## Debugging Data Issues
+
+### Log the actual API response
+```typescript
+import { test, expect } from '@playwright/test';
+
+const response = await request.post('/api/documents', { data: payload });
+const body = await response.json();
+
+// Log the full response when something seems wrong
+console.log('Create response:', JSON.stringify(body, null, 2));
+
+expect(response.status()).toBe(201);
+```
+
+### Use `test.info()` to add diagnostic data
+```typescript
+test.afterEach(async ({}, testInfo) => {
+  if (testInfo.status === 'failed') {
+    // Attach diagnostic data to the HTML report
+    testInfo.attach('created-document-id', {
+      body: testDocId ?? 'Not created',
+      contentType: 'text/plain'
+    });
+  }
+});
+```
+
+### Inspect the database directly
+```typescript
+// In your test, query the DB directly to verify the state
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+const doc = await prisma.document.findUnique({ where: { id: docId } });
+console.log('DB record:', doc);  // Is the data what you expect?
+await prisma.$disconnect();
+```
+
+<CodeEditor
+  moduleId="85-data-debug"
+  taskIndex={0}
+  placeholder="// Task: Create a document with a UNIQUE title to prevent data conflicts in parallel runs.&#10;// Requirements:&#10;//   1. Generate a unique title using a timestamp&#10;//   2. Create a document with that title and type 'Report'&#10;//   3. Assert the returned document ID is defined&#10;//&#10;// Why: If two parallel workers use the same title, the DB may reject duplicates"
+/>
+
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+const title = `Test Document ${Date.now()}`;
+const docId = await documentPage.createDocument({ title, type: 'Report' });
+expect(docId).toBeDefined();
+```
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+---
+
+## Common Mistakes
+
+> [!WARNING]
+> **Mistake 1: Brittle Implementation**  
+> **Wrong:** Tightly coupling test data with page interactions.  
+> **Correct:** Abstracting data and logic appropriately.  
+> **Why:** Prevents tests from breaking when minor details change.
+
+> [!WARNING]
+> **Mistake 2: Missing Synchronization**  
+> **Wrong:** Relying on implicit speeds or hardcoded sleeps.  
+> **Correct:** Using web-first assertions for synchronization.  
+> **Why:** Guarantees deterministic execution regardless of environment speed.
+
+---
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="85-data-debug"
+  taskIndex={1}
+  placeholder={`# Challenge: Complete the command line task
+# Write the correct command below:
+`}
+/>
+<Quiz moduleId="data-debug" />
+

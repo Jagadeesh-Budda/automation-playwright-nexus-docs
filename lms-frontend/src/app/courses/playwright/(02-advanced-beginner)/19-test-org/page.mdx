@@ -1,0 +1,157 @@
+﻿
+# 3.1: Test Organization
+
+
+## Learning Objectives
+
+By the end of this lesson, you will be able to:
+- Complete 3.1: Test Organization
+
+## Moving Beyond a Single Test
+
+Up until now, you've written one test per file. But an enterprise application will have hundreds or thousands of tests. You can't put them all in `my-first.spec.ts`.
+
+How should you organize them?
+
+### 1. Multiple Tests in One File
+
+A test file (a "spec" file) usually maps to a specific feature or page in your application. For example, `login.spec.ts` might contain several tests related to logging in:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+// Test 1: Happy path
+test('valid credentials succeed', async ({ page }) => {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill('admin@example.com');
+  await page.getByLabel('Password').fill('secret123');
+  await page.getByRole('button', { name: 'Sign In' }).click();
+  await expect(page).toHaveURL('/dashboard');
+});
+
+// Test 2: Sad path
+test('invalid credentials show error', async ({ page }) => {
+  await page.goto('/login');
+  await page.getByLabel('Email').fill('admin@example.com');
+  await page.getByLabel('Password').fill('WRONG');
+  await page.getByRole('button', { name: 'Sign In' }).click();
+  await expect(page.getByText('Invalid username or password')).toBeVisible();
+});
+```
+
+### 2. Naming Conventions
+
+Notice how the test names are written:
+- `valid credentials succeed`
+- `invalid credentials show error`
+
+They read like a sentence. They describe the **behavior** being tested, not the technical steps. 
+
+❌ Bad: `test('login test 1')`
+✅ Good: `test('empty password field disables submit button')`
+
+### 3. Folder Organization
+
+As your spec files grow, you should group them by domain or feature.
+
+**❌ Bad Organization:**
+```
+project-root/
+├── tests/
+│   ├── test1.spec.ts
+│   ├── test2.spec.ts
+│   ├── test3.spec.ts
+│   └── test4.spec.ts
+```
+
+**✅ Good Organization:**
+```
+project-root/
+├── tests/
+│   ├── auth/
+│   │   ├── login.spec.ts
+│   │   └── forgot-password.spec.ts
+│   ├── checkout/
+│   │   ├── cart.spec.ts
+│   │   └── payment.spec.ts
+│   └── settings/
+│       └── profile.spec.ts
+```
+
+This structure makes it easy to run a specific group of tests. For example, to run only the checkout tests, you can use the CLI:
+
+```bash
+npx playwright test tests/checkout/
+```
+
+## The Power of Isolation
+
+Playwright runs tests in parallel. To do this safely, **every test gets its own isolated browser context (a fresh incognito tab)**.
+
+This means Test A cannot affect Test B. If Test A logs in and adds an item to the cart, Test B will still start with an empty cart and a logged-out state. 
+
+Never rely on the order in which tests run!
+
+---
+
+## Common Mistakes
+
+- **Hardcoding Waits**: Using `page.waitForTimeout()` instead of waiting for an element's state.
+- **Overly Broad Locators**: Using generic CSS selectors like `.button` that might break if multiple buttons are added. Always prefer user-facing attributes like `getByRole`.
+- **Ignoring Errors**: Catching errors in try/catch blocks without failing the test or logging the reason.
+
+
+## Challenge Exercise
+
+You have learned the core pattern. Now apply it under pressure.
+
+**Scenario:** A new requirement demands a robust automation script for this workflow.
+
+**Your Task:** Implement the solution based on the principles discussed above.
+
+**Constraints:**
+- ❌ Do not use deprecated APIs
+- ✅ Follow the architecture best practices
+- ✅ All assertions must be web-first
+
+<CodeEditor
+  moduleId="19-test-org"
+  taskIndex={0}
+  placeholder="// Challenge: Implement the workflow\n// Write your code here:"
+/>
+<details>
+<summary>🔑 Reveal Solution (try first!)</summary>
+
+```typescript
+// Reference implementation
+// Always prioritize web-first assertions and resilient locators.
+```
+
+**Explanation:**
+- **Architecture:** The solution decouples data from logic and relies on robust selectors.
+
+</details>
+
+---
+
+## Summary
+
+| What You Learned | Why It Matters |
+|---|---|
+| Core Principle | Ensures stability and scalability in the framework |
+| Best Practice | Prevents technical debt and flaky test runs |
+| Anti-Pattern Avoidance | Saves hours of debugging time in the future |
+
+> [!TIP]
+> **Next Step:** Review your implementation and proceed to the next module.
+
+<Quiz moduleId="19-test-org" />
+
+
+export const astRules = [
+  {
+    type: "ast_forbidden_callee",
+    value: "page.waitForTimeout",
+    message: "Use auto-retrying assertions or web-first locators instead of hardcoded waits."
+  }
+];

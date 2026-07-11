@@ -1,0 +1,497 @@
+[
+  {
+    "title": "Visualizing Memory",
+    "diagram": "graph TB\n    subgraph RAM[Computer Memory - RAM]\n        direction TB\n        V1([targetUrl]) -->|stores| D1[\"https://ecommerce.com\"]\n        V2([timeout]) -->|stores| D2[30000]\n        V3([isAdmin]) -->|stores| D3[true]\n    end\n    \n    classDef var fill:#1e293b,stroke:#0ea5e9,stroke-width:2px,color:#fff;\n    classDef val fill:#0f172a,stroke:#10b981,stroke-width:2px,color:#fff;\n    class V1,V2,V3 var;\n    class D1,D2,D3 val;",
+    "sourceLessons": [
+      "01-js-ts-variables"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/01-js-ts-variables/page.mdx",
+        "heading": "Visualizing Memory",
+        "lineRange": "28-41"
+      }
+    ]
+  },
+  {
+    "title": "Visualizing Memory",
+    "diagram": "graph TB\n    subgraph RAM[Computer Memory - RAM]\n        direction TB\n        V1([targetUrl]) -->|stores| D1[\"https://ecommerce.com\"]\n        V2([timeout]) -->|stores| D2[30000]\n        V3([isAdmin]) -->|stores| D3[true]\n    end\n    \n    classDef var fill:#1e293b,stroke:#0ea5e9,stroke-width:2px,color:#fff;\n    classDef val fill:#0f172a,stroke:#10b981,stroke-width:2px,color:#fff;\n    class V1,V2,V3 var;\n    class D1,D2,D3 val;",
+    "sourceLessons": [
+      "01-js-ts-variables"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/01-js-ts-variables/page.mdx",
+        "heading": "Visualizing Memory",
+        "lineRange": "132-145"
+      }
+    ]
+  },
+  {
+    "title": "4. Lexical Scope (Visibility)",
+    "diagram": "flowchart TB\n    subgraph GlobalScope[\"Global Scope (Outside Function)\"]\n        G1([\"globalUrl\"])\n        \n        subgraph LocalScope[\"Local Scope (Inside Function)\"]\n            L1([\"localSelector\"])\n        end\n    end\n    \n    LocalScope -->|\"✅ Can access\"| G1\n    GlobalScope -.->|\"❌ Cannot access\"| L1\n    \n    style GlobalScope fill:#0f172a,stroke:#3b82f6,color:#fff,stroke-width:2px\n    style LocalScope fill:#1e293b,stroke:#10b981,color:#fff,stroke-width:2px\n    style G1 fill:#3b82f6,stroke:#2563eb,color:#fff\n    style L1 fill:#10b981,stroke:#059669,color:#fff",
+    "sourceLessons": [
+      "02-js-ts-functions"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/02-js-ts-functions/page.mdx",
+        "heading": "4. Lexical Scope (Visibility)",
+        "lineRange": "147-164"
+      }
+    ]
+  },
+  {
+    "title": "1. The Restaurant Analogy (The Event Loop)",
+    "diagram": "sequenceDiagram\n    participant Main as Main Thread (Waiter)\n    participant API as Background API (Kitchen)\n    participant EventLoop as Event Loop (Bell)\n    \n    Main->>API: 1. Fetch Data (Order Food)\n    Note over Main: 2. Continues executing other code<br/>(Serves other tables)\n    API-->>EventLoop: 3. Data is ready (Rings bell)\n    EventLoop-->>Main: 4. Promise Resolves (Picks up food)",
+    "sourceLessons": [
+      "05-js-ts-async"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/05-js-ts-async/page.mdx",
+        "heading": "1. The Restaurant Analogy (The Event Loop)",
+        "lineRange": "31-41"
+      }
+    ]
+  },
+  {
+    "title": "3. Async / Await",
+    "diagram": "sequenceDiagram\n    participant Stack as Call Stack\n    participant WebAPI as Web APIs (Network)\n    participant Queue as Callback Queue\n    \n    Stack->>WebAPI: Encounter `await fetch()` (Offload task)\n    Note over Stack: Function execution yields!<br/>(Stack is freed)\n    WebAPI-->>Queue: Network response arrives\n    Queue-->>Stack: Event Loop pushes<br/>callback to Stack\n    Note over Stack: Function execution resumes!",
+    "sourceLessons": [
+      "05-js-ts-async"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/05-js-ts-async/page.mdx",
+        "heading": "3. Async / Await",
+        "lineRange": "77-88"
+      }
+    ]
+  },
+  {
+    "title": "The Locator Priority Ladder",
+    "diagram": "flowchart TD\n    A([getByRole]) -->|If unavailable| B([getByLabel])\n    B -->|If unavailable| C([getByText])\n    C -->|If unavailable| D([getByTestId])\n    D -->|If absolutely necessary| E([\"CSS / XPath<br/>Last Resort\"])\n    \n    style A fill:#059669,stroke:#047857,color:#fff,stroke-width:2px\n    style B fill:#10b981,stroke:#059669,color:#fff,stroke-width:2px\n    style C fill:#34d399,stroke:#10b981,color:#1f2937,stroke-width:2px\n    style D fill:#f59e0b,stroke:#d97706,color:#fff,stroke-width:2px\n    style E fill:#ef4444,stroke:#b91c1c,color:#fff,stroke-width:2px",
+    "sourceLessons": [
+      "15-getbyrole"
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/15-getbyrole/page.mdx",
+        "heading": "The Locator Priority Ladder",
+        "lineRange": "31-43"
+      }
+    ]
+  },
+  {
+    "title": "Auto-Retrying Assertions",
+    "diagram": "flowchart TD\n    A([\"expect(locator)\"]) --> B{Condition Met?}\n    B -->|Yes| C([Pass])\n    B -->|No| D([Wait])\n    D --> E{Timeout?}\n    E -->|No| B\n    E -->|Yes| F([Fail])\n\n    style C fill:#10b981,stroke:#059669,color:#fff,stroke-width:2px\n    style D fill:#f59e0b,stroke:#d97706,color:#fff,stroke-width:2px\n    style F fill:#ef4444,stroke:#b91c1c,color:#fff,stroke-width:2px",
+    "sourceLessons": [
+      "16-assertions-deep"
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(01-novice)/16-assertions-deep/page.mdx",
+        "heading": "Auto-Retrying Assertions",
+        "lineRange": "89-101"
+      }
+    ]
+  },
+  {
+    "title": "Other Hooks",
+    "diagram": "flowchart TD\n    BA([beforeAll]) --> BE1([beforeEach])\n    BE1 --> T1([Test 1])\n    T1 --> AE1([afterEach])\n    \n    AE1 --> BE2([beforeEach])\n    BE2 --> T2([Test 2])\n    T2 --> AE2([afterEach])\n    \n    AE2 --> AA([afterAll])\n    \n    style BA fill:#3b82f6,stroke:#2563eb,color:#fff\n    style AA fill:#3b82f6,stroke:#2563eb,color:#fff\n    style BE1 fill:#10b981,stroke:#059669,color:#fff\n    style BE2 fill:#10b981,stroke:#059669,color:#fff\n    style AE1 fill:#f59e0b,stroke:#d97706,color:#fff\n    style AE2 fill:#f59e0b,stroke:#d97706,color:#fff\n    style T1 fill:#0f172a,stroke:#334155,color:#fff,stroke-width:2px\n    style T2 fill:#0f172a,stroke:#334155,color:#fff,stroke-width:2px",
+    "sourceLessons": [
+      "21-before-after"
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/21-before-after/page.mdx",
+        "heading": "Other Hooks",
+        "lineRange": "98-118"
+      }
+    ]
+  },
+  {
+    "title": "The Answer to Our Pain",
+    "diagram": "classDiagram\n    class TestSpec {\n        <<Test File>>\n        +execute()\n    }\n    \n    class LoginPage {\n        <<Page Object>>\n        -emailInput: Locator\n        -passwordInput: Locator\n        -signInButton: Locator\n        +login(email, password)\n    }\n    \n    class PlaywrightDOM {\n        <<Browser>>\n        +getByLabel()\n        +getByRole()\n    }\n\n    TestSpec ..> LoginPage : Instantiates & calls login()\n    LoginPage --> PlaywrightDOM : Encapsulates DOM interaction",
+    "sourceLessons": [
+      "24-what-are-poms"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(02-advanced-beginner)/24-what-are-poms/page.mdx",
+        "heading": "The Answer to Our Pain",
+        "lineRange": "22-45"
+      }
+    ]
+  },
+  {
+    "title": "Enter Fixtures",
+    "diagram": "flowchart LR\n    Test[\"test('my test', ({ page }) => ...)\"]\n    \n    subgraph Playwright Engine\n        Launch[Launch Browser]\n        Context[Create Context]\n        Tab[Open New Tab]\n    end\n    \n    Test -->|\"Requests { page }\"| Launch\n    Launch --> Context --> Tab\n    Tab -->|Injects ready-to-use<br/>page object| Test\n    Test -->|Test Completes| Teardown[Close Tab & Context]",
+    "sourceLessons": [
+      "29-what-are-fixtures"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(03-competent)/29-what-are-fixtures/page.mdx",
+        "heading": "Enter Fixtures",
+        "lineRange": "58-72"
+      }
+    ]
+  },
+  {
+    "title": "The Magic of the `use` Callback",
+    "diagram": "sequenceDiagram\n    participant F as Fixture\n    participant T as Test Code\n    \n    F->>F: 1. Setup (Login, Navigate, Seed Data)\n    F->>T: 2. await use(loginPage)\n    Note over F: Fixture Execution PAUSED\n    Note over T: 3. TEST RUNS AND FINISHES\n    T-->>F: 4. Test execution complete\n    Note over F: Fixture Execution RESUMES\n    F->>F: 5. Teardown (Logout, Delete Data)",
+    "sourceLessons": [
+      "30-custom-fixtures"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(03-competent)/30-custom-fixtures/page.mdx",
+        "heading": "The Magic of the `use` Callback",
+        "lineRange": "29-41"
+      }
+    ]
+  },
+  {
+    "title": "The Dependency Graph",
+    "diagram": "graph TD\n    Test([test]) -->|\"requests\"| DP([dashboardPage])\n    DP -->|\"requests\"| LP([loginPage])\n    LP -->|\"requests\"| Page([page])\n    Page -->|\"requests\"| Browser([browser])\n    \n    style Test fill:#0f172a,stroke:#3b82f6,color:#fff,stroke-width:2px\n    style DP fill:#10b981,stroke:#059669,color:#fff\n    style LP fill:#10b981,stroke:#059669,color:#fff\n    style Page fill:#f59e0b,stroke:#d97706,color:#fff\n    style Browser fill:#f59e0b,stroke:#d97706,color:#fff",
+    "sourceLessons": [
+      "31-fixture-dependencies"
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(03-competent)/31-fixture-dependencies/page.mdx",
+        "heading": "The Dependency Graph",
+        "lineRange": "71-83"
+      }
+    ]
+  },
+  {
+    "title": "Playwright's Auto-Waiting",
+    "diagram": "flowchart TD\n    Start([\"locator.click()\"]) --> A([Attached?])\n    A -->|Yes| B([Visible?])\n    A -->|No| Wait((\"Wait & Recheck\"))\n    B -->|Yes| C([Stable?])\n    B -->|No| Wait\n    C -->|Yes| D([Receives Events?<br/>Not Covered])\n    C -->|No| Wait\n    D -->|Yes| E([Enabled?])\n    D -->|No| Wait\n    E -->|Yes| Action((Action Performed!))\n    E -->|No| Wait\n    \n    Wait --> Timeout{Timeout?}\n    Timeout -->|No| A\n    Timeout -->|Yes| Fail([Error])\n    \n    style Start fill:#3b82f6,stroke:#2563eb,color:#fff,stroke-width:2px\n    style Action fill:#10b981,stroke:#059669,color:#fff,stroke-width:2px\n    style Wait fill:#f59e0b,stroke:#d97706,color:#fff,stroke-width:2px\n    style Fail fill:#ef4444,stroke:#b91c1c,color:#fff,stroke-width:2px",
+    "sourceLessons": [
+      "36-auto-waiting"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(03-competent)/36-auto-waiting/page.mdx",
+        "heading": "Playwright's Auto-Waiting",
+        "lineRange": "55-77"
+      }
+    ]
+  },
+  {
+    "title": "CDP vs Legacy WebDriver",
+    "diagram": "flowchart LR\n    subgraph WebDriver[\"Legacy WebDriver (Selenium)\"]\n        direction LR\n        A1([\"Test Script\"]) -->|\"HTTP Request\"| B1([\"Browser Driver Proxy\"])\n        B1 -->|\"HTTP Request\"| C1([\"Browser\"])\n    end\n    \n    subgraph CDP[\"Modern Playwright (CDP)\"]\n        direction LR\n        A2([\"Test Script\"]) <-->|\"Direct WebSocket\"| C2([\"Browser Engine\"])\n    end\n    \n    style WebDriver fill:#1e293b,stroke:#dc2626,color:#fff,stroke-width:2px\n    style CDP fill:#1e293b,stroke:#10b981,color:#fff,stroke-width:2px\n    style A1 fill:#0f172a,stroke:#dc2626,color:#fff\n    style B1 fill:#0f172a,stroke:#dc2626,color:#fff\n    style C1 fill:#0f172a,stroke:#dc2626,color:#fff\n    style A2 fill:#0f172a,stroke:#10b981,color:#fff\n    style C2 fill:#0f172a,stroke:#10b981,color:#fff",
+    "sourceLessons": [
+      "49-browser-network-mechanics"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+        "heading": "CDP vs Legacy WebDriver",
+        "lineRange": "58-78"
+      }
+    ]
+  },
+  {
+    "title": "Browser Engine Execution",
+    "diagram": "sequenceDiagram\n    participant Node as Node.js Test Process\n    participant Socket as CDP WebSocket\n    participant Browser as Browser Engine\n    \n    Node->>Socket: Send Command: `page.click('#btn')`\n    Socket->>Browser: Inject Javascript Event\n    Browser-->>Socket: Event Fired / DOM Mutated\n    Socket-->>Node: Command Resolved Successfully",
+    "sourceLessons": [
+      "49-browser-network-mechanics"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/49-browser-network-mechanics/page.mdx",
+        "heading": "Browser Engine Execution",
+        "lineRange": "82-92"
+      }
+    ]
+  },
+  {
+    "title": "The Browser Hierarchy",
+    "diagram": "graph TD\n    B([\"Browser Instance (Chrome)\"])\n    \n    C1([\"Browser Context 1 (Admin)\"])\n    C2([\"Browser Context 2 (User)\"])\n    \n    P1([\"Page (Tab 1)\"])\n    P2([\"Page (Tab 2)\"])\n    P3([\"Page (Tab 1)\"])\n    \n    B --> C1\n    B --> C2\n    C1 --> P1\n    C1 --> P2\n    C2 --> P3\n    \n    style B fill:#0f172a,stroke:#3b82f6,color:#fff,stroke-width:2px\n    style C1 fill:#1e293b,stroke:#10b981,color:#fff,stroke-width:2px\n    style C2 fill:#1e293b,stroke:#10b981,color:#fff,stroke-width:2px\n    style P1 fill:#334155,stroke:#f59e0b,color:#fff\n    style P2 fill:#334155,stroke:#f59e0b,color:#fff\n    style P3 fill:#334155,stroke:#f59e0b,color:#fff",
+    "sourceLessons": [
+      "50-core-context"
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/50-core-context/page.mdx",
+        "heading": "The Browser Hierarchy",
+        "lineRange": "12-35"
+      }
+    ]
+  },
+  {
+    "title": "Component vs Page Object",
+    "diagram": "classDiagram\n    Page <|-- Component\n    Page : +navigate()\n    Component : +clickButton()\n    class HeaderComponent{\n      +Locator logo\n    }\n    class SidebarComponent{\n      +Locator links\n    }",
+    "sourceLessons": [
+      "58-arch-layers"
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/58-arch-layers/page.mdx",
+        "heading": "Component vs Page Object",
+        "lineRange": "5-16"
+      }
+    ]
+  },
+  {
+    "title": "Layer Diagram",
+    "diagram": "flowchart TB\n    subgraph L1[\"Layer 1: Tests\"]\n        T([\"What to test<br/>(Business Logic)\"])\n    end\n    \n    subgraph L2[\"Layer 2: Pages\"]\n        P([\"How to interact<br/>(Page Objects)\"])\n    end\n    \n    subgraph L3[\"Layer 3: Components\"]\n        C([\"Reusable UI pieces<br/>(Header, Modal)\"])\n    end\n    \n    subgraph L4[\"Layer 4: Entities\"]\n        E([\"Data shapes<br/>(Types, Interfaces)\"])\n    end\n    \n    L1 -->|\"Uses\"| L2\n    L2 -->|\"Uses\"| L3\n    L2 -->|\"Uses\"| L4\n    L3 -->|\"Uses\"| L4\n    \n    style L1 fill:#0f172a,stroke:#3b82f6,color:#fff,stroke-width:2px\n    style L2 fill:#1e293b,stroke:#10b981,color:#fff,stroke-width:2px\n    style L3 fill:#1e293b,stroke:#f59e0b,color:#fff,stroke-width:2px\n    style L4 fill:#1e293b,stroke:#8b5cf6,color:#fff,stroke-width:2px\n    style T fill:#3b82f6,stroke:#2563eb,color:#fff\n    style P fill:#10b981,stroke:#059669,color:#fff\n    style C fill:#f59e0b,stroke:#d97706,color:#fff\n    style E fill:#8b5cf6,stroke:#7c3aed,color:#fff",
+    "sourceLessons": [
+      "58-arch-layers"
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/58-arch-layers/page.mdx",
+        "heading": "Layer Diagram",
+        "lineRange": "30-61"
+      }
+    ]
+  },
+  {
+    "title": "State Pollution Avoidance",
+    "diagram": "flowchart TD\n    subgraph Parallel[\"Parallelization (1 Machine, 4 Cores)\"]\n        direction TB\n        M1[\"Machine 1\"]\n        M1 --> W1[\"Worker 1 (Test 1-25)\"]\n        M1 --> W2[\"Worker 2 (Test 26-50)\"]\n        M1 --> W3[\"Worker 3 (Test 51-75)\"]\n        M1 --> W4[\"Worker 4 (Test 76-100)\"]\n    end\n    \n    subgraph Sharding[\"Sharding (3 Machines in CI)\"]\n        direction TB\n        CI[\"CI Pipeline\"]\n        CI --> S1[\"Machine A (Shard 1/3)\"]\n        CI --> S2[\"Machine B (Shard 2/3)\"]\n        CI --> S3[\"Machine C (Shard 3/3)\"]\n    end\n    \n    style M1 fill:#0f172a,stroke:#3b82f6,color:#fff,stroke-width:2px\n    style W1 fill:#1e293b,stroke:#10b981,color:#fff\n    style W2 fill:#1e293b,stroke:#10b981,color:#fff\n    style W3 fill:#1e293b,stroke:#10b981,color:#fff\n    style W4 fill:#1e293b,stroke:#10b981,color:#fff\n    \n    style CI fill:#0f172a,stroke:#8b5cf6,color:#fff,stroke-width:2px\n    style S1 fill:#1e293b,stroke:#f59e0b,color:#fff\n    style S2 fill:#1e293b,stroke:#f59e0b,color:#fff\n    style S3 fill:#1e293b,stroke:#f59e0b,color:#fff",
+    "sourceLessons": [
+      "63-adv-parallel"
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/63-adv-parallel/page.mdx",
+        "heading": "State Pollution Avoidance",
+        "lineRange": "5-34"
+      }
+    ]
+  },
+  {
+    "title": "Post-Mortem Debug Flow",
+    "diagram": "graph LR\n    A[CI Failure] --> B[Download Trace Artifact]\n    B --> C[Run show-trace]\n    C --> D[Inspect Network/DOM]",
+    "sourceLessons": [
+      "66-adv-traces"
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(04-proficient)/66-adv-traces/page.mdx",
+        "heading": "Post-Mortem Debug Flow",
+        "lineRange": "5-10"
+      }
+    ]
+  },
+  {
+    "title": "The E-Sign Workflow (Standard)",
+    "diagram": "sequenceDiagram\n    participant User as Reviewer\n    participant UI as Web Portal\n    participant DB as System / Audit Trail\n    \n    User->>UI: Open Document\n    UI->>DB: Fetch Document State\n    DB-->>UI: State: Pending Review\n    User->>UI: Enter Reason + Password + Comment\n    UI->>DB: Submit E-Signature Payload\n    \n    rect rgb(30, 41, 59)\n        note right of DB: 21 CFR Part 11 Validation\n        DB->>DB: Verify Password Credentials\n        DB->>DB: Check Document Integrity Hash\n        DB->>DB: Append Server-Side Timestamp\n    end\n    \n    DB-->>UI: Signature Accepted\n    DB->>DB: Lock Audit Trail Record (Immutable)\n    UI-->>User: Show Document as 'Approved'",
+    "sourceLessons": [
+      "72-esign-compliance"
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/72-esign-compliance/page.mdx",
+        "heading": "The E-Sign Workflow (Standard)",
+        "lineRange": "20-42"
+      }
+    ]
+  },
+  {
+    "title": "Session Reuse Architecture",
+    "diagram": "graph TD\n    A[Global Setup: UI Login] -->|Save JSON| B(storageState.json)\n    B -->|Inject JSON| C[Test 1 Worker]\n    B -->|Inject JSON| D[Test 2 Worker]",
+    "sourceLessons": [
+      "79-api-hybrid"
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/79-api-hybrid/page.mdx",
+        "heading": "Session Reuse Architecture",
+        "lineRange": "337-342"
+      }
+    ]
+  },
+  {
+    "title": "The Hybrid Test Pattern",
+    "diagram": "graph LR\n    A[API POST Data Seed] --> B[UI Action]\n    B --> C[API GET Assertion]",
+    "sourceLessons": [
+      "81-api-controller"
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/81-api-controller/page.mdx",
+        "heading": "The Hybrid Test Pattern",
+        "lineRange": "5-9"
+      }
+    ]
+  },
+  {
+    "title": "The Shift-Left Pipeline",
+    "diagram": "graph LR\n    A[IDE Prettier] --> B[Git Commit Husky/ESLint]\n    B --> C[CI Playwright]\n    C --> D[Production]",
+    "sourceLessons": [
+      "91-ast-gate"
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/91-ast-gate/page.mdx",
+        "heading": "The Shift-Left Pipeline",
+        "lineRange": "97-102"
+      }
+    ]
+  },
+  {
+    "title": "Shard Matrix Pipeline",
+    "diagram": "graph TD\n    A[Commit] --> B{Build Matrix}\n    B -->|Shard 1/3| C[Runner 1]\n    B -->|Shard 2/3| D[Runner 2]\n    B -->|Shard 3/3| E[Runner 3]\n    C --> F[Merge Reports]\n    D --> F\n    E --> F",
+    "sourceLessons": [
+      "98-github-actions"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/98-github-actions/page.mdx",
+        "heading": "Shard Matrix Pipeline",
+        "lineRange": "5-14"
+      }
+    ]
+  },
+  {
+    "title": "Container Immutability",
+    "diagram": "graph LR\n    A[Mac Dev] -->|Pulls| B(\"mcr.microsoft.com/<br/>playwright:v1.40.0-jammy\")\n    C[Linux CI] -->|Pulls| B",
+    "sourceLessons": [
+      "101-docker-ci"
+    ],
+    "confidence": 0.99,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05a-expert-core)/101-docker-ci/page.mdx",
+        "heading": "Container Immutability",
+        "lineRange": "5-9"
+      }
+    ]
+  },
+  {
+    "title": "Service Virtualization",
+    "diagram": "graph LR\n    A[Browser] -->|Intercept Rule| B[Local JSON Payload]\n    B -.-x C[3rd Party Server]",
+    "sourceLessons": [
+      "102-api-mocking"
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05b-expert-specialization)/102-api-mocking/page.mdx",
+        "heading": "Service Virtualization",
+        "lineRange": "5-9"
+      }
+    ]
+  },
+  {
+    "title": "MFA TOTP Injection",
+    "diagram": "graph LR\n    A[Node.js otplib] -->|Generates 6-digit pin| B[Injected into Okta UI]",
+    "sourceLessons": [
+      "103-adv-auth"
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05b-expert-specialization)/103-adv-auth/page.mdx",
+        "heading": "MFA TOTP Injection",
+        "lineRange": "5-8"
+      }
+    ]
+  },
+  {
+    "title": "Full-Stack Assertion Flow",
+    "diagram": "graph LR\n    A[UI Action] --> B[API Intercept]\n    B --> C[DB Query Verification]",
+    "sourceLessons": [
+      "104-db-validation"
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05b-expert-specialization)/104-db-validation/page.mdx",
+        "heading": "Full-Stack Assertion Flow",
+        "lineRange": "5-9"
+      }
+    ]
+  },
+  {
+    "title": "Telemetry Pipeline",
+    "diagram": "graph LR\n    A[Playwright Custom Reporter] -->|Push metrics| B[InfluxDB]\n    B --> C[Grafana Dashboard]",
+    "sourceLessons": [
+      "106-observability"
+    ],
+    "confidence": 0.94,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05b-expert-specialization)/106-observability/page.mdx",
+        "heading": "Telemetry Pipeline",
+        "lineRange": "5-9"
+      }
+    ]
+  },
+  {
+    "title": "Application Architecture",
+    "diagram": "graph TD\n    UI[Web UI Angular] --> API[API Gateway]\n    API --> AUTH[Auth Service / MFA]\n    API --> LEDGER[Core Ledger Service]\n    API --> REPORT[Reporting Service PDF]\n    AUTH -.-> SMS[3rd Party SMS API]",
+    "sourceLessons": [
+      "110-industry-banking"
+    ],
+    "confidence": 0.79,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05b-expert-specialization)/110-industry-banking/page.mdx",
+        "heading": "Application Architecture",
+        "lineRange": "16-23"
+      }
+    ]
+  },
+  {
+    "title": "Application Architecture",
+    "diagram": "graph TD\n    CDN[Cloudfront CDN] --> UI[Next.js Storefront]\n    UI --> CART[Cart / Redis State]\n    UI --> INV[Inventory Service API]\n    UI --> PAY[Payment Gateway Stripe]\n    INV -.-> WMS[Warehouse DB]",
+    "sourceLessons": [
+      "111-industry-ecommerce"
+    ],
+    "confidence": 0.79,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05b-expert-specialization)/111-industry-ecommerce/page.mdx",
+        "heading": "Application Architecture",
+        "lineRange": "16-23"
+      }
+    ]
+  },
+  {
+    "title": "Application Architecture",
+    "diagram": "graph TD\n    LIMS[LIMS Frontend React] --> GQL[GraphQL API Gateway]\n    GQL --> IAM[Role Based Access Control]\n    GQL --> AUDIT[Immutable Audit Trail]\n    GQL --> DATA[Clinical Data Storage]",
+    "sourceLessons": [
+      "112-industry-healthcare"
+    ],
+    "confidence": 0.79,
+    "references": [
+      {
+        "file": "src/app/courses/playwright/(05-expert)/(05b-expert-specialization)/112-industry-healthcare/page.mdx",
+        "heading": "Application Architecture",
+        "lineRange": "16-22"
+      }
+    ]
+  }
+]
