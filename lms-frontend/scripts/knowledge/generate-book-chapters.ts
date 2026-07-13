@@ -3667,7 +3667,7 @@ test('mock OTP code', async ({ page }) => {
 ];
 
 function generateBook() {
-  console.log('🏁 Starting compilation of the Expanded Playwright Academy Handbook (40 Chapters)...');
+  console.log('🏁 Starting compilation of the Expanded Automation Nexus Academy Handbook (40 Chapters)...');
 
   if (!fs.existsSync(HANDBOOK_DIR)) {
     fs.mkdirSync(HANDBOOK_DIR, { recursive: true });

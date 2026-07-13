@@ -731,7 +731,7 @@ function runValidation() {
   });
 
   const markdownReport = `
-# Playwright Academy Knowledge Validation Report
+# Automation Nexus Academy Knowledge Validation Report
 
 **Generated At:** ${reportDate}  
 **Validator Version:** 1.0  

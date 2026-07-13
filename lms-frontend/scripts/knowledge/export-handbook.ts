@@ -337,7 +337,7 @@ async function exportHandbook() {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Playwright Academy Handbook</title>
+  <title>Automation Nexus Academy Handbook</title>
   <!-- Load Marked, Tailwind CSS and Prism.js for Syntax Highlighting -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
@@ -835,7 +835,7 @@ async function exportHandbook() {
   <div class="cover-page">
     <div class="cover-badge">Enterprise Education Edition</div>
     <div class="max-w-3xl px-6">
-      <h1 class="text-6xl font-black text-white mb-6 tracking-tight leading-none">Playwright Academy<br/><span class="text-indigo-400">Handbook</span></h1>
+      <h1 class="text-6xl font-black text-white mb-6 tracking-tight leading-none">Automation Nexus Academy<br/><span class="text-indigo-400">Handbook</span></h1>
       <p class="text-xl text-gray-300 mb-12 max-w-xl mx-auto font-light leading-relaxed">A complete curriculum of engineering principles, code designs, and automation blueprints.</p>
       <div class="h-1.5 w-24 bg-gradient-to-r from-indigo-500 to-pink-500 mx-auto mb-12 rounded-full"></div>
       <p class="text-sm text-gray-500 uppercase tracking-widest font-semibold">Playwright Curriculum Engineering Board &copy; 2026</p>
@@ -1042,7 +1042,7 @@ async function exportHandbook() {
     displayHeaderFooter: true,
     headerTemplate: `
       <div style="font-size: 8px; font-family: sans-serif; color: #9ca3af; width: 100%; text-align: right; padding-right: 20mm;">
-        Playwright Academy Handbook
+        Automation Nexus Academy Handbook
       </div>
     `,
     footerTemplate: `

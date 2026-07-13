@@ -9,7 +9,7 @@ import MainWrapper from "../components/MainWrapper";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {
-  title: "DMS Docs",
+  title: "Automation Nexus Academy",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

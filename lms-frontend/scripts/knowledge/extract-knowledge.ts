@@ -591,7 +591,7 @@ function run() {
   const finalOutput: ExtractionOutput = {
     version: '1.0',
     generatedAt: dateStr,
-    academyVersion: 'Playwright Academy Bridge + Core v1.0',
+    academyVersion: 'Automation Nexus Academy Bridge + Core v1.0',
     lessonCount: lessonsExtracted,
     atoms
   };
@@ -626,7 +626,7 @@ function run() {
 # Knowledge Extraction Report
 **Generated At:** ${dateStr}  
 **Engine Version:** 1.0  
-**Academy Version:** Playwright Academy Bridge + Core v1.0
+**Academy Version:** Automation Nexus Academy Bridge + Core v1.0
 
 ## Run Statistics
 

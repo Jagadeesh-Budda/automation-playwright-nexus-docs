@@ -176,7 +176,7 @@ export default function AppInitializer({ children }: { children: React.ReactNode
               <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-cyan-500/30 bg-cyan-500/5 text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.15)]">
                 <Sparkles className="w-7 h-7" />
               </div>
-              <h3 className="text-xl font-black text-white uppercase tracking-tight">Playwright Mastery Setup</h3>
+              <h3 className="text-xl font-black text-white uppercase tracking-tight">Automation Nexus Setup</h3>
               <p className="text-xs text-slate-400 mt-1.5">Create your local profile to track code challenges and claim verified credentials.</p>
             </div>
 
