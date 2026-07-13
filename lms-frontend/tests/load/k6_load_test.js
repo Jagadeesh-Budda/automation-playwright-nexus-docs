@@ -75,7 +75,7 @@ function generatePayloads() {
   return {
     code: `test('Dynamic test run for ${moduleId}', async ({ page }) => {
       await page.goto('/course');
-      await expect(page).toHaveTitle(/Aegis/);
+      await expect(page).toHaveTitle(/ANA/);
     });`,
     moduleId,
     taskIndex: 0,
@@ -95,12 +95,12 @@ function getHeaders(vu, iter) {
 export function smokeTest() {
   const headers = getHeaders(__VU, 1);
   const data = generatePayloads();
-  
-  const res = http.post(`${BASE_URL}/api/validate-code`, JSON.stringify(data), { 
-    headers, 
-    tags: { name: 'validate' } 
+
+  const res = http.post(`${BASE_URL}/api/validate-code`, JSON.stringify(data), {
+    headers,
+    tags: { name: 'validate' }
   });
-  
+
   check(res, {
     'validate: status is 200': (r) => r.status === 200,
     'validate: response has valid boolean': (r) => r.json().valid !== undefined,
@@ -114,11 +114,11 @@ export function normalTest() {
   const data = generatePayloads();
 
   // 1. Submit code for validation
-  const valRes = http.post(`${BASE_URL}/api/validate-code`, JSON.stringify(data), { 
+  const valRes = http.post(`${BASE_URL}/api/validate-code`, JSON.stringify(data), {
     headers,
     tags: { name: 'validate' }
   });
-  check(valRes, { 
+  check(valRes, {
     'validate: status is 200': (r) => r.status === 200,
     'validate: response has valid boolean': (r) => r.json().valid !== undefined,
   });
@@ -128,11 +128,11 @@ export function normalTest() {
 
   // 2. Save Progress
   const progPayload = JSON.stringify({ moduleId: data.moduleId, score: 100 });
-  const progRes = http.post(`${BASE_URL}/api/progress`, progPayload, { 
+  const progRes = http.post(`${BASE_URL}/api/progress`, progPayload, {
     headers,
     tags: { name: 'progress' }
   });
-  check(progRes, { 
+  check(progRes, {
     'progress: status is 200': (r) => r.status === 200,
     'progress: response has success': (r) => r.json().success === true,
   });
@@ -140,11 +140,11 @@ export function normalTest() {
   sleep(Math.random() * 2 + 0.5);
 
   // 3. Query Progress Ledger
-  const getProgRes = http.get(`${BASE_URL}/api/progress`, { 
+  const getProgRes = http.get(`${BASE_URL}/api/progress`, {
     headers,
     tags: { name: 'progress' }
   });
-  check(getProgRes, { 
+  check(getProgRes, {
     'progress_get: status is 200': (r) => r.status === 200,
     'progress_get: has progress list': (r) => r.json().progress !== undefined,
   });
@@ -157,22 +157,22 @@ export function stressTest() {
   const headers = getHeaders(__VU, __ITER);
   const data = generatePayloads();
 
-  const valRes = http.post(`${BASE_URL}/api/validate-code`, JSON.stringify(data), { 
+  const valRes = http.post(`${BASE_URL}/api/validate-code`, JSON.stringify(data), {
     headers,
     tags: { name: 'validate' }
   });
-  check(valRes, { 
+  check(valRes, {
     'validate: status is 200': (r) => r.status === 200,
     'validate: response has valid boolean': (r) => r.json().valid !== undefined,
   });
 
   const progPayload = JSON.stringify({ moduleId: data.moduleId, score: 100 });
-  const progRes = http.post(`${BASE_URL}/api/progress`, progPayload, { 
+  const progRes = http.post(`${BASE_URL}/api/progress`, progPayload, {
     headers,
     tags: { name: 'progress' }
   });
-  check(progRes, { 
-    'progress: status is 200': (r) => r.status === 200 
+  check(progRes, {
+    'progress: status is 200': (r) => r.status === 200
   });
 
   sleep(Math.random() * 1 + 0.2); // Aggressive execution rate
@@ -184,7 +184,7 @@ export function certificateTest() {
 
   // A. Generate initial progress so they are eligible to claim certs
   const progPayload = JSON.stringify({ moduleId: '10-first-test', score: 100 });
-  http.post(`${BASE_URL}/api/progress`, progPayload, { 
+  http.post(`${BASE_URL}/api/progress`, progPayload, {
     headers,
     tags: { name: 'progress' }
   });
@@ -193,11 +193,11 @@ export function certificateTest() {
 
   // B. Claim Certificate
   const certPayload = JSON.stringify({ name: `Candidate ${__VU}`, path: 'all' });
-  const certRes = http.post(`${BASE_URL}/api/certify`, certPayload, { 
+  const certRes = http.post(`${BASE_URL}/api/certify`, certPayload, {
     headers,
     tags: { name: 'certify' }
   });
-  
+
   check(certRes, {
     'certify: status is 200': (r) => r.status === 200,
     'certify: returns certId': (r) => r.json().certId !== undefined,

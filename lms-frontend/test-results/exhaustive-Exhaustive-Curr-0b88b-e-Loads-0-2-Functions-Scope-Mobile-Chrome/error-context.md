@@ -41,11 +41,11 @@ Call log:
         - text: Initialize Profile
       - button "Restore from Sync Code or User ID" [ref=e21] [cursor=pointer]
   - complementary [ref=e22]:
-    - link "Aegis Automation" [ref=e24] [cursor=pointer]:
+    - link "ANA Automation" [ref=e24] [cursor=pointer]:
       - /url: /
       - img [ref=e27]
       - generic:
-        - generic: Aegis
+        - generic: ANA
         - generic: Automation
     - link "Dashboard" [ref=e33] [cursor=pointer]:
       - /url: /
