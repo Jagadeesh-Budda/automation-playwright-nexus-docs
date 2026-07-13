@@ -1,4 +1,4 @@
-﻿## Learning Objectives
+## Learning Objectives
 
 By the end of this lesson, you will be able to:
 - Successfully clone and verify repository
@@ -67,11 +67,11 @@ npx playwright test tests/smoke/health-check.spec.ts --headed
 **Expected output when environment is correct:**
 ```
 Running 5 tests using 4 workers
-  ✓  smoke › homepage loads (2.3s)
-  ✓  smoke › login page accessible (1.8s)
-  ✓  smoke › API responds with 200 (0.9s)
-  ✓  smoke › database connection OK (1.2s)
-  ✓  smoke › file upload service OK (2.1s)
+  ?  smoke � homepage loads (2.3s)
+  ?  smoke � login page accessible (1.8s)
+  ?  smoke � API responds with 200 (0.9s)
+  ?  smoke � database connection OK (1.2s)
+  ?  smoke � file upload service OK (2.1s)
 
 5 passed (8.3s)
 ```
@@ -98,26 +98,26 @@ npx --version     # Should match npm version
 
 ## Common Environment Failures
 
-### ❌ "Cannot find module" error
+### ? "Cannot find module" error
 ```bash
 # Fix: Reinstall dependencies
 rm -rf node_modules
 npm install
 ```
 
-### ❌ "Browser not found" error
+### ? "Browser not found" error
 ```bash
 # Fix: Install Playwright browsers
 npx playwright install
 ```
 
-### ❌ "ECONNREFUSED" - App not reachable
+### ? "ECONNREFUSED" - App not reachable
 ```bash
 # Fix: Check BASE_URL in your .env file
 # Make sure the staging server is running
 ```
 
-### ❌ SSL Certificate errors
+### ? SSL Certificate errors
 ```bash
 # Fix: Add to playwright.config.ts
 use: {
@@ -170,9 +170,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="42-fundamentals-exec"
@@ -182,7 +182,7 @@ You have learned the core pattern. Now apply it under pressure.
 // Write the commands below:`}
 />
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

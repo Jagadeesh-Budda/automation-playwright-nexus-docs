@@ -4,7 +4,7 @@ import * as crypto from 'crypto';
 
 export const dynamic = 'force-dynamic';
 const DEFAULT_USER_ID = "student_1";
-const CERT_SECRET = process.env.CERT_SECRET || 'asa-industrial-authority-secret-2026';
+const CERT_SECRET = process.env.CERT_SECRET || 'ana-industrial-authority-secret-2026';
 
 export async function POST(request: Request) {
   try {
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
       'regulated': 'REG'
     };
     const prefix = prefixMap[path as string] || 'ALL';
-    const certId = `ASA-UI-${prefix}-${year}-${rand}`;
+    const certId = `ANA-UI-${prefix}-${year}-${rand}`;
 
     // 4. Calculate average score
     const allProgress = await prisma.userProgress.findMany({

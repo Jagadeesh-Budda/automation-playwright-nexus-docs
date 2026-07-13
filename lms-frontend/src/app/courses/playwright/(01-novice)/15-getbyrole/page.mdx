@@ -1,4 +1,4 @@
-﻿
+
 # 2.1: getByRole & Friends
 
 
@@ -14,19 +14,19 @@ When you need to find an element, Playwright offers many options. But they are n
 To see why, look at this comparison:
 
 ```typescript
-// ❌ Bad: Fragile CSS selector. Will break if the design changes.
+// ? Bad: Fragile CSS selector. Will break if the design changes.
 await page.locator('div > div:nth-child(3) button').click();
 
-// ✅ Better: Semantic locator. Survives UI changes.
+// ? Better: Semantic locator. Survives UI changes.
 await page.getByRole('button', { name: 'Submit' }).click();
 ```
 
 Playwright strongly recommends a specific "priority ladder" to make your tests resilient to UI changes:
 
-1. **`getByRole`** (🥇 Always try this first)
-2. **`getByLabel`** (🥈 For form fields)
-3. **`getByText`** (🥉 For non-interactive text)
-4. **`getByTestId`** (🔌 Escape hatch)
+1. **`getByRole`** (?? Always try this first)
+2. **`getByLabel`** (?? For form fields)
+3. **`getByText`** (?? For non-interactive text)
+4. **`getByTestId`** (?? Escape hatch)
 
 ```mermaid
 flowchart TD
@@ -43,7 +43,7 @@ flowchart TD
 ```
 
 > [!NOTE]
-> **💡 Key Takeaway**  
+> **?? Key Takeaway**  
 > Always prioritize user-facing semantic locators like `getByRole`. Only fall back to test IDs or CSS/XPath as a last resort.
 
 Let's explore each one.
@@ -112,7 +112,7 @@ Write a test that navigates to a login page and uses:
 3. `getByRole` to click the submit `button`.
 
 **Constraints:**
-- ❌ Do NOT use `page.locator()`. You must strictly use the semantic locators listed above.
+- ? Do NOT use `page.locator()`. You must strictly use the semantic locators listed above.
 
 <CodeEditor
   moduleId="15-getbyrole"
@@ -159,9 +159,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="15-getbyrole"
@@ -180,7 +180,7 @@ test('role selector challenge', async ({ page }) => {
 });`}
 />
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

@@ -1,4 +1,4 @@
-﻿# 18.3: Zero Hardcoded Wait Gate
+# 18.3: Zero Hardcoded Wait Gate
 
 ## Learning Objectives
 
@@ -152,10 +152,10 @@ function createViolation(
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ❌ Banned
+// ? Banned
 await page.waitForTimeout(3000);
 
-// ✅ Wait for a specific UI condition
+// ? Wait for a specific UI condition
 await expect(page.getByText('Loading complete')).toBeVisible();
 await expect(page.getByRole('progressbar')).toBeHidden();
 await expect(page).toHaveURL('/dashboard');
@@ -163,10 +163,10 @@ await expect(page).toHaveURL('/dashboard');
 
 ### Instead of `Promise + setTimeout`:
 ```typescript
-// ❌ Banned
+// ? Banned
 await new Promise(resolve => setTimeout(resolve, 2000));
 
-// ✅ Wait for a network request
+// ? Wait for a network request
 await page.waitForResponse(resp => resp.url().includes('/api/data'));
 ```
 
@@ -174,12 +174,12 @@ await page.waitForResponse(resp => resp.url().includes('/api/data'));
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ❌ Banned
+// ? Banned
 while (!await page.getByText('Done').isVisible()) {
   await page.waitForTimeout(500);
 }
 
-// ✅ Use expect.toPass for polling
+// ? Use expect.toPass for polling
 await expect(async () => {
   await expect(page.getByText('Done')).toBeVisible();
 }).toPass({ timeout: 30_000, intervals: [500, 1000, 2000] });
@@ -192,7 +192,7 @@ await expect(async () => {
 />
 
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -214,9 +214,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Write an AST auditor rule that detects `while` loops containing a `waitForTimeout` call.
 
 **Constraints:**
-- ❌ You may NOT use `page.waitForTimeout` in your solution code
-- ✅ You MUST use the AST `walk` function
-- ✅ All assertions must be web-first
+- ? You may NOT use `page.waitForTimeout` in your solution code
+- ? You MUST use the AST `walk` function
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="89-ast-waits"

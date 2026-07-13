@@ -137,7 +137,7 @@ export default function CertificateClaim() {
         <div className="flex items-center gap-3">
           <Award className="w-6 h-6 text-yellow-500" />
           <div>
-            <h3 className="m-0 font-bold text-[var(--text-main)] text-base">ASA Cryptographic Certification Engine</h3>
+            <h3 className="m-0 font-bold text-[var(--text-main)] text-base">ANA Cryptographic Certification Engine</h3>
             <p className="m-0 text-xs text-[var(--text-muted)]">Verifies local sqlite database progress and issues cryptographically signed credentials.</p>
           </div>
         </div>
@@ -158,7 +158,7 @@ export default function CertificateClaim() {
             <p className="font-bold m-0">Your Course Progress: {Math.min(completedCount, 77)} / 77 modules mastered</p>
             <p className="m-0 mt-1">
               {isEligible
-                ? "You have completed the required modules and are eligible to claim your Aegis Automation certification!"
+                ? "You have completed the required modules and are eligible to claim your Automation Nexus certification!"
                 : "You must complete and pass at least 1 module assessment to unlock certificate generation."}
             </p>
           </div>
@@ -242,7 +242,7 @@ export default function CertificateClaim() {
               
               <div className="flex flex-col sm:flex-row gap-3">
                 <a 
-                  href={`https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=Playwright+Automation+Legend&organizationName=Aegis+Automation+Academy&issueYear=${new Date().getFullYear()}&issueMonth=${new Date().getMonth() + 1}&certUrl=${qrPayload}&certId=${certificate.certId}`}
+                  href={`https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=Playwright+Automation+Legend&organizationName=Automation+Nexus+Academy&issueYear=${new Date().getFullYear()}&issueMonth=${new Date().getMonth() + 1}&certUrl=${qrPayload}&certId=${certificate.certId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#0e76a8] text-white rounded font-medium hover:bg-[#006097] transition-colors no-underline text-sm"
@@ -300,7 +300,7 @@ export default function CertificateClaim() {
                   {/* Top: Institute Title & Subtitle */}
                   <div style={{ textAlign: "center", marginBottom: "14px" }}>
                     <h1 style={{ margin: 0, fontSize: "1.55rem", fontWeight: 900, letterSpacing: "2px", background: "linear-gradient(to right, #f8fafc, #94a3b8)", WebkitBackgroundClip: "text", color: "transparent", whiteSpace: "nowrap" }}>
-                      PLAYWRIGHT AUTOMATION ACADEMY
+                      AUTOMATION NEXUS ACADEMY
                     </h1>
                     <p style={{ margin: "3px 0 0", fontSize: "0.7rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "3px", fontWeight: 600 }}>
                       Certifying Authority: Automation Excellence Institute
@@ -335,7 +335,7 @@ export default function CertificateClaim() {
                       For successfully completing
                     </p>
                     <p style={{ fontSize: "1.6rem", fontWeight: 900, background: "linear-gradient(to right, #f8fafc, #cbd5e1)", WebkitBackgroundClip: "text", color: "transparent", margin: "0 0 6px 0", letterSpacing: "2px" }}>
-                      AEGIS AUTOMATION
+                      AUTOMATION NEXUS
                     </p>
                     <p style={{ fontSize: "1.2rem", fontWeight: 800, color: "#fbbf24", margin: "0", letterSpacing: "3px", textShadow: "0 0 15px rgba(251,191,36,0.4)" }}>
                       AUTOMATION LEGEND TRACK
@@ -379,7 +379,7 @@ export default function CertificateClaim() {
                         Founder & Course Director
                       </div>
                       <div style={{ fontSize: "0.75rem", color: "#fbbf24", marginTop: "1px", fontWeight: 600, textTransform: "uppercase" }}>
-                        Aegis Automation
+                        Automation Nexus
                       </div>
                       <div style={{ fontSize: "0.75rem", color: "#22d3ee", marginTop: "3px", display: "flex", alignItems: "center", gap: "6px", textShadow: "0 0 8px rgba(34, 211, 238, 0.4)", fontWeight: 700 }}>
                         <CheckCircle style={{ width: "14px", height: "14px" }} /> Digitally Signed & Verified

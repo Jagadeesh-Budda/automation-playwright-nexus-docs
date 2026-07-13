@@ -1,4 +1,4 @@
-﻿# 15.1: 21 CFR Part 11 Compliance
+# 15.1: 21 CFR Part 11 Compliance
 
 ## Learning Objectives
 
@@ -42,7 +42,7 @@ sequenceDiagram
 ```
 
 > [!NOTE]
-> **💡 Key Takeaway**  
+> **?? Key Takeaway**  
 > Under 21 CFR Part 11, the UI is just a portal. The actual compliance happens deep within the system architecture. This is why your Playwright tests must rigorously verify the Audit Trail (who, what, when, why) to mathematically prove the system is compliant.
 
 ## What We Must Test
@@ -68,7 +68,7 @@ test('signing is rejected if document was modified after opening');
 
 // AUDIT TRAIL TESTS:
 test('audit trail records the correct user, timestamp, and reason');
-test('audit trail is read-only — no edit or delete');
+test('audit trail is read-only � no edit or delete');
 test('audit trail entries are in chronological order');
 ```
 
@@ -155,7 +155,7 @@ test.describe('21 CFR Part 11 - Electronic Signature Compliance', () => {
 />
 
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -211,9 +211,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="72-esign-compliance"

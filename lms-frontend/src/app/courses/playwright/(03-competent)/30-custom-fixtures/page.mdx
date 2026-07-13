@@ -1,4 +1,4 @@
-﻿
+
 # 5.2: Creating Custom Fixtures
 
 
@@ -41,7 +41,7 @@ sequenceDiagram
 ```
 
 > [!NOTE]
-> **💡 Key Takeaway**  
+> **?? Key Takeaway**  
 > A fixture runs until `await use(...)`, hands control to the test, and then resumes afterward for cleanup.
 
 ## Using the Fixture in a Test
@@ -51,8 +51,8 @@ Now that we created `fixtures.ts`, we must import `test` from our new file inste
 ```typescript
 // tests/login.spec.ts
 
-// ❌ OLD WAY: import { test, expect } from '@playwright/test';
-// ✅ NEW WAY: Import our extended test!
+// ? OLD WAY: import { test, expect } from '@playwright/test';
+// ? NEW WAY: Import our extended test!
 import { test, expect } from '../fixtures';
 
 test('admin can see dashboard', async ({ loginPage }) => {

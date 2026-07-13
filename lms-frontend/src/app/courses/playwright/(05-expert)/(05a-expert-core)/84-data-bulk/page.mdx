@@ -1,4 +1,4 @@
-﻿# 17.3: Bulk Inventory Import
+# 17.3: Bulk Inventory Import
 
 ## Learning Objectives
 
@@ -121,7 +121,7 @@ export class DataFactory {
     await Promise.allSettled(
       ids.map(id => this.request.delete(`/api/documents/${id}`, { headers: this.headers }))
     );
-    console.log(`🧹 Cleaned up ${ids.length} test records`);
+    console.log(`?? Cleaned up ${ids.length} test records`);
   }
 }
 ```
@@ -190,7 +190,7 @@ test.describe('Pagination with bulk data', () => {
 />
 
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -246,9 +246,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="84-data-bulk"

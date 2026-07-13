@@ -1,4 +1,4 @@
-Ôªø# 8.8: Selenium/Cypress ‚Üí Playwright
+# 8.8: Selenium/Cypress ? Playwright
 
 ## Learning Objectives
 
@@ -12,11 +12,11 @@ By the end of this lesson, you will be able to:
 | Selenium Concept | Playwright Equivalent | Key Difference |
 |-----------------|----------------------|----------------|
 | `WebDriver` | `Browser` / `BrowserContext` | Playwright uses contexts for isolation, not separate drivers |
-| `WebElement` | `Locator` | Locators are **lazy** ‚Äî they don't query the DOM until you act |
+| `WebElement` | `Locator` | Locators are **lazy** ó they don't query the DOM until you act |
 | `driver.findElement(By.id())` | `page.getByRole()` | Playwright prefers semantic/accessible locators |
-| `WebDriverWait` + `ExpectedConditions` | Built-in auto-waiting | Playwright waits automatically ‚Äî no explicit waits needed |
-| `Thread.sleep()` | ‚ùå Banned | Use `expect().toBeVisible()` instead |
-| `driver.switchTo().frame()` | `page.frameLocator()` | No need to "switch" ‚Äî frameLocator chains naturally |
+| `WebDriverWait` + `ExpectedConditions` | Built-in auto-waiting | Playwright waits automatically ó no explicit waits needed |
+| `Thread.sleep()` | ? Banned | Use `expect().toBeVisible()` instead |
+| `driver.switchTo().frame()` | `page.frameLocator()` | No need to "switch" ó frameLocator chains naturally |
 | `driver.switchTo().window()` | `page.waitForEvent('popup')` | Playwright gives you the page directly |
 | `Actions` class | `locator.hover()`, `locator.dragTo()` | Built into locators, no separate class |
 | `driver.manage().timeouts()` | `playwright.config.ts` | Centralized configuration |
@@ -54,17 +54,17 @@ test('admin can login', async ({ page }) => {
   
   await expect(page).toHaveURL('/dashboard');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dashboard');
-  // No driver.quit() ‚Äî Playwright handles cleanup via fixtures
+  // No driver.quit() ó Playwright handles cleanup via fixtures
 });
 ```
 
 ### Top 5 Things Selenium Users Get Wrong in Playwright
 
-1. **Adding explicit waits** ‚Äî Playwright auto-waits. Don't add `waitForSelector()` before `click()`.
-2. **Using `page.$()` (ElementHandle)** ‚Äî Use `page.getByRole()` (Locator) instead. Locators are lazy and resilient.
-3. **Closing the browser manually** ‚Äî Playwright fixtures handle cleanup automatically.
-4. **Using CSS selectors for everything** ‚Äî Use `getByRole()`, `getByLabel()`, `getByText()` first.
-5. **Creating a "Base Test" class with inheritance** ‚Äî Use `test.extend()` with fixtures instead.
+1. **Adding explicit waits** ó Playwright auto-waits. Don't add `waitForSelector()` before `click()`.
+2. **Using `page.$()` (ElementHandle)** ó Use `page.getByRole()` (Locator) instead. Locators are lazy and resilient.
+3. **Closing the browser manually** ó Playwright fixtures handle cleanup automatically.
+4. **Using CSS selectors for everything** ó Use `getByRole()`, `getByLabel()`, `getByText()` first.
+5. **Creating a "Base Test" class with inheritance** ó Use `test.extend()` with fixtures instead.
 
 ---
 
@@ -78,8 +78,8 @@ test('admin can login', async ({ page }) => {
 | `cy.get('.selector')` | `page.getByRole()` | Playwright prefers semantic locators |
 | `cy.contains('text')` | `page.getByText('text')` | Same concept |
 | `cy.intercept()` | `page.route()` | Same concept, different API |
-| `cy.fixture()` | `test.extend()` fixtures | Different meaning ‚Äî Cypress fixtures are data files |
-| Automatic retry | Automatic retry | Both auto-retry ‚Äî similar philosophy |
+| `cy.fixture()` | `test.extend()` fixtures | Different meaning ó Cypress fixtures are data files |
+| Automatic retry | Automatic retry | Both auto-retry ó similar philosophy |
 | Chaining (`cy.get().click()`) | Await chaining (`await locator.click()`) | Playwright uses `async/await` |
 | `beforeEach()` hooks | `test.beforeEach()` | Same concept |
 | `cy.wrap()` | Not needed | Playwright natively handles async |
@@ -90,13 +90,13 @@ test('admin can login', async ({ page }) => {
 ### Critical Difference: Architecture
 
 ```
-Cypress:     Browser ‚Üê injects commands ‚Üí Your test (runs in browser)
-Playwright:  Node.js ‚Üí controls browser via DevTools Protocol ‚Üí Browser
+Cypress:     Browser ? injects commands ? Your test (runs in browser)
+Playwright:  Node.js ? controls browser via DevTools Protocol ? Browser
 ```
 
 **Why this matters:**
-- **Cypress** runs inside the browser ‚Äî limited to one tab, one domain, one browser
-- **Playwright** runs outside the browser ‚Äî supports multiple tabs, multiple browsers, multiple domains, API calls, file system access
+- **Cypress** runs inside the browser ó limited to one tab, one domain, one browser
+- **Playwright** runs outside the browser ó supports multiple tabs, multiple browsers, multiple domains, API calls, file system access
 
 ### Before & After: API Interception
 
@@ -125,16 +125,16 @@ await page.route('/api/documents', route => {
 
 await page.goto('/documents');
 await expect(page.getByRole('row')).toHaveCount(1);
-// No need for cy.wait() ‚Äî web-first assertions retry automatically
+// No need for cy.wait() ó web-first assertions retry automatically
 ```
 
 ### Top 5 Things Cypress Users Get Wrong in Playwright
 
-1. **Forgetting `await`** ‚Äî Every Playwright action needs `await`. Cypress chains implicitly.
-2. **Looking for `cy.wait()`** ‚Äî Use `expect().toBeVisible()` or `page.waitForResponse()` instead.
-3. **Expecting single-tab limitation** ‚Äî Playwright supports multi-tab! Use `page.waitForEvent('popup')`.
-4. **Using `data-cy` attribute** ‚Äî Playwright calls it `data-testid` (configurable in config).
-5. **Missing `should()` chaining** ‚Äî Use `await expect(locator).toBeVisible()` ‚Äî it's separate from the locator.
+1. **Forgetting `await`** ó Every Playwright action needs `await`. Cypress chains implicitly.
+2. **Looking for `cy.wait()`** ó Use `expect().toBeVisible()` or `page.waitForResponse()` instead.
+3. **Expecting single-tab limitation** ó Playwright supports multi-tab! Use `page.waitForEvent('popup')`.
+4. **Using `data-cy` attribute** ó Playwright calls it `data-testid` (configurable in config).
+5. **Missing `should()` chaining** ó Use `await expect(locator).toBeVisible()` ó it's separate from the locator.
 
 ---
 
@@ -201,9 +201,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ‚ùå Do not use deprecated APIs
-- ‚úÖ Follow the architecture best practices
-- ‚úÖ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="47-migration-guide"
@@ -215,7 +215,7 @@ You have learned the core pattern. Now apply it under pressure.
 // Write your Playwright conversion below:`}
 />
 <details>
-<summary>üîë Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

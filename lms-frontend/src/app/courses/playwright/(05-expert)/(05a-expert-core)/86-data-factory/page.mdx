@@ -1,4 +1,4 @@
-﻿# 17.5: The Test Factory Pattern
+# 17.5: The Test Factory Pattern
 
 ## Learning Objectives
 
@@ -148,7 +148,7 @@ test.describe('Document Operations', () => {
   });
 
   test('can view an approved document', async ({ page }) => {
-    // ✅ No setup code in the test — factory handles it
+    // ? No setup code in the test � factory handles it
     const doc = await factory.approvedDocument({ title: 'View Test Doc' });
     
     await page.goto(`/documents/${doc.id}`);
@@ -178,7 +178,7 @@ test.describe('Document Operations', () => {
 />
 
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 export const DocumentFactory = (overrides = {}) => ({
@@ -233,9 +233,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="86-data-factory"

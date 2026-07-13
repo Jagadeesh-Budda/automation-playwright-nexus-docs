@@ -1,4 +1,4 @@
-﻿
+
 # 3.4: The Duplication Problem
 
 
@@ -17,11 +17,11 @@ Imagine your application requires users to log in before they can do almost anyt
 
 ```
 tests/
-  login.spec.ts          → has login code
-  dashboard.spec.ts      → has login code inside beforeEach
-  settings.spec.ts       → has login code inside beforeEach
-  upload.spec.ts         → has login code inside beforeEach
-  admin-panel.spec.ts    → has login code inside beforeEach
+  login.spec.ts          ? has login code
+  dashboard.spec.ts      ? has login code inside beforeEach
+  settings.spec.ts       ? has login code inside beforeEach
+  upload.spec.ts         ? has login code inside beforeEach
+  admin-panel.spec.ts    ? has login code inside beforeEach
 ```
 
 Inside every single one of those files, you have this code:
@@ -44,11 +44,11 @@ What happens to your tests?
 **They all break.**
 
 ```
-❌ dashboard.spec.ts  — Timeout finding 'Email'
-❌ settings.spec.ts   — Timeout finding 'Email'
-❌ upload.spec.ts     — Timeout finding 'Email'
-❌ admin-panel.spec.ts— Timeout finding 'Email'
-❌ reports.spec.ts    — Timeout finding 'Email'
+? dashboard.spec.ts  � Timeout finding 'Email'
+? settings.spec.ts   � Timeout finding 'Email'
+? upload.spec.ts     � Timeout finding 'Email'
+? admin-panel.spec.ts� Timeout finding 'Email'
+? reports.spec.ts    � Timeout finding 'Email'
 ```
 
 Every single test file turns red. 
@@ -96,9 +96,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="22-duplication-problem"
@@ -106,7 +106,7 @@ You have learned the core pattern. Now apply it under pressure.
   placeholder="// Challenge: Implement the workflow\n// Write your code here:"
 />
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

@@ -1,4 +1,4 @@
-﻿# 0.5: Async/Await & Promises
+# 0.5: Async/Await & Promises
 
 
 
@@ -88,7 +88,7 @@ sequenceDiagram
 ```
 
 > [!NOTE]
-> **💡 Key Takeaway**  
+> **?? Key Takeaway**  
 > Using `await` pauses your function's execution until the background task completes, preventing Playwright from interacting with elements before they are actually ready.
 
 ```javascript
@@ -118,7 +118,7 @@ The waiter drops off the ticket and instantly moves on, without waiting for the 
 import { test, expect } from '@playwright/test';
 
 test('Broken Flow', async ({ page }) => {
-  // ❌ Missing await!
+  // ? Missing await!
   // Playwright starts the click, but JS instantly moves to the next line!
   page.click('#submit-btn'); 
   

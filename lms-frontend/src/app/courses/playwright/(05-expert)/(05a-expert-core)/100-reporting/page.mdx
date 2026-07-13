@@ -1,4 +1,4 @@
-﻿# 16.3: Industrial Reporting
+# 16.3: Industrial Reporting
 
 ## Learning Objectives
 
@@ -141,12 +141,12 @@ class SummaryReporter implements Reporter {
     const total = this.summary.passed + this.summary.failed + this.summary.skipped;
     const passRate = Math.round((this.summary.passed / total) * 100);
     
-    console.log(`\n📊 Test Summary:`);
-    console.log(`   ✅ Passed:  ${this.summary.passed}`);
-    console.log(`   ❌ Failed:  ${this.summary.failed}`);
-    console.log(`   ⏭️  Skipped: ${this.summary.skipped}`);
-    console.log(`   📈 Pass Rate: ${passRate}%`);
-    console.log(`   ⏱️  Duration: ${Math.round(this.summary.duration / 1000)}s`);
+    console.log(`\n?? Test Summary:`);
+    console.log(`   ? Passed:  ${this.summary.passed}`);
+    console.log(`   ? Failed:  ${this.summary.failed}`);
+    console.log(`   ??  Skipped: ${this.summary.skipped}`);
+    console.log(`   ?? Pass Rate: ${passRate}%`);
+    console.log(`   ??  Duration: ${Math.round(this.summary.duration / 1000)}s`);
   }
 }
 

@@ -1,4 +1,4 @@
-﻿
+
 # 3.3: Before/After Hooks
 
 
@@ -90,10 +90,10 @@ This is much cleaner. The tests now only contain the logic they actually care ab
 
 Playwright provides four main hooks:
 
-1. `test.beforeEach()` — Runs before *each* test. (Most common)
-2. `test.afterEach()` — Runs after *each* test. (Used for cleanup)
-3. `test.beforeAll()` — Runs *once* before all tests in the file. (Dangerous for beginners, as it shares state)
-4. `test.afterAll()` — Runs *once* after all tests in the file.
+1. `test.beforeEach()` � Runs before *each* test. (Most common)
+2. `test.afterEach()` � Runs after *each* test. (Used for cleanup)
+3. `test.beforeAll()` � Runs *once* before all tests in the file. (Dangerous for beginners, as it shares state)
+4. `test.afterAll()` � Runs *once* after all tests in the file.
 
 ```mermaid
 flowchart TD
@@ -118,7 +118,7 @@ flowchart TD
 ```
 
 > [!NOTE]
-> **💡 Key Takeaway**  
+> **?? Key Takeaway**  
 > `beforeEach` runs again from scratch for every single test in the block, ensuring each test starts with a completely fresh state.
 
 > [!WARNING]
@@ -131,7 +131,7 @@ Add a `beforeEach` hook that navigates to your application's homepage.
 Add two tests inside the block that perform different searches.
 
 **Constraints:**
-- ❌ Do NOT use `test.beforeAll()` or `test.afterAll()`. You must strictly use `test.beforeEach()` to ensure state isolation.
+- ? Do NOT use `test.beforeAll()` or `test.afterAll()`. You must strictly use `test.beforeEach()` to ensure state isolation.
 
 <CodeEditor
   moduleId="21-before-after"
@@ -178,9 +178,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="21-before-after"
@@ -208,7 +208,7 @@ test('view settings', async ({ page }) => {
 });`}
 />
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

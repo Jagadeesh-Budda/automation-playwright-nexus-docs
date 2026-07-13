@@ -1,4 +1,4 @@
-﻿# 10.3: Component-Based Locators
+# 10.3: Component-Based Locators
 
 ## Learning Objectives
 
@@ -7,9 +7,9 @@ By the end of this lesson, you will be able to:
 
 ## Where Do Locators Live?
 
-In the ASA architecture, **locators always live in Page Object files** (Layer 2). They are never written directly in spec files. This is enforced by the AST Auditor's Gate 4.
+In the ANA architecture, **locators always live in Page Object files** (Layer 2). They are never written directly in spec files. This is enforced by the AST Auditor's Gate 4.
 
-The question isn't whether to use Page Objects — it's *how* to structure them.
+The question isn't whether to use Page Objects � it's *how* to structure them.
 
 ## The Recommended Page Object Pattern
 
@@ -20,9 +20,9 @@ import { Page, Locator } from '@playwright/test';
 export class DocumentPage {
   readonly page: Page;
   
-  // ─────────────────────────────────────────
+  // -----------------------------------------
   // Section 1: Locators (declared as properties)
-  // ─────────────────────────────────────────
+  // -----------------------------------------
   
   // Navigation
   readonly uploadButton: Locator;
@@ -66,9 +66,9 @@ export class DocumentPage {
     this.uploadConfirmButton = this.uploadModal.getByRole('button', { name: 'Upload' });
   }
 
-  // ─────────────────────────────────────────
+  // -----------------------------------------
   // Section 2: Methods (business actions)
-  // ─────────────────────────────────────────
+  // -----------------------------------------
 
   async navigate() {
     await this.page.goto('/documents');
@@ -86,7 +86,7 @@ export class DocumentPage {
     await this.loadingSpinner.waitFor({ state: 'hidden' });
   }
 
-  // Dynamic locators — return a locator based on input
+  // Dynamic locators � return a locator based on input
   getRowByDocId(docId: string): Locator {
     return this.tableRows.filter({ hasText: docId });
   }
@@ -168,7 +168,7 @@ export class DataTableComponent {
 ```
 
 ```typescript
-// pages/DocumentPage.ts — uses DataTableComponent
+// pages/DocumentPage.ts � uses DataTableComponent
 import { DataTableComponent } from '../components/DataTableComponent';
 
 export class DocumentPage {
@@ -260,13 +260,13 @@ export class AutocompleteComponent {
 When two Page Objects share behavior, **compose** shared components instead of extending a base class:
 
 ```typescript
-// ❌ Avoid: Deep inheritance hierarchy
+// ? Avoid: Deep inheritance hierarchy
 class BasePage { /* ... */ }
 class AuthenticatedPage extends BasePage { /* ... */ }
 class DocumentPage extends AuthenticatedPage { /* ... */ }
 class SpecialDocumentPage extends DocumentPage { /* ... */ }
 
-// ✅ Prefer: Composition — reuse components
+// ? Prefer: Composition � reuse components
 class DocumentPage {
   readonly navbar: NavbarComponent;
   readonly sidebar: SidebarComponent;
@@ -291,7 +291,7 @@ export class DashboardPage {
   readonly page: Page;
   readonly heading: Locator;
   
-  // Conditional elements — may or may not exist
+  // Conditional elements � may or may not exist
   readonly adminPanel: Locator;
   readonly reviewerQueue: Locator;
 
@@ -354,15 +354,15 @@ test('document preview opens correctly', async ({ documentPage }) => {
 
 ## Anti-Patterns to Avoid
 
-### ❌ Anti-Pattern 1: Locators as methods (recreated every call)
+### ? Anti-Pattern 1: Locators as methods (recreated every call)
 ```typescript
-// Bad — creates a new locator object on every call (though functionally works)
+// Bad � creates a new locator object on every call (though functionally works)
 getUploadButton() {
   return this.page.getByRole('button', { name: 'Upload' });
 }
 ```
 
-### ✅ Correct: Locators as properties (created once, assigned in constructor)
+### ? Correct: Locators as properties (created once, assigned in constructor)
 ```typescript
 import { Page, Locator } from '@playwright/test';
 
@@ -377,29 +377,29 @@ export class LoginPage {
 }
 ```
 
-### ❌ Anti-Pattern 2: CSS strings scattered everywhere
+### ? Anti-Pattern 2: CSS strings scattered everywhere
 ```typescript
 this.btn = page.locator('.btn-primary.upload-btn');
 ```
 
-### ✅ Correct: Semantic locators
+### ? Correct: Semantic locators
 ```typescript
 this.uploadButton = page.getByRole('button', { name: 'Upload Document' });
 ```
 
-### ❌ Anti-Pattern 3: Assertions inside Page Objects
+### ? Anti-Pattern 3: Assertions inside Page Objects
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// Bad — Page Objects should PERFORM actions, not VERIFY them
+// Bad � Page Objects should PERFORM actions, not VERIFY them
 async uploadFile(path: string) {
   await this.fileInput.setInputFiles(path);
   await this.uploadConfirmButton.click();
-  await expect(this.successBanner).toBeVisible();  // ❌ Don't assert here!
+  await expect(this.successBanner).toBeVisible();  // ? Don't assert here!
 }
 ```
 
-### ✅ Correct: Return state, let the test assert
+### ? Correct: Return state, let the test assert
 ```typescript
 import { test, expect } from '@playwright/test';
 
@@ -412,7 +412,7 @@ async uploadFile(path: string) {
 // Test asserts the outcome
 test('upload shows success', async ({ documentPage }) => {
   await documentPage.uploadFile('report.pdf');
-  await expect(documentPage.successBanner).toBeVisible();  // ✅ Assert in the test
+  await expect(documentPage.successBanner).toBeVisible();  // ? Assert in the test
 });
 ```
 
@@ -461,9 +461,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="54-locators-arch"
@@ -483,7 +483,7 @@ test('challenge exercise', async ({ page }) => {
 });`}
 />
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

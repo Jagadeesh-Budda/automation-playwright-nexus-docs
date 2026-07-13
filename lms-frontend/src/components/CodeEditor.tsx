@@ -220,8 +220,7 @@ export default function CodeEditor({ moduleId, placeholder = "// Write your Play
                 <textarea
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  placeholder={`// AEGIS Sandbox Playboard\n// Hint: ${(lessonContent?.tasks?.[taskIndex] as any)?.hint || 'Write your code here'}\n\n`}
-                  className="w-full h-56 p-5 font-mono text-[13px] leading-relaxed bg-[#1e1e1e] text-[#d4d4d4] focus:outline-none resize-none"
+                  placeholder={`// NEXUS Sandbox Playboard\n// Hint: ${(lessonContent?.tasks?.[taskIndex] as any)?.hint || 'Write your code here'}\n\n`}                  className="w-full h-56 p-5 font-mono text-[13px] leading-relaxed bg-[#1e1e1e] text-[#d4d4d4] focus:outline-none resize-none"
                   spellCheck="false"
                 />
               </div>
@@ -230,7 +229,7 @@ export default function CodeEditor({ moduleId, placeholder = "// Write your Play
               <div className="bg-[#0a0a0a] rounded-xl border border-slate-800 p-5 font-mono text-[13px] leading-relaxed text-slate-400 shadow-inner overflow-y-auto max-h-40">
                 <div className="flex items-center gap-2 text-emerald-500 font-bold mb-3">
                   <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-                  AEGIS INDUSTRIAL WORKSPACE v2.8
+                  NEXUS INDUSTRIAL WORKSPACE v2.8
                 </div>
                 {error ? (
                   <div className="text-red-400 mb-2">
@@ -247,7 +246,7 @@ export default function CodeEditor({ moduleId, placeholder = "// Write your Play
                   </div>
                 )}
                 <div className="flex text-slate-500 items-center">
-                  <span className="text-[#38bdf8] font-bold">candidate@AEGIS-workspace</span>
+                  <span className="text-[#38bdf8] font-bold">candidate@NEXUS-workspace</span>
                   <span className="text-slate-400 mx-1">:</span>
                   <span className="text-emerald-400">~</span>
                   <span className="ml-1 text-white">$</span>

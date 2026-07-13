@@ -1,17 +1,17 @@
-﻿# 8.1: The Sprint Cycle
+# 8.1: The Sprint Cycle
 
 ## Learning Objectives
 
 By the end of this lesson, you will be able to:
-- Understand the Automation Skill Authority (ASA) automation sprint cycle
+- Understand the Automation Nexus Academy (ANA) automation sprint cycle
 
 ## What is the Sprint Cycle?
 
 In professional automation engineering, tests are not written randomly. They follow a structured, repeatable **5-day sprint cycle** designed to ensure every automation engineer produces stable, reviewed, and CI-ready code by the end of the week.
 
-Think of it like a factory assembly line — each day has a specific role, and skipping a step breaks the quality guarantee.
+Think of it like a factory assembly line � each day has a specific role, and skipping a step breaks the quality guarantee.
 
-## The ASA 5-Day Sprint Model
+## The ANA 5-Day Sprint Model
 
 | Day | Focus | Goal |
 |-----|-------|------|
@@ -21,13 +21,13 @@ Think of it like a factory assembly line — each day has a specific role, and s
 | **Day 4** | Architecture Review | Refactor, ensure 4-layer compliance |
 | **Day 5** | PR & Merge | Pass AST audit, get PR approved |
 
-## Core Tools in the ASA Stack
+## Core Tools in the ANA Stack
 
 ```
-Playwright   → UI Automation Engine
-Jira         → Sprint tracking and ticket management
-GitHub       → Source control and Pull Request reviews
-.env files   → Environment-specific configuration
+Playwright   ? UI Automation Engine
+Jira         ? Sprint tracking and ticket management
+GitHub       ? Source control and Pull Request reviews
+.env files   ? Environment-specific configuration
 ```
 
 ## Why This Process Matters
@@ -37,28 +37,28 @@ Without a structured sprint cycle, automation engineers tend to:
 - Hardcode `sleep()` calls instead of using smart waiting (causes flaky CI failures)
 - Skip the architecture review (creates unmaintainable test suites)
 
-The ASA sprint cycle enforces discipline so your test suite grows **without accumulating technical debt**.
+The ANA sprint cycle enforces discipline so your test suite grows **without accumulating technical debt**.
 
 ## The Definition of Done (DoD)
 
 A test is **not done** until:
-1. ✅ It passes in `--headed` and `--headless` mode
-2. ✅ The AST Auditor passes in `--strict` mode (no hardcoded waits, no magic strings)
-3. ✅ A senior engineer has approved the Pull Request on GitHub
-4. ✅ The test passes in the CI/CD pipeline (GitHub Actions)
+1. ? It passes in `--headed` and `--headless` mode
+2. ? The AST Auditor passes in `--strict` mode (no hardcoded waits, no magic strings)
+3. ? A senior engineer has approved the Pull Request on GitHub
+4. ? The test passes in the CI/CD pipeline (GitHub Actions)
 
 > [!IMPORTANT]
 > **The #1 rule:** Never push code that fails locally. If a test fails on your machine, it will always fail in CI. Fix it first.
 
 ## Real-World Context: Pharmaceutical DMS
 
-In a Document Management System (DMS) for a pharmaceutical company, automation tests are **regulatory artifacts**. A failing test isn't just a bug — it can block a product release. The sprint cycle ensures every test is treated with the seriousness it deserves.
+In a Document Management System (DMS) for a pharmaceutical company, automation tests are **regulatory artifacts**. A failing test isn't just a bug � it can block a product release. The sprint cycle ensures every test is treated with the seriousness it deserves.
 
 ## Common Mistakes on Day 1
 
-❌ **Starting to code before reading the spec** — You will test the wrong thing.
-❌ **Skipping Jira ticket updates** — Your team loses visibility into progress.
-✅ **Correct approach:** Read the acceptance criteria first, write test scenarios in plain English, *then* open your code editor.
+? **Starting to code before reading the spec** � You will test the wrong thing.
+? **Skipping Jira ticket updates** � Your team loses visibility into progress.
+? **Correct approach:** Read the acceptance criteria first, write test scenarios in plain English, *then* open your code editor.
 
 ## The Training Wheels Are Coming Off: Introduction to AST Gates
 
@@ -95,9 +95,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="40-onboarding"
@@ -117,7 +117,7 @@ test('challenge exercise', async ({ page }) => {
 });`}
 />
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

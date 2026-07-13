@@ -1,4 +1,4 @@
-﻿## Learning Objectives
+## Learning Objectives
 
 By the end of this lesson, you will be able to:
 - Achieve 0 Critical Violations
@@ -19,7 +19,7 @@ grep -r "new LoginPage\|new DocumentPage\|new ESignPage" tests/
 
 # 3. Check that NO spec file contains page.locator() calls
 grep -r "page\.locator\|page\.getByRole\|page\.getByText" tests/
-# Expected output: (nothing — all locators should be in pages/)
+# Expected output: (nothing � all locators should be in pages/)
 
 # 4. Verify every spec file imports from fixtures/baseTest, not @playwright/test
 grep -r "from '@playwright/test'" tests/
@@ -35,15 +35,15 @@ grep -r "from '.*fixtures/baseTest'" tests/
 npx ts-node scripts/ast-audit.ts
 
 # Expected output when passing:
-# 🔍 Running AST Audit...
+# ?? Running AST Audit...
 # 
-# ✅ Gate 1: No hardcoded sleeps — PASSED (0 violations)
-# ✅ Gate 2: No hardcoded credentials — PASSED (0 violations)
-# ✅ Gate 3: All async operations awaited — PASSED (0 violations)
-# ✅ Gate 4: No locators in spec files — PASSED (0 violations)
-# ✅ Gate 5: All tests have describe blocks — PASSED (0 violations)
+# ? Gate 1: No hardcoded sleeps � PASSED (0 violations)
+# ? Gate 2: No hardcoded credentials � PASSED (0 violations)
+# ? Gate 3: All async operations awaited � PASSED (0 violations)
+# ? Gate 4: No locators in spec files � PASSED (0 violations)
+# ? Gate 5: All tests have describe blocks � PASSED (0 violations)
 # 
-# ✅ AST Audit passed! All 5 gates cleared.
+# ? AST Audit passed! All 5 gates cleared.
 ```
 
 ## Test Quality Audit
@@ -55,13 +55,13 @@ import { test, expect } from '@playwright/test';
 
 // For each test, verify:
 
-// ✅ 1. Has a describe block
+// ? 1. Has a describe block
 test.describe('Module Name', () => { ... });
 
-// ✅ 2. Has a clear, readable name
+// ? 2. Has a clear, readable name
 test('admin can upload and submit a Protocol document', async () => { ... });
 
-// ✅ 3. Follows AAA pattern
+// ? 3. Follows AAA pattern
 test('example', async ({ documentPage }) => {
   // Arrange
   const doc = DocumentFactory({ type: 'Protocol' });
@@ -73,12 +73,12 @@ test('example', async ({ documentPage }) => {
   await expect(documentPage.getStatusBadge(id)).toContainText('Draft');
 });
 
-// ✅ 4. Cleans up after itself
+// ? 4. Cleans up after itself
 test.afterEach(async ({ apiClient }) => {
   if (testDocId) await apiClient.delete(testDocId);
 });
 
-// ✅ 5. Does NOT depend on other tests' data
+// ? 5. Does NOT depend on other tests' data
 // Every test creates its own data
 ```
 
@@ -86,13 +86,13 @@ test.afterEach(async ({ apiClient }) => {
 
 Verify you have tests for all critical paths:
 
-| Feature | Happy Path ✅ | Error Path ✅ | Security ✅ |
+| Feature | Happy Path ? | Error Path ? | Security ? |
 |---------|-------------|-------------|------------|
-| Login | ✅ Valid login | ✅ Wrong password | ✅ Role-based access |
-| Document Upload | ✅ PDF upload | ✅ File too large | ✅ Unauthorized upload |
-| Review Workflow | ✅ Approve | ✅ Reject | ✅ Wrong role can't approve |
-| E-Sign | ✅ Valid signature | ✅ Wrong password | ✅ Can't re-sign |
-| API | ✅ CRUD operations | ✅ 404 / 403 | ✅ JWT token validation |
+| Login | ? Valid login | ? Wrong password | ? Role-based access |
+| Document Upload | ? PDF upload | ? File too large | ? Unauthorized upload |
+| Review Workflow | ? Approve | ? Reject | ? Wrong role can't approve |
+| E-Sign | ? Valid signature | ? Wrong password | ? Can't re-sign |
+| API | ? CRUD operations | ? 404 / 403 | ? JWT token validation |
 
 ## Performance Baseline
 
@@ -128,7 +128,7 @@ Your Capstone suite should complete in **under 5 minutes** when run with `worker
 
 ```bash
 grep -r "from '@playwright/test'" tests/
-# Expected output: (nothing — all spec files should import from fixtures/baseTest)
+# Expected output: (nothing � all spec files should import from fixtures/baseTest)
 ```
 
 </SolutionGate>
@@ -173,9 +173,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="97-capstone-audit"
@@ -185,7 +185,7 @@ You have learned the core pattern. Now apply it under pressure.
 `}
 />
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

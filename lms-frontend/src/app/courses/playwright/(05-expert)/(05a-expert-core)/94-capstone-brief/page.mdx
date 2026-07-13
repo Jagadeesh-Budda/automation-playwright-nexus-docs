@@ -1,4 +1,4 @@
-﻿# 23.1: The Capstone Blueprint
+# 23.1: The Capstone Blueprint
 
 ## Learning Objectives
 
@@ -27,7 +27,7 @@ By the end of the Capstone, your framework will:
 **Core modules:**
 1. Authentication (login, logout, role switching)
 2. Document Management (upload, search, filter, paginate)
-3. Review Workflow (submit → review → approve/reject)
+3. Review Workflow (submit ? review ? approve/reject)
 4. E-Sign (sign with reason + password, audit trail)
 5. Admin Panel (user management, system configuration)
 
@@ -52,46 +52,46 @@ Your automation framework passes the Capstone when ALL of these are true:
 
 ```
 capstone-dms-automation/
-├── tests/
-│   ├── auth/
-│   │   └── login.spec.ts
-│   ├── documents/
-│   │   ├── upload.spec.ts
-│   │   ├── search.spec.ts
-│   │   └── workflow.spec.ts
-│   ├── e-sign/
-│   │   └── signature-workflow.spec.ts
-│   ├── api/
-│   │   ├── documents-api.spec.ts
-│   │   └── auth-api.spec.ts
-│   └── compliance/
-│       └── audit-trail.spec.ts
-├── pages/
-│   ├── LoginPage.ts
-│   ├── DocumentPage.ts
-│   ├── UploadPage.ts
-│   ├── ReviewPage.ts
-│   ├── ESignPage.ts
-│   └── AuditTrailPage.ts
-├── components/
-│   ├── Modal.ts
-│   ├── DataTable.ts
-│   └── ESignModal.ts
-├── entities/
-│   ├── User.ts
-│   ├── Document.ts
-│   └── Signature.ts
-├── fixtures/
-│   └── baseTest.ts
-├── utils/
-│   ├── ApiClient.ts
-│   ├── DataFactory.ts
-│   └── AstAuditor.ts
-├── data/
-│   └── testDocuments.json
-├── .env.example
-├── playwright.config.ts
-└── global-setup.ts
++-- tests/
+�   +-- auth/
+�   �   +-- login.spec.ts
+�   +-- documents/
+�   �   +-- upload.spec.ts
+�   �   +-- search.spec.ts
+�   �   +-- workflow.spec.ts
+�   +-- e-sign/
+�   �   +-- signature-workflow.spec.ts
+�   +-- api/
+�   �   +-- documents-api.spec.ts
+�   �   +-- auth-api.spec.ts
+�   +-- compliance/
+�       +-- audit-trail.spec.ts
++-- pages/
+�   +-- LoginPage.ts
+�   +-- DocumentPage.ts
+�   +-- UploadPage.ts
+�   +-- ReviewPage.ts
+�   +-- ESignPage.ts
+�   +-- AuditTrailPage.ts
++-- components/
+�   +-- Modal.ts
+�   +-- DataTable.ts
+�   +-- ESignModal.ts
++-- entities/
+�   +-- User.ts
+�   +-- Document.ts
+�   +-- Signature.ts
++-- fixtures/
+�   +-- baseTest.ts
++-- utils/
+�   +-- ApiClient.ts
+�   +-- DataFactory.ts
+�   +-- AstAuditor.ts
++-- data/
+�   +-- testDocuments.json
++-- .env.example
++-- playwright.config.ts
++-- global-setup.ts
 ```
 
 ## Planning Your Capstone
@@ -171,9 +171,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="94-capstone-brief"
@@ -193,7 +193,7 @@ test('challenge exercise', async ({ page }) => {
 });`}
 />
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

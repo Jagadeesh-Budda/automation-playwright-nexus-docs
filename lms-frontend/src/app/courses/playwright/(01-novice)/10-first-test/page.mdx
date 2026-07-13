@@ -1,4 +1,4 @@
-﻿
+
 # 1.1: Your First Test
 
 
@@ -65,10 +65,10 @@ test('my very first test', async ({ page }) => {
 ```
 
 ### Breaking it down:
-- `import { test, expect }` — We bring in the two most important tools from Playwright. `test` lets us define a test block. `expect` lets us verify things.
-- `async ({ page })` — Playwright gives every test a fresh, isolated `page` object (a browser tab). Because browser actions take time, we must use `async`/`await`.
-- `page.goto()` — Navigates the browser to a URL.
-- `expect().toHaveTitle()` — An assertion. It checks if the page title matches what we want.
+- `import { test, expect }` � We bring in the two most important tools from Playwright. `test` lets us define a test block. `expect` lets us verify things.
+- `async ({ page })` � Playwright gives every test a fresh, isolated `page` object (a browser tab). Because browser actions take time, we must use `async`/`await`.
+- `page.goto()` � Navigates the browser to a URL.
+- `expect().toHaveTitle()` � An assertion. It checks if the page title matches what we want.
 
 ## Step 4: Run It!
 
@@ -85,7 +85,7 @@ Running 3 tests using 3 workers
   3 passed (2.1s)
 ```
 
-**Congratulations! You just ran your first automated test.** ✅
+**Congratulations! You just ran your first automated test.** ?
 
 Wait, why did it say 3 tests passed when we only wrote one? By default, Playwright runs your test across 3 different browsers (Chromium, Firefox, and WebKit) at the same time.
 
@@ -142,8 +142,8 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Write a second test in the same file that navigates to `https://playwright.dev/docs/intro` and verifies the heading text says 'Installation'.
 
 **Constraints:**
-- ✅ You MUST use a web-first assertion like `expect(locator).toHaveText()`
-- ✅ Both tests must run successfully
+- ? You MUST use a web-first assertion like `expect(locator).toHaveText()`
+- ? Both tests must run successfully
 
 <CodeEditor
   moduleId="10-first-test"
@@ -164,7 +164,7 @@ test('challenge exercise', async ({ page }) => {
 />
 
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 import { test, expect } from '@playwright/test';

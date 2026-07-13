@@ -89,7 +89,7 @@ test('authorized API call with bearer token', async ({ request }) => {
   const response = await request.get('/api/admin/users', {
     headers: {
       Authorization: `Bearer ${token}`,
-      'x-tenant-id': 'AEGIS'
+      'x-tenant-id': 'Nexus'
     }
   });
   

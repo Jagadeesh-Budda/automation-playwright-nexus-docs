@@ -1,8 +1,8 @@
-﻿# 0.4: Objects & Literals
+# 0.4: Objects & Literals
 
 In the previous lessons, we discussed primitive data types (Strings, Numbers, Booleans). But what if you need to represent something more complex, like a User with a name, email, and password? 
 
-In JavaScript and TypeScript, we group related data together using **Objects**. Objects are foundational to UI automation—you will use them constantly to store test data, define configuration options, and pass arguments to Playwright methods.
+In JavaScript and TypeScript, we group related data together using **Objects**. Objects are foundational to UI automation�you will use them constantly to store test data, define configuration options, and pass arguments to Playwright methods.
 
 ---
 
@@ -43,12 +43,12 @@ Why are objects so important in automation? Because tests require **Data**.
 Instead of creating five separate variables for a login test, we group them into a single, clean `credentials` object.
 
 ```javascript
-// ❌ Messy and hard to pass between functions
+// ? Messy and hard to pass between functions
 const loginEmail = "test@example.com";
 const loginPassword = "Password123!";
 const loginRole = "Admin";
 
-// ✅ Clean and organized
+// ? Clean and organized
 const credentials = {
   email: "test@example.com",
   password: "Password123!",
@@ -82,9 +82,9 @@ To visualize how this looks:
 
 ```text
 API Response
-└── data
-    └── preferences
-        └── theme
++-- data
+    +-- preferences
+        +-- theme
 ```
 
 Accessing this nested data uses chained dot notation:
@@ -107,10 +107,10 @@ let settings = {
   retries: 1
 };
 
-// ✅ This is perfectly legal! We are modifying a property inside the object.
+// ? This is perfectly legal! We are modifying a property inside the object.
 settings.timeout = 10000;
 
-// ❌ This will crash! We are trying to assign a completely new object to the 'settings' label.
+// ? This will crash! We are trying to assign a completely new object to the 'settings' label.
 settings = { timeout: 10000, retries: 1 };
 ```
 

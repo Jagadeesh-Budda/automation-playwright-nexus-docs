@@ -1,4 +1,4 @@
-﻿# 16.1: GitHub Actions CI
+# 16.1: GitHub Actions CI
 
 ### Shard Matrix Pipeline
 
@@ -26,15 +26,15 @@ A test suite that only runs on one developer's machine is only partially useful.
 
 ```
 Developer pushes code
-        ↓
+        ?
 GitHub Actions triggered
-        ↓
+        ?
 Runs on a clean Ubuntu machine
-        ↓
-Installs deps → AST Audit → Type Check → Tests → Report
-        ↓
+        ?
+Installs deps ? AST Audit ? Type Check ? Tests ? Report
+        ?
 Results visible on GitHub PR page
-        ↓
+        ?
 Merge allowed / blocked based on results
 ```
 
@@ -55,9 +55,9 @@ on:
   workflow_dispatch:  # Allow manual triggers from GitHub UI
 
 jobs:
-  # ─────────────────────────────────────────
+  # -----------------------------------------
   # JOB 1: Quality Gate (fast, no browser)
-  # ─────────────────────────────────────────
+  # -----------------------------------------
   quality-gate:
     name: AST Quality Gate
     runs-on: ubuntu-latest
@@ -82,9 +82,9 @@ jobs:
       - name: AST Audit
         run: npx ts-node scripts/ast-audit.ts
 
-  # ─────────────────────────────────────────
+  # -----------------------------------------
   # JOB 2: Test Suite (requires quality-gate to pass first)
-  # ─────────────────────────────────────────
+  # -----------------------------------------
   test:
     name: Playwright Tests (${{ matrix.browser }})
     runs-on: ubuntu-latest
@@ -140,7 +140,7 @@ jobs:
 
 ## Storing Secrets in GitHub
 
-1. Go to your GitHub repo → **Settings** → **Secrets and variables** → **Actions**
+1. Go to your GitHub repo ? **Settings** ? **Secrets and variables** ? **Actions**
 2. Click **New repository secret**
 3. Add each secret: `STAGING_BASE_URL`, `ADMIN_USER`, `ADMIN_PASS`, etc.
 
@@ -156,13 +156,13 @@ env:
 
 Set up branch protection to enforce that CI passes before merging:
 
-1. Go to repo **Settings** → **Branches** → **Add protection rule**
+1. Go to repo **Settings** ? **Branches** ? **Add protection rule**
 2. Branch name pattern: `main`
-3. Check: ✅ **Require status checks to pass before merging**
+3. Check: ? **Require status checks to pass before merging**
 4. Add status checks: `quality-gate`, `test (chromium)`, `test (firefox)`, `test (webkit)`
-5. Check: ✅ **Require branches to be up to date before merging**
+5. Check: ? **Require branches to be up to date before merging**
 
-Now, **no one** can merge a PR that breaks the test suite — including yourself.
+Now, **no one** can merge a PR that breaks the test suite � including yourself.
 
 ## Notification Setup
 

@@ -1,4 +1,4 @@
-﻿
+
 # 5.1: What Are Fixtures?
 
 
@@ -79,7 +79,7 @@ Instead of this:
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ❌ Without custom fixtures
+// ? Without custom fixtures
 test('admin can upload data', async ({ page }) => {
   const loginPage = new LoginPage(page);
   await page.goto('/login');
@@ -94,7 +94,7 @@ We could write this:
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ✅ With custom fixtures
+// ? With custom fixtures
 test('admin can upload data', async ({ uploadPage }) => {
   await uploadPage.uploadFile('data.csv');
 });
@@ -129,9 +129,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="29-what-are-fixtures"
@@ -139,7 +139,7 @@ You have learned the core pattern. Now apply it under pressure.
   placeholder="// Challenge: Implement the workflow\n// Write your code here:"
 />
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

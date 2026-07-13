@@ -164,7 +164,7 @@ export default async function CredentialVerificationPage({ params }: { params: {
               
               <div className="flex flex-col gap-2 w-full">
                 <a 
-                  href={`https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=Playwright+Automation+Legend&organizationName=Aegis+Automation+Academy&issueYear=${new Date(record.issuedAt).getFullYear()}&issueMonth=${new Date(record.issuedAt).getMonth() + 1}&certUrl=https://aegis-automation.com/credential/${record.certId}&certId=${record.certId}`}
+                  href={`https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=Playwright+Automation+Legend&organizationName=Automation+Nexus+Academy&issueYear=${new Date(record.issuedAt).getFullYear()}&issueMonth=${new Date(record.issuedAt).getMonth() + 1}&certUrl=https://automationnexus.online/credential/${record.certId}&certId=${record.certId}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="w-full flex items-center justify-center px-4 py-2 bg-[#0e76a8] text-white rounded font-medium hover:bg-[#006097] transition-colors no-underline text-xs"

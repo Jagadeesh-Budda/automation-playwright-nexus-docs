@@ -1,4 +1,4 @@
-﻿# 14.3: Visual Regression Testing
+# 14.3: Visual Regression Testing
 
 ## Learning Objectives
 
@@ -47,7 +47,7 @@ On the very first run, Playwright creates the baseline screenshots (there's noth
 npx playwright test --update-snapshots
 
 # Output:
-# ✓  visual › document list page looks correct
+# ?  visual � document list page looks correct
 #    Snapshot written: document-list.png
 ```
 
@@ -59,7 +59,7 @@ On every subsequent run, Playwright compares the current screenshot to the basel
 npx playwright test
 
 # Output:
-# ✗  visual › document list page looks correct
+# ?  visual � document list page looks correct
 #    Error: Screenshot comparison failed
 #    Expected: tests/visual/document-list-expected.png
 #    Actual:   test-results/visual/document-list-actual.png
@@ -117,7 +117,7 @@ test('status badges render correctly for each state', async ({ page }) => {
 ## Cross-Browser Visual Testing
 
 ```typescript
-// playwright.config.ts — run visual tests on all browsers
+// playwright.config.ts � run visual tests on all browsers
 projects: [
   {
     name: 'visual-chrome',
@@ -162,7 +162,7 @@ npx playwright test tests/visual/document-list.spec.ts --update-snapshots
 />
 
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -216,9 +216,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="65-adv-visual"

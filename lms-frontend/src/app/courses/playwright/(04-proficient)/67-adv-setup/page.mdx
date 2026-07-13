@@ -1,4 +1,4 @@
-﻿# 14.5: Global Setup & Teardown
+# 14.5: Global Setup & Teardown
 
 ## Learning Objectives
 
@@ -25,7 +25,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 async function globalSetup(config: FullConfig) {
-  console.log('🚀 Running global setup...');
+  console.log('?? Running global setup...');
   
   const { baseURL } = config.projects[0].use;
   const browser = await chromium.launch();
@@ -36,7 +36,7 @@ async function globalSetup(config: FullConfig) {
   await setupAuth(browser, baseURL!, 'viewer');
 
   await browser.close();
-  console.log('✅ Global setup complete');
+  console.log('? Global setup complete');
 }
 
 async function setupAuth(browser: any, baseURL: string, role: string) {
@@ -55,7 +55,7 @@ async function setupAuth(browser: any, baseURL: string, role: string) {
   await context.storageState({ path: `.auth/${role}.json` });
   await context.close();
   
-  console.log(`  ✓ Auth state saved for: ${role}`);
+  console.log(`  ? Auth state saved for: ${role}`);
 }
 
 export default globalSetup;
@@ -70,7 +70,7 @@ import { PrismaClient } from '@prisma/client';
 import * as fs from 'fs';
 
 async function globalTeardown(config: FullConfig) {
-  console.log('🧹 Running global teardown...');
+  console.log('?? Running global teardown...');
   
   // 1. Clean up test data from database
   const prisma = new PrismaClient();
@@ -85,7 +85,7 @@ async function globalTeardown(config: FullConfig) {
     fs.unlinkSync(`./test-fixtures/temp/${file}`);
   }
   
-  console.log('✅ Teardown complete');
+  console.log('? Teardown complete');
 }
 
 export default globalTeardown;
@@ -149,7 +149,7 @@ projects: [
 ```
 
 ```typescript
-// auth.setup.ts — the setup project's test file
+// auth.setup.ts � the setup project's test file
 import { test as setup } from '@playwright/test';
 
 setup('authenticate as admin', async ({ page }) => {
@@ -170,7 +170,7 @@ setup('authenticate as admin', async ({ page }) => {
 />
 
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 async function setupAuth(browser, baseURL, role) {
@@ -225,9 +225,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="67-adv-setup"

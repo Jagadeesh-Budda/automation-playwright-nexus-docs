@@ -1,4 +1,4 @@
-﻿# 18.4: Analyzing Parsing Errors
+# 18.4: Analyzing Parsing Errors
 
 ## Learning Objectives
 
@@ -104,25 +104,25 @@ test('does NOT flag expect.toPass with polling', () => {
 
 ### Bug 1: Rule matches too broadly
 ```typescript
-// ❌ Bug: Flags ANY call to waitForTimeout, even in helper files
+// ? Bug: Flags ANY call to waitForTimeout, even in helper files
 if (isMethodCall(node, 'waitForTimeout')) { ... }
 
-// ✅ Fix: Only flag in spec files, not utility files
+// ? Fix: Only flag in spec files, not utility files
 if (isMethodCall(node, 'waitForTimeout') && filePath.includes('.spec.')) { ... }
 ```
 
 ### Bug 2: Null reference in AST walking
 ```typescript
-// ❌ Bug: node.callee might be null for some CallExpression types
+// ? Bug: node.callee might be null for some CallExpression types
 if (node.callee.property.name === 'waitForTimeout') { ... }  // TypeError!
 
-// ✅ Fix: Use optional chaining
+// ? Fix: Use optional chaining
 if (node.callee?.property?.name === 'waitForTimeout') { ... }
 ```
 
 ### Bug 3: Missing array iteration
 ```typescript
-// ❌ Bug: Only walks the direct children, misses nested nodes
+// ? Bug: Only walks the direct children, misses nested nodes
 function walk(node: any, visitor: Function) {
   visitor(node);
   for (const key of Object.keys(node)) {
@@ -130,14 +130,14 @@ function walk(node: any, visitor: Function) {
   }
 }
 
-// ✅ Fix: Handle arrays and prevent circular parent references
+// ? Fix: Handle arrays and prevent circular parent references
 function walk(node: any, visitor: Function) {
   if (!node || typeof node !== 'object') return;
   visitor(node);
   for (const key of Object.keys(node)) {
     if (key === 'parent') continue; // Prevent circular stack overflow
     if (Array.isArray(node[key])) {
-      node[key].forEach((child: any) => walk(child, visitor));  // ✅
+      node[key].forEach((child: any) => walk(child, visitor));  // ?
     } else {
       walk(node[key], visitor);
     }
@@ -152,7 +152,7 @@ function walk(node: any, visitor: Function) {
 />
 
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -177,8 +177,8 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Write a unit test that verifies your AST rule does NOT flag `$eval` if it's called on an object other than `page`.
 
 **Constraints:**
-- ❌ Do NOT parse `page.$eval` in this test
-- ✅ You MUST assert that the violations array is empty
+- ? Do NOT parse `page.$eval` in this test
+- ? You MUST assert that the violations array is empty
 
 <CodeEditor
   moduleId="90-ast-debug"

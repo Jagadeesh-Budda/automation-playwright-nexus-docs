@@ -37,10 +37,10 @@ test.describe('Admin Dashboard', () => {
 
   test.beforeEach(async ({ page }) => {
     // Violation 2: Hardcoded environment URLs and credentials
-    await page.goto('https://staging-dms.AEGIS.com/login');
+    await page.goto('https://staging-dms.Nexus.com/login');
     
     // Violation 3: Extremely brittle CSS ID locators
-    await page.locator('#username-input-v2-final').fill('admin@AEGIS.com');
+    await page.locator('#username-input-v2-final').fill('admin@Nexus.com');
     await page.locator('.btn.btn-primary.login.w-full').click();
     
     // Violation 4: Hardcoded wait! The definition of flakiness and slow execution!
@@ -56,7 +56,7 @@ test.describe('Admin Dashboard', () => {
     await page.locator('button:has-text("New User")').click();
     
     await page.getByLabel('Name').fill('Test User');
-    await page.getByLabel('Email').fill('test@AEGIS.com');
+    await page.getByLabel('Email').fill('test@Nexus.com');
     await page.getByRole('button', { name: 'Save' }).click();
 
     // Violation 5: Asserting .count() synchronously instead of using a web-first toHaveCount() assertion
@@ -70,7 +70,7 @@ test.describe('Admin Dashboard', () => {
   test('Verify created user exists and configure permissions', async ({ page }) => {
     // Violation 6: Assumes the previous test ran successfully! 
     // If run in parallel, createdUserId will be empty!
-    await page.goto(`https://staging-dms.AEGIS.com/users/${createdUserId}`);
+    await page.goto(`https://staging-dms.Nexus.com/users/${createdUserId}`);
     
     // Violation 7: Dangerous forEach loop with unawaited async code!
     const tabs = ['Profile', 'Permissions', 'Audit'];
@@ -100,7 +100,7 @@ Why is this code so dangerous?
 
 ## 3. The Refactored Masterpiece (The Solution)
 
-Here is how a Senior Automation Engineer refactors the suite to meet the **ASA Definition of Done**.
+Here is how a Senior Automation Engineer refactors the suite to meet the **ANA Definition of Done**.
 
 ### Step 1: Encapsulating State & Using API Setup
 We eliminate the global state by making every test atomic. The "Verify" test should create its own user instantly via the API, rather than relying on the UI.
@@ -129,7 +129,7 @@ test.describe('Admin Dashboard', () => {
     await page.getByRole('button', { name: 'New User' }).click();
     
     // Generating dynamic data to avoid collisions
-    const uniqueEmail = `test-${Date.now()}@AEGIS.com`;
+    const uniqueEmail = `test-${Date.now()}@Nexus.com`;
     
     await page.getByLabel('Name').fill('Test User');
     await page.getByLabel('Email').fill(uniqueEmail);

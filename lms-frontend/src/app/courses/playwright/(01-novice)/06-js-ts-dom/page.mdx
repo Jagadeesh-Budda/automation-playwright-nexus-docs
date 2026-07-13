@@ -1,4 +1,4 @@
-﻿
+
 
 # 0.6: DOM & HTML Basics
 
@@ -70,18 +70,18 @@ await page.locator('input[name="username"]').fill('admin@corp.com');
 
 Because CSS selectors are brittle and break when developers change the styling of the app, Playwright heavily advocates for **User-Facing Locators** (Accessibility Locators).
 
-If an engineer changes `class="btn primary"` to `class="btn secondary"`, a CSS locator breaks. But the user doesn't care about the class name—they just see a button that says "Submit".
+If an engineer changes `class="btn primary"` to `class="btn secondary"`, a CSS locator breaks. But the user doesn't care about the class name�they just see a button that says "Submit".
 
 By using `getByRole` or `getByText`, you test the application exactly how a blind user with a screen reader experiences it, ensuring robust accessibility and resilient tests.
 
 ```javascript
-// ❌ Brittle CSS Locator
+// ? Brittle CSS Locator
 await page.locator('button.btn.primary').click();
 
-// ✅ Resilient User-Facing Locator
+// ? Resilient User-Facing Locator
 await page.getByRole('button', { name: 'Submit' }).click();
 
-// ✅ Resilient User-Facing Locator
+// ? Resilient User-Facing Locator
 await page.getByPlaceholder('Email').fill('admin@corp.com');
 ```
 

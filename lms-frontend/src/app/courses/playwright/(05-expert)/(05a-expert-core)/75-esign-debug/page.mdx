@@ -1,4 +1,4 @@
-﻿# 15.4: Modal Interception Errors
+# 15.4: Modal Interception Errors
 
 ## Learning Objectives
 
@@ -21,10 +21,10 @@ E-Sign tests fail more often than standard UI tests because they involve:
 
 **Fix:** Use `fill()` not `type()`:
 ```typescript
-// ❌ May mistype special characters
+// ? May mistype special characters
 await passwordInput.type('P@ssw0rd!');
 
-// ✅ Sets the value directly without keyboard simulation
+// ? Sets the value directly without keyboard simulation
 await passwordInput.fill('P@ssw0rd!');
 
 // If fill() still fails, try pressSequentially
@@ -51,7 +51,7 @@ await expect(modal).not.toHaveClass(/animating/);
 await modal.getByLabel('Reason').fill('Approved');
 ```
 
-## Failure 3: Race Condition — Audit Trail Not Created Yet
+## Failure 3: Race Condition � Audit Trail Not Created Yet
 
 **Symptom:** After signing, the test immediately checks the audit trail and finds it empty.
 
@@ -61,13 +61,13 @@ await modal.getByLabel('Reason').fill('Approved');
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ❌ Race condition — audit might not exist yet
+// ? Race condition � audit might not exist yet
 await eSignPage.signDocument({ reason: 'Approved', password: pass });
 await auditPage.navigateTo(docId);
 let count = await auditPage.getAllEntries().count();
 expect(count).toBe(3);  // Flaky!
 
-// ✅ Poll until the entry appears
+// ? Poll until the entry appears
 await eSignPage.signDocument({ reason: 'Approved', password: pass });
 await auditPage.navigateTo(docId);
 
@@ -113,10 +113,10 @@ import { test, expect } from '@playwright/test';
 
 await eSignModal.sign({ reason: '...', password: pass });
 
-// ❌ Modal is now closed, this element is gone!
+// ? Modal is now closed, this element is gone!
 await expect(eSignModal.successMessage).toBeVisible();
 
-// ✅ Assert on the page-level element that appears after modal closes
+// ? Assert on the page-level element that appears after modal closes
 await expect(page.getByRole('status', { name: 'Document Approved' })).toBeVisible();
 ```
 
@@ -133,7 +133,7 @@ page.on('response', response => {
 });
 
 page.on('requestfailed', request => {
-  console.error(`FAILED REQUEST: ${request.url()} — ${request.failure()?.errorText}`);
+  console.error(`FAILED REQUEST: ${request.url()} � ${request.failure()?.errorText}`);
 });
 ```
 
@@ -144,7 +144,7 @@ page.on('requestfailed', request => {
 />
 
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -200,9 +200,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="75-esign-debug"

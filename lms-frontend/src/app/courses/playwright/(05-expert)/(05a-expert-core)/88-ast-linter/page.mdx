@@ -1,4 +1,4 @@
-﻿# 18.2: Custom Linter Heuristics
+# 18.2: Custom Linter Heuristics
 
 ## Learning Objectives
 
@@ -7,9 +7,9 @@ By the end of this lesson, you will be able to:
 
 ## What is an AST Linter?
 
-An AST Linter is a tool that walks the AST of your code and reports **rule violations** — specific patterns that you've decided are forbidden or required in your codebase.
+An AST Linter is a tool that walks the AST of your code and reports **rule violations** � specific patterns that you've decided are forbidden or required in your codebase.
 
-Unlike ESLint (which is general-purpose), the ASA linter enforces **automation-specific** rules that ESLint doesn't know about.
+Unlike ESLint (which is general-purpose), the ANA linter enforces **automation-specific** rules that ESLint doesn't know about.
 
 ## Building a Complete AST Linter
 
@@ -111,8 +111,8 @@ export class AstLinter {
     const warnings = this.violations.filter(v => v.severity === 'warning');
     
     for (const v of this.violations) {
-      const icon = v.severity === 'error' ? '❌' : '⚠️';
-      console.log(`${icon} [${v.rule}] ${v.file}:${v.line} — ${v.message}`);
+      const icon = v.severity === 'error' ? '?' : '??';
+      console.log(`${icon} [${v.rule}] ${v.file}:${v.line} � ${v.message}`);
     }
     
     console.log(`\n${this.violations.length} problems (${errors.length} errors, ${warnings.length} warnings)`);
@@ -123,9 +123,9 @@ export class AstLinter {
   }
 }
 
-// ─────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------
 // Built-in Rules
-// ─────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------
 
 export const noHardcodedSleepRule: LintRule = {
   name: 'no-hardcoded-sleep',
@@ -189,7 +189,7 @@ const linter = new AstLinter()
 const violations = linter.lintDirectory('tests/**/*.spec.ts');
 linter.report();
 
-// Exits with code 1 if any errors found — fails the CI build!
+// Exits with code 1 if any errors found � fails the CI build!
 ```
 
 ```bash
@@ -204,7 +204,7 @@ npx ts-node scripts/lint.ts
 />
 
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 const linter = new AstLinter().addRule(noHardcodedSleepRule);
@@ -254,9 +254,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="88-ast-linter"

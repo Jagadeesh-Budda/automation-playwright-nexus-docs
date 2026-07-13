@@ -20,7 +20,7 @@ async function main() {
   await page.waitForLoadState('networkidle');
 
   console.log('3. Checking for setup modal...');
-  const modal = await page.locator('text=Playwright Mastery Setup').count();
+  const modal = await page.locator('text=Automation Nexus Setup').count();
   console.log(`   Modal visible: ${modal > 0}`);
 
   console.log('4. Checking for pr-review-challenge div...');

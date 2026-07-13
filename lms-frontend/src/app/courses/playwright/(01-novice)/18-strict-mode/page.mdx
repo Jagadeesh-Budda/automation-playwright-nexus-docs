@@ -1,4 +1,4 @@
-﻿
+
 # 2.4: Strict Mode & Debugging Basics
 
 
@@ -16,7 +16,7 @@ Strict Mode means: **If you ask Playwright to click an element, and it finds MOR
 ```typescript
 // Imagine a page with two "Submit" buttons (one at the top, one at the bottom)
 await page.getByRole('button', { name: 'Submit' }).click(); 
-// ❌ CRASH: strict mode violation
+// ? CRASH: strict mode violation
 ```
 
 ### Why does it crash?
@@ -111,9 +111,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="18-strict-mode"
@@ -121,7 +121,7 @@ You have learned the core pattern. Now apply it under pressure.
   placeholder="// Challenge: Implement the workflow\n// Write your code here:"
 />
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

@@ -1,4 +1,4 @@
-﻿# 16.1: The Automation Pyramid
+# 16.1: The Automation Pyramid
 
 ## Learning Objectives
 
@@ -12,12 +12,12 @@ The Test Pyramid is a framework for balancing your test investment. It tells you
 ```
          /\
         /  \
-       / UI \        ← Few (10-20%) — Slow, expensive, high coverage
+       / UI \        ? Few (10-20%) � Slow, expensive, high coverage
       /------\
-     / API    \      ← More (30-40%) — Fast, reliable, targeted
+     / API    \      ? More (30-40%) � Fast, reliable, targeted
     /----------\
-   / Unit       \    ← Most (50-60%) — Blazing fast, isolated
-  /──────────────\
+   / Unit       \    ? Most (50-60%) � Blazing fast, isolated
+  /--------------\
 ```
 
 **Why not write everything as a UI test?**
@@ -29,12 +29,12 @@ The Test Pyramid is a framework for balancing your test investment. It tells you
 
 ## Playwright's API Testing Capability
 
-Playwright has a built-in HTTP client (`request`) that lets you make direct API calls — no browser, no UI, pure HTTP.
+Playwright has a built-in HTTP client (`request`) that lets you make direct API calls � no browser, no UI, pure HTTP.
 
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// This test runs without opening any browser — just raw HTTP
+// This test runs without opening any browser � just raw HTTP
 test('GET /api/documents returns paginated results', async ({ request }) => {
   const response = await request.get('/api/documents', {
     params: { page: 1, limit: 10 }
@@ -53,13 +53,13 @@ test('GET /api/documents returns paginated results', async ({ request }) => {
 
 | Scenario | API Test | UI Test |
 |----------|----------|---------|
-| Business logic validation | ✅ Best | Too slow |
-| Data validation (field types, formats) | ✅ Best | Fragile |
-| Authentication/Authorization | ✅ Best | Too slow |
-| Error handling (400, 401, 403, 500) | ✅ Best | Hard to trigger |
-| Happy path user journey | ⚠️ Partial | ✅ Best |
-| Visual layout verification | ❌ Not possible | ✅ Only option |
-| Cross-browser compatibility | ❌ Not possible | ✅ Only option |
+| Business logic validation | ? Best | Too slow |
+| Data validation (field types, formats) | ? Best | Fragile |
+| Authentication/Authorization | ? Best | Too slow |
+| Error handling (400, 401, 403, 500) | ? Best | Hard to trigger |
+| Happy path user journey | ?? Partial | ? Best |
+| Visual layout verification | ? Not possible | ? Only option |
+| Cross-browser compatibility | ? Not possible | ? Only option |
 
 ## The Hybrid Strategy
 
@@ -111,7 +111,7 @@ use: {
 />
 
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -166,9 +166,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="77-api-pyramid"

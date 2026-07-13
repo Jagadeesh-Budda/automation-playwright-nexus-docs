@@ -1,4 +1,4 @@
-﻿## Learning Objectives
+## Learning Objectives
 
 By the end of this lesson, you will be able to:
 - Understand the path to Automation Architect
@@ -18,7 +18,7 @@ if (missing.length > 0) {
   console.error('Missing ENV vars:', missing);
   process.exit(1);
 }
-console.log('✅ All environment variables are set');
+console.log('? All environment variables are set');
 "
 ```
 
@@ -43,10 +43,10 @@ npx playwright show-report
 ```
 
 **Target metrics for certification:**
-- ✅ 90%+ pass rate on first run
-- ✅ No tests failing due to hardcoded waits
-- ✅ Total execution time < 5 minutes
-- ✅ HTML report generated successfully
+- ? 90%+ pass rate on first run
+- ? No tests failing due to hardcoded waits
+- ? Total execution time < 5 minutes
+- ? HTML report generated successfully
 
 ## Step 4: Final Checklist Sign-Off
 
@@ -97,10 +97,10 @@ CI/CD READINESS
 Once all items are checked:
 
 1. Submit a Pull Request to the `main` branch
-2. All CI checks must be green ✅
+2. All CI checks must be green ?
 3. A senior engineer reviews and approves the PR
 4. Your E-Signature is applied to the Certification document in the DMS
-5. You receive your digitally-signed **ASA Automation Engineer Certificate**
+5. You receive your digitally-signed **ANA Automation Engineer Certificate**
 
 The certificate includes:
 - Your name
@@ -116,7 +116,7 @@ Congratulations! You have completed the entire Playwright Automation Engineer cu
 **Where to go from here:**
 - **Extend the framework** with more modules (Accessibility testing, Performance monitoring)
 - **Mentor junior engineers** through their Capstone
-- **Contribute to the ASA OSS** repository on GitHub
+- **Contribute to the ANA OSS** repository on GitHub
 - **Study for Expert level** (Advanced CI/CD, Custom Reporters, Plugin Development)
 
 > [!TIP]
@@ -131,11 +131,11 @@ Congratulations! You have completed the entire Playwright Automation Engineer cu
 <CodeEditor
   moduleId="109-capstone-verify"
   taskIndex={0}
-  placeholder="// 🎓 CONGRATULATIONS! You have reached the end of the course.&#10;// Task: Write the final Playwright test command that:&#10;//   1. Uses the HTML reporter&#10;//   2. Runs with 4 parallel workers&#10;//&#10;// Write the complete npx command below:"
+  placeholder="// ?? CONGRATULATIONS! You have reached the end of the course.&#10;// Task: Write the final Playwright test command that:&#10;//   1. Uses the HTML reporter&#10;//   2. Runs with 4 parallel workers&#10;//&#10;// Write the complete npx command below:"
 />
 
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```bash
 npx playwright test --reporter=html --workers=4
@@ -154,9 +154,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="109-capstone-verify"
@@ -176,7 +176,7 @@ test('challenge exercise', async ({ page }) => {
 });`}
 />
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

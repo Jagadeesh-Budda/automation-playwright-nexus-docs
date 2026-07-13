@@ -1,4 +1,4 @@
-Ôªø# 12.2: The ValidatedPage Interface
+# 12.2: The ValidatedPage Interface
 
 ## Learning Objectives
 
@@ -8,10 +8,10 @@ By the end of this lesson, you will be able to:
 ## Why TypeScript in Test Automation?
 
 Playwright is built in TypeScript. Using TypeScript properly in your test framework gives you:
-- **Auto-complete** in VS Code ‚Äî no more typos in field names
-- **Compile-time errors** ‚Äî catch bugs before tests even run
-- **Self-documenting code** ‚Äî interfaces describe the shape of your data
-- **Refactoring confidence** ‚Äî rename a field, TypeScript tells you every place to update
+- **Auto-complete** in VS Code ó no more typos in field names
+- **Compile-time errors** ó catch bugs before tests even run
+- **Self-documenting code** ó interfaces describe the shape of your data
+- **Refactoring confidence** ó rename a field, TypeScript tells you every place to update
 
 ## Defining Data Interfaces
 
@@ -63,7 +63,7 @@ import { test, expect } from '@playwright/test';
 import { Document, DocumentStatus } from '../entities/Document';
 
 export class DocumentPage {
-  // Method signature uses the interface ‚Äî self-documenting!
+  // Method signature uses the interface ó self-documenting!
   async createDocument(doc: Partial<Document>): Promise<string> {
     await this.newDocumentButton.click();
     
@@ -132,16 +132,16 @@ type FixtureMap<T> = { [K in keyof T]: T[K] };
 ## Generic Utility Types in Test Code
 
 ```typescript
-// Partial<T> ‚Äî make all fields optional (useful for test data)
+// Partial<T> ó make all fields optional (useful for test data)
 const partialDoc: Partial<Document> = { title: 'Test Doc' };
 
-// Required<T> ‚Äî make all fields required
+// Required<T> ó make all fields required
 const fullDoc: Required<Document> = { /* all fields must be provided */ };
 
-// Pick<T, K> ‚Äî select specific fields
+// Pick<T, K> ó select specific fields
 type DocumentSummary = Pick<Document, 'id' | 'title' | 'status'>;
 
-// Omit<T, K> ‚Äî exclude specific fields
+// Omit<T, K> ó exclude specific fields
 type DocumentInput = Omit<Document, 'id' | 'uploadedAt' | 'uploadedBy'>;
 ```
 
@@ -235,9 +235,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ‚ùå Do not use deprecated APIs
-- ‚úÖ Follow the architecture best practices
-- ‚úÖ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="59-arch-interface"
@@ -257,7 +257,7 @@ test('challenge exercise', async ({ page }) => {
 });`}
 />
 <details>
-<summary>üîë Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

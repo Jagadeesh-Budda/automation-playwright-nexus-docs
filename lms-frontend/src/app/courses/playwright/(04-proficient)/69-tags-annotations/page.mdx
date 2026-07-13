@@ -1,4 +1,4 @@
-ï»¿# 14.7: Test Tags & Annotations
+# 14.7: Test Tags & Annotations
 
 ## Learning Objectives
 
@@ -11,7 +11,7 @@ In a suite of 500+ tests, you need to answer questions like:
 - "Run only smoke tests before deploying"
 - "Skip flaky tests in this CI run"
 - "Mark this test as slow so it gets more timeout"
-- "This test is broken â€” don't run it but don't delete it"
+- "This test is broken — don't run it but don't delete it"
 
 Tags and annotations solve all of these.
 
@@ -89,7 +89,7 @@ npx playwright test --grep-invert @visual
 npx playwright test --grep @smoke --project=Chrome
 ```
 
-## `test.skip()` â€” Conditionally Skip Tests
+## `test.skip()` — Conditionally Skip Tests
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -111,7 +111,7 @@ test('production-only test', async ({ page }) => {
 });
 ```
 
-## `test.fixme()` â€” Known Broken Tests
+## `test.fixme()` — Known Broken Tests
 
 Mark tests that are currently broken but shouldn't be deleted:
 
@@ -126,20 +126,20 @@ The difference between `skip` and `fixme`:
 - `test.skip()` = "This test doesn't apply in this context"
 - `test.fixme()` = "This test is broken and needs fixing"
 
-## `test.slow()` â€” Extra Timeout for Heavy Tests
+## `test.slow()` — Extra Timeout for Heavy Tests
 
 ```typescript
 import { test, expect } from '@playwright/test';
 
 test('generate comprehensive compliance report', async ({ page }) => {
-  test.slow();  // Triples the test timeout (30s â†’ 90s)
+  test.slow();  // Triples the test timeout (30s ? 90s)
   
   await page.getByRole('button', { name: 'Generate Full Report' }).click();
   await expect(page.getByText('Report ready')).toBeVisible({ timeout: 60_000 });
 });
 ```
 
-## `test.fail()` â€” Expected Failure
+## `test.fail()` — Expected Failure
 
 Mark a test that is **expected** to fail (passes when it fails, fails when it passes):
 
@@ -152,12 +152,12 @@ test('known bug: date picker resets on blur', async ({ page }) => {
   await page.getByLabel('Start Date').fill('2024-01-15');
   await page.getByLabel('End Date').click();
   
-  // Bug: the start date resets â€” this assertion currently fails
+  // Bug: the start date resets — this assertion currently fails
   await expect(page.getByLabel('Start Date')).toHaveValue('2024-01-15');
 });
 ```
 
-When the bug is fixed, the test will start "passing" â€” which means `test.fail()` will make it **fail**, reminding you to remove `test.fail()`.
+When the bug is fixed, the test will start "passing" — which means `test.fail()` will make it **fail**, reminding you to remove `test.fail()`.
 
 ## `test.describe.skip()` and `test.describe.fixme()`
 
@@ -242,7 +242,7 @@ export default defineConfig({
     },
     {
       name: 'all',
-      // No grep filter â€” runs everything
+      // No grep filter — runs everything
     },
   ],
 });
@@ -268,7 +268,7 @@ export default defineConfig({
 />
 
 <details>
-<summary>ğŸ”‘ Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -321,9 +321,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- âŒ Do not use deprecated APIs
-- âœ… Follow the architecture best practices
-- âœ… All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="69-tags-annotations"

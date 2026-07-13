@@ -1,4 +1,4 @@
-﻿# 15.3: Multi-Step Approval Flows
+# 15.3: Multi-Step Approval Flows
 
 ## Learning Objectives
 
@@ -11,19 +11,19 @@ In a pharmaceutical DMS, a complete E-Sign workflow looks like this:
 
 ```
 QA Engineer creates a Protocol document (Admin)
-       ↓
+       ?
 Document submitted for review (Admin)
-       ↓
+       ?
 Reviewer receives notification
-       ↓
+       ?
 Reviewer reads the document
-       ↓
+       ?
 Reviewer signs with reason + password (Reviewer)
-       ↓
+       ?
 System records the signature in the Audit Trail
-       ↓
-Document status → "Approved"
-       ↓
+       ?
+Document status ? "Approved"
+       ?
 QA Auditor verifies the audit trail is complete
 ```
 
@@ -171,7 +171,7 @@ test('signing completes with server confirmation', async ({ page, eSignPage }) =
 />
 
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -225,9 +225,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="74-esign-exec"

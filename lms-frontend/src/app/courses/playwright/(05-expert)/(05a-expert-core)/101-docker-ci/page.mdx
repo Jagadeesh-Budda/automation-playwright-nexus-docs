@@ -1,4 +1,4 @@
-﻿# 16.4: Docker & Containerized Execution
+# 16.4: Docker & Containerized Execution
 
 ### Container Immutability
 
@@ -28,9 +28,9 @@ Microsoft provides official Docker images with all browsers pre-installed:
 docker pull mcr.microsoft.com/playwright:v1.48.0-noble
 
 # Image variants:
-# mcr.microsoft.com/playwright:v1.48.0-noble          ← All browsers + dependencies
-# mcr.microsoft.com/playwright:v1.48.0-noble-amd64    ← x86 specific
-# mcr.microsoft.com/playwright:v1.48.0-noble-arm64    ← ARM specific (M1/M2 Macs)
+# mcr.microsoft.com/playwright:v1.48.0-noble          ? All browsers + dependencies
+# mcr.microsoft.com/playwright:v1.48.0-noble-amd64    ? x86 specific
+# mcr.microsoft.com/playwright:v1.48.0-noble-arm64    ? ARM specific (M1/M2 Macs)
 ```
 
 ## Running Tests in Docker (Quick Start)
@@ -192,7 +192,7 @@ jobs:
 ```
 
 > [!TIP]
-> Using the container approach skips `npx playwright install` entirely — browsers are already in the Docker image. This saves 2-3 minutes per CI run.
+> Using the container approach skips `npx playwright install` entirely � browsers are already in the Docker image. This saves 2-3 minutes per CI run.
 
 ## Linux-Specific Considerations
 

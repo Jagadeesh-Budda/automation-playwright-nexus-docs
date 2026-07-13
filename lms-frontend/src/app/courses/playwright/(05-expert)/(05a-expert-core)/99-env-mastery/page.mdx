@@ -1,4 +1,4 @@
-﻿# 16.2: Environment Mastery
+# 16.2: Environment Mastery
 
 ## Learning Objectives
 
@@ -10,10 +10,10 @@ By the end of this lesson, you will be able to:
 Most test suites only work in one environment. Professional frameworks work in any environment by changing a single configuration variable.
 
 ```
-Developer machine    → http://localhost:3000
-Staging environment  → https://staging.pharmadoc.example.com
-UAT environment      → https://uat.pharmadoc.example.com
-Production (read-only) → https://pharmadoc.example.com
+Developer machine    ? http://localhost:3000
+Staging environment  ? https://staging.pharmadoc.example.com
+UAT environment      ? https://uat.pharmadoc.example.com
+Production (read-only) ? https://pharmadoc.example.com
 ```
 
 ## The `.env` File Hierarchy
@@ -26,7 +26,7 @@ Production (read-only) → https://pharmadoc.example.com
 ```
 
 ```bash
-# .env (safe to commit — no secrets)
+# .env (safe to commit � no secrets)
 BASE_URL=http://localhost:3000
 API_TIMEOUT=10000
 SCREENSHOT_ON_FAIL=true
@@ -77,7 +77,7 @@ Some tests only make sense in certain environments:
 ```typescript
 import { test, expect } from '@playwright/test';
 
-test.skip(process.env.TEST_ENV === 'production', 'Skipped in production — read-only environment');
+test.skip(process.env.TEST_ENV === 'production', 'Skipped in production � read-only environment');
 
 test('admin can delete a document', async ({ documentPage }) => {
   // This test is skipped in production
@@ -89,7 +89,7 @@ test('admin can delete a document', async ({ documentPage }) => {
 import { test, expect } from '@playwright/test';
 
 // Or use test tags to group environment-specific tests
-test('performance test — only in staging', {
+test('performance test � only in staging', {
   annotation: { type: 'skip', description: 'Only runs in staging' },
 }, async ({ page }) => {
   // ...
@@ -125,7 +125,7 @@ export function validateEnvironment(): void {
     throw new Error(`BASE_URL is not a valid URL: ${process.env.BASE_URL}`);
   }
   
-  console.log(`✅ Environment validated for: ${process.env.BASE_URL}`);
+  console.log(`? Environment validated for: ${process.env.BASE_URL}`);
 }
 ```
 

@@ -1,4 +1,4 @@
-﻿# 14.9: Component Testing
+# 14.9: Component Testing
 
 ## Learning Objectives
 
@@ -7,24 +7,24 @@ By the end of this lesson, you will be able to:
 
 ## What is Component Testing?
 
-Component Testing (CT) lets you test **individual UI components** without running a full application. Instead of navigating through a login page, dashboard, and settings to test a date picker — you mount the date picker directly in an isolated browser.
+Component Testing (CT) lets you test **individual UI components** without running a full application. Instead of navigating through a login page, dashboard, and settings to test a date picker � you mount the date picker directly in an isolated browser.
 
 ```
-E2E Test:        Full App → Login → Navigate → Find Component → Test It
-Component Test:  Mount Component → Test It
+E2E Test:        Full App ? Login ? Navigate ? Find Component ? Test It
+Component Test:  Mount Component ? Test It
 ```
 
 ## When to Use Component Testing vs E2E
 
 | Scenario | Component Test | E2E Test |
 |----------|:--------------:|:--------:|
-| Testing a button's click behavior | ✅ | ❌ Overkill |
-| Testing a form with validation | ✅ | ❌ |
-| Testing a data table with sorting | ✅ | ❌ |
-| Testing a multi-page workflow | ❌ | ✅ |
-| Testing login → upload → sign flow | ❌ | ✅ |
-| Testing API integration | ❌ | ✅ |
-| Testing a shared UI library | ✅ | ❌ |
+| Testing a button's click behavior | ? | ? Overkill |
+| Testing a form with validation | ? | ? |
+| Testing a data table with sorting | ? | ? |
+| Testing a multi-page workflow | ? | ? |
+| Testing login ? upload ? sign flow | ? | ? |
+| Testing API integration | ? | ? |
+| Testing a shared UI library | ? | ? |
 
 ## Setting Up Component Testing
 
@@ -140,7 +140,7 @@ import { test, expect } from '@playwright/test';
 test('card renders children content', async ({ mount }) => {
   const component = await mount(
     <Card title="Document Details">
-      <p>Protocol v2.0 — Approved</p>
+      <p>Protocol v2.0 � Approved</p>
     </Card>
   );
   
@@ -193,13 +193,13 @@ npx playwright test -c playwright-ct.config.ts tests/components/Button.spec.tsx
 ```
         /\
        /  \        E2E Tests (few, slow, high confidence)
-      /    \       → Full workflows, multi-page flows
+      /    \       ? Full workflows, multi-page flows
      /------\
     /        \     Component Tests (many, fast, medium confidence)
-   /          \    → Individual components, form validation
+   /          \    ? Individual components, form validation
   /            \
  /--------------\  Unit Tests (most, fastest, low confidence)
-                   → Pure functions, data transformations
+                   ? Pure functions, data transformations
 ```
 
 Component testing fills the gap between unit tests (no browser) and E2E tests (full app). Use it when:
@@ -215,7 +215,7 @@ Component testing fills the gap between unit tests (no browser) and E2E tests (f
 />
 
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -274,9 +274,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="71-component-testing"

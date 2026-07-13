@@ -104,8 +104,8 @@ export default function Sidebar() {
                 isSidebarExpanded ? 'opacity-100 max-w-[200px]' : 'opacity-0 max-w-0'
               }`}
             >
-              <span className="text-sm font-black text-white uppercase tracking-[0.12em] leading-none">Aegis</span>
-              <span className="text-[9px] font-bold text-cyan-400 uppercase tracking-[0.25em] leading-none mt-1">Automation</span>
+              <span className="text-sm font-black text-white uppercase tracking-[0.12em] leading-none">Nexus</span>
+              <span className="text-[9px] font-bold text-cyan-400 uppercase tracking-[0.25em] leading-none mt-1">Academy</span>
             </div>
           </Link>
         </div>

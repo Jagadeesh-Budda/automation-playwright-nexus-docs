@@ -1,4 +1,4 @@
-﻿# 10.5: File Upload & Download
+# 10.5: File Upload & Download
 
 ## Learning Objectives
 
@@ -60,7 +60,7 @@ test('upload a dynamically created CSV', async ({ page }) => {
 ### Upload via Buffer (No File on Disk)
 
 ```typescript
-// Create a file directly from a buffer — no temp file needed
+// Create a file directly from a buffer � no temp file needed
 await page.getByLabel('Upload').setInputFiles({
   name: 'test-document.txt',
   mimeType: 'text/plain',
@@ -276,7 +276,7 @@ test('large file download completes', async ({ page }) => {
 });
 ```
 
-## Upload → Download Round-Trip Test
+## Upload ? Download Round-Trip Test
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -340,9 +340,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="56-file-handling"
@@ -351,7 +351,7 @@ You have learned the core pattern. Now apply it under pressure.
 // Complete the download handler script below:`}
 />
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

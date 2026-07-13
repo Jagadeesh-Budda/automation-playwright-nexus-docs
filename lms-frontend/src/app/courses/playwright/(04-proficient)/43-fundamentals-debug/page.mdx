@@ -1,4 +1,4 @@
-﻿# 8.4: Conflict Resolution
+# 8.4: Conflict Resolution
 
 ## Learning Objectives
 
@@ -11,14 +11,14 @@ A merge conflict happens when **two engineers change the same line of code** in 
 
 In a professional team, conflicts happen constantly. Knowing how to resolve them quickly is a core engineering skill.
 
-## The ASA Git Workflow
+## The ANA Git Workflow
 
 ```
 main (protected)
-  │
-  └── feature/DMS-42-login-tests  ← your branch
-        │
-        └── You make commits here, then open a Pull Request to main
+  �
+  +-- feature/DMS-42-login-tests  ? your branch
+        �
+        +-- You make commits here, then open a Pull Request to main
 ```
 
 **Never push directly to `main`.** Always work on a feature branch.
@@ -30,7 +30,7 @@ main (protected)
 | History | Creates a merge commit | Keeps history linear and clean |
 | Conflicts | Resolved once | May need to resolve per-commit |
 | When to use | When merging feature branches | When syncing with main daily |
-| **ASA Standard** | ❌ Avoid | ✅ Preferred |
+| **ANA Standard** | ? Avoid | ? Preferred |
 
 ## The Daily Sync Workflow (Rebase)
 
@@ -133,7 +133,7 @@ git reset --hard origin/main
 
 ```bash
 git fetch origin          # Download latest remote changes
-git rebase origin/main    # Rebase your branch on main (ASA standard)
+git rebase origin/main    # Rebase your branch on main (ANA standard)
 git rebase --continue     # Continue after resolving conflicts
 git rebase --abort        # Cancel and go back
 git status                # See which files have conflicts
@@ -185,9 +185,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="43-fundamentals-debug"
@@ -197,7 +197,7 @@ You have learned the core pattern. Now apply it under pressure.
 `}
 />
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

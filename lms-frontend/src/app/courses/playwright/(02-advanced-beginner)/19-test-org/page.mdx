@@ -1,4 +1,4 @@
-﻿
+
 # 3.1: Test Organization
 
 
@@ -47,35 +47,35 @@ Notice how the test names are written:
 
 They read like a sentence. They describe the **behavior** being tested, not the technical steps. 
 
-❌ Bad: `test('login test 1')`
-✅ Good: `test('empty password field disables submit button')`
+? Bad: `test('login test 1')`
+? Good: `test('empty password field disables submit button')`
 
 ### 3. Folder Organization
 
 As your spec files grow, you should group them by domain or feature.
 
-**❌ Bad Organization:**
+**? Bad Organization:**
 ```
 project-root/
-├── tests/
-│   ├── test1.spec.ts
-│   ├── test2.spec.ts
-│   ├── test3.spec.ts
-│   └── test4.spec.ts
++-- tests/
+�   +-- test1.spec.ts
+�   +-- test2.spec.ts
+�   +-- test3.spec.ts
+�   +-- test4.spec.ts
 ```
 
-**✅ Good Organization:**
+**? Good Organization:**
 ```
 project-root/
-├── tests/
-│   ├── auth/
-│   │   ├── login.spec.ts
-│   │   └── forgot-password.spec.ts
-│   ├── checkout/
-│   │   ├── cart.spec.ts
-│   │   └── payment.spec.ts
-│   └── settings/
-│       └── profile.spec.ts
++-- tests/
+�   +-- auth/
+�   �   +-- login.spec.ts
+�   �   +-- forgot-password.spec.ts
+�   +-- checkout/
+�   �   +-- cart.spec.ts
+�   �   +-- payment.spec.ts
+�   +-- settings/
+�       +-- profile.spec.ts
 ```
 
 This structure makes it easy to run a specific group of tests. For example, to run only the checkout tests, you can use the CLI:
@@ -110,9 +110,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="19-test-org"
@@ -120,7 +120,7 @@ You have learned the core pattern. Now apply it under pressure.
   placeholder="// Challenge: Implement the workflow\n// Write your code here:"
 />
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

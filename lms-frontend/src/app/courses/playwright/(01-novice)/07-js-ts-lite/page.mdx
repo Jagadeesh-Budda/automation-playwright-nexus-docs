@@ -1,4 +1,4 @@
-﻿# 0.7: TypeScript Lite
+# 0.7: TypeScript Lite
 
 In this course, we use **TypeScript**. If you are new to programming, you might be wondering why we aren't just using plain JavaScript.
 
@@ -46,12 +46,12 @@ const isHeadless: boolean = true;
 The most important place to use TypeScript is in your functions. If a function requires a user ID (which is a number), you don't want someone passing a string by mistake.
 
 ```typescript
-// ❌ Pure JavaScript: No warnings if you pass a string
+// ? Pure JavaScript: No warnings if you pass a string
 function setupUser(userId) {
   // ...
 }
 
-// ✅ TypeScript: Explicitly requires a number
+// ? TypeScript: Explicitly requires a number
 function setupUser(userId: number) {
   // ...
 }

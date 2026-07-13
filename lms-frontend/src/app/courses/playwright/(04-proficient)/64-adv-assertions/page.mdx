@@ -1,4 +1,4 @@
-﻿# 14.2: Custom Expect Assertions
+# 14.2: Custom Expect Assertions
 
 ## Learning Objectives
 
@@ -8,9 +8,9 @@ By the end of this lesson, you will be able to:
 ## The Assertion Philosophy
 
 Great assertions are:
-1. **Specific** — they check exactly what matters, nothing more
-2. **Readable** — the failing message is self-explanatory
-3. **Async** — they use `await expect()` so Playwright can retry
+1. **Specific** � they check exactly what matters, nothing more
+2. **Readable** � the failing message is self-explanatory
+3. **Async** � they use `await expect()` so Playwright can retry
 
 ## Page-Level Assertions
 
@@ -57,7 +57,7 @@ await expect(page.getByRole('checkbox', { name: 'Accept Terms' })).toBeChecked()
 await expect(page.getByRole('checkbox')).not.toBeChecked();
 ```
 
-## ⚠️ Negation Semantics: A Critical Distinction
+## ?? Negation Semantics: A Critical Distinction
 
 These two assertions look similar but behave **differently**:
 
@@ -73,9 +73,9 @@ await expect(locator).not.toBeVisible();
 
 | Assertion | Element in DOM but hidden | Element NOT in DOM |
 |-----------|:------------------------:|:------------------:|
-| `toBeHidden()` | ✅ Passes | ✅ Passes |
-| `not.toBeVisible()` | ✅ Passes | ✅ Passes |
-| `not.toBeAttached()` | ❌ Fails | ✅ Passes |
+| `toBeHidden()` | ? Passes | ? Passes |
+| `not.toBeVisible()` | ? Passes | ? Passes |
+| `not.toBeAttached()` | ? Fails | ? Passes |
 
 **Rule of thumb:** Use `not.toBeAttached()` when you need to verify an element was completely removed from the DOM (e.g., after deletion).
 
@@ -145,7 +145,7 @@ await expect(page.getByLabel('Status')).toHaveValue('Approved');
 
 ## Soft Assertions: Collect All Failures
 
-Regular assertions stop the test immediately on failure. **Soft assertions** collect all failures and report them at the end — perfect for data-heavy verification pages.
+Regular assertions stop the test immediately on failure. **Soft assertions** collect all failures and report them at the end � perfect for data-heavy verification pages.
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -165,7 +165,7 @@ test('validate document details page', async ({ page }) => {
 ```
 
 > [!WARNING]
-> Soft assertions still mark the test as **failed** — they just don't abort it early. All failures are collected and reported at the end.
+> Soft assertions still mark the test as **failed** � they just don't abort it early. All failures are collected and reported at the end.
 
 ## Custom Error Messages
 
@@ -243,7 +243,7 @@ test('document is fully signed', async ({ documentPage }) => {
 });
 ```
 
-## `expect.poll()` — Retry Arbitrary Functions
+## `expect.poll()` � Retry Arbitrary Functions
 
 Use `expect.poll()` when you need to retry a **non-locator value** until it satisfies a condition:
 
@@ -264,20 +264,20 @@ await expect.poll(async () => {
 
 | Feature | `expect.poll()` | `expect.toPass()` |
 |---------|:--------------:|:------------------:|
-| Retries a single value | ✅ | ❌ |
-| Retries a block of code | ❌ | ✅ |
-| Returns a value to assert | ✅ | ❌ |
-| Supports multiple assertions | ❌ | ✅ |
+| Retries a single value | ? | ? |
+| Retries a block of code | ? | ? |
+| Returns a value to assert | ? | ? |
+| Supports multiple assertions | ? | ? |
 
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// expect.poll() — single value
+// expect.poll() � single value
 await expect.poll(async () => {
   return await page.getByRole('row').count();
 }).toBeGreaterThan(5);
 
-// expect.toPass() — multiple assertions in a block
+// expect.toPass() � multiple assertions in a block
 await expect(async () => {
   const count = await page.getByRole('row').count();
   expect(count).toBeGreaterThan(5);
@@ -314,34 +314,34 @@ First run creates the snapshot file. Subsequent runs compare against it. Update 
 
 ## Assertion Best Practices
 
-### ✅ Assert state, not implementation
+### ? Assert state, not implementation
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ✅ Good — asserts what the user sees
+// ? Good � asserts what the user sees
 await expect(page.getByRole('alert')).toContainText('Document saved');
 
-// ❌ Bad — asserts internal implementation details
+// ? Bad � asserts internal implementation details
 await expect(page.locator('.toast-container .alert-success')).toHaveClass('fade-in');
 ```
 
-### ✅ One assertion per concern
+### ? One assertion per concern
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ✅ Good — each assertion checks one thing
+// ? Good � each assertion checks one thing
 await expect(statusBadge).toContainText('Approved');
 await expect(signatureCount).toHaveText('3 of 3');
 
-// ❌ Bad — brittle compound assertion
+// ? Bad � brittle compound assertion
 await expect(documentRow).toHaveText(/Approved.*3 of 3.*Regulatory/);
 ```
 
-### ✅ Use custom messages for complex flows
+### ? Use custom messages for complex flows
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ✅ Good — tells you exactly which step failed in a multi-step test
+// ? Good � tells you exactly which step failed in a multi-step test
 await expect(statusBadge, 'Status should update to Approved after step 3').toContainText('Approved');
 ```
 
@@ -360,7 +360,7 @@ await expect(statusBadge, 'Status should update to Approved after step 3').toCon
 />
 
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 await expect.poll(async () => {
@@ -411,9 +411,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="64-adv-assertions"

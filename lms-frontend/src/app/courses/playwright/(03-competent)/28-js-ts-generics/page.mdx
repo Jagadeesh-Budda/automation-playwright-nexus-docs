@@ -1,9 +1,9 @@
-﻿
+
 
 # Pre-5: TypeScript Generics Deep Dive
 
 
-In Module 0.6, you learned Interfaces, Types, and Classes. You can now *read* TypeScript code. But throughout this course, you'll encounter patterns like `Factory<T>`, `test.extend<Fixtures>()`, and `Map<string, string[]>` — code that uses **Generics**.
+In Module 0.6, you learned Interfaces, Types, and Classes. You can now *read* TypeScript code. But throughout this course, you'll encounter patterns like `Factory<T>`, `test.extend<Fixtures>()`, and `Map<string, string[]>` � code that uses **Generics**.
 
 This module teaches you to *create* generics, not just consume them.
 
@@ -27,7 +27,7 @@ function wrapInArray(value: string): string[] {
 This works for strings. But what if you need to wrap a number? Or a User object?
 
 ```typescript
-// ❌ Do you duplicate the function for every type?
+// ? Do you duplicate the function for every type?
 function wrapStringInArray(value: string): string[] { return [value]; }
 function wrapNumberInArray(value: number): number[] { return [value]; }
 function wrapUserInArray(value: User): User[] { return [value]; }
@@ -36,7 +36,7 @@ function wrapUserInArray(value: User): User[] { return [value]; }
 This is unmaintainable. You could use `any`, but that destroys type safety:
 
 ```typescript
-// ❌ Works, but TypeScript can't help you anymore
+// ? Works, but TypeScript can't help you anymore
 function wrapInArray(value: any): any[] {
   return [value];
 }
@@ -62,12 +62,12 @@ function wrapInArray<T>(value: T): T[] {
 When you call this function, TypeScript **infers** `T` from the argument:
 
 ```typescript
-const strings = wrapInArray("hello");  // T = string → returns string[]
-const numbers = wrapInArray(42);       // T = number → returns number[]
-const users = wrapInArray({ name: "Alice" }); // T = { name: string } → returns { name: string }[]
+const strings = wrapInArray("hello");  // T = string ? returns string[]
+const numbers = wrapInArray(42);       // T = number ? returns number[]
+const users = wrapInArray({ name: "Alice" }); // T = { name: string } ? returns { name: string }[]
 
 // TypeScript now catches errors:
-strings.push(42); // ❌ Error: number is not assignable to string
+strings.push(42); // ? Error: number is not assignable to string
 ```
 
 ### The Arrow Function Version
@@ -92,10 +92,10 @@ const makePair = <A, B>(first: A, second: B): [A, B] => {
   return [first, second];
 };
 
-const pair = makePair("status", 200); // → [string, number]
+const pair = makePair("status", 200); // ? [string, number]
 ```
 
-This is exactly how `Map<K, V>` works internally — it takes a Key type and a Value type.
+This is exactly how `Map<K, V>` works internally � it takes a Key type and a Value type.
 
 ---
 
@@ -104,21 +104,21 @@ This is exactly how `Map<K, V>` works internally — it takes a Key type and a V
 What if your generic function needs to access a property on `T`? You can't just assume `T` has a `.length` property:
 
 ```typescript
-// ❌ Error: Property 'length' does not exist on type 'T'
+// ? Error: Property 'length' does not exist on type 'T'
 const getLength = <T>(item: T): number => item.length;
 ```
 
 Use `extends` to **constrain** what `T` can be:
 
 ```typescript
-// ✅ T must have a 'length' property
+// ? T must have a 'length' property
 const getLength = <T extends { length: number }>(item: T): number => {
   return item.length;
 };
 
-getLength("hello");     // ✅ string has length
-getLength([1, 2, 3]);   // ✅ array has length
-getLength(42);          // ❌ Error: number doesn't have length
+getLength("hello");     // ? string has length
+getLength([1, 2, 3]);   // ? array has length
+getLength(42);          // ? Error: number doesn't have length
 ```
 
 ---
@@ -154,7 +154,7 @@ Notice how `ApiResponse<User>` and `ApiResponse<Document[]>` are completely diff
 
 TypeScript ships with powerful generic utility types. You'll see these constantly in Playwright code:
 
-### `Partial<T>` — Make all properties optional
+### `Partial<T>` � Make all properties optional
 
 ```typescript
 interface User {
@@ -168,21 +168,21 @@ type UserUpdate = Partial<User>;
 // Equivalent to: { name?: string; email?: string; role?: string; }
 ```
 
-### `Pick<T, K>` — Select specific properties
+### `Pick<T, K>` � Select specific properties
 
 ```typescript
 type UserCredentials = Pick<User, 'email' | 'role'>;
 // Equivalent to: { email: string; role: string; }
 ```
 
-### `Omit<T, K>` — Remove specific properties
+### `Omit<T, K>` � Remove specific properties
 
 ```typescript
 type UserWithoutRole = Omit<User, 'role'>;
 // Equivalent to: { name: string; email: string; }
 ```
 
-### `Record<K, V>` — Create a typed dictionary
+### `Record<K, V>` � Create a typed dictionary
 
 ```typescript
 type StatusMap = Record<string, number>;
@@ -295,7 +295,7 @@ Every major Playwright pattern uses generics. Now you know what they mean:
 3. **Utility Types** (`Partial<T>`, `Pick<T, K>`, `Omit<T, K>`, `Record<K, V>`) transform existing types.
 4. The **Factory Pattern** (`(overrides?: Partial<T>) => T`) is the foundation of test data generation in enterprise Playwright.
 
-You are now equipped to both *read* and *write* generic TypeScript — a skill that separates junior automation engineers from senior ones.
+You are now equipped to both *read* and *write* generic TypeScript � a skill that separates junior automation engineers from senior ones.
 
 **Proceed to Module 0.7: Control Flow & Error Handling.**
 

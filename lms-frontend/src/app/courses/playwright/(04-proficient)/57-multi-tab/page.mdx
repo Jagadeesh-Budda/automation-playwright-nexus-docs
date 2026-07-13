@@ -1,4 +1,4 @@
-﻿# 10.6: Multi-Tab & Multi-Window
+# 10.6: Multi-Tab & Multi-Window
 
 ## Learning Objectives
 
@@ -111,7 +111,7 @@ import { test, expect } from '@playwright/test';
 test('login via Google OAuth popup', async ({ page }) => {
   await page.goto('/login');
   
-  // Click "Sign in with Google" — opens OAuth popup
+  // Click "Sign in with Google" � opens OAuth popup
   const popupPromise = page.waitForEvent('popup');
   await page.getByRole('button', { name: 'Sign in with Google' }).click();
   const oauthPopup = await popupPromise;
@@ -122,10 +122,10 @@ test('login via Google OAuth popup', async ({ page }) => {
   await oauthPopup.getByLabel('Password').fill('test-password');
   await oauthPopup.getByRole('button', { name: 'Sign in' }).click();
   
-  // The popup closes automatically after auth — wait for it
+  // The popup closes automatically after auth � wait for it
   await oauthPopup.waitForEvent('close');
   
-  // Back in the original page — user should be logged in
+  // Back in the original page � user should be logged in
   await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 });
 ```
@@ -293,9 +293,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="57-multi-tab"
@@ -304,7 +304,7 @@ You have learned the core pattern. Now apply it under pressure.
 // Complete the promise handler below:`}
 />
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

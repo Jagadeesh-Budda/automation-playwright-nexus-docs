@@ -1,4 +1,4 @@
-﻿# 10.1: Advanced Locator Composition
+# 10.1: Advanced Locator Composition
 
 ## Learning Objectives
 
@@ -7,7 +7,7 @@ By the end of this lesson, you will be able to:
 
 ## The Problem: Multiple Matching Elements
 
-Most pages contain repeated UI patterns — rows in a table, items in a list, cards in a grid. Your locator will match ALL of them. You need to **filter** down to the one specific element you care about.
+Most pages contain repeated UI patterns � rows in a table, items in a list, cards in a grid. Your locator will match ALL of them. You need to **filter** down to the one specific element you care about.
 
 ```typescript
 // This returns ALL rows in the table (not useful for targeting one)
@@ -28,7 +28,7 @@ await pendingRow.getByRole('button', { name: 'Review' }).click();
 
 ## Filter Options
 
-### `hasText` — Filter by visible text
+### `hasText` � Filter by visible text
 
 ```typescript
 // Find the row that contains "Clinical Trial Report"
@@ -38,7 +38,7 @@ const docRow = page.getByRole('row').filter({ hasText: 'Clinical Trial Report' }
 const approvedRow = page.getByRole('row').filter({ hasText: /approved/i });
 ```
 
-### `has` — Filter by child locator
+### `has` � Filter by child locator
 
 ```typescript
 // Find a card that contains a specific badge element
@@ -52,7 +52,7 @@ const unselectedRow = page.getByRole('row').filter({
 });
 ```
 
-### `hasNot` — Exclude elements containing something
+### `hasNot` � Exclude elements containing something
 
 ```typescript
 // Get all document rows EXCEPT draft ones
@@ -191,9 +191,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="52-locators-code"
@@ -206,7 +206,7 @@ const row = page.getByRole('row').filter({ hasText: 'Sarah' });
 // Click the Edit button in this specific row:`}
 />
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 // Reference implementation

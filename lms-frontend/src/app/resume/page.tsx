@@ -29,7 +29,7 @@ export default function ResumeBuilder() {
         </div>
         <h1 className="text-3xl font-black text-white uppercase tracking-widest mb-4">Access Denied</h1>
         <p className="text-slate-400 max-w-md mx-auto mb-8 leading-relaxed">
-          The Enterprise Resume Builder is an exclusive tool reserved for certified engineers. You must complete the Capstone Project and claim your Aegis Automation Certificate to unlock this feature.
+          The Enterprise Resume Builder is an exclusive tool reserved for certified engineers. You must complete the Capstone Project and claim your Automation Nexus Certificate to unlock this feature.
         </p>
         <Link 
           href="/"

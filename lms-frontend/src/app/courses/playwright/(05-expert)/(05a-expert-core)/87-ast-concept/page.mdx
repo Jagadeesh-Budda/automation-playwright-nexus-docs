@@ -1,4 +1,4 @@
-﻿# 18.1: The Abstract Syntax Tree (AST)
+# 18.1: The Abstract Syntax Tree (AST)
 
 ## Learning Objectives
 
@@ -7,7 +7,7 @@ By the end of this lesson, you will be able to:
 
 ## What Happens When Your Code is Parsed?
 
-Before any JavaScript/TypeScript code runs, the Node.js engine parses it into an **Abstract Syntax Tree (AST)** — a tree data structure that represents the logical structure of your code.
+Before any JavaScript/TypeScript code runs, the Node.js engine parses it into an **Abstract Syntax Tree (AST)** � a tree data structure that represents the logical structure of your code.
 
 ```typescript
 // Your source code
@@ -37,12 +37,12 @@ The AST Auditor **walks this tree** looking for patterns that violate the qualit
 
 ## The Parser: `acorn`
 
-The ASA framework uses the `acorn` library to parse JavaScript:
+The ANA framework uses the `acorn` library to parse JavaScript:
 
 ```typescript
 import { parse } from 'acorn';
 
-const code = `// ❌ Anti-pattern\nawait page.waitForTimeout(3000);`;
+const code = `// ? Anti-pattern\nawait page.waitForTimeout(3000);`;
 const ast = parse(code, {
   ecmaVersion: 2022,
   sourceType: 'module',
@@ -58,7 +58,7 @@ For TypeScript files, we use `@typescript-eslint/typescript-estree`:
 ```typescript
 import { parse } from '@typescript-eslint/typescript-estree';
 
-const ast = parse(`// ❌ Anti-pattern\nawait page.waitForTimeout(3000);`, {
+const ast = parse(`// ? Anti-pattern\nawait page.waitForTimeout(3000);`, {
   jsx: false,
   tokens: true,
   range: true,
@@ -201,9 +201,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Write an AST auditor function `checkForEval` that detects usages of `page.$eval` and returns a list of violations.
 
 **Constraints:**
-- ❌ You may NOT use `page.waitForTimeout`
-- ✅ You MUST use `walk` to traverse the tree
-- ✅ All assertions must be web-first
+- ? You may NOT use `page.waitForTimeout`
+- ? You MUST use `walk` to traverse the tree
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="87-ast-concept"
@@ -243,7 +243,7 @@ test('challenge exercise', async ({ page }) => {
 />
 
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```
 // AwaitExpression > CallExpression > MemberExpression

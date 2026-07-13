@@ -1,4 +1,4 @@
-﻿# 17.4: Handling Partial Failures
+# 17.4: Handling Partial Failures
 
 ## Learning Objectives
 
@@ -39,7 +39,7 @@ const title = `Test Document ${Date.now()}`;
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ❌ Tests share the same document ID
+// ? Tests share the same document ID
 const SHARED_DOC_ID = 'DOC-TEST-001';
 
 test('can view document', async ({ documentPage }) => {
@@ -52,7 +52,7 @@ test('can delete document', async ({ documentPage }) => {
   // ...
 });
 
-// ✅ Each test creates its own data
+// ? Each test creates its own data
 test('can view document', async ({ documentPage }) => {
   const id = await documentPage.createDocument({ title: 'View Test' });
   await documentPage.navigateTo(id);
@@ -94,10 +94,10 @@ test.beforeEach(async ({ documentPage }) => {
 ```typescript
 import { randomUUID } from 'crypto';
 
-// ✅ UUID is guaranteed unique across parallel workers
+// ? UUID is guaranteed unique across parallel workers
 const title1 = `Test-${randomUUID()}`;
 
-// ✅ Or use a combination of worker ID + timestamp via environment variables
+// ? Or use a combination of worker ID + timestamp via environment variables
 const title2 = `Test-${process.env.TEST_WORKER_INDEX}-${Date.now()}`;
 ```
 
@@ -147,7 +147,7 @@ await prisma.$disconnect();
 />
 
 <details>
-<summary>🔑 Reveal Solution (try first!)</summary>
+<summary>?? Reveal Solution (try first!)</summary>
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -199,9 +199,9 @@ You have learned the core pattern. Now apply it under pressure.
 **Your Task:** Implement the solution based on the principles discussed above.
 
 **Constraints:**
-- ❌ Do not use deprecated APIs
-- ✅ Follow the architecture best practices
-- ✅ All assertions must be web-first
+- ? Do not use deprecated APIs
+- ? Follow the architecture best practices
+- ? All assertions must be web-first
 
 <CodeEditor
   moduleId="85-data-debug"
