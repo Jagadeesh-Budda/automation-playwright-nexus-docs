@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import AppInitializer from "../components/AppInitializer";
 import PageWrapper from "../components/PageWrapper";
 import MainWrapper from "../components/MainWrapper";
+import { Analytics } from '@vercel/analytics/next';
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,6 +26,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </PageWrapper>
           </MainWrapper>
         </AppInitializer>
+        <Analytics />
       </body>
     </html>
   );
