@@ -13,7 +13,7 @@ import { PathEligibilityBadge } from './PathEligibilityBadge';
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { completedModules, initUser, isSidebarExpanded, setSidebarExpanded, streak, unlockedAchievements, selectedPath } = useMasteryStore();
+  const { completedModules, initUser, isSidebarExpanded, setSidebarExpanded, streak, unlockedAchievements, selectedPath, setPremiumModalOpen } = useMasteryStore();
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
 
   const pathModules = selectedPath === 'all' ? modulesData : modulesData.filter(m => (m as any).learningPaths?.includes(selectedPath));
@@ -298,15 +298,13 @@ export default function Sidebar() {
         {/* 3.5. Premium Upgrade Call-to-Action */}
         {isSidebarExpanded && (
           <div className="px-4 mb-4 flex-shrink-0">
-            <a
-              href="https://topmate.io/jagadeesh_budda/2203055"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2.5 w-full py-2.5 rounded-xl border border-purple-500/30 bg-gradient-to-r from-purple-600/10 to-pink-500/10 hover:from-purple-600/20 hover:to-pink-500/20 hover:border-purple-500/50 text-purple-200 hover:text-white font-bold text-xs uppercase tracking-wider transition-all duration-300 no-underline shadow-[0_0_15px_rgba(168,85,247,0.1)] hover:shadow-[0_0_20px_rgba(168,85,247,0.2)]"
+            <button
+              onClick={() => setPremiumModalOpen(true)}
+              className="flex items-center justify-center gap-2.5 w-full py-2.5 rounded-xl border border-purple-500/30 bg-gradient-to-r from-purple-600/10 to-pink-500/10 hover:from-purple-600/20 hover:to-pink-500/20 hover:border-purple-500/50 text-purple-200 hover:text-white font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-[0_0_15px_rgba(168,85,247,0.1)] hover:shadow-[0_0_20px_rgba(168,85,247,0.2)] cursor-pointer"
             >
               <ShoppingBag className="w-4 h-4 text-purple-400" />
               Get Premium Code
-            </a>
+            </button>
           </div>
         )}
 

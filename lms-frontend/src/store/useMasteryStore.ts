@@ -21,7 +21,10 @@ interface MasteryState {
   claimedCertificates: Record<string, boolean>;
   selectedPath: 'all' | 'foundations' | 'enterprise' | 'regulated';
   
+  isPremiumModalOpen: boolean;
+  
   setMobileSyncOpen: (open: boolean) => void;
+  setPremiumModalOpen: (open: boolean) => void;
   setSidebarExpanded: (expanded: boolean) => void;
   setSelectedPath: (path: 'all' | 'foundations' | 'enterprise' | 'regulated') => void;
   setClaimedCertificate: (path: string) => void;
@@ -63,6 +66,7 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
   loading: true,
   isMobileSyncOpen: false,
   isSidebarExpanded: false,
+  isPremiumModalOpen: false,
   claimedCertificates: {},
   selectedPath: 'all',
   
@@ -77,6 +81,7 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
   showMilestoneCelebration: null,
 
   setMobileSyncOpen: (open) => set({ isMobileSyncOpen: open }),
+  setPremiumModalOpen: (open) => set({ isPremiumModalOpen: open }),
   setSidebarExpanded: (expanded) => set({ isSidebarExpanded: expanded }),
   setSelectedPath: (path) => {
     set({ selectedPath: path });

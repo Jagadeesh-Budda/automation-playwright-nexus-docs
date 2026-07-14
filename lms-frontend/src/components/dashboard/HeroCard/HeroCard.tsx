@@ -115,6 +115,30 @@ export default function HeroCard() {
                 <span className="text-xs font-bold text-cyan-400 block mt-0.5">{pathCompletionPercentage === 100 ? "COMPLETED" : `Become an ${nextStageName}`}</span>
               </div>
             </div>
+
+            {/* Platform Metrics (SPRINT 1) */}
+            <div className="mb-5 pt-3.5 border-t border-white/5 flex flex-wrap items-center gap-x-5 gap-y-2">
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-300 font-bold">
+                <span className="text-cyan-400 font-mono">122</span>
+                <span className="text-slate-500 font-medium">Lessons</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-300 font-bold">
+                <span className="text-cyan-400 font-mono">1100+</span>
+                <span className="text-slate-500 font-medium">Quizzes</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-300 font-bold">
+                <span className="text-cyan-400 font-mono">529</span>
+                <span className="text-slate-500 font-medium">AST Rules</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-300 font-bold">
+                <span className="text-cyan-400 font-mono">20+</span>
+                <span className="text-slate-500 font-medium">Projects</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-[11px] text-slate-300 font-bold">
+                <span className="text-cyan-400">Verified</span>
+                <span className="text-slate-500 font-medium">Certificates</span>
+              </div>
+            </div>
           </div>
 
           <div className="flex items-center gap-3 mt-auto">

@@ -236,9 +236,31 @@ export default function CodeEditor({ moduleId, placeholder = "// Write your Play
                     [ERROR] Validation failed. {error}
                   </div>
                 ) : result ? (
-                  <div className={result.valid ? "text-emerald-400 mb-2" : "text-amber-400 mb-2"}>
-                    {result.valid ? "[SUCCESS] AST Validation Passed! Execution logic verified." : `[FAILED] Architectural Requirements Not Met:\n${result.issues?.join('\n')}`}
-                  </div>
+                  result.valid ? (
+                    <div className="text-emerald-400 mb-2 font-mono">
+                      <div className="font-bold text-emerald-300 mb-2">✅ Architecture Validation Passed</div>
+                      <div className="space-y-1 pl-2 text-emerald-400/90 text-xs">
+                        <div>✔ Proper Assertions Detected</div>
+                        <div>✔ Correct Locator Strategy</div>
+                        <div>✔ No waitForTimeout Usage</div>
+                        <div>✔ AST Rules Satisfied</div>
+                      </div>
+                      <div className="mt-3 text-slate-500 text-xs italic">Ready for the next challenge.</div>
+                    </div>
+                  ) : (
+                    <div className="text-amber-400 mb-2 font-mono">
+                      <div className="font-bold text-amber-300 mb-2">⚠ Architecture Issues Found</div>
+                      <div className="space-y-1.5 pl-2 text-amber-400/90 text-xs">
+                        {result.issues?.map((issue: string, idx: number) => (
+                          <div key={idx} className="flex items-start gap-1.5">
+                            <span className="text-amber-500">•</span>
+                            <span>{issue}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="mt-3 text-slate-500 text-xs">Review the highlighted diagnostics.</div>
+                    </div>
+                  )
                 ) : (
                   <div className="mb-5">
                     Secure sandboxed environment ready. Type 'help' for instructions.<br />

@@ -5,11 +5,13 @@ import { UserPlus, Sparkles, Key, Check, Loader2, X } from 'lucide-react';
 import NavigationProgress from './NavigationProgress';
 import { useSessionTracker } from '../hooks/useSessionTracker';
 import { useCodeBlockCopy } from '../hooks/useCodeBlockCopy';
+import PremiumModal from './dashboard/PremiumModal';
 
 export default function AppInitializer({ children }: { children: React.ReactNode }) {
   const { 
     userName, userId, userProgress, initUser, setUser, 
     syncFromPayload, loading, isMobileSyncOpen, setMobileSyncOpen,
+    isPremiumModalOpen, setPremiumModalOpen
   } = useMasteryStore();
 
   useSessionTracker();
@@ -345,6 +347,10 @@ export default function AppInitializer({ children }: { children: React.ReactNode
 
       <NavigationProgress />
       {children}
+      <PremiumModal 
+        isOpen={isPremiumModalOpen} 
+        onClose={() => setPremiumModalOpen(false)} 
+      />
     </>
   );
 }
