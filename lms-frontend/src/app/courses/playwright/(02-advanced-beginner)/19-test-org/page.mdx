@@ -58,24 +58,24 @@ As your spec files grow, you should group them by domain or feature.
 ```
 project-root/
 +-- tests/
-¦   +-- test1.spec.ts
-¦   +-- test2.spec.ts
-¦   +-- test3.spec.ts
-¦   +-- test4.spec.ts
+ï¿½   +-- test1.spec.ts
+ï¿½   +-- test2.spec.ts
+ï¿½   +-- test3.spec.ts
+ï¿½   +-- test4.spec.ts
 ```
 
 **? Good Organization:**
 ```
 project-root/
 +-- tests/
-¦   +-- auth/
-¦   ¦   +-- login.spec.ts
-¦   ¦   +-- forgot-password.spec.ts
-¦   +-- checkout/
-¦   ¦   +-- cart.spec.ts
-¦   ¦   +-- payment.spec.ts
-¦   +-- settings/
-¦       +-- profile.spec.ts
+ï¿½   +-- auth/
+ï¿½   ï¿½   +-- login.spec.ts
+ï¿½   ï¿½   +-- forgot-password.spec.ts
+ï¿½   +-- checkout/
+ï¿½   ï¿½   +-- cart.spec.ts
+ï¿½   ï¿½   +-- payment.spec.ts
+ï¿½   +-- settings/
+ï¿½       +-- profile.spec.ts
 ```
 
 This structure makes it easy to run a specific group of tests. For example, to run only the checkout tests, you can use the CLI:

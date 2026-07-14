@@ -35,7 +35,7 @@ await expect(page.getByText('Saved successfully')).toBeVisible();
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ? ANTI-PATTERN: isVisible() returns boolean immediately — doesn't wait or assert
+// ? ANTI-PATTERN: isVisible() returns boolean immediately ï¿½ doesn't wait or assert
 const visible = await page.getByText('Success').isVisible();  // Returns false, test doesn't fail!
 
 // ? FIX: Use expect() for retry + assertion
@@ -82,13 +82,13 @@ class LoginPage {
 ### 5. `Promise.race()` for Event + Action
 
 ```typescript
-// ? ANTI-PATTERN: Race condition — download may resolve with undefined
+// ? ANTI-PATTERN: Race condition ï¿½ download may resolve with undefined
 const download = await Promise.race([
   page.waitForEvent('download'),
   page.getByRole('button', { name: 'Export' }).click(),
 ]);
 
-// ? FIX: Use Promise.all() — click triggers the event
+// ? FIX: Use Promise.all() ï¿½ click triggers the event
 const [download] = await Promise.all([
   page.waitForEvent('download'),
   page.getByRole('button', { name: 'Export' }).click(),
@@ -227,7 +227,7 @@ test('create 100 documents', async ({ api }) => {
   for (let i = 0; i < 100; i++) {
     await api.createDocument({ title: `Test ${i}` });
   }
-  // Never cleans up — database grows with every run
+  // Never cleans up ï¿½ database grows with every run
 });
 
 // ? FIX: Cleanup in fixture teardown
@@ -250,7 +250,7 @@ docFixture: async ({ request }, use) => {
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ? ANTI-PATTERN: Waits for 500ms of no network — slow and unreliable
+// ? ANTI-PATTERN: Waits for 500ms of no network ï¿½ slow and unreliable
 await page.goto('/dashboard', { waitUntil: 'networkidle' });
 
 // ? FIX: Wait for the specific element you need
@@ -351,7 +351,7 @@ const text = await page.getByRole('heading').textContent();
 import { test, expect } from '@playwright/test';
 
 // ? ANTI-PATTERN: Generic failure message
-await expect(row).toBeVisible();  // "Expected to be visible" — which row?
+await expect(row).toBeVisible();  // "Expected to be visible" ï¿½ which row?
 
 // ? FIX: Custom message
 await expect(row, `Document DOC-${id} should appear in the table`).toBeVisible();

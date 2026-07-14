@@ -8,10 +8,10 @@ By the end of this lesson, you will be able to:
 ## Why TypeScript in Test Automation?
 
 Playwright is built in TypeScript. Using TypeScript properly in your test framework gives you:
-- **Auto-complete** in VS Code — no more typos in field names
-- **Compile-time errors** — catch bugs before tests even run
-- **Self-documenting code** — interfaces describe the shape of your data
-- **Refactoring confidence** — rename a field, TypeScript tells you every place to update
+- **Auto-complete** in VS Code ï¿½ no more typos in field names
+- **Compile-time errors** ï¿½ catch bugs before tests even run
+- **Self-documenting code** ï¿½ interfaces describe the shape of your data
+- **Refactoring confidence** ï¿½ rename a field, TypeScript tells you every place to update
 
 ## Defining Data Interfaces
 
@@ -63,7 +63,7 @@ import { test, expect } from '@playwright/test';
 import { Document, DocumentStatus } from '../entities/Document';
 
 export class DocumentPage {
-  // Method signature uses the interface — self-documenting!
+  // Method signature uses the interface ï¿½ self-documenting!
   async createDocument(doc: Partial<Document>): Promise<string> {
     await this.newDocumentButton.click();
     
@@ -132,16 +132,16 @@ type FixtureMap<T> = { [K in keyof T]: T[K] };
 ## Generic Utility Types in Test Code
 
 ```typescript
-// Partial<T> — make all fields optional (useful for test data)
+// Partial<T> ï¿½ make all fields optional (useful for test data)
 const partialDoc: Partial<Document> = { title: 'Test Doc' };
 
-// Required<T> — make all fields required
+// Required<T> ï¿½ make all fields required
 const fullDoc: Required<Document> = { /* all fields must be provided */ };
 
-// Pick<T, K> — select specific fields
+// Pick<T, K> ï¿½ select specific fields
 type DocumentSummary = Pick<Document, 'id' | 'title' | 'status'>;
 
-// Omit<T, K> — exclude specific fields
+// Omit<T, K> ï¿½ exclude specific fields
 type DocumentInput = Omit<Document, 'id' | 'uploadedAt' | 'uploadedBy'>;
 ```
 

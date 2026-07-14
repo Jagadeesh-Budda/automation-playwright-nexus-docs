@@ -51,7 +51,7 @@ await expect(modal).not.toHaveClass(/animating/);
 await modal.getByLabel('Reason').fill('Approved');
 ```
 
-## Failure 3: Race Condition — Audit Trail Not Created Yet
+## Failure 3: Race Condition ï¿½ Audit Trail Not Created Yet
 
 **Symptom:** After signing, the test immediately checks the audit trail and finds it empty.
 
@@ -61,7 +61,7 @@ await modal.getByLabel('Reason').fill('Approved');
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ? Race condition — audit might not exist yet
+// ? Race condition ï¿½ audit might not exist yet
 await eSignPage.signDocument({ reason: 'Approved', password: pass });
 await auditPage.navigateTo(docId);
 let count = await auditPage.getAllEntries().count();
@@ -133,7 +133,7 @@ page.on('response', response => {
 });
 
 page.on('requestfailed', request => {
-  console.error(`FAILED REQUEST: ${request.url()} — ${request.failure()?.errorText}`);
+  console.error(`FAILED REQUEST: ${request.url()} ï¿½ ${request.failure()?.errorText}`);
 });
 ```
 

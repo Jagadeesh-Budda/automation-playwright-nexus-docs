@@ -19,7 +19,7 @@ grep -r "new LoginPage\|new DocumentPage\|new ESignPage" tests/
 
 # 3. Check that NO spec file contains page.locator() calls
 grep -r "page\.locator\|page\.getByRole\|page\.getByText" tests/
-# Expected output: (nothing — all locators should be in pages/)
+# Expected output: (nothing ï¿½ all locators should be in pages/)
 
 # 4. Verify every spec file imports from fixtures/baseTest, not @playwright/test
 grep -r "from '@playwright/test'" tests/
@@ -37,11 +37,11 @@ npx ts-node scripts/ast-audit.ts
 # Expected output when passing:
 # ?? Running AST Audit...
 # 
-# ? Gate 1: No hardcoded sleeps — PASSED (0 violations)
-# ? Gate 2: No hardcoded credentials — PASSED (0 violations)
-# ? Gate 3: All async operations awaited — PASSED (0 violations)
-# ? Gate 4: No locators in spec files — PASSED (0 violations)
-# ? Gate 5: All tests have describe blocks — PASSED (0 violations)
+# ? Gate 1: No hardcoded sleeps ï¿½ PASSED (0 violations)
+# ? Gate 2: No hardcoded credentials ï¿½ PASSED (0 violations)
+# ? Gate 3: All async operations awaited ï¿½ PASSED (0 violations)
+# ? Gate 4: No locators in spec files ï¿½ PASSED (0 violations)
+# ? Gate 5: All tests have describe blocks ï¿½ PASSED (0 violations)
 # 
 # ? AST Audit passed! All 5 gates cleared.
 ```
@@ -128,7 +128,7 @@ Your Capstone suite should complete in **under 5 minutes** when run with `worker
 
 ```bash
 grep -r "from '@playwright/test'" tests/
-# Expected output: (nothing — all spec files should import from fixtures/baseTest)
+# Expected output: (nothing ï¿½ all spec files should import from fixtures/baseTest)
 ```
 
 </SolutionGate>

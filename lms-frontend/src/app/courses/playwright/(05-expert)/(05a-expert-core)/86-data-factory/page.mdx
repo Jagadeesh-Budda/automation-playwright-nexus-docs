@@ -148,7 +148,7 @@ test.describe('Document Operations', () => {
   });
 
   test('can view an approved document', async ({ page }) => {
-    // ? No setup code in the test — factory handles it
+    // ? No setup code in the test ï¿½ factory handles it
     const doc = await factory.approvedDocument({ title: 'View Test Doc' });
     
     await page.goto(`/documents/${doc.id}`);

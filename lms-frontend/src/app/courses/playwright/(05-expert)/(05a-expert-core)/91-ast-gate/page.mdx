@@ -17,11 +17,11 @@ git push ? GitHub PR opened
 GitHub Actions triggers
       ?
 +-------------------------------------+
-¦  STEP 1: Lint (ESLint)              ¦
-¦  STEP 2: Type Check (tsc)           ¦  
-¦  STEP 3: AST Audit ? THE GATE      ¦
-¦  STEP 4: Test Execution             ¦
-¦  STEP 5: Visual Regression          ¦
+ï¿½  STEP 1: Lint (ESLint)              ï¿½
+ï¿½  STEP 2: Type Check (tsc)           ï¿½  
+ï¿½  STEP 3: AST Audit ? THE GATE      ï¿½
+ï¿½  STEP 4: Test Execution             ï¿½
+ï¿½  STEP 5: Visual Regression          ï¿½
 +-------------------------------------+
       ?
 All steps green? ? Merge allowed ?
@@ -124,7 +124,7 @@ jobs:
       - name: TypeScript type check
         run: npx tsc --noEmit
       
-      # THE AST GATE — runs BEFORE tests
+      # THE AST GATE ï¿½ runs BEFORE tests
       - name: AST Quality Gate
         run: npx ts-node scripts/ast-audit.ts
       
@@ -162,7 +162,7 @@ Now, if an engineer tries to commit code with a violation, git will refuse it:
 git commit -m "Add login test"
 # ?? Running AST Audit...
 # ? AST Audit FAILED: 1 violation found.
-# ? [no-hardcoded-sleep] tests/login.spec.ts:15 — waitForTimeout() is banned.
+# ? [no-hardcoded-sleep] tests/login.spec.ts:15 ï¿½ waitForTimeout() is banned.
 # 
 # error: pre-commit hook failed
 ```
@@ -171,9 +171,9 @@ git commit -m "Add login test"
 
 ```typescript
 // The audit script uses exit codes to communicate status to CI:
-process.exit(0);  // Success — all gates passed
-process.exit(1);  // Failure — violations found, block the merge
-process.exit(2);  // Error   — the auditor itself crashed
+process.exit(0);  // Success ï¿½ all gates passed
+process.exit(1);  // Failure ï¿½ violations found, block the merge
+process.exit(2);  // Error   ï¿½ the auditor itself crashed
 ```
 
 

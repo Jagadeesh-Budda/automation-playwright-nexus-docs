@@ -7,15 +7,15 @@ By the end of this lesson, you will be able to:
 
 ## Why Accessibility Testing Matters
 
-Accessibility isn't optional — it's a **legal requirement** in many industries (ADA, Section 508, EU Accessibility Act). In regulated environments like pharmaceuticals, inaccessible software can block FDA compliance.
+Accessibility isn't optional ï¿½ it's a **legal requirement** in many industries (ADA, Section 508, EU Accessibility Act). In regulated environments like pharmaceuticals, inaccessible software can block FDA compliance.
 
-Playwright has **first-class accessibility testing** built in — no plugins needed.
+Playwright has **first-class accessibility testing** built in ï¿½ no plugins needed.
 
 ## The Accessibility Tree
 
 Every web page has two representations:
-1. **DOM tree** — the HTML structure (`<div>`, `<button>`, `<input>`)
-2. **Accessibility tree** — the semantic structure that screen readers see (`button "Submit"`, `textbox "Email"`)
+1. **DOM tree** ï¿½ the HTML structure (`<div>`, `<button>`, `<input>`)
+2. **Accessibility tree** ï¿½ the semantic structure that screen readers see (`button "Submit"`, `textbox "Email"`)
 
 Playwright's `getByRole()` locators query the **accessibility tree**, which is why they're the gold standard for locators.
 
@@ -23,7 +23,7 @@ Playwright's `getByRole()` locators query the **accessibility tree**, which is w
 
 ### `toHaveAccessibleName()`
 
-Checks the element's accessible name — what a screen reader announces:
+Checks the element's accessible name ï¿½ what a screen reader announces:
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -197,7 +197,7 @@ test('interactive elements have sufficient contrast', async ({ page }) => {
       };
     });
     
-    // Log for manual review — automated contrast calculation is complex
+    // Log for manual review ï¿½ automated contrast calculation is complex
     console.log(`Button: ${await button.textContent()} | Color: ${styles.color} | BG: ${styles.backgroundColor}`);
   }
 });

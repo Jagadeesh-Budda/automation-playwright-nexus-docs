@@ -20,7 +20,7 @@ By the end of this lesson, you will be able to:
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ? Raw API calls in tests — duplicated, hard to maintain
+// ? Raw API calls in tests ï¿½ duplicated, hard to maintain
 test('document approval updates status', async ({ request }) => {
   const authRes = await request.post('/api/auth/login', { 
     data: { email: process.env.ADMIN_USER, password: process.env.ADMIN_PASS }
@@ -207,7 +207,7 @@ docApi: async ({ request }, use) => {
 <CodeEditor
   moduleId="81-api-controller"
   taskIndex={0}
-  placeholder="// Task: Write an API controller method that does TWO things in sequence:&#10;//   1. Creates a document via this.create(payload)&#10;//   2. Immediately approves it via this.approve(doc.id, reason)&#10;//   3. Returns the created document object&#10;//&#10;// This is a convenience method for test setup — create + approve in one call"
+  placeholder="// Task: Write an API controller method that does TWO things in sequence:&#10;//   1. Creates a document via this.create(payload)&#10;//   2. Immediately approves it via this.approve(doc.id, reason)&#10;//   3. Returns the created document object&#10;//&#10;// This is a convenience method for test setup ï¿½ create + approve in one call"
 />
 
 <details>

@@ -16,7 +16,7 @@ The AST Auditor prevents this by catching violations automatically. But you stil
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ? VIOLATION — locators in spec file
+// ? VIOLATION ï¿½ locators in spec file
 test('admin deletes a document', async ({ page }) => {
   // These locators belong in DocumentPage.ts
   await page.getByRole('row').filter({ hasText: 'DOC-001' })
@@ -31,7 +31,7 @@ test('admin deletes a document', async ({ page }) => {
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ? CORRECT — locators extracted to Page Object
+// ? CORRECT ï¿½ locators extracted to Page Object
 test('admin deletes a document', async ({ documentPage }) => {
   await documentPage.deleteDocument('DOC-001');
   await expect(documentPage.deletionSuccessMessage).toBeVisible();
@@ -43,7 +43,7 @@ test('admin deletes a document', async ({ documentPage }) => {
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ? VIOLATION — assertion in Page Object
+// ? VIOLATION ï¿½ assertion in Page Object
 export class DocumentPage {
   async approveDocument(docId: string) {
     await this.getActionButton(docId, 'Approve').click();
@@ -57,12 +57,12 @@ export class DocumentPage {
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ? CORRECT — assertion stays in the test
+// ? CORRECT ï¿½ assertion stays in the test
 export class DocumentPage {
   async approveDocument(docId: string) {
     await this.getActionButton(docId, 'Approve').click();
     await this.modal.confirm();
-    // No assertion here — return a value if needed
+    // No assertion here ï¿½ return a value if needed
   }
 }
 
@@ -76,7 +76,7 @@ await expect(documentPage.getStatusBadge('DOC-001')).toContainText('Approved');
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ? VIOLATION — test imports a component directly (skips Page Object layer)
+// ? VIOLATION ï¿½ test imports a component directly (skips Page Object layer)
 import { Modal } from '../../components/Modal';
 
 test('modal closes on cancel', async ({ page }) => {
@@ -88,7 +88,7 @@ test('modal closes on cancel', async ({ page }) => {
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ? CORRECT — access components through the Page Object
+// ? CORRECT ï¿½ access components through the Page Object
 test('modal closes on cancel', async ({ documentPage }) => {
   await documentPage.deleteButton.click();
   await documentPage.modal.cancel();
@@ -150,7 +150,7 @@ test('search filters results', async ({ documentPage }) => {
 <CodeEditor
   moduleId="60-arch-debug"
   taskIndex={0}
-  placeholder="// Task: Refactor the test below so that NO locators appear in the spec file.&#10;// Move the interaction into a Page Object method.&#10;//&#10;// CURRENT TEST (with locator in spec — anti-pattern):&#10;//   test('clicks delete', async ({ page }) => {&#10;//     await page.getByRole('button', { name: 'Delete' }).click();&#10;//   });&#10;//&#10;// Write BOTH:&#10;//   1. The Page Object method&#10;//   2. The refactored test using a fixture"
+  placeholder="// Task: Refactor the test below so that NO locators appear in the spec file.&#10;// Move the interaction into a Page Object method.&#10;//&#10;// CURRENT TEST (with locator in spec ï¿½ anti-pattern):&#10;//   test('clicks delete', async ({ page }) => {&#10;//     await page.getByRole('button', { name: 'Delete' }).click();&#10;//   });&#10;//&#10;// Write BOTH:&#10;//   1. The Page Object method&#10;//   2. The refactored test using a fixture"
 />
 
 <details>

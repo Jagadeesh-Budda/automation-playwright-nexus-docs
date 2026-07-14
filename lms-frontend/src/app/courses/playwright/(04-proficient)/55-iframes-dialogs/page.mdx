@@ -11,13 +11,13 @@ iframes embed a separate HTML document inside a page. They're everywhere: paymen
 
 Playwright cannot directly access elements inside an iframe using `page.getByRole()`. You need `page.frameLocator()`.
 
-## `page.frameLocator()` — The iframe Gateway
+## `page.frameLocator()` ï¿½ The iframe Gateway
 
 ```typescript
 // Target elements inside an iframe by its CSS selector or attribute
 const paymentFrame = page.frameLocator('#payment-iframe');
 
-// Now use any locator inside the frame — same API as page
+// Now use any locator inside the frame ï¿½ same API as page
 await paymentFrame.getByLabel('Card Number').fill('4242424242424242');
 await paymentFrame.getByLabel('Expiry').fill('12/28');
 await paymentFrame.getByLabel('CVC').fill('123');
@@ -86,10 +86,10 @@ await stripeFrame.getByLabel('Card number').fill('4242424242424242');
 | `page.frame()` | `Frame \| null` | Direct frame access for navigation/evaluation |
 
 ```typescript
-// frameLocator — for element interaction (preferred)
+// frameLocator ï¿½ for element interaction (preferred)
 await page.frameLocator('#editor').getByRole('button').click();
 
-// frame — for page-level operations
+// frame ï¿½ for page-level operations
 const frame = page.frame({ name: 'editor' });
 await frame?.goto('https://editor.example.com/new');
 const title = await frame?.title();
@@ -123,9 +123,9 @@ test('user can format text in the WYSIWYG editor', async ({ page }) => {
 
 ## Native Browser Dialogs
 
-Native browser dialogs (`alert()`, `confirm()`, `prompt()`) are NOT part of the DOM — they're browser-level UI that blocks JavaScript execution.
+Native browser dialogs (`alert()`, `confirm()`, `prompt()`) are NOT part of the DOM ï¿½ they're browser-level UI that blocks JavaScript execution.
 
-## `page.on('dialog')` — The Handler Pattern
+## `page.on('dialog')` ï¿½ The Handler Pattern
 
 You must set up a listener **before** the dialog appears:
 
@@ -144,14 +144,14 @@ test('handles confirmation dialog', async ({ page }) => {
   // Now trigger the action that opens the dialog
   await page.getByRole('button', { name: 'Delete Document' }).click();
   
-  // The dialog was automatically handled — continue with assertions
+  // The dialog was automatically handled ï¿½ continue with assertions
   await expect(page.getByText('Document deleted')).toBeVisible();
 });
 ```
 
 ## Handling Different Dialog Types
 
-### `alert()` — Information only
+### `alert()` ï¿½ Information only
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -163,7 +163,7 @@ page.on('dialog', async dialog => {
 });
 ```
 
-### `confirm()` — Accept or Dismiss
+### `confirm()` ï¿½ Accept or Dismiss
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -181,7 +181,7 @@ page.on('dialog', async dialog => {
 });
 ```
 
-### `prompt()` — Accept with Input
+### `prompt()` ï¿½ Accept with Input
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -200,7 +200,7 @@ await page.evaluate(() => {
 });
 ```
 
-### `beforeunload` — Unsaved Changes Warning
+### `beforeunload` ï¿½ Unsaved Changes Warning
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -224,13 +224,13 @@ page.once('dialog', async dialog => {
 });
 
 await page.getByRole('button', { name: 'Delete' }).click();
-// Subsequent dialogs won't be handled — they'll block!
+// Subsequent dialogs won't be handled ï¿½ they'll block!
 ```
 
 ## Auto-Dismissing All Dialogs
 
 ```typescript
-// In your fixture — automatically dismiss all dialogs
+// In your fixture ï¿½ automatically dismiss all dialogs
 test.beforeEach(async ({ page }) => {
   page.on('dialog', dialog => dialog.dismiss());
 });
@@ -244,7 +244,7 @@ import { test, expect } from '@playwright/test';
 test('deleting a document requires confirmation', async ({ page, documentPage }) => {
   await documentPage.navigate();
   
-  // Test 1: Dismiss the dialog — document should NOT be deleted
+  // Test 1: Dismiss the dialog ï¿½ document should NOT be deleted
   page.once('dialog', async dialog => {
     expect(dialog.message()).toContain('permanently delete');
     await dialog.dismiss();
@@ -253,7 +253,7 @@ test('deleting a document requires confirmation', async ({ page, documentPage })
   await documentPage.getActionButton('DOC-001', 'Delete').click();
   await expect(documentPage.getRowByDocId('DOC-001')).toBeVisible();  // Still there
   
-  // Test 2: Accept the dialog — document SHOULD be deleted
+  // Test 2: Accept the dialog ï¿½ document SHOULD be deleted
   page.once('dialog', async dialog => {
     await dialog.accept();
   });

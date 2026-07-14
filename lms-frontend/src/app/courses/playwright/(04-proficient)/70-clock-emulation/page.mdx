@@ -5,7 +5,7 @@
 By the end of this lesson, you will be able to:
 - Use Clock API and device emulation for edge case testing
 
-## Clock API — Controlling Time
+## Clock API ï¿½ Controlling Time
 
 Playwright's Clock API lets you **freeze, advance, and manipulate time** inside the browser. Perfect for testing countdowns, session timeouts, scheduled events, and time-dependent UI.
 
@@ -15,7 +15,7 @@ Playwright's Clock API lets you **freeze, advance, and manipulate time** inside 
 import { test, expect } from '@playwright/test';
 
 test('session timeout shows warning after 25 minutes', async ({ page }) => {
-  // Install fake clock — freezes Date.now(), setTimeout, setInterval
+  // Install fake clock ï¿½ freezes Date.now(), setTimeout, setInterval
   await page.clock.install({ time: new Date('2024-06-15T10:00:00') });
   
   await page.goto('/dashboard');
@@ -38,7 +38,7 @@ await page.clock.install({ time: new Date('2024-01-15T09:00:00Z') });
 await page.clock.fastForward('05:00');      // 5 minutes
 await page.clock.fastForward(30_000);       // 30 seconds (milliseconds)
 
-// Jump to a specific time (skips timers — doesn't fire them)
+// Jump to a specific time (skips timers ï¿½ doesn't fire them)
 await page.clock.setFixedTime(new Date('2024-01-15T17:00:00Z'));
 
 // Set system time without affecting timers
@@ -203,7 +203,7 @@ test('app works offline after initial load', async ({ page, context }) => {
   // Go offline
   await context.setOffline(true);
   
-  // Try to navigate — should show cached content or offline message
+  // Try to navigate ï¿½ should show cached content or offline message
   await page.getByRole('link', { name: 'Documents' }).click();
   await expect(page.getByText(/offline|cached/i)).toBeVisible();
   

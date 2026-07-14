@@ -64,7 +64,7 @@ flowchart TB
 > **?? Key Takeaway**  
 > Strict separation of concerns is the secret to scaling test automation. Tests dictate the "what", Pages handle the "how", Components handle shared UI, and Entities handle the shape of the data.
 
-## Layer 1: Tests — "What"
+## Layer 1: Tests ï¿½ "What"
 
 Tests describe **business scenarios** in human-readable language. They should be understandable by a product manager.
 
@@ -129,7 +129,7 @@ export class ESignPage {
 }
 ```
 
-## Layer 3: Components — Shared UI Pieces
+## Layer 3: Components ï¿½ Shared UI Pieces
 
 Components are used inside Page Objects when the same UI element appears on multiple pages.
 
@@ -172,7 +172,7 @@ export class DocumentPage {
 }
 ```
 
-## Layer 4: Entities — Data Types
+## Layer 4: Entities ï¿½ Data Types
 
 ```typescript
 // entities/Document.ts
@@ -222,7 +222,7 @@ Test (What)
 <summary>?? Reveal Solution (try first!)</summary>
 
 ```
-// Answer: Layer 3 — components/Modal.ts
+// Answer: Layer 3 ï¿½ components/Modal.ts
 // WHY: Modal is a reusable UI element shared across multiple pages.
 // It belongs in the Components layer, not in Pages (too specific)
 // or Entities (not a data shape).

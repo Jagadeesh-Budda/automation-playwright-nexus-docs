@@ -7,7 +7,7 @@ By the end of this lesson, you will be able to:
 
 ## The Challenge of Dynamic Tables
 
-Static tables are easy — you know what data will be there. But real-world enterprise apps have **dynamic tables** where:
+Static tables are easy ï¿½ you know what data will be there. But real-world enterprise apps have **dynamic tables** where:
 - Data changes based on server state
 - Rows are added, removed, or reordered between test runs
 - Tables are paginated across multiple pages
@@ -20,10 +20,10 @@ Your tests must handle all of this without becoming brittle.
 ### Strategy 1: Test by Content, Not Position
 
 ```typescript
-// ? Fragile — breaks if the row order changes
+// ? Fragile ï¿½ breaks if the row order changes
 await page.getByRole('row').nth(2).getByRole('button', { name: 'Edit' }).click();
 
-// ? Resilient — finds the row regardless of position
+// ? Resilient ï¿½ finds the row regardless of position
 await page.getByRole('row')
   .filter({ hasText: 'DOC-2024-001' })
   .getByRole('button', { name: 'Edit' })
@@ -35,10 +35,10 @@ await page.getByRole('row')
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ? Fragile — fails if someone adds a new document
+// ? Fragile ï¿½ fails if someone adds a new document
 await expect(page.getByRole('row')).toHaveCount(15);
 
-// ? Resilient — checks the condition you actually care about
+// ? Resilient ï¿½ checks the condition you actually care about
 await expect(page.getByRole('row').filter({ hasText: 'Q3 Report' })).toBeVisible();
 ```
 

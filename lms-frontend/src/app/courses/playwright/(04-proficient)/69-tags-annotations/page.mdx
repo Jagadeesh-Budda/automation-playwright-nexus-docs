@@ -11,7 +11,7 @@ In a suite of 500+ tests, you need to answer questions like:
 - "Run only smoke tests before deploying"
 - "Skip flaky tests in this CI run"
 - "Mark this test as slow so it gets more timeout"
-- "This test is broken — don't run it but don't delete it"
+- "This test is broken ï¿½ don't run it but don't delete it"
 
 Tags and annotations solve all of these.
 
@@ -89,7 +89,7 @@ npx playwright test --grep-invert @visual
 npx playwright test --grep @smoke --project=Chrome
 ```
 
-## `test.skip()` — Conditionally Skip Tests
+## `test.skip()` ï¿½ Conditionally Skip Tests
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -111,7 +111,7 @@ test('production-only test', async ({ page }) => {
 });
 ```
 
-## `test.fixme()` — Known Broken Tests
+## `test.fixme()` ï¿½ Known Broken Tests
 
 Mark tests that are currently broken but shouldn't be deleted:
 
@@ -126,7 +126,7 @@ The difference between `skip` and `fixme`:
 - `test.skip()` = "This test doesn't apply in this context"
 - `test.fixme()` = "This test is broken and needs fixing"
 
-## `test.slow()` — Extra Timeout for Heavy Tests
+## `test.slow()` ï¿½ Extra Timeout for Heavy Tests
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -139,7 +139,7 @@ test('generate comprehensive compliance report', async ({ page }) => {
 });
 ```
 
-## `test.fail()` — Expected Failure
+## `test.fail()` ï¿½ Expected Failure
 
 Mark a test that is **expected** to fail (passes when it fails, fails when it passes):
 
@@ -152,12 +152,12 @@ test('known bug: date picker resets on blur', async ({ page }) => {
   await page.getByLabel('Start Date').fill('2024-01-15');
   await page.getByLabel('End Date').click();
   
-  // Bug: the start date resets — this assertion currently fails
+  // Bug: the start date resets ï¿½ this assertion currently fails
   await expect(page.getByLabel('Start Date')).toHaveValue('2024-01-15');
 });
 ```
 
-When the bug is fixed, the test will start "passing" — which means `test.fail()` will make it **fail**, reminding you to remove `test.fail()`.
+When the bug is fixed, the test will start "passing" ï¿½ which means `test.fail()` will make it **fail**, reminding you to remove `test.fail()`.
 
 ## `test.describe.skip()` and `test.describe.fixme()`
 
@@ -242,7 +242,7 @@ export default defineConfig({
     },
     {
       name: 'all',
-      // No grep filter — runs everything
+      // No grep filter ï¿½ runs everything
     },
   ],
 });

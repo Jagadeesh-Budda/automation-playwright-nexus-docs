@@ -19,10 +19,10 @@ Modals are deceptively complex to test:
 Always scope your interactions to the `getByRole('dialog')` locator. This prevents accidentally clicking outside the modal.
 
 ```typescript
-// ? Wrong — might click the wrong button outside the modal
+// ? Wrong ï¿½ might click the wrong button outside the modal
 await page.getByRole('button', { name: 'Cancel' }).click();
 
-// ? Correct — scoped to the dialog
+// ? Correct ï¿½ scoped to the dialog
 const modal = page.getByRole('dialog');
 await modal.getByRole('button', { name: 'Cancel' }).click();
 ```

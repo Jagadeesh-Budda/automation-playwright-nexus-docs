@@ -12,11 +12,11 @@ The Test Pyramid is a framework for balancing your test investment. It tells you
 ```
          /\
         /  \
-       / UI \        ? Few (10-20%) — Slow, expensive, high coverage
+       / UI \        ? Few (10-20%) ï¿½ Slow, expensive, high coverage
       /------\
-     / API    \      ? More (30-40%) — Fast, reliable, targeted
+     / API    \      ? More (30-40%) ï¿½ Fast, reliable, targeted
     /----------\
-   / Unit       \    ? Most (50-60%) — Blazing fast, isolated
+   / Unit       \    ? Most (50-60%) ï¿½ Blazing fast, isolated
   /--------------\
 ```
 
@@ -29,12 +29,12 @@ The Test Pyramid is a framework for balancing your test investment. It tells you
 
 ## Playwright's API Testing Capability
 
-Playwright has a built-in HTTP client (`request`) that lets you make direct API calls — no browser, no UI, pure HTTP.
+Playwright has a built-in HTTP client (`request`) that lets you make direct API calls ï¿½ no browser, no UI, pure HTTP.
 
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// This test runs without opening any browser — just raw HTTP
+// This test runs without opening any browser ï¿½ just raw HTTP
 test('GET /api/documents returns paginated results', async ({ request }) => {
   const response = await request.get('/api/documents', {
     params: { page: 1, limit: 10 }

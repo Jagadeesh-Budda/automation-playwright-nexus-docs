@@ -7,7 +7,7 @@ By the end of this lesson, you will be able to:
 
 ## Why Folder Structure Matters
 
-A bad folder structure makes a test suite feel like a junk drawer — everything is mixed together, nothing is reusable, and new engineers can't find anything. A good folder structure makes the suite feel like a well-organized factory.
+A bad folder structure makes a test suite feel like a junk drawer ï¿½ everything is mixed together, nothing is reusable, and new engineers can't find anything. A good folder structure makes the suite feel like a well-organized factory.
 
 The ANA standard uses a **4-layer architecture** that maps directly to how a software application is built.
 
@@ -16,37 +16,37 @@ The ANA standard uses a **4-layer architecture** that maps directly to how a sof
 ```
 project-root/
 +-- tests/              ? LAYER 1: Test Specs (the "What")
-¦   +-- admin/
-¦   ¦   +-- login.spec.ts
-¦   ¦   +-- document-upload.spec.ts
-¦   +-- e-sign/
-¦       +-- signature-flow.spec.ts
-¦
+ï¿½   +-- admin/
+ï¿½   ï¿½   +-- login.spec.ts
+ï¿½   ï¿½   +-- document-upload.spec.ts
+ï¿½   +-- e-sign/
+ï¿½       +-- signature-flow.spec.ts
+ï¿½
 +-- pages/              ? LAYER 2: Page Objects (the "How")
-¦   +-- LoginPage.ts
-¦   +-- DocumentPage.ts
-¦   +-- ESignPage.ts
-¦
+ï¿½   +-- LoginPage.ts
+ï¿½   +-- DocumentPage.ts
+ï¿½   +-- ESignPage.ts
+ï¿½
 +-- components/         ? LAYER 3: Reusable UI Components
-¦   +-- Header.ts
-¦   +-- Modal.ts
-¦   +-- DataTable.ts
-¦
+ï¿½   +-- Header.ts
+ï¿½   +-- Modal.ts
+ï¿½   +-- DataTable.ts
+ï¿½
 +-- entities/           ? LAYER 4: Data Models & Types
-¦   +-- User.ts
-¦   +-- Document.ts
-¦   +-- Signature.ts
-¦
+ï¿½   +-- User.ts
+ï¿½   +-- Document.ts
+ï¿½   +-- Signature.ts
+ï¿½
 +-- fixtures/           ? Test infrastructure (base test, hooks)
-¦   +-- baseTest.ts
-¦
+ï¿½   +-- baseTest.ts
+ï¿½
 +-- utils/              ? Shared utility functions
-¦   +-- dateHelper.ts
-¦   +-- fileHelper.ts
-¦
+ï¿½   +-- dateHelper.ts
+ï¿½   +-- fileHelper.ts
+ï¿½
 +-- data/               ? Test data (JSON, CSV, factories)
-¦   +-- testUsers.json
-¦
+ï¿½   +-- testUsers.json
+ï¿½
 +-- .env                ? Secret config (never commit!)
 +-- playwright.config.ts
 +-- package.json
@@ -54,22 +54,22 @@ project-root/
 
 ## Layer-by-Layer Explanation
 
-### Layer 1: `tests/` — Test Specs (The "What")
+### Layer 1: `tests/` ï¿½ Test Specs (The "What")
 These files contain **only** the test logic. They describe what you are testing in plain business language. They should be readable by a non-engineer.
 
 <CodeExplainer preset="admin-login-spec" />
 
-### Layer 2: `pages/` — Page Objects (The "How")
-These files contain all the **selectors and interactions** for a specific page. When the UI changes, you only update this file — not 50 different test files.
+### Layer 2: `pages/` ï¿½ Page Objects (The "How")
+These files contain all the **selectors and interactions** for a specific page. When the UI changes, you only update this file ï¿½ not 50 different test files.
 
 <CodeExplainer preset="login-page-ts" />
 
-### Layer 3: `components/` — Reusable UI Components
+### Layer 3: `components/` ï¿½ Reusable UI Components
 These model **shared UI elements** that appear on multiple pages (headers, modals, navigation, data tables).
 
 <CodeExplainer preset="modal-ts" />
 
-### Layer 4: `entities/` — Data Models & Types
+### Layer 4: `entities/` ï¿½ Data Models & Types
 These are TypeScript interfaces that define the **shape of your data**.
 
 <CodeExplainer preset="user-ts" />

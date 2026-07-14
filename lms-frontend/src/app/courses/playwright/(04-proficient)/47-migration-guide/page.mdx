@@ -12,11 +12,11 @@ By the end of this lesson, you will be able to:
 | Selenium Concept | Playwright Equivalent | Key Difference |
 |-----------------|----------------------|----------------|
 | `WebDriver` | `Browser` / `BrowserContext` | Playwright uses contexts for isolation, not separate drivers |
-| `WebElement` | `Locator` | Locators are **lazy** — they don't query the DOM until you act |
+| `WebElement` | `Locator` | Locators are **lazy** ï¿½ they don't query the DOM until you act |
 | `driver.findElement(By.id())` | `page.getByRole()` | Playwright prefers semantic/accessible locators |
-| `WebDriverWait` + `ExpectedConditions` | Built-in auto-waiting | Playwright waits automatically — no explicit waits needed |
+| `WebDriverWait` + `ExpectedConditions` | Built-in auto-waiting | Playwright waits automatically ï¿½ no explicit waits needed |
 | `Thread.sleep()` | ? Banned | Use `expect().toBeVisible()` instead |
-| `driver.switchTo().frame()` | `page.frameLocator()` | No need to "switch" — frameLocator chains naturally |
+| `driver.switchTo().frame()` | `page.frameLocator()` | No need to "switch" ï¿½ frameLocator chains naturally |
 | `driver.switchTo().window()` | `page.waitForEvent('popup')` | Playwright gives you the page directly |
 | `Actions` class | `locator.hover()`, `locator.dragTo()` | Built into locators, no separate class |
 | `driver.manage().timeouts()` | `playwright.config.ts` | Centralized configuration |
@@ -54,17 +54,17 @@ test('admin can login', async ({ page }) => {
   
   await expect(page).toHaveURL('/dashboard');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dashboard');
-  // No driver.quit() — Playwright handles cleanup via fixtures
+  // No driver.quit() ï¿½ Playwright handles cleanup via fixtures
 });
 ```
 
 ### Top 5 Things Selenium Users Get Wrong in Playwright
 
-1. **Adding explicit waits** — Playwright auto-waits. Don't add `waitForSelector()` before `click()`.
-2. **Using `page.$()` (ElementHandle)** — Use `page.getByRole()` (Locator) instead. Locators are lazy and resilient.
-3. **Closing the browser manually** — Playwright fixtures handle cleanup automatically.
-4. **Using CSS selectors for everything** — Use `getByRole()`, `getByLabel()`, `getByText()` first.
-5. **Creating a "Base Test" class with inheritance** — Use `test.extend()` with fixtures instead.
+1. **Adding explicit waits** ï¿½ Playwright auto-waits. Don't add `waitForSelector()` before `click()`.
+2. **Using `page.$()` (ElementHandle)** ï¿½ Use `page.getByRole()` (Locator) instead. Locators are lazy and resilient.
+3. **Closing the browser manually** ï¿½ Playwright fixtures handle cleanup automatically.
+4. **Using CSS selectors for everything** ï¿½ Use `getByRole()`, `getByLabel()`, `getByText()` first.
+5. **Creating a "Base Test" class with inheritance** ï¿½ Use `test.extend()` with fixtures instead.
 
 ---
 
@@ -78,8 +78,8 @@ test('admin can login', async ({ page }) => {
 | `cy.get('.selector')` | `page.getByRole()` | Playwright prefers semantic locators |
 | `cy.contains('text')` | `page.getByText('text')` | Same concept |
 | `cy.intercept()` | `page.route()` | Same concept, different API |
-| `cy.fixture()` | `test.extend()` fixtures | Different meaning — Cypress fixtures are data files |
-| Automatic retry | Automatic retry | Both auto-retry — similar philosophy |
+| `cy.fixture()` | `test.extend()` fixtures | Different meaning ï¿½ Cypress fixtures are data files |
+| Automatic retry | Automatic retry | Both auto-retry ï¿½ similar philosophy |
 | Chaining (`cy.get().click()`) | Await chaining (`await locator.click()`) | Playwright uses `async/await` |
 | `beforeEach()` hooks | `test.beforeEach()` | Same concept |
 | `cy.wrap()` | Not needed | Playwright natively handles async |
@@ -95,8 +95,8 @@ Playwright:  Node.js ? controls browser via DevTools Protocol ? Browser
 ```
 
 **Why this matters:**
-- **Cypress** runs inside the browser — limited to one tab, one domain, one browser
-- **Playwright** runs outside the browser — supports multiple tabs, multiple browsers, multiple domains, API calls, file system access
+- **Cypress** runs inside the browser ï¿½ limited to one tab, one domain, one browser
+- **Playwright** runs outside the browser ï¿½ supports multiple tabs, multiple browsers, multiple domains, API calls, file system access
 
 ### Before & After: API Interception
 
@@ -125,16 +125,16 @@ await page.route('/api/documents', route => {
 
 await page.goto('/documents');
 await expect(page.getByRole('row')).toHaveCount(1);
-// No need for cy.wait() — web-first assertions retry automatically
+// No need for cy.wait() ï¿½ web-first assertions retry automatically
 ```
 
 ### Top 5 Things Cypress Users Get Wrong in Playwright
 
-1. **Forgetting `await`** — Every Playwright action needs `await`. Cypress chains implicitly.
-2. **Looking for `cy.wait()`** — Use `expect().toBeVisible()` or `page.waitForResponse()` instead.
-3. **Expecting single-tab limitation** — Playwright supports multi-tab! Use `page.waitForEvent('popup')`.
-4. **Using `data-cy` attribute** — Playwright calls it `data-testid` (configurable in config).
-5. **Missing `should()` chaining** — Use `await expect(locator).toBeVisible()` — it's separate from the locator.
+1. **Forgetting `await`** ï¿½ Every Playwright action needs `await`. Cypress chains implicitly.
+2. **Looking for `cy.wait()`** ï¿½ Use `expect().toBeVisible()` or `page.waitForResponse()` instead.
+3. **Expecting single-tab limitation** ï¿½ Playwright supports multi-tab! Use `page.waitForEvent('popup')`.
+4. **Using `data-cy` attribute** ï¿½ Playwright calls it `data-testid` (configurable in config).
+5. **Missing `should()` chaining** ï¿½ Use `await expect(locator).toBeVisible()` ï¿½ it's separate from the locator.
 
 ---
 

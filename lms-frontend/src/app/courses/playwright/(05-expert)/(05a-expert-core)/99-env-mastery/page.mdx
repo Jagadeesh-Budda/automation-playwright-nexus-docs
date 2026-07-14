@@ -26,7 +26,7 @@ Production (read-only) ? https://pharmadoc.example.com
 ```
 
 ```bash
-# .env (safe to commit — no secrets)
+# .env (safe to commit ï¿½ no secrets)
 BASE_URL=http://localhost:3000
 API_TIMEOUT=10000
 SCREENSHOT_ON_FAIL=true
@@ -77,7 +77,7 @@ Some tests only make sense in certain environments:
 ```typescript
 import { test, expect } from '@playwright/test';
 
-test.skip(process.env.TEST_ENV === 'production', 'Skipped in production — read-only environment');
+test.skip(process.env.TEST_ENV === 'production', 'Skipped in production ï¿½ read-only environment');
 
 test('admin can delete a document', async ({ documentPage }) => {
   // This test is skipped in production
@@ -89,7 +89,7 @@ test('admin can delete a document', async ({ documentPage }) => {
 import { test, expect } from '@playwright/test';
 
 // Or use test tags to group environment-specific tests
-test('performance test — only in staging', {
+test('performance test ï¿½ only in staging', {
   annotation: { type: 'skip', description: 'Only runs in staging' },
 }, async ({ page }) => {
   // ...

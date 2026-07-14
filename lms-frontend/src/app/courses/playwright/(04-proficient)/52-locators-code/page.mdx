@@ -7,7 +7,7 @@ By the end of this lesson, you will be able to:
 
 ## The Problem: Multiple Matching Elements
 
-Most pages contain repeated UI patterns — rows in a table, items in a list, cards in a grid. Your locator will match ALL of them. You need to **filter** down to the one specific element you care about.
+Most pages contain repeated UI patterns ï¿½ rows in a table, items in a list, cards in a grid. Your locator will match ALL of them. You need to **filter** down to the one specific element you care about.
 
 ```typescript
 // This returns ALL rows in the table (not useful for targeting one)
@@ -28,7 +28,7 @@ await pendingRow.getByRole('button', { name: 'Review' }).click();
 
 ## Filter Options
 
-### `hasText` — Filter by visible text
+### `hasText` ï¿½ Filter by visible text
 
 ```typescript
 // Find the row that contains "Clinical Trial Report"
@@ -38,7 +38,7 @@ const docRow = page.getByRole('row').filter({ hasText: 'Clinical Trial Report' }
 const approvedRow = page.getByRole('row').filter({ hasText: /approved/i });
 ```
 
-### `has` — Filter by child locator
+### `has` ï¿½ Filter by child locator
 
 ```typescript
 // Find a card that contains a specific badge element
@@ -52,7 +52,7 @@ const unselectedRow = page.getByRole('row').filter({
 });
 ```
 
-### `hasNot` — Exclude elements containing something
+### `hasNot` ï¿½ Exclude elements containing something
 
 ```typescript
 // Get all document rows EXCEPT draft ones

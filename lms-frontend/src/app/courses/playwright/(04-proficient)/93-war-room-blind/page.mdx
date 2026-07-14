@@ -1,4 +1,4 @@
-# 11.1: Blind War Room — Unlabeled Debugging
+# 11.1: Blind War Room ï¿½ Unlabeled Debugging
 
 
 
@@ -57,7 +57,7 @@ test.describe('Document Upload', () => {
 <details>
 <summary>?? Root Cause Analysis (try to find it yourself first!)</summary>
 
-**Root Cause:** `.textContent()` is NOT a web-first assertion. It grabs the text content *immediately* — before the toast notification has rendered in the DOM.
+**Root Cause:** `.textContent()` is NOT a web-first assertion. It grabs the text content *immediately* ï¿½ before the toast notification has rendered in the DOM.
 
 On a fast local machine, the toast appears in ~50ms, so `.textContent()` grabs it in time. On a slow CI machine with limited resources, the toast takes ~200-500ms, so `.textContent()` returns `null`.
 
@@ -70,12 +70,12 @@ test('user uploads a PDF and sees confirmation', async ({ page }) => {
   await page.getByRole('button', { name: 'Upload' }).click();
   await page.locator('input[type="file"]').setInputFiles('report.pdf');
   await page.getByRole('button', { name: 'Confirm' }).click();
-  // ? Web-first assertion — automatically retries until the toast appears
+  // ? Web-first assertion ï¿½ automatically retries until the toast appears
   await expect(page.locator('.toast-message')).toHaveText('Upload successful');
 });
 ```
 
-**Key Lesson:** Never use `.textContent()` or `.innerText()` as substitutes for assertions. Use `expect().toHaveText()` or `expect().toContainText()` — they retry automatically.
+**Key Lesson:** Never use `.textContent()` or `.innerText()` as substitutes for assertions. Use `expect().toHaveText()` or `expect().toContainText()` ï¿½ they retry automatically.
 
 </details>
 
@@ -133,7 +133,7 @@ test('admin searches for the user', async ({ page }) => {
 `'qa-test@company.com'` is used by every test run. When Worker 1 creates this user and Worker 3 tries to create the same user simultaneously, the database rejects the duplicate email. On the second run, the user already exists from the first run.
 
 **Root Cause 2: Test 2 depends on Test 1.**
-The "search" test assumes the "create" test ran first and succeeded. In parallel, Worker 1 might run "search" while Worker 2 hasn't finished "create" yet. Even sequentially, if "create" fails, "search" fails too — masking the real error.
+The "search" test assumes the "create" test ran first and succeeded. In parallel, Worker 1 might run "search" while Worker 2 hasn't finished "create" yet. Even sequentially, if "create" fails, "search" fails too ï¿½ masking the real error.
 
 **Root Cause 3: No cleanup.**
 The test creates data but never deletes it. After the first run, `qa-test@company.com` exists in the database permanently, causing "create" to fail on every subsequent run.
@@ -199,7 +199,7 @@ test('verify document count on dashboard', async ({ page }) => {
 
 ### Your Task
 
-This is the hardest challenge. The bug is NOT just a code issue — it's a combination of code AND environment.
+This is the hardest challenge. The bug is NOT just a code issue ï¿½ it's a combination of code AND environment.
 
 1. Identify all the code-level issues.
 2. Identify the environment-level issue.
@@ -221,13 +221,13 @@ This is the hardest challenge. The bug is NOT just a code issue — it's a combina
 <summary>?? Root Cause Analysis (try to find it yourself first!)</summary>
 
 **Code Issue 1: `networkidle` is unreliable.**
-`waitForLoadState('networkidle')` waits for 500ms of no network activity. If the dashboard has a WebSocket connection, a polling heartbeat, or analytics pings, `networkidle` may never resolve — or resolve prematurely.
+`waitForLoadState('networkidle')` waits for 500ms of no network activity. If the dashboard has a WebSocket connection, a polling heartbeat, or analytics pings, `networkidle` may never resolve ï¿½ or resolve prematurely.
 
 **Code Issue 2: `.textContent()` is not a web-first assertion.**
-Same pattern as Challenge A — `.textContent()` grabs the value immediately without retrying. If the dashboard count loads asynchronously after the page shell renders, it may still show "0" or an empty string.
+Same pattern as Challenge A ï¿½ `.textContent()` grabs the value immediately without retrying. If the dashboard count loads asynchronously after the page shell renders, it may still show "0" or an empty string.
 
 **Environment Issue: Nightly database cleanup.**
-The staging environment runs a scheduled job at midnight that wipes test data. In the morning, manual testers or other automated suites have created documents, so the count is > 0. At midnight, the cleanup runs, leaving the count at 0. This is NOT a bug — the test is asserting on environment state it doesn't control.
+The staging environment runs a scheduled job at midnight that wipes test data. In the morning, manual testers or other automated suites have created documents, so the count is > 0. At midnight, the cleanup runs, leaving the count at 0. This is NOT a bug ï¿½ the test is asserting on environment state it doesn't control.
 
 **The Fix:**
 ```typescript
@@ -241,7 +241,7 @@ test('verify document count on dashboard', async ({ page, request }) => {
 
   await page.goto('/dashboard');
 
-  // ? Web-first assertion with retry — no networkidle needed
+  // ? Web-first assertion with retry ï¿½ no networkidle needed
   await expect(page.getByTestId('doc-count')).not.toHaveText('0');
 });
 ```

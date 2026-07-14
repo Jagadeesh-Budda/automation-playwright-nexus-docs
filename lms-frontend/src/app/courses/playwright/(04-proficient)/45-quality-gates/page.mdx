@@ -9,13 +9,13 @@ By the end of this lesson, you will be able to:
 
 **AST** stands for **Abstract Syntax Tree**. It is a tree-shaped data structure that represents the structure of your code.
 
-When you write `await page.click('#btn')`, the JavaScript engine doesn't see raw text — it parses it into a tree of nodes: an `AwaitExpression` containing a `CallExpression` (`page.click`) with an `Argument` (`'#btn'`).
+When you write `await page.click('#btn')`, the JavaScript engine doesn't see raw text ï¿½ it parses it into a tree of nodes: an `AwaitExpression` containing a `CallExpression` (`page.click`) with an `Argument` (`'#btn'`).
 
-The AST Auditor reads this tree programmatically to check whether your code follows the required standards — **without actually running the tests**.
+The AST Auditor reads this tree programmatically to check whether your code follows the required standards ï¿½ **without actually running the tests**.
 
 ## Why Use an AST Auditor?
 
-A traditional linter (like ESLint) checks code style. An AST Auditor goes deeper — it checks **architectural correctness**:
+A traditional linter (like ESLint) checks code style. An AST Auditor goes deeper ï¿½ it checks **architectural correctness**:
 
 | Regular Linter | AST Auditor |
 |----------------|-------------|
@@ -32,25 +32,25 @@ Every piece of automation code must pass these 5 gates before a PR can be merged
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ? BANNED — fails AST Gate 1
+// ? BANNED ï¿½ fails AST Gate 1
 await page.waitForTimeout(3000);
 
-// ? CORRECT — use web-first assertions instead
+// ? CORRECT ï¿½ use web-first assertions instead
 await expect(page.getByText('Document Saved')).toBeVisible();
 ```
 
 ### Gate 2: No Hardcoded Credentials
 ```typescript
-// ? BANNED — fails AST Gate 2
+// ? BANNED ï¿½ fails AST Gate 2
 await page.fill('#username', 'admin@Nexus.com');
 
-// ? CORRECT — use environment variables
+// ? CORRECT ï¿½ use environment variables
 await page.fill('#username', process.env.ADMIN_USER!);
 ```
 
 ### Gate 3: Await All Async Operations
 ```typescript
-// ? BANNED — missing await, fails Gate 3
+// ? BANNED ï¿½ missing await, fails Gate 3
 page.click('#submit');  // This is a floating promise!
 
 // ? CORRECT
@@ -61,12 +61,12 @@ await page.click('#submit');
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ? BANNED — locator in spec file, fails Gate 4
+// ? BANNED ï¿½ locator in spec file, fails Gate 4
 test('upload doc', async ({ page }) => {
   await page.locator('#upload-btn').click();
 });
 
-// ? CORRECT — locator belongs in the Page Object
+// ? CORRECT ï¿½ locator belongs in the Page Object
 test('upload doc', async ({ documentPage }) => {
   await documentPage.uploadButton.click();
 });
@@ -76,7 +76,7 @@ test('upload doc', async ({ documentPage }) => {
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ? BANNED — no describe block
+// ? BANNED ï¿½ no describe block
 test('login works', async ({ page }) => { ... });
 
 // ? CORRECT
@@ -95,11 +95,11 @@ npx ts-node utils/ast-auditor.ts --path=tests/
 npx ts-node utils/ast-auditor.ts --path=tests/ --strict
 
 # Expected output when passing:
-# ? Gate 1: No hardcoded sleeps — PASSED
-# ? Gate 2: No hardcoded credentials — PASSED
-# ? Gate 3: All async operations awaited — PASSED
-# ? Gate 4: No locators in spec files — PASSED
-# ? Gate 5: All tests have describe blocks — PASSED
+# ? Gate 1: No hardcoded sleeps ï¿½ PASSED
+# ? Gate 2: No hardcoded credentials ï¿½ PASSED
+# ? Gate 3: All async operations awaited ï¿½ PASSED
+# ? Gate 4: No locators in spec files ï¿½ PASSED
+# ? Gate 5: All tests have describe blocks ï¿½ PASSED
 # 
 # AST Audit Complete: 5/5 Gates Passed ?
 ```

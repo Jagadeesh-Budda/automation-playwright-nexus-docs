@@ -8,9 +8,9 @@ By the end of this lesson, you will be able to:
 ## The Assertion Philosophy
 
 Great assertions are:
-1. **Specific** — they check exactly what matters, nothing more
-2. **Readable** — the failing message is self-explanatory
-3. **Async** — they use `await expect()` so Playwright can retry
+1. **Specific** ï¿½ they check exactly what matters, nothing more
+2. **Readable** ï¿½ the failing message is self-explanatory
+3. **Async** ï¿½ they use `await expect()` so Playwright can retry
 
 ## Page-Level Assertions
 
@@ -145,7 +145,7 @@ await expect(page.getByLabel('Status')).toHaveValue('Approved');
 
 ## Soft Assertions: Collect All Failures
 
-Regular assertions stop the test immediately on failure. **Soft assertions** collect all failures and report them at the end — perfect for data-heavy verification pages.
+Regular assertions stop the test immediately on failure. **Soft assertions** collect all failures and report them at the end ï¿½ perfect for data-heavy verification pages.
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -165,7 +165,7 @@ test('validate document details page', async ({ page }) => {
 ```
 
 > [!WARNING]
-> Soft assertions still mark the test as **failed** — they just don't abort it early. All failures are collected and reported at the end.
+> Soft assertions still mark the test as **failed** ï¿½ they just don't abort it early. All failures are collected and reported at the end.
 
 ## Custom Error Messages
 
@@ -243,7 +243,7 @@ test('document is fully signed', async ({ documentPage }) => {
 });
 ```
 
-## `expect.poll()` — Retry Arbitrary Functions
+## `expect.poll()` ï¿½ Retry Arbitrary Functions
 
 Use `expect.poll()` when you need to retry a **non-locator value** until it satisfies a condition:
 
@@ -272,12 +272,12 @@ await expect.poll(async () => {
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// expect.poll() — single value
+// expect.poll() ï¿½ single value
 await expect.poll(async () => {
   return await page.getByRole('row').count();
 }).toBeGreaterThan(5);
 
-// expect.toPass() — multiple assertions in a block
+// expect.toPass() ï¿½ multiple assertions in a block
 await expect(async () => {
   const count = await page.getByRole('row').count();
   expect(count).toBeGreaterThan(5);
@@ -318,10 +318,10 @@ First run creates the snapshot file. Subsequent runs compare against it. Update 
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ? Good — asserts what the user sees
+// ? Good ï¿½ asserts what the user sees
 await expect(page.getByRole('alert')).toContainText('Document saved');
 
-// ? Bad — asserts internal implementation details
+// ? Bad ï¿½ asserts internal implementation details
 await expect(page.locator('.toast-container .alert-success')).toHaveClass('fade-in');
 ```
 
@@ -329,11 +329,11 @@ await expect(page.locator('.toast-container .alert-success')).toHaveClass('fade-
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ? Good — each assertion checks one thing
+// ? Good ï¿½ each assertion checks one thing
 await expect(statusBadge).toContainText('Approved');
 await expect(signatureCount).toHaveText('3 of 3');
 
-// ? Bad — brittle compound assertion
+// ? Bad ï¿½ brittle compound assertion
 await expect(documentRow).toHaveText(/Approved.*3 of 3.*Regulatory/);
 ```
 
@@ -341,7 +341,7 @@ await expect(documentRow).toHaveText(/Approved.*3 of 3.*Regulatory/);
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// ? Good — tells you exactly which step failed in a multi-step test
+// ? Good ï¿½ tells you exactly which step failed in a multi-step test
 await expect(statusBadge, 'Status should update to Approved after step 3').toContainText('Approved');
 ```
 

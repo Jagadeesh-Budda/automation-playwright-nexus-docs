@@ -49,7 +49,7 @@ npx playwright show-trace test-results/document-upload-spec/trace.zip
 
 ## Step 3: Interactive Debugging
 
-### `page.pause()` — Breakpoint in the Test
+### `page.pause()` ï¿½ Breakpoint in the Test
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -65,7 +65,7 @@ test('debug upload flow', async ({ page }) => {
 });
 ```
 
-### `PWDEBUG=1` — Debug Without Modifying Code
+### `PWDEBUG=1` ï¿½ Debug Without Modifying Code
 
 ```bash
 # PowerShell
@@ -75,9 +75,9 @@ $env:PWDEBUG=1; npx playwright test tests/document-upload.spec.ts
 PWDEBUG=1 npx playwright test tests/document-upload.spec.ts
 ```
 
-Every action pauses automatically — step through with the Inspector UI.
+Every action pauses automatically ï¿½ step through with the Inspector UI.
 
-### `--ui` Mode — The Best of Both Worlds
+### `--ui` Mode ï¿½ The Best of Both Worlds
 
 ```bash
 npx playwright test --ui
@@ -85,7 +85,7 @@ npx playwright test --ui
 
 Features:
 - Click any test to run it
-- Watch mode — auto-runs when files change
+- Watch mode ï¿½ auto-runs when files change
 - Click any step to see the DOM at that moment
 - Filter tests by status, file, or search
 - Built-in trace viewer

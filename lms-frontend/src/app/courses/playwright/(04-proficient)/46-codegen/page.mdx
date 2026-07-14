@@ -31,8 +31,8 @@ npx playwright codegen --browser=firefox https://dms.example.com
 ## What Happens When You Run Codegen?
 
 Two windows open:
-1. **Browser window** — interact with your app normally (click, type, navigate)
-2. **Inspector window** — shows the generated test code in real-time
+1. **Browser window** ï¿½ interact with your app normally (click, type, navigate)
+2. **Inspector window** ï¿½ shows the generated test code in real-time
 
 Every action you perform in the browser instantly generates a line of code in the Inspector.
 
@@ -64,7 +64,7 @@ test('test', async ({ page }) => {
 ```
 
 > [!TIP]
-> Codegen automatically chooses the **best locator strategy** — it prefers `getByRole`, `getByLabel`, and `getByText` over CSS selectors. This gives you resilient locators out of the box.
+> Codegen automatically chooses the **best locator strategy** ï¿½ it prefers `getByRole`, `getByLabel`, and `getByText` over CSS selectors. This gives you resilient locators out of the box.
 
 ## Recording with Authentication
 
@@ -165,16 +165,16 @@ test('admin can upload a document', async ({ documentPage }) => {
 | Starting a brand new test from scratch | ? Yes |
 | Finding the right locator for a complex element | ? Yes |
 | Learning how Playwright maps your actions to code | ? Yes |
-| Writing production-grade Page Objects | ? No — use codegen as a starting point, then refactor |
-| Debugging a failing test | ? No — use `page.pause()` or `--ui` mode instead |
+| Writing production-grade Page Objects | ? No ï¿½ use codegen as a starting point, then refactor |
+| Debugging a failing test | ? No ï¿½ use `page.pause()` or `--ui` mode instead |
 
 ## VS Code Integration
 
 If you use VS Code with the Playwright extension:
 1. Open the Testing sidebar
-2. Click **Record new** — Codegen opens directly inside VS Code
-3. Click **Record at cursor** — appends generated code at your cursor position
-4. Click **Pick locator** — hover over elements and get locators inline
+2. Click **Record new** ï¿½ Codegen opens directly inside VS Code
+3. Click **Record at cursor** ï¿½ appends generated code at your cursor position
+4. Click **Pick locator** ï¿½ hover over elements and get locators inline
 
 This is the fastest way to work with Codegen in practice.
 

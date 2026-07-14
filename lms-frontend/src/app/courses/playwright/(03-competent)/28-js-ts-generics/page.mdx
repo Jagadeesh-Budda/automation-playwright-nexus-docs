@@ -3,7 +3,7 @@
 # Pre-5: TypeScript Generics Deep Dive
 
 
-In Module 0.6, you learned Interfaces, Types, and Classes. You can now *read* TypeScript code. But throughout this course, you'll encounter patterns like `Factory<T>`, `test.extend<Fixtures>()`, and `Map<string, string[]>` — code that uses **Generics**.
+In Module 0.6, you learned Interfaces, Types, and Classes. You can now *read* TypeScript code. But throughout this course, you'll encounter patterns like `Factory<T>`, `test.extend<Fixtures>()`, and `Map<string, string[]>` ï¿½ code that uses **Generics**.
 
 This module teaches you to *create* generics, not just consume them.
 
@@ -95,7 +95,7 @@ const makePair = <A, B>(first: A, second: B): [A, B] => {
 const pair = makePair("status", 200); // ? [string, number]
 ```
 
-This is exactly how `Map<K, V>` works internally — it takes a Key type and a Value type.
+This is exactly how `Map<K, V>` works internally ï¿½ it takes a Key type and a Value type.
 
 ---
 
@@ -154,7 +154,7 @@ Notice how `ApiResponse<User>` and `ApiResponse<Document[]>` are completely diff
 
 TypeScript ships with powerful generic utility types. You'll see these constantly in Playwright code:
 
-### `Partial<T>` — Make all properties optional
+### `Partial<T>` ï¿½ Make all properties optional
 
 ```typescript
 interface User {
@@ -168,21 +168,21 @@ type UserUpdate = Partial<User>;
 // Equivalent to: { name?: string; email?: string; role?: string; }
 ```
 
-### `Pick<T, K>` — Select specific properties
+### `Pick<T, K>` ï¿½ Select specific properties
 
 ```typescript
 type UserCredentials = Pick<User, 'email' | 'role'>;
 // Equivalent to: { email: string; role: string; }
 ```
 
-### `Omit<T, K>` — Remove specific properties
+### `Omit<T, K>` ï¿½ Remove specific properties
 
 ```typescript
 type UserWithoutRole = Omit<User, 'role'>;
 // Equivalent to: { name: string; email: string; }
 ```
 
-### `Record<K, V>` — Create a typed dictionary
+### `Record<K, V>` ï¿½ Create a typed dictionary
 
 ```typescript
 type StatusMap = Record<string, number>;
@@ -295,7 +295,7 @@ Every major Playwright pattern uses generics. Now you know what they mean:
 3. **Utility Types** (`Partial<T>`, `Pick<T, K>`, `Omit<T, K>`, `Record<K, V>`) transform existing types.
 4. The **Factory Pattern** (`(overrides?: Partial<T>) => T`) is the foundation of test data generation in enterprise Playwright.
 
-You are now equipped to both *read* and *write* generic TypeScript — a skill that separates junior automation engineers from senior ones.
+You are now equipped to both *read* and *write* generic TypeScript ï¿½ a skill that separates junior automation engineers from senior ones.
 
 **Proceed to Module 0.7: Control Flow & Error Handling.**
 

@@ -47,7 +47,7 @@ Running 100 tests sequentially (one after another) might take 20 minutes. Runnin
 
 ## How Playwright Parallelizes Tests
 
-Playwright distributes tests across **workers** — isolated Node.js processes, each with their own browser instance.
+Playwright distributes tests across **workers** ï¿½ isolated Node.js processes, each with their own browser instance.
 
 ```
 Worker 1 (Chromium) ? runs tests/admin/*.spec.ts
@@ -56,7 +56,7 @@ Worker 3 (Firefox)  ? runs tests/smoke/*.spec.ts
 Worker 4 (WebKit)   ? runs tests/e-sign/*.spec.ts
 ```
 
-Each worker is completely isolated — separate browser, separate cookies, separate memory.
+Each worker is completely isolated ï¿½ separate browser, separate cookies, separate memory.
 
 ## Configuring Workers
 
@@ -112,7 +112,7 @@ test('view document', async ({ documentPage }) => {
 import { test, expect } from '@playwright/test';
 
 test('view a document', async ({ documentPage }) => {
-  // Create fresh data in this test — no dependency on other tests
+  // Create fresh data in this test ï¿½ no dependency on other tests
   const docId = await documentPage.createDocument({ 
     title: `Test-${Date.now()}-${Math.random().toString(36).slice(2)}` 
   });
@@ -153,7 +153,7 @@ documentPage: async ({ page, request }, use) => {
 },
 ```
 
-## `test.describe.configure()` — Granular Control
+## `test.describe.configure()` ï¿½ Granular Control
 
 ```typescript
 import { test, expect } from '@playwright/test';
@@ -215,9 +215,9 @@ projects: [
 ],
 ```
 
-Running on 5 projects simultaneously means each test actually runs 5 times — once per browser. Your entire matrix becomes:
+Running on 5 projects simultaneously means each test actually runs 5 times ï¿½ once per browser. Your entire matrix becomes:
 ```
-100 tests × 5 browsers = 500 test executions
+100 tests ï¿½ 5 browsers = 500 test executions
 ```
 With 10 workers, this completes in the time it would take to run 50 sequential tests.
 

@@ -9,7 +9,7 @@ By the end of this lesson, you will be able to:
 
 In the ANA architecture, **locators always live in Page Object files** (Layer 2). They are never written directly in spec files. This is enforced by the AST Auditor's Gate 4.
 
-The question isn't whether to use Page Objects — it's *how* to structure them.
+The question isn't whether to use Page Objects ï¿½ it's *how* to structure them.
 
 ## The Recommended Page Object Pattern
 
@@ -86,7 +86,7 @@ export class DocumentPage {
     await this.loadingSpinner.waitFor({ state: 'hidden' });
   }
 
-  // Dynamic locators — return a locator based on input
+  // Dynamic locators ï¿½ return a locator based on input
   getRowByDocId(docId: string): Locator {
     return this.tableRows.filter({ hasText: docId });
   }
@@ -168,7 +168,7 @@ export class DataTableComponent {
 ```
 
 ```typescript
-// pages/DocumentPage.ts — uses DataTableComponent
+// pages/DocumentPage.ts ï¿½ uses DataTableComponent
 import { DataTableComponent } from '../components/DataTableComponent';
 
 export class DocumentPage {
@@ -266,7 +266,7 @@ class AuthenticatedPage extends BasePage { /* ... */ }
 class DocumentPage extends AuthenticatedPage { /* ... */ }
 class SpecialDocumentPage extends DocumentPage { /* ... */ }
 
-// ? Prefer: Composition — reuse components
+// ? Prefer: Composition ï¿½ reuse components
 class DocumentPage {
   readonly navbar: NavbarComponent;
   readonly sidebar: SidebarComponent;
@@ -291,7 +291,7 @@ export class DashboardPage {
   readonly page: Page;
   readonly heading: Locator;
   
-  // Conditional elements — may or may not exist
+  // Conditional elements ï¿½ may or may not exist
   readonly adminPanel: Locator;
   readonly reviewerQueue: Locator;
 
@@ -356,7 +356,7 @@ test('document preview opens correctly', async ({ documentPage }) => {
 
 ### ? Anti-Pattern 1: Locators as methods (recreated every call)
 ```typescript
-// Bad — creates a new locator object on every call (though functionally works)
+// Bad ï¿½ creates a new locator object on every call (though functionally works)
 getUploadButton() {
   return this.page.getByRole('button', { name: 'Upload' });
 }
@@ -391,7 +391,7 @@ this.uploadButton = page.getByRole('button', { name: 'Upload Document' });
 ```typescript
 import { test, expect } from '@playwright/test';
 
-// Bad — Page Objects should PERFORM actions, not VERIFY them
+// Bad ï¿½ Page Objects should PERFORM actions, not VERIFY them
 async uploadFile(path: string) {
   await this.fileInput.setInputFiles(path);
   await this.uploadConfirmButton.click();
