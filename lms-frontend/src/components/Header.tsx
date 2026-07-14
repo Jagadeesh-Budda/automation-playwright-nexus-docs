@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from 'react';
-import { Moon, Sun, User, Settings, Check, X, QrCode, Flame, Bell, Clock, Award, Menu } from 'lucide-react';
+import { Moon, Sun, User, Settings, Check, X, QrCode, Flame, Bell, Clock, Award, Menu, ShoppingBag } from 'lucide-react';
 import SearchBar from './SearchBar';
 import AudioReader from './AudioReader';
 import NotificationCenter from './NotificationCenter';
@@ -115,6 +115,17 @@ export default function Header() {
             <Flame className="w-4 h-4 text-orange-500 fill-orange-500 animate-pulse" />
             <span>{streak || 1} Day Streak</span>
           </div>
+
+          {/* Premium Source Code Link */}
+          <a
+            href="https://topmate.io/jagadeesh_budda/2203055"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-purple-500/30 bg-purple-500/5 hover:bg-purple-500/10 text-xs font-black text-purple-300 uppercase tracking-wider transition-all duration-300 no-underline shadow-[0_0_10px_rgba(168,85,247,0.05)] hover:shadow-[0_0_15px_rgba(168,85,247,0.15)] cursor-pointer"
+          >
+            <ShoppingBag className="w-3.5 h-3.5 text-purple-400" />
+            <span>Get Code</span>
+          </a>
 
           <NotificationCenter />
 

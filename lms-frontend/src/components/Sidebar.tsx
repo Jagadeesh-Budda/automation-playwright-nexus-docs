@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { 
   LayoutDashboard,
-  Lock, CheckCircle2, Flame, Target, ChevronDown, ChevronRight
+  Lock, CheckCircle2, Flame, Target, ChevronDown, ChevronRight, ShoppingBag
 } from 'lucide-react';
 import modulesData from '../data/metadata.json';
 import { useMasteryStore } from '../store/useMasteryStore';
@@ -294,6 +294,21 @@ export default function Sidebar() {
               })}
           </div>
         </div>
+
+        {/* 3.5. Premium Upgrade Call-to-Action */}
+        {isSidebarExpanded && (
+          <div className="px-4 mb-4 flex-shrink-0">
+            <a
+              href="https://topmate.io/jagadeesh_budda/2203055"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-2.5 w-full py-2.5 rounded-xl border border-purple-500/30 bg-gradient-to-r from-purple-600/10 to-pink-500/10 hover:from-purple-600/20 hover:to-pink-500/20 hover:border-purple-500/50 text-purple-200 hover:text-white font-bold text-xs uppercase tracking-wider transition-all duration-300 no-underline shadow-[0_0_15px_rgba(168,85,247,0.1)] hover:shadow-[0_0_20px_rgba(168,85,247,0.2)]"
+            >
+              <ShoppingBag className="w-4 h-4 text-purple-400" />
+              Get Premium Code
+            </a>
+          </div>
+        )}
 
         {/* 4. Bottom Anchor (User Stats) */}
         <div className={`border-t border-[var(--border-color)] bg-slate-950/60 transition-all duration-300 flex-shrink-0 ${
