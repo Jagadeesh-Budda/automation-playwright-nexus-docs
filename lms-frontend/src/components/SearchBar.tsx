@@ -39,6 +39,14 @@ const TYPE_COLORS: Record<string, string> = {
   Architecture: "#8b5cf6",
 };
 
+const POPULAR_LESSONS = [
+  { title: "JS/TS Variables & Scope", url: "/courses/playwright/01-js-ts-variables" },
+  { title: "Writing Your First Playwright Test", url: "/courses/playwright/10-first-test" },
+  { title: "What are Page Object Models (POMs)", url: "/courses/playwright/24-what-are-poms" },
+  { title: "Github Actions & CI/CD Pipelines", url: "/courses/playwright/98-github-actions" },
+  { title: "Capstone Project Architecture Brief", url: "/courses/playwright/94-capstone-brief" }
+];
+
 const RECENT_KEY = "lms_recent_searches";
 
 function getRecent(): string[] {
@@ -255,15 +263,44 @@ export default function SearchBar() {
             </div>
           )}
 
-          {/* Default hint */}
-          {showDefault && (
-            <div style={{ padding: "24px 16px", textAlign: "center", color: "var(--text-muted)", fontSize: "0.875rem" }}>
-              <BookOpen style={{ width: "32px", height: "32px", margin: "0 auto 8px", opacity: 0.4 }} />
-              <div>Start typing to search across all {searchIndexData.length} Playwright lessons</div>
-              <div style={{ marginTop: "6px", fontSize: "0.75rem", opacity: 0.6 }}>
-                Press <kbd style={{ padding: "1px 5px", borderRadius: "4px", border: "1px solid var(--border-color)", fontSize: "0.7rem" }}>↑</kbd>{" "}
-                <kbd style={{ padding: "1px 5px", borderRadius: "4px", border: "1px solid var(--border-color)", fontSize: "0.7rem" }}>↓</kbd> to navigate,{" "}
-                <kbd style={{ padding: "1px 5px", borderRadius: "4px", border: "1px solid var(--border-color)", fontSize: "0.7rem" }}>↵</kbd> to open
+          {/* Popular Lessons (Sprint 3) */}
+          {isOpen && !query && (
+            <div>
+              <div style={{ padding: "10px 16px 6px", fontSize: "0.7rem", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", borderTop: recentSearches.length > 0 ? "1px solid var(--border-color)" : "none" }}>
+                🔥 Popular Lessons
+              </div>
+              {POPULAR_LESSONS.map((p) => (
+                <button
+                  key={p.url}
+                  onClick={() => navigate(p.url, p.title)}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "10px",
+                    padding: "10px 16px",
+                    background: "none",
+                    border: "none",
+                    color: "var(--text-main)",
+                    cursor: "pointer",
+                    fontSize: "0.875rem",
+                    textAlign: "left",
+                    transition: "background 0.15s",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = "var(--sidebar-bg)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+                >
+                  <BookOpen style={{ width: "14px", height: "14px", color: "var(--accent)", flexShrink: 0 }} />
+                  {p.title}
+                </button>
+              ))}
+              
+              <div style={{ padding: "16px", textAlign: "center", color: "var(--text-muted)", borderTop: "1px solid var(--border-color)" }}>
+                <div style={{ fontSize: "0.75rem", opacity: 0.6 }}>
+                  Press <kbd style={{ padding: "1px 5px", borderRadius: "4px", border: "1px solid var(--border-color)", fontSize: "0.7rem" }}>↑</kbd>{" "}
+                  <kbd style={{ padding: "1px 5px", borderRadius: "4px", border: "1px solid var(--border-color)", fontSize: "0.7rem" }}>↓</kbd> to navigate,{" "}
+                  <kbd style={{ padding: "1px 5px", borderRadius: "4px", border: "1px solid var(--border-color)", fontSize: "0.7rem" }}>↵</kbd> to open
+                </div>
               </div>
             </div>
           )}

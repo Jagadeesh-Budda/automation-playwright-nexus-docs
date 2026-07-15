@@ -35,44 +35,48 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
             <span>Developer Package</span>
           </div>
           <h2 className="text-2xl md:text-3xl font-black text-white uppercase tracking-tight">
-            Automation Nexus Upgrade
+            Build Your Own Enterprise Playwright LMS
           </h2>
-          <p className="text-slate-400 text-xs md:text-sm mt-1.5">
-            Claim the complete source code framework used to build this platform and deploy your own LMS.
+          <p className="text-slate-400 text-xs md:text-sm mt-1.5 leading-relaxed">
+            Deploy a production-ready learning platform with authentication, AST validation, PostgreSQL, enterprise dashboards, certificates, and complete source code.
           </p>
         </div>
 
         {/* Comparison Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           
-          {/* Left Column: Community Version */}
+          {/* Left Column: Community Edition */}
           <div className="rounded-xl border border-slate-900 bg-slate-900/20 p-6 flex flex-col justify-between">
             <div>
-              <h3 className="text-lg font-bold text-slate-300 mb-1">Community Sandbox</h3>
-              <p className="text-xs text-slate-500 mb-6">Free browser-based learning environment</p>
+              <h3 className="text-lg font-bold text-slate-300 mb-1">Community Edition</h3>
+              <p className="text-xs text-slate-550 mb-6">Free browser-based learning environment</p>
               
               <ul className="space-y-3.5">
-                <li className="flex items-start gap-3 text-xs text-slate-400">
+                <li className="flex items-start gap-3 text-xs text-slate-455">
                   <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                  <span>Access to all 122 interactive lessons online</span>
+                  <span>✓ 122 Lessons</span>
                 </li>
-                <li className="flex items-start gap-3 text-xs text-slate-400">
+                <li className="flex items-start gap-3 text-xs text-slate-455">
                   <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                  <span>Interactive editor validation logic</span>
+                  <span>✓ Quizzes</span>
                 </li>
-                <li className="flex items-start gap-3 text-xs text-slate-400">
+                <li className="flex items-start gap-3 text-xs text-slate-455">
                   <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                  <span>Learning path progress tracking</span>
+                  <span>✓ Challenges</span>
                 </li>
-                <li className="flex items-start gap-3 text-xs text-slate-400">
+                <li className="flex items-start gap-3 text-xs text-slate-455">
                   <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
-                  <span>Basic profile & badge statistics</span>
+                  <span>✓ Certificates</span>
+                </li>
+                <li className="flex items-start gap-3 text-xs text-slate-455">
+                  <Check className="w-4 h-4 text-emerald-500 flex-shrink-0 mt-0.5" />
+                  <span>✓ Public LMS</span>
                 </li>
               </ul>
             </div>
             
             <div className="mt-8 pt-4 border-t border-slate-900">
-              <span className="text-2xl font-bold text-slate-400 uppercase tracking-tight">Free Access</span>
+              <span className="text-2xl font-bold text-slate-400 uppercase tracking-tight font-mono">Free Access</span>
               <p className="text-[10px] text-slate-500 mt-1">Available online at your live URL</p>
             </div>
           </div>
@@ -92,27 +96,35 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
               <ul className="space-y-3.5">
                 <li className="flex items-start gap-3 text-xs text-slate-200">
                   <Check className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
-                  <span><strong>Full LMS Codebase:</strong> Next.js frontend + Express API server</span>
+                  <span>✓ Full Source Code (Next.js + Express)</span>
                 </li>
                 <li className="flex items-start gap-3 text-xs text-slate-200">
                   <Check className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
-                  <span><strong>AST Compiler Engines:</strong> ACORN linter scripts code</span>
+                  <span>✓ Backend Server integration code</span>
                 </li>
                 <li className="flex items-start gap-3 text-xs text-slate-200">
                   <Check className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
-                  <span><strong>Database Architecture:</strong> Local Postgres SQL schema files</span>
+                  <span>✓ JWT Authentication setup modules</span>
                 </li>
                 <li className="flex items-start gap-3 text-xs text-slate-200">
                   <Check className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
-                  <span><strong>Secure Authentication:</strong> JWT token and profile modules</span>
+                  <span>✓ PostgreSQL database database schemas</span>
                 </li>
                 <li className="flex items-start gap-3 text-xs text-slate-200">
                   <Check className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
-                  <span><strong>Certificates:</strong> Custom PDFs & cryptographically signed keys</span>
+                  <span>✓ AST Validation Engine (ACORN compiler checks)</span>
                 </li>
                 <li className="flex items-start gap-3 text-xs text-slate-200">
                   <Check className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
-                  <span><strong>B2B Readiness:</strong> Resell or deploy as a private corporate hub</span>
+                  <span>✓ Certification APIs signature keys</span>
+                </li>
+                <li className="flex items-start gap-3 text-xs text-slate-200">
+                  <Check className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
+                  <span>✓ Admin Dashboard system logs</span>
+                </li>
+                <li className="flex items-start gap-3 text-xs text-slate-200">
+                  <Check className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
+                  <span>✓ Enterprise Templates configuration</span>
                 </li>
               </ul>
             </div>
@@ -121,7 +133,7 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
               <div>
                 <span className="text-xs text-purple-400 line-through">₹4,999</span>
                 <div className="flex items-baseline gap-1.5">
-                  <span className="text-3xl font-black text-white">₹1,499</span>
+                  <span className="text-3xl font-black text-white font-mono">₹1,499</span>
                   <span className="text-[10px] text-slate-400">One-time</span>
                 </div>
               </div>
@@ -133,7 +145,7 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
                 className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white font-black text-xs uppercase tracking-wider rounded-lg transition-all duration-300 no-underline shadow-[0_4px_15px_rgba(168,85,247,0.3)] cursor-pointer"
               >
                 <ShoppingBag className="w-4 h-4" />
-                Buy Bundle
+                Get Enterprise Bundle
               </a>
             </div>
           </div>

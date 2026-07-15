@@ -13,7 +13,7 @@ import { PathEligibilityBadge } from './PathEligibilityBadge';
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { completedModules, initUser, isSidebarExpanded, setSidebarExpanded, streak, unlockedAchievements, selectedPath, setPremiumModalOpen } = useMasteryStore();
+  const { completedModules, initUser, isSidebarExpanded, setSidebarExpanded, streak, unlockedAchievements, selectedPath, setPremiumModalOpen, getFirstIncompleteModule } = useMasteryStore();
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
 
   const pathModules = selectedPath === 'all' ? modulesData : modulesData.filter(m => (m as any).learningPaths?.includes(selectedPath));
@@ -63,6 +63,12 @@ export default function Sidebar() {
   if (activeStageIndex === -1 || process.env.NODE_ENV === 'development') {
     activeStageIndex = STAGES.length - 1; // all graduated/unlocked in dev mode
   }
+
+  const currentLesson = getFirstIncompleteModule();
+  const remainingLessonsCount = pathModules.length - completedModules.length;
+  const pathLabel = selectedPath === 'all' 
+    ? 'Global' 
+    : selectedPath.charAt(0).toUpperCase() + selectedPath.slice(1);
 
   return (
     <>
@@ -303,7 +309,7 @@ export default function Sidebar() {
               className="flex items-center justify-center gap-2.5 w-full py-2.5 rounded-xl border border-purple-500/30 bg-gradient-to-r from-purple-600/10 to-pink-500/10 hover:from-purple-600/20 hover:to-pink-500/20 hover:border-purple-500/50 text-purple-200 hover:text-white font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-[0_0_15px_rgba(168,85,247,0.1)] hover:shadow-[0_0_20px_rgba(168,85,247,0.2)] cursor-pointer"
             >
               <ShoppingBag className="w-4 h-4 text-purple-400" />
-              Get Premium Code
+              Build Your Own LMS
             </button>
           </div>
         )}
@@ -334,9 +340,25 @@ export default function Sidebar() {
               </div>
             </div>
 
-            <div className="mt-1 flex items-center gap-2 text-[11px] font-bold text-slate-300 bg-slate-900/50 px-3 py-2 rounded-lg border border-slate-800">
-              <Target className="w-3.5 h-3.5 text-purple-400 flex-shrink-0" />
-              <span className="truncate">Goal: Automation Engineer</span>
+            {/* Sidebar Details Grid (Sprint 3) */}
+            <div className="grid grid-cols-2 gap-2 text-[10px] bg-slate-950 border border-slate-900 p-2.5 rounded-xl text-left">
+              <div>
+                <span className="text-slate-500 text-[8px] block uppercase tracking-wider">Path</span>
+                <span className="font-black text-slate-300 truncate block uppercase tracking-wider">{pathLabel}</span>
+              </div>
+              <div>
+                <span className="text-slate-500 text-[8px] block uppercase tracking-wider">Stage</span>
+                <span className="font-black text-cyan-400 truncate block uppercase tracking-wider">{STAGES[activeStageIndex]?.title || 'Legend'}</span>
+              </div>
+              <div className="col-span-2 border-t border-slate-900/80 pt-1.5 mt-0.5">
+                <span className="text-slate-500 text-[8px] block uppercase tracking-wider">Current Target</span>
+                <span className="font-extrabold text-white truncate block text-[11px] mt-0.5" title={currentLesson?.title || 'None'}>
+                  {currentLesson ? currentLesson.title.split(':').slice(-1)[0] : 'All Completed'}
+                </span>
+                <span className="text-[9px] text-slate-400 font-bold block mt-0.5">
+                  {remainingLessonsCount} remaining lessons
+                </span>
+              </div>
             </div>
           </div>
         </div>

@@ -108,9 +108,29 @@ export default function TelemetryPanel() {
           
           <div className="space-y-3 overflow-y-auto max-h-[140px] flex-grow scrollbar-thin pr-1">
             {!telemetryLogs || telemetryLogs.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full text-slate-500 opacity-70 mt-6">
-                <Activity className="w-6 h-6 mb-2" />
-                <span className="text-[10px] font-bold uppercase tracking-widest">No Recent Activity</span>
+              <div className="flex flex-col justify-center h-full text-slate-500 py-1 text-left max-w-xs mx-auto">
+                <span className="text-[9px] font-black text-cyan-400 uppercase tracking-widest mb-2 block text-center">What happens after I begin?</span>
+                <div className="flex flex-col gap-0.5 text-[10px] font-bold text-slate-400 pl-4">
+                  <div className="flex items-center gap-2">
+                    <span className="w-4 h-4 rounded-full bg-slate-900 border border-slate-800 text-[8px] flex items-center justify-center font-mono flex-shrink-0 text-cyan-400">1</span>
+                    <span className="truncate text-slate-300">Complete Lesson 0.1 (Variables)</span>
+                  </div>
+                  <div className="h-2.5 w-[1px] bg-slate-800 ml-2" />
+                  <div className="flex items-center gap-2 opacity-70">
+                    <span className="w-4 h-4 rounded-full bg-slate-900 border border-slate-800 text-[8px] flex items-center justify-center font-mono flex-shrink-0">2</span>
+                    <span className="truncate">Unlock Realtime Telemetry Logs</span>
+                  </div>
+                  <div className="h-2.5 w-[1px] bg-slate-800 ml-2" />
+                  <div className="flex items-center gap-2 opacity-70">
+                    <span className="w-4 h-4 rounded-full bg-slate-900 border border-slate-800 text-[8px] flex items-center justify-center font-mono flex-shrink-0">3</span>
+                    <span className="truncate">Earn XP & Maintain Streaks</span>
+                  </div>
+                  <div className="h-2.5 w-[1px] bg-slate-800 ml-2" />
+                  <div className="flex items-center gap-2 opacity-70">
+                    <span className="w-4 h-4 rounded-full bg-slate-900 border border-slate-800 text-[8px] flex items-center justify-center font-mono flex-shrink-0">4</span>
+                    <span className="truncate">Claim Verifiable Certification Keys</span>
+                  </div>
+                </div>
               </div>
             ) : (
               telemetryLogs.slice(0, 5).map((l, idx) => {

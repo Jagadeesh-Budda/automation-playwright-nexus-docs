@@ -226,8 +226,17 @@ export default function TopicMastery() {
 
         <div className="w-full h-12 border-b border-white/5 mb-2 relative flex flex-col justify-end pb-2">
           {completedChaptersCount === 0 ? (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-[10px] text-slate-500 font-medium">Start your first lesson to generate learning analytics.</span>
+            <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
+              <span className="text-[9px] font-black text-cyan-400 uppercase tracking-widest mb-1.5 block">What happens after I begin?</span>
+              <div className="flex items-center gap-1 text-[8px] font-bold text-slate-500 font-mono">
+                <span className="text-slate-300">Complete Lesson 0.1</span>
+                <span>➔</span>
+                <span>Unlock Analytics</span>
+                <span>➔</span>
+                <span>Earn XP</span>
+                <span>➔</span>
+                <span>Claim Cert</span>
+              </div>
             </div>
           ) : (
             <div className="w-full h-12 relative">
