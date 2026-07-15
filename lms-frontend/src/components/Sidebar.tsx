@@ -13,8 +13,10 @@ import { PathEligibilityBadge } from './PathEligibilityBadge';
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { completedModules, initUser, isSidebarExpanded, setSidebarExpanded, streak, unlockedAchievements, selectedPath, setPremiumModalOpen, getFirstIncompleteModule } = useMasteryStore();
+  const { completedModules, initUser, isSidebarExpanded, setSidebarExpanded, streak, unlockedAchievements, selectedPath, setPremiumModalOpen, getFirstIncompleteModule, isReadingModeActive } = useMasteryStore();
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
+
+  if (isReadingModeActive) return null;
 
   const pathModules = selectedPath === 'all' ? modulesData : modulesData.filter(m => (m as any).learningPaths?.includes(selectedPath));
 

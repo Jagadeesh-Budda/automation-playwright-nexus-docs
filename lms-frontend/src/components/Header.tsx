@@ -8,7 +8,8 @@ import { useMasteryStore } from '../store/useMasteryStore';
 
 export default function Header() {
   const [theme, setTheme] = useState('light');
-  const { userName, userId, setUser, setMobileSyncOpen, streak, completedModules, unlockedAchievements, setPremiumModalOpen, isSidebarExpanded, setSidebarExpanded } = useMasteryStore();
+  const { userName, userId, setUser, setMobileSyncOpen, streak, completedModules, unlockedAchievements, setPremiumModalOpen, isSidebarExpanded, setSidebarExpanded, isReadingModeActive } = useMasteryStore();
+  if (isReadingModeActive) return null;
   const [showEditModal, setShowEditModal] = useState(false);
   const [newName, setNewName] = useState('');
   const [copiedId, setCopiedId] = useState(false);

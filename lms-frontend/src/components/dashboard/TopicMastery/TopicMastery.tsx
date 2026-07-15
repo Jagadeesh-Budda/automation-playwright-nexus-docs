@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Zap, BookOpen, ShieldCheck, Check, Lock, Trophy } from 'lucide-react';
 import { useDashboardStats } from '../../../hooks/dashboard/useDashboardStats';
@@ -26,6 +26,14 @@ export default function TopicMastery() {
   } = useDashboardStats();
 
   const { getTopicProgressDetails } = useTopicMastery();
+
+  const [expandedStageKey, setExpandedStageKey] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (activeStage && !expandedStageKey) {
+      setExpandedStageKey(activeStage.key);
+    }
+  }, [activeStage, expandedStageKey]);
 
   const chartPath = generateChartPath(completedChaptersCount);
 
@@ -61,10 +69,126 @@ export default function TopicMastery() {
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch w-full">
       {/* Card 1: Stage Progress */}
       <div className="premium-depth-card rounded-[2rem] p-6 flex flex-col justify-between h-full text-left">
-        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-2 m-0">
+        <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-4 m-0">
           <Zap className="w-4 h-4 text-emerald-400" /> Stage Progress
         </h3>
-        <div className="w-full flex flex-col items-center py-2 relative z-10 overflow-visible">
+        
+        {/* MOBILE ONLY: Accordion Stages list */}
+        <div className="flex flex-col gap-2.5 md:hidden">
+          {STAGES.map((stage) => {
+            const prog = getStageProgress(stage.key);
+            const isActive = activeStage?.key === stage.key;
+            const isGraduated = prog?.isGraduated;
+            const status = isGraduated ? 'completed' : isActive ? 'in-progress' : 'locked';
+            const isExpanded = expandedStageKey === stage.key;
+            
+            return (
+              <div key={stage.key} className={`border rounded-2xl p-4 transition-all duration-355 ease-in-out ${
+                isGraduated 
+                  ? 'border-emerald-500/20 bg-emerald-500/5' 
+                  : isActive 
+                    ? 'border-cyan-500/30 bg-cyan-500/5 shadow-[0_0_15px_rgba(6,182,212,0.05)]' 
+                    : 'border-slate-800/40 bg-slate-950/20 opacity-60'
+              }`}>
+                {/* Header toggle */}
+                <button
+                  onClick={() => {
+                    if (status !== 'locked') {
+                      setExpandedStageKey(isExpanded ? null : stage.key);
+                    }
+                  }}
+                  disabled={status === 'locked'}
+                  className="w-full flex items-center justify-between bg-transparent border-none p-0 cursor-pointer text-left"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg">{stage.emoji}</span>
+                    <div>
+                      <div className="text-xs font-black text-white uppercase tracking-wider">{stage.title}</div>
+                      <div className="text-[9px] text-slate-500 uppercase tracking-widest mt-0.5">{stage.goal}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {isGraduated && <Check className="w-4 h-4 text-emerald-400" />}
+                    {isActive && <div className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.8)]" />}
+                    {status === 'locked' ? (
+                      <Lock className="w-3.5 h-3.5 text-slate-700" />
+                    ) : (
+                      <span className="text-xs text-slate-400 font-bold">{isExpanded ? '▲' : '▼'}</span>
+                    )}
+                  </div>
+                </button>
+                
+                {/* Expanded items */}
+                {isExpanded && (
+                  <div className="mt-4 border-t border-white/5 pt-3 space-y-3.5 animate-celebration-in text-left">
+                    {stage.key === 'expert' ? (
+                      EXPERT_SUBSECTIONS.map((sub, i) => (
+                        <div key={i} className="mb-2">
+                          <div className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-2">{sub.label}</div>
+                          <div className="space-y-1">
+                            {sub.groups.map((group: string, j: number) => {
+                              const groupModules = modulesData.filter(m => m.group === group);
+                              const completedInGroup = groupModules.filter(m => completedModules.includes(m.id)).length;
+                              const targetUrl = groupModules.length > 0 ? `/courses/playwright/${groupModules[0].slug || groupModules[0].id}` : '#';
+                              return (
+                                <button 
+                                  key={j} 
+                                  onClick={() => router.push(targetUrl)}
+                                  className="w-full p-2.5 rounded-lg bg-slate-900/50 hover:bg-slate-800/80 border border-white/5 hover:border-cyan-500/20 flex justify-between items-center transition-all cursor-pointer text-left font-sans"
+                                >
+                                  <span className="text-[10px] font-bold text-slate-350">{group.split(' ').slice(1).join(' ')}</span>
+                                  <span className="text-[9px] text-slate-500 font-mono">{completedInGroup}/{groupModules.length}</span>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))
+                    ) : (
+                      stage.groups.map((group: string, i: number) => {
+                        const groupModules = modulesData.filter(m => m.group === group);
+                        const completedInGroup = groupModules.filter(m => completedModules.includes(m.id)).length;
+                        const targetUrl = groupModules.length > 0 ? `/courses/playwright/${groupModules[0].slug || groupModules[0].id}` : '#';
+                        return (
+                          <button 
+                            key={i} 
+                            onClick={() => router.push(targetUrl)}
+                            className="w-full p-2.5 rounded-lg bg-slate-900/50 hover:bg-slate-800/80 border border-white/5 hover:border-cyan-500/20 flex justify-between items-center transition-all cursor-pointer text-left font-sans"
+                          >
+                            <span className="text-[10px] font-bold text-slate-350">{group.split(' ').slice(1).join(' ')}</span>
+                            <span className="text-[9px] text-slate-500 font-mono">{completedInGroup}/{groupModules.length}</span>
+                          </button>
+                        );
+                      })
+                    )}
+                    
+                    {/* Milestone verification row */}
+                    <div className="border-t border-white/5 pt-3 flex items-center justify-between text-[10px]">
+                      <span className="text-slate-500 font-bold uppercase tracking-wider">Milestone verification:</span>
+                      {prog?.milestoneChallengePassed ? (
+                        <span className="text-emerald-400 font-bold flex items-center gap-1">✔ COMPLETED</span>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            const targetId = stage.milestone.challengeLessonId;
+                            const slug = modulesData.find(m => m.id === targetId)?.slug || targetId;
+                            router.push(`/courses/playwright/${slug}`);
+                          }}
+                          className="px-2.5 py-1 rounded bg-amber-500/20 hover:bg-amber-500/30 text-amber-400 font-black border border-amber-500/30 uppercase tracking-wider cursor-pointer"
+                        >
+                          Unlock &rarr;
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+        {/* DESKTOP ONLY: Timeline SVG Zigzag node diagram */}
+        <div className="hidden md:flex w-full flex-col items-center py-2 relative z-10 overflow-visible">
           {STAGES.map((stage, idx) => {
             const prog = getStageProgress(stage.key);
             const isActive = activeStage?.key === stage.key;
@@ -130,7 +254,7 @@ export default function TopicMastery() {
       </div>
 
       {/* Card 2: Current Stage Detail */}
-      <div className="premium-depth-card rounded-[2rem] p-6 flex flex-col justify-between h-full text-left">
+      <div className="premium-depth-card rounded-[2rem] p-6 flex flex-col justify-between h-full text-left hidden md:flex">
         <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 mb-4 m-0">
           <BookOpen className="w-4 h-4 text-cyan-400" /> Current Stage Detail
         </h3>

@@ -1,13 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import mermaid from 'mermaid';
-
-mermaid.initialize({
-  startOnLoad: false,
-  theme: 'dark',
-  securityLevel: 'loose',
-});
 
 interface MermaidProps {
   chart: string;
@@ -21,6 +14,13 @@ export default function Mermaid({ chart }: MermaidProps) {
     let isMounted = true;
     const renderChart = async () => {
       try {
+        const mermaid = (await import('mermaid')).default;
+        mermaid.initialize({
+          startOnLoad: false,
+          theme: 'dark',
+          securityLevel: 'loose',
+        });
+        
         // Generate a unique ID for the svg to avoid conflicts
         const id = `mermaid-${Math.random().toString(36).substr(2, 9)}`;
         const { svg: renderedSvg } = await mermaid.render(id, chart);

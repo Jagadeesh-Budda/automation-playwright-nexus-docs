@@ -448,3 +448,24 @@ aside::-webkit-scrollbar-thumb:hover {
   box-shadow: 0 0 15px rgba(168, 85, 247, 0.35) !important;
 }
 
+/* Speech synthesis highlighting styling (Sprint v1.0.1) */
+.speech-active-highlight {
+  background-color: rgba(6, 182, 212, 0.08) !important;
+  border-left: 3px solid #06b6d4 !important;
+  border-radius: 4px;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.15);
+  transition: all 0.3s ease-in-out;
+}
+
+/* Responsive Table Wrapper (Sprint v1.0.1) */
+.table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin: 24px 0;
+}
+

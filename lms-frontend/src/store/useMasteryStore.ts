@@ -22,10 +22,12 @@ interface MasteryState {
   selectedPath: 'all' | 'foundations' | 'enterprise' | 'regulated';
   
   isPremiumModalOpen: boolean;
+  isReadingModeActive: boolean;
   
   setMobileSyncOpen: (open: boolean) => void;
   setPremiumModalOpen: (open: boolean) => void;
   setSidebarExpanded: (expanded: boolean) => void;
+  setReadingModeActive: (active: boolean) => void;
   setSelectedPath: (path: 'all' | 'foundations' | 'enterprise' | 'regulated') => void;
   setClaimedCertificate: (path: string) => void;
   setUser: (name: string, id: string) => Promise<void>;
@@ -67,6 +69,7 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
   isMobileSyncOpen: false,
   isSidebarExpanded: false,
   isPremiumModalOpen: false,
+  isReadingModeActive: false,
   claimedCertificates: {},
   selectedPath: 'all',
   
@@ -83,6 +86,7 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
   setMobileSyncOpen: (open) => set({ isMobileSyncOpen: open }),
   setPremiumModalOpen: (open) => set({ isPremiumModalOpen: open }),
   setSidebarExpanded: (expanded) => set({ isSidebarExpanded: expanded }),
+  setReadingModeActive: (active) => set({ isReadingModeActive: active }),
   setSelectedPath: (path) => {
     set({ selectedPath: path });
     localStorage.setItem('asa_selected_path', path);

@@ -130,7 +130,7 @@ const CustomH1 = ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElemen
     const rest = match[2];
     return (
       <div className="mb-10 pb-6 border-b border-slate-800/60">
-        <h1 className="text-3xl md:text-5xl font-black tracking-tight flex flex-col md:flex-row md:items-center gap-4" {...props}>
+        <h1 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight flex flex-col md:flex-row md:items-center gap-4" {...props}>
           <span className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-700 dark:text-cyan-400 text-2xl md:text-3xl shrink-0 shadow-[0_0_20px_rgba(34,211,238,0.15)]">
             {prefix.replace(':', '')}
           </span>
@@ -145,7 +145,7 @@ const CustomH1 = ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElemen
 
   return (
     <div className="mb-10 pb-6 border-b border-slate-800/60">
-      <h1 className="text-3xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-800 to-slate-500 dark:from-white dark:to-slate-400 bg-clip-text text-transparent" {...props}>
+      <h1 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-800 to-slate-500 dark:from-white dark:to-slate-400 bg-clip-text text-transparent" {...props}>
         {children}
       </h1>
       {metaTags}
@@ -161,7 +161,7 @@ const CustomH2 = ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElemen
     const prefix = match[1];
     const rest = match[2];
     return (
-      <h2 className="text-2xl md:text-3xl font-bold mt-16 mb-6 flex items-center gap-3 text-slate-800 dark:text-slate-100 border-b border-slate-300 dark:border-slate-800/40 pb-3" {...props}>
+      <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mt-16 mb-6 flex items-center gap-3 text-slate-800 dark:text-slate-100 border-b border-slate-300 dark:border-slate-800/40 pb-3" {...props}>
         <span className="text-cyan-600 dark:text-cyan-400 font-black">{prefix}</span>
         <span>{rest.trim()}</span>
       </h2>
@@ -169,9 +169,17 @@ const CustomH2 = ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElemen
   }
 
   return (
-    <h2 className="text-2xl md:text-3xl font-bold mt-16 mb-6 text-slate-800 dark:text-slate-100 border-b border-slate-300 dark:border-slate-800/40 pb-3" {...props}>
+    <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mt-16 mb-6 text-slate-800 dark:text-slate-100 border-b border-slate-300 dark:border-slate-800/40 pb-3" {...props}>
       {children}
     </h2>
+  );
+};
+
+const CustomTable = (props: React.TableHTMLAttributes<HTMLTableElement>) => {
+  return (
+    <div className="table-responsive-wrapper">
+      <table {...props} />
+    </div>
   );
 };
 
@@ -192,6 +200,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
     blockquote: CustomBlockquote,
     pre: CustomPre,
     h1: CustomH1,
-    h2: CustomH2
+    h2: CustomH2,
+    table: CustomTable
   };
 }
