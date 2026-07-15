@@ -9,7 +9,7 @@ export default function MainWrapper({ children }: { children: React.ReactNode })
     <div 
       id="main-wrapper" 
       className={`flex-1 min-h-screen flex flex-col transition-[margin-left] duration-300 ease-in-out ml-0 ${
-        isReadingModeActive ? 'ml-0' : (isSidebarExpanded ? 'lg:ml-[260px]' : 'lg:ml-[70px]')
+        isReadingModeActive ? 'ml-0' : (isSidebarExpanded ? 'md:ml-[280px]' : 'md:ml-[70px]')
       }`}
     >
       {children}

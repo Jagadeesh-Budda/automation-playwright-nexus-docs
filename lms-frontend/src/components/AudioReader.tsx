@@ -6,6 +6,7 @@ import {
   Volume2, Play, Pause, Square, SkipBack, SkipForward, RotateCcw, X, 
   HelpCircle, BookOpen, BookOpenCheck 
 } from 'lucide-react';
+import { createPortal } from 'react-dom';
 
 export default function AudioReader() {
   const pathname = usePathname();
@@ -25,6 +26,7 @@ export default function AudioReader() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [totalParagraphs, setTotalParagraphs] = useState(0);
   const [speed, setSpeed] = useState(1.0);
+  const [mounted, setMounted] = useState(false);
   
   const [isQuizPromptOpen, setIsQuizPromptOpen] = useState(false);
 
@@ -86,10 +88,15 @@ export default function AudioReader() {
     updateVoices();
     s.onvoiceschanged = updateVoices;
 
+    updateVoices();
+    s.onvoiceschanged = updateVoices;
+
     const savedSpeed = localStorage.getItem('nexus_reader_speed');
     if (savedSpeed) {
       setSpeed(parseFloat(savedSpeed));
     }
+
+    setMounted(true);
 
     return () => {
       s.cancel();
@@ -118,75 +125,89 @@ export default function AudioReader() {
     if (!synth) return;
     synth.cancel();
 
-    const elements = getReadableElements();
-    if (index < 0 || index >= elements.length) {
-      setIsPlaying(false);
-      setIsPaused(false);
-      return;
-    }
-
-    const targetEl = elements[index];
-    const text = targetEl.textContent?.trim() || '';
-    if (!text) {
-      const nextIdx = index + 1;
-      setCurrentIndex(nextIdx);
-      speakCurrentParagraph(nextIdx);
-      return;
-    }
-
-    // Highlight the active text element in the DOM
-    elements.forEach((el, idx) => {
-      if (idx === index) {
-        el.classList.add('speech-active-highlight');
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      } else {
-        el.classList.remove('speech-active-highlight');
-      }
-    });
-
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = speed;
-    
-    const matchedVoice = voices.find(v => v.name === selectedVoiceName);
-    if (matchedVoice) {
-      utterance.voice = matchedVoice;
-    }
-
-    utterance.onend = () => {
-      targetEl.classList.remove('speech-active-highlight');
+    // Small delay after cancel() — Chrome silently drops utterances if speak() is called immediately after cancel()
+    setTimeout(() => {
+      const elements = getReadableElements();
+      setTotalParagraphs(elements.length);
       
-      const nextIdx = index + 1;
-      if (nextIdx < elements.length) {
-        // Look ahead: pause if next block is a Quiz Component
-        const nextEl = elements[nextIdx];
-        const isNextQuiz = nextEl.closest('.quiz-item') || nextEl.classList.contains('quiz-item') || nextEl.id === 'quiz-section' || nextEl.textContent?.includes('Quiz:');
-        
-        if (isNextQuiz) {
-          setIsPaused(true);
-          setIsPlaying(false);
-          setIsQuizPromptOpen(true);
-          setCurrentIndex(nextIdx);
-        } else {
-          setCurrentIndex(nextIdx);
-          speakCurrentParagraph(nextIdx);
-        }
-      } else {
+      if (elements.length === 0) {
+        console.warn('[AudioReader] No readable elements found in <article>. MDX content may not have loaded yet.');
         setIsPlaying(false);
         setIsPaused(false);
-        setCurrentIndex(0);
-        localStorage.removeItem(`nexus_read_index_${moduleId}`);
+        return;
       }
-    };
 
-    utterance.onerror = () => {
-      setIsPlaying(false);
+      if (index < 0 || index >= elements.length) {
+        setIsPlaying(false);
+        setIsPaused(false);
+        return;
+      }
+
+      const targetEl = elements[index];
+      const text = targetEl.textContent?.trim() || '';
+      if (!text) {
+        const nextIdx = index + 1;
+        setCurrentIndex(nextIdx);
+        speakCurrentParagraph(nextIdx);
+        return;
+      }
+
+      // Highlight the active text element in the DOM
+      elements.forEach((el, idx) => {
+        if (idx === index) {
+          el.classList.add('speech-active-highlight');
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+          el.classList.remove('speech-active-highlight');
+        }
+      });
+
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = speed;
+      
+      const matchedVoice = voices.find(v => v.name === selectedVoiceName);
+      if (matchedVoice) {
+        utterance.voice = matchedVoice;
+      }
+
+      utterance.onend = () => {
+        targetEl.classList.remove('speech-active-highlight');
+        
+        const nextIdx = index + 1;
+        if (nextIdx < elements.length) {
+          // Look ahead: pause if next block is a Quiz Component
+          const nextEl = elements[nextIdx];
+          const isNextQuiz = nextEl.closest('.quiz-item') || nextEl.classList.contains('quiz-item') || nextEl.id === 'quiz-section' || nextEl.textContent?.includes('Quiz:');
+          
+          if (isNextQuiz) {
+            setIsPaused(true);
+            setIsPlaying(false);
+            setIsQuizPromptOpen(true);
+            setCurrentIndex(nextIdx);
+          } else {
+            setCurrentIndex(nextIdx);
+            speakCurrentParagraph(nextIdx);
+          }
+        } else {
+          setIsPlaying(false);
+          setIsPaused(false);
+          setCurrentIndex(0);
+          localStorage.removeItem(`nexus_read_index_${moduleId}`);
+        }
+      };
+
+      utterance.onerror = (e) => {
+        if (e.error === 'interrupted') return; // Normal lifecycle cancel/skip trigger
+        console.error('[AudioReader] Speech error:', e.error);
+        setIsPlaying(false);
+        setIsPaused(false);
+      };
+
+      synth.speak(utterance);
+      setIsPlaying(true);
       setIsPaused(false);
-    };
-
-    synth.speak(utterance);
-    setIsPlaying(true);
-    setIsPaused(false);
-    localStorage.setItem(`nexus_read_index_${moduleId}`, index.toString());
+      localStorage.setItem(`nexus_read_index_${moduleId}`, index.toString());
+    }, 50);
   };
 
   const handlePlayToggle = () => {
@@ -309,9 +330,8 @@ export default function AudioReader() {
         )}
       </button>
 
-      {/* Floating Glassmorphic Player Panel */}
-      {isPlayerOpen && (
-        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[92%] max-w-xl bg-slate-950/85 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl p-4 z-[9999] flex flex-col gap-3 font-sans transition-all duration-300 ease-in-out border-cyan-500/10">
+      {isPlayerOpen && mounted && createPortal(
+        <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[92%] max-w-xl bg-slate-950/90 border border-white/10 backdrop-blur-xl rounded-2xl shadow-2xl p-4 z-[9999] flex flex-col gap-3 font-sans transition-all duration-300 ease-in-out border-cyan-500/10">
           
           {/* Header Info */}
           <div className="flex items-center justify-between border-b border-white/5 pb-2">
@@ -436,7 +456,7 @@ export default function AudioReader() {
           <div className="grid grid-cols-2 gap-3 border-t border-white/5 pt-2.5 text-left">
             {/* Voice Select */}
             <div className="flex flex-col gap-1">
-              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Select Voice Voice</label>
+              <label className="text-[9px] font-black text-slate-500 uppercase tracking-widest">Select Voice</label>
               <select 
                 value={selectedVoiceName}
                 onChange={handleVoiceChange}
@@ -483,7 +503,8 @@ export default function AudioReader() {
             />
           </div>
 
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

@@ -15,8 +15,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { completedModules, initUser, isSidebarExpanded, setSidebarExpanded, streak, unlockedAchievements, selectedPath, setPremiumModalOpen, getFirstIncompleteModule, isReadingModeActive } = useMasteryStore();
   const [expandedGroup, setExpandedGroup] = useState<string | null>(null);
-
-  if (isReadingModeActive) return null;
+  const collapseTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const pathModules = selectedPath === 'all' ? modulesData : modulesData.filter(m => (m as any).learningPaths?.includes(selectedPath));
 
@@ -24,8 +23,18 @@ export default function Sidebar() {
     initUser();
   }, [initUser]);
 
-  const handleMouseEnter = useCallback(() => setSidebarExpanded(true), [setSidebarExpanded]);
-  const handleMouseLeave = useCallback(() => setSidebarExpanded(false), [setSidebarExpanded]);
+  const handleMouseEnter = useCallback(() => {
+    if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+      if (collapseTimer.current) clearTimeout(collapseTimer.current);
+      setSidebarExpanded(true);
+    }
+  }, [setSidebarExpanded]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (typeof window !== 'undefined' && window.innerWidth >= 768) {
+      collapseTimer.current = setTimeout(() => setSidebarExpanded(false), 150);
+    }
+  }, [setSidebarExpanded]);
 
   const isDashboard = pathname === '/';
 
@@ -72,6 +81,8 @@ export default function Sidebar() {
     ? 'Global' 
     : selectedPath.charAt(0).toUpperCase() + selectedPath.slice(1);
 
+  if (isReadingModeActive) return null;
+
   return (
     <>
       <style>{`
@@ -89,16 +100,16 @@ export default function Sidebar() {
       {isSidebarExpanded && (
         <div 
           onClick={() => setSidebarExpanded(false)}
-          className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[999] lg:hidden"
+          className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[999] md:hidden"
         />
       )}
       <aside 
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className={`fixed top-0 h-screen flex flex-col bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] z-[1000] shadow-[2px_0_12px_rgba(0,0,0,0.15)] overflow-hidden transition-all duration-300 ease-in-out w-[280px] lg:w-auto ${
+        className={`fixed top-0 h-screen flex flex-col bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] z-[1000] shadow-[2px_0_12px_rgba(0,0,0,0.15)] overflow-hidden transition-all duration-300 ease-in-out w-[280px] ${
           isSidebarExpanded 
-            ? 'left-0 lg:w-[280px]' 
-            : 'left-[-280px] lg:left-0 lg:w-[70px]'
+            ? 'left-0 md:w-[280px]' 
+            : 'left-[-280px] md:left-0 md:w-[70px]'
         }`}
       >
         {/* 1. Header: Branding */}

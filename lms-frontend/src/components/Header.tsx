@@ -9,39 +9,11 @@ import { useMasteryStore } from '../store/useMasteryStore';
 export default function Header() {
   const [theme, setTheme] = useState('light');
   const { userName, userId, setUser, setMobileSyncOpen, streak, completedModules, unlockedAchievements, setPremiumModalOpen, isSidebarExpanded, setSidebarExpanded, isReadingModeActive } = useMasteryStore();
-  if (isReadingModeActive) return null;
   const [showEditModal, setShowEditModal] = useState(false);
   const [newName, setNewName] = useState('');
   const [copiedId, setCopiedId] = useState(false);
-
   const [timeStr, setTimeStr] = useState('');
   const [sessionSecs, setSessionSecs] = useState(0);
-
-  // Dynamic Rank & Level Logic
-  const totalChapters = 76; // modulesData.length
-  const completedChaptersCount = completedModules.length;
-  const completionPercentage = Math.round((completedChaptersCount / totalChapters) * 100);
-
-  let currentRankIndex = 0;
-  if (completionPercentage >= 20 && completionPercentage < 50) currentRankIndex = 1;
-  else if (completionPercentage >= 50 && completionPercentage < 80) currentRankIndex = 2;
-  else if (completionPercentage >= 80) currentRankIndex = 3;
-
-  const RANKS = ["Junior Specialist", "Automation Engineer", "Framework Architect", "Automation Legend"];
-  const rankName = RANKS[currentRankIndex];
-
-  // Simple approximation of Projects Built for Header XP calculation (to match Dashboard roughly)
-  // Phases are roughly at 20%, 40%, 60%, 80%, 100% completion
-  const simulatedProjectsBuilt = Math.floor(completionPercentage / 20); 
-  const simulatedAchievements = unlockedAchievements ? unlockedAchievements.length : 0;
-  
-  let calculatedXP = (completedChaptersCount * 15) + (streak > 0 ? 20 : 0);
-  calculatedXP += simulatedProjectsBuilt * 250; 
-  calculatedXP += simulatedAchievements * 100;  
-  for (let i = 0; i < currentRankIndex; i++) {
-    calculatedXP += (i + 1) * 500;
-  }
-  const level = Math.floor(calculatedXP / 100) + 1;
 
   useEffect(() => {
     const saved = localStorage.getItem('theme') || 'light';
@@ -66,6 +38,8 @@ export default function Header() {
       clearInterval(sessionInterval);
     };
   }, []);
+
+  if (isReadingModeActive) return null;
 
   const formatSessionTime = (seconds: number) => {
     const m = Math.floor(seconds / 60);
@@ -100,6 +74,30 @@ export default function Header() {
     setTimeout(() => setCopiedId(false), 2000);
   };
 
+  // Dynamic Rank & Level Logic
+  const totalChapters = 76;
+  const completedChaptersCount = completedModules.length;
+  const completionPercentage = Math.round((completedChaptersCount / totalChapters) * 100);
+
+  let currentRankIndex = 0;
+  if (completionPercentage >= 20 && completionPercentage < 50) currentRankIndex = 1;
+  else if (completionPercentage >= 50 && completionPercentage < 80) currentRankIndex = 2;
+  else if (completionPercentage >= 80) currentRankIndex = 3;
+
+  const RANKS = ["Junior Specialist", "Automation Engineer", "Framework Architect", "Automation Legend"];
+  const rankName = RANKS[currentRankIndex];
+
+  const simulatedProjectsBuilt = Math.floor(completionPercentage / 20); 
+  const simulatedAchievements = unlockedAchievements ? unlockedAchievements.length : 0;
+  
+  let calculatedXP = (completedChaptersCount * 15) + (streak > 0 ? 20 : 0);
+  calculatedXP += simulatedProjectsBuilt * 250; 
+  calculatedXP += simulatedAchievements * 100;  
+  for (let i = 0; i < currentRankIndex; i++) {
+    calculatedXP += (i + 1) * 500;
+  }
+  const level = Math.floor(calculatedXP / 100) + 1;
+
   return (
     <>
       <header className="h-16 border-b border-[var(--glass-border)] bg-[var(--sidebar-bg)]/80 backdrop-blur-xl px-4 md:px-6 flex items-center justify-between sticky top-0 z-40 transition-colors">
@@ -107,7 +105,7 @@ export default function Header() {
         <div className="flex items-center gap-4 flex-1">
           <button 
             onClick={() => setSidebarExpanded(!isSidebarExpanded)}
-            className="p-2 -ml-2 rounded-lg hover:bg-[var(--sidebar-bg)] text-[var(--text-main)] transition-colors border-none bg-transparent cursor-pointer flex lg:hidden"
+            className="p-2 -ml-2 rounded-lg hover:bg-[var(--sidebar-bg)] text-[var(--text-main)] transition-colors border-none bg-transparent cursor-pointer flex md:hidden"
             title="Toggle Sidebar Menu"
           >
             <Menu className="w-5 h-5 text-slate-400" />
