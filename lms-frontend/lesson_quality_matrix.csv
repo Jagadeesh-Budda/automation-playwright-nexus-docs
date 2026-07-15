@@ -1,0 +1,123 @@
+Module ID,Title,Level,Group,Has MDX,Has Objectives,Has Examples,Has Mistakes,Has Takeaways,Has Next Steps,Quizzes Count,Exercises Count,AST Rules Count,Errors Count,Warnings Count
+"01-js-ts-variables","0.1: Variables & Data Types",0,"🌱 MODULE 0: JS/TS FOR AUTOMATION",true,true,true,true,true,true,1,3,7,0,1
+"02-js-ts-functions","0.2: Functions & Scope",0,"🌱 MODULE 0: JS/TS FOR AUTOMATION",true,true,true,true,true,true,5,3,6,0,1
+"03-js-ts-es6","0.3: Arrays & ES6",0,"🌱 MODULE 0: JS/TS FOR AUTOMATION",true,true,true,true,true,true,2,2,4,0,0
+"04-js-ts-objects","0.4: Objects & Literals",0,"🌱 MODULE 0: JS/TS FOR AUTOMATION",true,true,true,true,true,true,5,2,2,0,2
+"05-js-ts-async","0.5: Async/Await & Promises",0,"🌱 MODULE 0: JS/TS FOR AUTOMATION",true,true,true,true,true,true,5,2,4,0,2
+"06-js-ts-dom","0.6: DOM & HTML Basics",0,"🌱 MODULE 0: JS/TS FOR AUTOMATION",true,true,true,true,true,true,5,2,2,0,1
+"07-js-ts-lite","0.7: TypeScript Lite",0,"🌱 MODULE 0: JS/TS FOR AUTOMATION",true,true,true,true,true,true,5,2,2,0,2
+"08-js-ts-control-flow","0.8: Control Flow & Error Handling",0,"🌱 MODULE 0: JS/TS FOR AUTOMATION",true,true,true,true,true,true,2,2,4,0,0
+"09-js-ts-modules","0.9: ES Modules & Imports",0,"🌱 MODULE 0: JS/TS FOR AUTOMATION",true,true,true,true,true,true,2,2,4,0,0
+"10-first-test","1.1: Your First Test",1,"🚀 MODULE 1: YOUR FIRST TEST",true,true,true,true,true,true,15,2,6,0,2
+"11-navigating-clicking","1.2: Navigating & Clicking",1,"🚀 MODULE 1: YOUR FIRST TEST",true,true,true,true,true,true,2,2,10,0,1
+"12-writing-assertions","1.3: Writing Assertions",1,"🚀 MODULE 1: YOUR FIRST TEST",true,true,true,true,true,true,5,1,4,0,1
+"13-running-reading","1.4: Running & Reading Results",1,"🚀 MODULE 1: YOUR FIRST TEST",true,true,true,true,true,true,3,1,3,0,0
+"14-break-it","1.5: Break It On Purpose",1,"🚀 MODULE 1: YOUR FIRST TEST",true,true,true,true,true,true,3,1,3,0,1
+"15-getbyrole","2.1: getByRole & Friends",2,"🔍 MODULE 2: LOCATORS & ASSERTIONS",true,true,true,true,true,true,2,2,4,0,0
+"16-assertions-deep","2.2: Assertions Deep Dive",2,"🔍 MODULE 2: LOCATORS & ASSERTIONS",true,true,true,true,true,true,2,1,2,0,1
+"17-dynamic-elements","2.3: Dynamic Elements",2,"🔍 MODULE 2: LOCATORS & ASSERTIONS",true,true,true,true,true,true,2,1,2,0,0
+"18-strict-mode","2.4: Strict Mode & Debugging Basics",2,"🔍 MODULE 2: LOCATORS & ASSERTIONS",true,true,true,true,true,true,3,1,3,0,1
+"19-test-org","3.1: Test Organization",3,"📁 MODULE 3: TEST ORGANIZATION",true,true,true,true,true,true,3,1,3,0,1
+"20-describe-blocks","3.2: Describe Blocks",3,"📁 MODULE 3: TEST ORGANIZATION",true,true,true,true,true,true,3,1,3,0,1
+"21-before-after","3.3: Before/After Hooks",3,"📁 MODULE 3: TEST ORGANIZATION",true,true,true,true,true,true,2,2,6,0,0
+"22-duplication-problem","3.4: The Duplication Problem",3,"📁 MODULE 3: TEST ORGANIZATION",true,true,true,true,true,true,5,1,3,0,1
+"23-js-ts-ts-oop","Pre-4: TypeScript Classes Deep Dive",4,"🏛️ MODULE 4: PAGE OBJECTS",true,true,true,true,true,true,2,2,4,0,0
+"24-what-are-poms","4.1: What Are Page Objects?",4,"🏛️ MODULE 4: PAGE OBJECTS",true,true,true,true,true,true,3,1,3,0,1
+"25-first-pom","4.2: Your First Page Object",4,"🏛️ MODULE 4: PAGE OBJECTS",true,true,true,true,true,true,2,1,2,0,0
+"26-multi-page","4.3: Multi-Page Tests",4,"🏛️ MODULE 4: PAGE OBJECTS",true,true,true,true,true,true,2,1,2,0,0
+"27-refactor-exercise","4.4: The Refactor Exercise",4,"🏛️ MODULE 4: PAGE OBJECTS",true,true,true,true,true,true,2,1,2,0,0
+"28-js-ts-generics","Pre-5: TypeScript Generics Deep Dive",5,"🧩 MODULE 5: FIXTURES & DI",true,true,true,true,true,true,5,1,1,0,1
+"29-what-are-fixtures","5.1: What Are Fixtures?",5,"🧩 MODULE 5: FIXTURES & DI",true,true,true,true,true,true,3,1,3,0,1
+"30-custom-fixtures","5.2: Creating Custom Fixtures",5,"🧩 MODULE 5: FIXTURES & DI",true,true,true,true,true,true,5,1,1,0,1
+"31-fixture-dependencies","5.3: Fixture Dependencies",5,"🧩 MODULE 5: FIXTURES & DI",true,true,true,true,true,true,2,1,2,0,0
+"32-basetest-pattern","5.4: The BaseTest Pattern",5,"🧩 MODULE 5: FIXTURES & DI",true,true,true,true,true,true,2,1,2,0,1
+"33-the-brief","6.1: The Challenge Brief",0,"🏗️ MODULE 6: THE FRAMEWORK CHALLENGE",true,true,true,true,true,true,0,0,0,0,1
+"34-hints","6.2: Challenge Hints",0,"🏗️ MODULE 6: THE FRAMEWORK CHALLENGE",true,true,true,true,true,true,0,0,0,0,1
+"35-reference-solution","6.3: Reference Solution",0,"🏗️ MODULE 6: THE FRAMEWORK CHALLENGE",true,true,true,true,true,true,0,0,0,0,0
+"36-auto-waiting","7.1: Auto Waiting & Actionability",0,"⏱️ MODULE 7: SYNCHRONIZATION & RELIABILITY",true,true,true,true,true,true,2,2,4,0,2
+"37-assertions-vs-waits","7.2: Assertions vs Waits",0,"⏱️ MODULE 7: SYNCHRONIZATION & RELIABILITY",true,true,true,true,true,true,2,2,4,0,2
+"38-timeouts","7.3: Timeouts & waitFor",0,"⏱️ MODULE 7: SYNCHRONIZATION & RELIABILITY",true,true,true,true,true,true,2,2,2,0,2
+"39-network-sync","7.4: Network Synchronization",0,"⏱️ MODULE 7: SYNCHRONIZATION & RELIABILITY",true,true,true,true,true,true,2,2,4,0,2
+"40-onboarding","8.1: The Sprint Cycle",6,"🧱 MODULE 8: ENTERPRISE PRACTICES",true,true,true,true,true,true,15,2,2,0,1
+"41-fundamentals-cli","8.2: CLI & Config Mastery",6,"🧱 MODULE 8: ENTERPRISE PRACTICES",true,true,true,true,true,true,15,2,6,0,0
+"42-fundamentals-exec","8.3: Environment Validation",6,"🧱 MODULE 8: ENTERPRISE PRACTICES",true,true,true,true,true,true,15,2,6,0,0
+"43-fundamentals-debug","8.4: Conflict Resolution",6,"🧱 MODULE 8: ENTERPRISE PRACTICES",true,true,true,true,true,true,15,2,4,0,1
+"44-fundamentals-arch","8.5: Industrial Folder Design",6,"🧱 MODULE 8: ENTERPRISE PRACTICES",true,true,true,true,true,true,15,2,2,0,1
+"45-quality-gates","8.6: AST Quality Gates",6,"🧱 MODULE 8: ENTERPRISE PRACTICES",true,true,true,false,true,true,15,1,3,0,3
+"46-codegen","8.7: Test Generator & Codegen",6,"🧱 MODULE 8: ENTERPRISE PRACTICES",true,true,true,true,true,true,15,2,4,0,1
+"47-migration-guide","8.8: Selenium/Cypress → Playwright",6,"🧱 MODULE 8: ENTERPRISE PRACTICES",true,true,true,true,true,true,15,2,4,0,1
+"48-js-execution-context","8.9: The JavaScript Execution Context",6,"🧱 MODULE 8: ENTERPRISE PRACTICES",true,true,true,true,true,true,15,2,6,0,2
+"49-browser-network-mechanics","8.10: Browser Engine & Network Mechanics",6,"🧱 MODULE 8: ENTERPRISE PRACTICES",true,true,true,true,true,true,15,2,6,0,2
+"50-core-context","9.1: Browser Context & State",7,"🎭 MODULE 9: PLAYWRIGHT ADVANCED CORE",true,true,true,true,true,true,15,2,4,0,3
+"51-debugging-workflow","9.2: The Debugging Playbook",7,"🎭 MODULE 9: PLAYWRIGHT ADVANCED CORE",true,true,true,true,true,true,15,2,4,0,1
+"52-locators-code","10.1: Advanced Locator Composition",8,"🗝️ MODULE 10: ADVANCED LOCATORS",true,true,true,true,true,true,15,2,6,0,0
+"53-locators-exec","10.2: Dynamic Tables & Lists",8,"🗝️ MODULE 10: ADVANCED LOCATORS",true,true,true,true,true,true,15,1,2,0,0
+"54-locators-arch","10.3: Component-Based Locators",8,"🗝️ MODULE 10: ADVANCED LOCATORS",true,true,true,true,true,true,15,2,4,0,2
+"55-iframes-dialogs","10.4: iframes & Native Dialogs",8,"🗝️ MODULE 10: ADVANCED LOCATORS",true,true,true,true,true,true,15,2,4,0,0
+"56-file-handling","10.5: File Upload & Download",8,"🗝️ MODULE 10: ADVANCED LOCATORS",true,true,true,true,true,true,15,2,6,0,0
+"57-multi-tab","10.6: Multi-Tab & Multi-Window",8,"🗝️ MODULE 10: ADVANCED LOCATORS",true,true,true,true,true,true,15,2,4,0,1
+"58-arch-layers","12.1: The 4-Layer Separation",9,"🏗️ MODULE 12: ADVANCED ARCHITECTURE",true,true,true,true,true,true,15,2,4,0,1
+"59-arch-interface","12.2: The ValidatedPage Interface",9,"🏗️ MODULE 12: ADVANCED ARCHITECTURE",true,true,true,true,true,true,15,2,6,0,1
+"60-arch-debug","12.3: Finding Leaky Abstractions",9,"🏗️ MODULE 12: ADVANCED ARCHITECTURE",true,true,true,true,true,true,15,2,4,0,1
+"61-arch-entity","12.4: Entity-Page Relationships",9,"🏗️ MODULE 12: ADVANCED ARCHITECTURE",true,true,true,true,true,true,15,2,2,0,1
+"62-anti-patterns","12.5: The Anti-Pattern Catalog",9,"🏗️ MODULE 12: ADVANCED ARCHITECTURE",true,true,true,true,true,true,15,2,4,0,2
+"63-adv-parallel","14.1: Parallelization & Sharding",10,"⚡ MODULE 14: ADVANCED FEATURES",true,true,true,true,true,true,15,2,4,0,1
+"64-adv-assertions","14.2: Custom Expect Assertions",10,"⚡ MODULE 14: ADVANCED FEATURES",true,true,true,true,true,true,15,3,6,0,1
+"65-adv-visual","14.3: Visual Regression Testing",10,"⚡ MODULE 14: ADVANCED FEATURES",true,true,true,true,true,true,15,3,6,0,0
+"66-adv-traces","14.4: Flaky Retries & Video",10,"⚡ MODULE 14: ADVANCED FEATURES",true,true,true,true,true,true,15,3,6,0,0
+"67-adv-setup","14.5: Global Setup & Teardown",10,"⚡ MODULE 14: ADVANCED FEATURES",true,true,true,true,true,true,15,2,4,0,2
+"68-accessibility","14.6: Accessibility Testing",10,"⚡ MODULE 14: ADVANCED FEATURES",true,true,true,true,true,true,15,2,4,0,1
+"69-tags-annotations","14.7: Test Tags & Annotations",10,"⚡ MODULE 14: ADVANCED FEATURES",true,true,true,true,true,true,15,2,4,0,2
+"70-clock-emulation","14.8: Clock & Device Emulation",10,"⚡ MODULE 14: ADVANCED FEATURES",true,true,true,true,true,true,15,2,4,0,1
+"71-component-testing","14.9: Component Testing",10,"⚡ MODULE 14: ADVANCED FEATURES",true,true,true,true,true,true,15,2,4,0,2
+"72-esign-compliance","15.1: 21 CFR Part 11 Compliance",11,"✍️ MODULE 15: E-SIGNATURE & MODALS",true,true,true,true,true,true,15,2,4,0,1
+"73-esign-modal","15.2: The ESignModal Component",11,"✍️ MODULE 15: E-SIGNATURE & MODALS",true,true,true,true,true,true,15,2,6,0,1
+"74-esign-exec","15.3: Multi-Step Approval Flows",11,"✍️ MODULE 15: E-SIGNATURE & MODALS",true,true,true,true,true,true,15,2,6,0,0
+"75-esign-debug","15.4: Modal Interception Errors",11,"✍️ MODULE 15: E-SIGNATURE & MODALS",true,true,true,true,true,true,15,2,6,0,0
+"76-esign-arch","15.5: The Singleton Modal Pattern",11,"✍️ MODULE 15: E-SIGNATURE & MODALS",true,true,true,true,true,true,15,2,6,0,1
+"77-api-pyramid","16.1: The Automation Pyramid",12,"🔌 MODULE 16: API TESTING & HYBRID FLOWS",true,true,true,true,true,true,15,2,4,0,2
+"78-api-request","16.2: The Request Fixture",12,"🔌 MODULE 16: API TESTING & HYBRID FLOWS",true,true,true,true,true,true,15,2,6,0,1
+"79-api-hybrid","16.3: Hybrid Data Setup",12,"🔌 MODULE 16: API TESTING & HYBRID FLOWS",true,true,true,true,true,true,15,3,7,0,0
+"80-api-auth","16.4: Handling 401 Unauthorized",12,"🔌 MODULE 16: API TESTING & HYBRID FLOWS",true,true,true,true,true,true,15,2,6,0,0
+"81-api-controller","16.5: The API Controller Pattern",12,"🔌 MODULE 16: API TESTING & HYBRID FLOWS",true,true,true,true,true,true,15,2,4,0,1
+"82-data-logic","17.1: Parameterization vs. Permutation",13,"📊 MODULE 17: DATA-DRIVEN ENGINEERING",true,true,true,true,true,true,15,2,2,0,1
+"83-data-iteration","17.2: Iterating over Data Sets",13,"📊 MODULE 17: DATA-DRIVEN ENGINEERING",true,true,true,true,true,true,15,2,4,0,1
+"84-data-bulk","17.3: Bulk Inventory Import",13,"📊 MODULE 17: DATA-DRIVEN ENGINEERING",true,true,true,true,true,true,15,2,6,0,0
+"85-data-debug","17.4: Handling Partial Failures",13,"📊 MODULE 17: DATA-DRIVEN ENGINEERING",true,true,true,true,true,true,15,2,4,0,0
+"86-data-factory","17.5: The Test Factory Pattern",13,"📊 MODULE 17: DATA-DRIVEN ENGINEERING",true,true,true,true,true,true,15,2,4,0,2
+"87-ast-concept","18.1: The Abstract Syntax Tree (AST)",14,"🛠️ MODULE 18: FRAMEWORK ENGINEERING & AST",true,true,true,true,true,true,15,2,2,0,2
+"88-ast-linter","18.2: Custom Linter Heuristics",14,"🛠️ MODULE 18: FRAMEWORK ENGINEERING & AST",true,true,true,true,true,true,15,2,4,0,1
+"89-ast-waits","18.3: Zero Hardcoded Wait Gate",14,"🛠️ MODULE 18: FRAMEWORK ENGINEERING & AST",true,true,true,true,true,true,15,2,2,0,2
+"90-ast-debug","18.4: Analyzing Parsing Errors",14,"🛠️ MODULE 18: FRAMEWORK ENGINEERING & AST",true,true,true,true,true,true,15,2,2,0,2
+"91-ast-gate","18.5: The Quality Gate Pattern",14,"🛠️ MODULE 18: FRAMEWORK ENGINEERING & AST",true,true,true,true,true,true,15,2,4,0,1
+"92-war-room-sandbox","18.6: The War Room Sandbox",14,"🛠️ MODULE 18: FRAMEWORK ENGINEERING & AST",true,true,true,true,true,true,15,1,3,0,1
+"93-war-room-blind","11.1: Blind War Room — Unlabeled Debugging",8,"⚔️ MODULE 11: WAR ROOM",true,true,true,true,true,true,2,5,10,0,1
+"94-capstone-brief","23.1: The Capstone Blueprint",15,"🏆 MODULE 23: FINAL CAPSTONE CERTIFICATION",true,true,true,true,true,true,15,2,4,0,2
+"95-capstone-pom","23.2: Building the POM Foundation",15,"🏆 MODULE 23: FINAL CAPSTONE CERTIFICATION",true,true,true,true,false,true,15,1,8,0,1
+"96-capstone-exec","23.3: The Golden Flow (E2E)",15,"🏆 MODULE 23: FINAL CAPSTONE CERTIFICATION",true,true,true,true,true,true,15,2,16,0,1
+"97-capstone-audit","23.4: The Final Quality Gate",15,"🏆 MODULE 23: FINAL CAPSTONE CERTIFICATION",true,true,true,true,true,true,15,2,12,0,0
+"98-github-actions","16.1: GitHub Actions CI",16,"⚙️ MODULE 16: ORCHESTRATION",true,true,true,true,false,true,15,2,2,0,0
+"99-env-mastery","16.2: Environment Mastery",16,"⚙️ MODULE 16: ORCHESTRATION",true,true,true,true,false,true,15,1,1,0,0
+"100-reporting","16.3: Industrial Reporting",16,"⚙️ MODULE 16: ORCHESTRATION",true,true,true,true,true,true,15,1,1,0,0
+"101-docker-ci","16.4: Docker & Containerized Execution",16,"⚙️ MODULE 16: ORCHESTRATION",true,true,true,true,false,true,15,2,2,0,0
+"102-api-mocking","19.1: API Mocking & Virtualization",undefined,"🌐 MODULE 19: ADVANCED ENTERPRISE TOPOLOGIES",true,true,true,true,true,true,15,2,4,0,1
+"103-adv-auth","19.2: Advanced Authentication Strategies",undefined,"🌐 MODULE 19: ADVANCED ENTERPRISE TOPOLOGIES",true,true,true,true,true,true,15,2,4,0,1
+"104-db-validation","19.3: Database Validation & Audit Trails",undefined,"🌐 MODULE 19: ADVANCED ENTERPRISE TOPOLOGIES",true,true,true,true,true,true,15,2,4,0,2
+"105-network-debug","19.4: Network Debugging & Traffic Analysis",undefined,"🌐 MODULE 19: ADVANCED ENTERPRISE TOPOLOGIES",true,true,true,true,true,true,15,2,4,0,2
+"106-observability","19.5: Observability & Monitoring",undefined,"🌐 MODULE 19: ADVANCED ENTERPRISE TOPOLOGIES",true,true,true,true,true,true,15,2,4,0,2
+"107-ai-automation","19.6: AI-Assisted Test Automation",undefined,"🌐 MODULE 19: ADVANCED ENTERPRISE TOPOLOGIES",true,true,true,true,true,true,15,2,4,0,1
+"108-capstone-project","13.1: Build the Enterprise Framework",8,"🎓 MODULE 13: MILESTONE PROJECT",true,true,true,true,true,true,2,2,4,0,2
+"109-capstone-verify","13.2: Certification Claim",8,"🎓 MODULE 13: MILESTONE PROJECT",true,true,true,true,true,true,15,2,6,0,1
+"110-industry-banking","20.1: 🏦 Banking Specialist Project",undefined,"🚀 MODULE 20: INDUSTRY TRACKS",true,true,true,true,true,true,2,2,16,0,1
+"111-industry-ecommerce","20.2: 🛒 Commerce Specialist Project",undefined,"🚀 MODULE 20: INDUSTRY TRACKS",true,true,true,true,true,true,2,2,14,0,1
+"112-industry-healthcare","20.3: 🏥 Pharma Specialist Project",undefined,"🚀 MODULE 20: INDUSTRY TRACKS",true,true,true,true,true,true,2,2,14,0,1
+"113-interview-coding","21.1: Technical Phone Screen",undefined,"🎤 MODULE 21: INTERVIEW PREP",true,true,true,true,true,true,0,1,3,0,0
+"114-interview-system-design","21.2: SDET System Design",undefined,"🎤 MODULE 21: INTERVIEW PREP",true,true,true,true,true,true,0,2,6,0,1
+"115-interview-behavioral","21.3: QA Behavioral Scenarios",undefined,"🎤 MODULE 21: INTERVIEW PREP",true,true,true,true,true,true,0,1,3,0,0
+"116-template-api","22.1: API Framework Boilerplate",undefined,"📦 MODULE 22: ENTERPRISE TEMPLATES",true,true,true,true,true,true,0,2,6,0,1
+"117-template-hybrid","22.2: Hybrid E2E Boilerplate",undefined,"📦 MODULE 22: ENTERPRISE TEMPLATES",true,true,true,true,true,true,0,2,6,0,1
+"118-template-reporting","22.3: Observability Boilerplate",undefined,"📦 MODULE 22: ENTERPRISE TEMPLATES",true,true,true,true,true,true,0,2,6,0,1
+"200-test-data-management","Module D: Test Data Management",undefined,"💎 ELITE TIER: ENGINEERING",true,true,true,true,true,true,5,1,2,0,0
+"201-network-mocking-deep-dive","Module E: Network Mocking Deep Dive",undefined,"💎 ELITE TIER: ENGINEERING",true,true,true,true,true,true,5,1,3,0,0
+"202-refactor-bloathouse","Module F: Refactor the Bloathouse",undefined,"💎 ELITE TIER: ENGINEERING",true,true,true,true,true,true,0,1,3,0,2
+"203-failure-academy","Module G: The Failure Academy",undefined,"💎 ELITE TIER: ENGINEERING",true,true,false,false,true,true,5,1,3,0,1

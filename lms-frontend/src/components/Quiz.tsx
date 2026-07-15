@@ -98,11 +98,19 @@ export default function Quiz({ moduleId }: QuizProps) {
         // Shuffle final question list
         const finalQuestions = shuffle(selected);
 
-        // Shuffle options for each question
-        const processed = finalQuestions.map(q => ({
-          ...q,
-          shuffledOptions: q.options ? shuffle(q.options) : []
-        }));
+        // Shuffle options and normalize correct answers array for each question (Sprint 4.4)
+        const processed = finalQuestions.map(q => {
+          const isMulti = q.type === 'multi-select';
+          let parsedAnswers = q.a;
+          if (isMulti && typeof q.a === 'string') {
+            parsedAnswers = q.a.split(',').map((s: string) => s.trim());
+          }
+          return {
+            ...q,
+            shuffledOptions: q.options ? shuffle(q.options) : [],
+            a: parsedAnswers
+          };
+        });
 
         setQuestions(processed);
         setIsSubmitted(false);

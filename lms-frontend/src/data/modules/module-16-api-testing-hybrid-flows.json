@@ -1098,7 +1098,7 @@
             ],
             "a": [
               "await expect(page).toHaveURL(/.*login/);",
-              "await expect(page.locator('#username-input')).toBeVisible()"
+              "await expect(page.locator('#username-input')).toBeVisible();"
             ],
             "explanation": "A complete UI assertion verifies both the logical state (the URL changed to the login route) and the physical rendering state (the login inputs actually appeared on the screen)."
           },

@@ -17073,7 +17073,7 @@
           ],
           "a": [
             "await expect(page).toHaveURL(/.*login/);",
-            "await expect(page.locator('#username-input')).toBeVisible()"
+            "await expect(page.locator('#username-input')).toBeVisible();"
           ],
           "explanation": "A complete UI assertion verifies both the logical state (the URL changed to the login route) and the physical rendering state (the login inputs actually appeared on the screen)."
         },
@@ -18646,7 +18646,8 @@
           "objective": "data_debug",
           "type": "scenario",
           "difficulty": "easy",
-          "scenario": "Your test uses `expect.soft()` extensively. At the end of the test, how do you manually evaluate if any soft assertions failed so you can trigger a custom cleanup script?",
+          "scenario": "Your test uses `expect.soft()` extensively.",
+          "q": "At the end of the test, how do you manually evaluate if any soft assertions failed so you can trigger a custom cleanup script?",
           "options": [
             "You cannot.",
             "Use `expect(test.info().errors).toHaveLength(0)`. The `test.info()` object tracks all execution state, including the array of accumulated soft assertion errors.",
