@@ -141,13 +141,13 @@ export default function DashboardHome() {
                 Build Your Own LMS
               </h3>
               <p className="text-slate-400 text-xs leading-relaxed mb-6">
-                Deploy a production-ready learning platform with authentication, AST validation, PostgreSQL, enterprise dashboards, certificates, and complete source code.
+                Deploy a production-ready learning platform with AST validation, PostgreSQL, enterprise dashboards, certificates, and complete source code.
               </p>
               
               <ul className="space-y-3.5 mb-6">
                 <li className="flex items-center gap-2.5 text-xs text-slate-300">
                   <CheckCircle className="w-4 h-4 text-purple-400 flex-shrink-0" />
-                  <span>✓ JWT Authentication & PostgreSQL</span>
+                  <span>✓ Full Next.js & PostgreSQL Stack</span>
                 </li>
                 <li className="flex items-center gap-2.5 text-xs text-slate-300">
                   <CheckCircle className="w-4 h-4 text-purple-400 flex-shrink-0" />

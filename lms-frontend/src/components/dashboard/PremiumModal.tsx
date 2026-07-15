@@ -104,7 +104,7 @@ export default function PremiumModal({ isOpen, onClose }: PremiumModalProps) {
                 </li>
                 <li className="flex items-start gap-3 text-xs text-slate-200">
                   <Check className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
-                  <span>✓ JWT Authentication setup modules</span>
+                  <span>✓ Interactive Sandbox Code Playground</span>
                 </li>
                 <li className="flex items-start gap-3 text-xs text-slate-200">
                   <Check className="w-4 h-4 text-purple-400 flex-shrink-0 mt-0.5" />
