@@ -44,7 +44,7 @@ export default function HeroCard() {
   const currentRankName = RANKS[currentRankIndex]?.name || 'Student';
 
   return (
-    <div className="premium-depth-card rounded-[2rem] p-5 md:p-6 relative overflow-hidden flex flex-col justify-between h-full min-h-[300px]">
+    <div className="premium-depth-card rounded-[2rem] p-5 md:p-6 relative overflow-hidden flex flex-col justify-between h-full min-h-[300px] hover-premium-float">
       <div className="absolute -right-20 -top-20 h-60 w-60 rounded-full bg-cyan-500/5 blur-[100px] pointer-events-none" />
       <div className="absolute -left-20 -bottom-20 h-60 w-60 rounded-full bg-blue-500/5 blur-[100px] pointer-events-none" />
       

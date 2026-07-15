@@ -76,7 +76,7 @@ export default function DashboardHome() {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
           
           {/* Onboarding Welcome Card (60%) */}
-          <div className="lg:col-span-3 rounded-2xl border border-slate-850 bg-slate-950/20 p-6 md:p-8 flex flex-col justify-between relative overflow-hidden shadow-2xl">
+          <div className="lg:col-span-3 rounded-2xl border border-slate-850 bg-slate-950/20 p-6 md:p-8 flex flex-col justify-between relative overflow-hidden shadow-2xl hover-premium-float">
             <div className="absolute -left-20 -top-20 h-60 w-60 rounded-full bg-blue-500/5 blur-[100px] pointer-events-none" />
             
             <div className="max-w-xl">
@@ -119,7 +119,7 @@ export default function DashboardHome() {
             <div className="flex flex-col sm:flex-row items-center gap-4 pt-5 border-t border-slate-900">
               <Link 
                 href={startLearningUrl}
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[0_4px_20px_rgba(6,182,212,0.25)] no-underline cursor-pointer border-none"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[0_4px_20px_rgba(6,182,212,0.25)] no-underline cursor-pointer border-none glow-btn-hover"
               >
                 <Play className="w-3.5 h-3.5 fill-white" />
                 START LEARNING
@@ -129,7 +129,7 @@ export default function DashboardHome() {
           </div>
 
           {/* Bento Grid Premium Card (40%) */}
-          <div className="lg:col-span-2 rounded-2xl border border-purple-500/20 bg-purple-950/5 p-6 md:p-8 flex flex-col justify-between relative overflow-hidden shadow-2xl">
+          <div className="lg:col-span-2 rounded-2xl border border-purple-500/20 bg-purple-950/5 p-6 md:p-8 flex flex-col justify-between relative overflow-hidden shadow-2xl hover-premium-float">
             <div className="absolute -right-20 -bottom-20 h-60 w-60 rounded-full bg-purple-500/5 blur-[100px] pointer-events-none" />
             
             <div>
@@ -162,7 +162,7 @@ export default function DashboardHome() {
             
             <button
               onClick={() => setPremiumModalOpen(true)}
-              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[0_4px_15px_rgba(168,85,247,0.2)] cursor-pointer border-none"
+              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white font-black text-xs uppercase tracking-widest rounded-xl transition-all duration-300 shadow-[0_4px_15px_rgba(168,85,247,0.2)] cursor-pointer border-none glow-btn-hover"
             >
               Get Enterprise Bundle
               <ChevronRight className="w-4 h-4" />

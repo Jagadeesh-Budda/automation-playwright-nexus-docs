@@ -414,3 +414,37 @@ aside::-webkit-scrollbar-thumb:hover {
 
 /* Milestone Challenge Lesson Highlight */
 .milestone-lesson-highlight { border: 1px dashed rgba(245, 158, 11, 0.4) !important; background-color: rgba(245, 158, 11, 0.05) !important; }
+
+/* Custom Scrollbars (Sprint 3.5) */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Hover Premium Float & Glowing CTA Animations (Sprint 3.5) */
+.hover-premium-float {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.hover-premium-float:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25), 0 0 20px rgba(6, 182, 212, 0.05);
+}
+
+.glow-btn-hover {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.glow-btn-hover:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 15px rgba(168, 85, 247, 0.35) !important;
+}
+
