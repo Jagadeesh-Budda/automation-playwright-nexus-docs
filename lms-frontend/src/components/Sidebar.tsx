@@ -83,18 +83,27 @@ export default function Sidebar() {
           animation: particleDrop 4s infinite ease-in-out;
         }
       `}</style>
+      {/* Mobile Backdrop Overlay */}
+      {isSidebarExpanded && (
+        <div 
+          onClick={() => setSidebarExpanded(false)}
+          className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[999] lg:hidden"
+        />
+      )}
       <aside 
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className={`fixed top-0 left-0 h-screen flex flex-col bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] z-[1000] shadow-[2px_0_12px_rgba(0,0,0,0.15)] overflow-hidden transition-all duration-300 ease-in-out ${
-          isSidebarExpanded ? 'w-[280px]' : 'w-[70px]'
+        className={`fixed top-0 h-screen flex flex-col bg-[var(--sidebar-bg)] border-r border-[var(--border-color)] z-[1000] shadow-[2px_0_12px_rgba(0,0,0,0.15)] overflow-hidden transition-all duration-300 ease-in-out w-[280px] lg:w-auto ${
+          isSidebarExpanded 
+            ? 'left-0 lg:w-[280px]' 
+            : 'left-[-280px] lg:left-0 lg:w-[70px]'
         }`}
       >
         {/* 1. Header: Branding */}
         <div className={`flex items-center border-b border-[var(--border-color)] flex-shrink-0 transition-all duration-300 ${
           isSidebarExpanded ? 'p-5' : 'p-4 justify-center'
         }`}>
-          <Link href="/" className="no-underline flex items-center group">
+          <Link href="/" onClick={() => setSidebarExpanded(false)} className="no-underline flex items-center group">
             <div className="w-10 h-10 rounded-xl bg-slate-950 border border-cyan-500/20 relative overflow-hidden flex flex-shrink-0 items-center justify-center shadow-[0_0_15px_rgba(6,182,212,0.3)]">
               <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/10 to-blue-600/10 opacity-50 group-hover:opacity-100 transition-opacity duration-300" />
               <svg className="w-8 h-8 relative z-10" viewBox="0 0 100 100">
@@ -122,6 +131,7 @@ export default function Sidebar() {
         }`}>
           <Link 
             href="/"
+            onClick={() => setSidebarExpanded(false)}
             className={`flex items-center rounded-xl text-[0.85rem] no-underline transition-all duration-200 ${
               isSidebarExpanded ? 'px-4 py-2.5 gap-3.5' : 'p-2.5 justify-center gap-0'
             } ${
@@ -273,6 +283,7 @@ export default function Sidebar() {
                                         <div key={module.id} className="flex flex-col gap-0.5 mb-1">
                                           <Link 
                                             href={moduleUrl}
+                                            onClick={() => setSidebarExpanded(false)}
                                             className={`py-1 px-1.5 rounded text-[9.5px] font-medium transition-colors flex items-center justify-between ${
                                               isActiveModule 
                                                 ? 'bg-cyan-500/10 text-cyan-400 font-bold border border-cyan-500/20' 

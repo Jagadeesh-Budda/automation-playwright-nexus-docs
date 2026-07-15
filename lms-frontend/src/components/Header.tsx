@@ -8,7 +8,7 @@ import { useMasteryStore } from '../store/useMasteryStore';
 
 export default function Header() {
   const [theme, setTheme] = useState('light');
-  const { userName, userId, setUser, setMobileSyncOpen, streak, completedModules, unlockedAchievements, setPremiumModalOpen } = useMasteryStore();
+  const { userName, userId, setUser, setMobileSyncOpen, streak, completedModules, unlockedAchievements, setPremiumModalOpen, isSidebarExpanded, setSidebarExpanded } = useMasteryStore();
   const [showEditModal, setShowEditModal] = useState(false);
   const [newName, setNewName] = useState('');
   const [copiedId, setCopiedId] = useState(false);
@@ -104,7 +104,11 @@ export default function Header() {
       <header className="h-16 border-b border-[var(--glass-border)] bg-[var(--sidebar-bg)]/80 backdrop-blur-xl px-4 md:px-6 flex items-center justify-between sticky top-0 z-40 transition-colors">
         
         <div className="flex items-center gap-4 flex-1">
-          <button className="p-2 -ml-2 rounded-lg hover:bg-[var(--sidebar-bg)] text-[var(--text-main)] transition-colors border-none bg-transparent cursor-pointer hidden md:flex lg:hidden">
+          <button 
+            onClick={() => setSidebarExpanded(!isSidebarExpanded)}
+            className="p-2 -ml-2 rounded-lg hover:bg-[var(--sidebar-bg)] text-[var(--text-main)] transition-colors border-none bg-transparent cursor-pointer flex lg:hidden"
+            title="Toggle Sidebar Menu"
+          >
             <Menu className="w-5 h-5 text-slate-400" />
           </button>
           <SearchBar />
