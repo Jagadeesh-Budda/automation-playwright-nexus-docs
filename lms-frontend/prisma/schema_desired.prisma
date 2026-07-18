@@ -8,42 +8,44 @@ datasource db {
 }
 
 model User {
-  id                  String         @id @default(uuid())
-  email               String         @unique
-  name                String         @default("Student")
-  role                String         @default("student")
+  id                  String   @id @default(uuid())
+  email               String   @unique
+  name                String   @default("Student")
+  role                String   @default("student")
   otp                 String?
   otpExpiry           DateTime?
-  createdAt           DateTime       @default(now())
-  updatedAt           DateTime       @updatedAt
-  lastActivityDate    String?
   learningPreferences Json?
-  todayMinutes        Int            @default(0)
-  totalMinutes        Int            @default(0)
-  certificates        Certificate[]
-  events              MasteryEvent[]
-  refreshTokens       RefreshToken[]
-  userProgress        UserProgress[]
+  lastActivityDate    String?
+  todayMinutes        Int      @default(0)
+  totalMinutes        Int      @default(0)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  userProgress  UserProgress[]
+  certificates  Certificate[]
+  events        MasteryEvent[]
+  refreshTokens RefreshToken[]
 }
 
 model Progress {
   id        String   @id @default(uuid())
   userId    String   @unique
-  state     String
+  state     String   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model UserProgress {
-  id                String    @id @default(uuid())
+  id                String   @id @default(uuid())
   user_id           String
   module_id         String
-  score             Int       @default(0)
-  attempts          Int       @default(0)
-  failed_objectives String
+  score             Int      @default(0)
+  attempts          Int      @default(0)
+  failed_objectives String   
   lockedUntil       DateTime?
-  version           String    @default("1.5.0")
-  user              User      @relation(fields: [user_id], references: [id])
+  version           String   @default("1.5.0")
+
+  user User @relation(fields: [user_id], references: [id])
 
   @@unique([user_id, module_id])
 }
@@ -60,7 +62,8 @@ model Certificate {
   user_id              String?
   hash_signature       String?  @unique
   validation_url       String?
-  user                 User?    @relation(fields: [user_id], references: [id])
+
+  user User? @relation(fields: [user_id], references: [id])
 }
 
 model IdempotencyKey {
@@ -74,9 +77,10 @@ model MasteryEvent {
   type      String
   userId    String
   moduleId  String?
-  payload   String
+  payload   String   
   timestamp DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model RefreshToken {
@@ -85,8 +89,11 @@ model RefreshToken {
   userId    String
   expiresAt DateTime
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+
+  user User @relation(fields: [userId], references: [id])
 }
+
+// ─── Revision Center Tables ──────────────────────────────────────────────────
 
 model UserBookmark {
   id        String   @id @default(cuid())
@@ -99,6 +106,7 @@ model UserBookmark {
   @@index([userId])
 }
 
+// Multiple notes allowed per lesson — no unique constraint on (userId, lessonId)
 model UserNote {
   id        String   @id @default(cuid())
   userId    String
@@ -120,6 +128,7 @@ model UserHighlight {
   paragraphId     String
   anchorText      String
   focusText       String
+  // occurrenceIndex disambiguates identical text appearing multiple times in the same paragraph
   occurrenceIndex Int      @default(0)
   color           String   @default("yellow")
   createdAt       DateTime @default(now())
@@ -132,13 +141,14 @@ model RevisionSchedule {
   id                  String   @id @default(cuid())
   userId              String
   lessonId            String
-  interval            Int      @default(1)
+  interval            Int      @default(1)   // days until next review
   repetitions         Int      @default(0)
   easeFactor          Float    @default(2.5)
   nextReview          DateTime @default(now())
-  lastScore           Int      @default(0)
-  lessonVersion       Int      @default(1)
-  lastReviewedVersion Int      @default(1)
+  lastScore           Int      @default(0)   // 0-5 confidence rating
+  // Lesson version tracking — auto-flag for re-review when course content changes
+  lessonVersion       Int      @default(1)   // current version from metadata.json
+  lastReviewedVersion Int      @default(1)   // version at time of last user review
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt
 

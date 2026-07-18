@@ -1,0 +1,1 @@
+-- Baseline migration: mark current schema as applied. No schema changes.

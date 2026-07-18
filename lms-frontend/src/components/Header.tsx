@@ -127,6 +127,16 @@ export default function Header() {
             <span>{streak || 1} Day Streak</span>
           </div>
 
+          {/* Revision Center Link */}
+          <a
+            id="header-revision-center-link"
+            href="/revision-center"
+            className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/5 hover:bg-indigo-500/10 text-xs font-black text-indigo-400 uppercase tracking-wider transition-all duration-300 hidden md:flex"
+            title="Revision Center — bookmarks, notes, spaced repetition"
+          >
+            🧠 <span className="hidden lg:inline">Revise</span>
+          </a>
+
           {/* Premium Source Code Link */}
           <button
             onClick={() => setPremiumModalOpen(true)}
