@@ -10,6 +10,8 @@ import TelemetryPanel from '../components/dashboard/Telemetry/TelemetryPanel';
 import AchievementsModal from '../components/dashboard/Achievements/AchievementsModal';
 import SkillTreeModal from '../components/dashboard/SkillTree/SkillTreeModal';
 import MilestoneCelebration from '../components/dashboard/Milestone/MilestoneCelebration';
+import LearningProfileWidget from '../components/dashboard/Profile/LearningProfileWidget';
+import OnboardingWizard from '../components/dashboard/Profile/OnboardingWizard';
 
 import { useMasteryStore } from '../store/useMasteryStore';
 import { 
@@ -21,14 +23,22 @@ import Link from 'next/link';
 export default function DashboardHome() {
   const [mounted, setMounted] = useState(false);
   const [showTreeModal, setShowTreeModal] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [activeTab, setActiveTab] = useState<'learn' | 'stats' | 'activity'>('learn');
   const { loading, initUser } = useDashboardStats();
-  const { completedModules, getFirstIncompleteModule, setPremiumModalOpen } = useMasteryStore();
+  const { completedModules, getFirstIncompleteModule, setPremiumModalOpen, skillLevel } = useMasteryStore();
 
   useEffect(() => {
     setMounted(true);
     initUser();
   }, [initUser]);
+
+  // Show onboarding wizard if skill level is not set yet
+  useEffect(() => {
+    if (mounted && !loading && !skillLevel) {
+      setShowOnboarding(true);
+    }
+  }, [mounted, loading, skillLevel]);
 
   if (!mounted || loading) {
     return (
@@ -71,6 +81,9 @@ export default function DashboardHome() {
           {motivationText}
         </span>
       </div>
+
+      {/* Learning Profile Overview Widget (v1.1.0 Phase 1) */}
+      <LearningProfileWidget onEditProfile={() => setShowOnboarding(true)} />
 
       {/* 📱 MOBILE TABS SELECTOR (Visible on mobile only) */}
       <div className="flex md:hidden bg-slate-950/60 border border-white/5 p-1 rounded-xl gap-1">
@@ -359,6 +372,10 @@ export default function DashboardHome() {
       />
       
       <MilestoneCelebration />
+
+      {showOnboarding && (
+        <OnboardingWizard onClose={() => setShowOnboarding(false)} />
+      )}
     </div>
   );
 }

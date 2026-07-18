@@ -465,8 +465,8 @@ export default function AudioReader() {
                 {voices.length === 0 ? (
                   <option>Loading System Voices...</option>
                 ) : (
-                  voices.map(voice => (
-                    <option key={voice.name} value={voice.name}>
+                  voices.map((voice, idx) => (
+                    <option key={`${voice.name}-${idx}`} value={voice.name}>
                       {voice.name.replace('Microsoft', 'MS').replace('Google', 'Google').substring(0, 24)}
                     </option>
                   ))

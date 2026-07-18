@@ -8,9 +8,11 @@ import { useMasteryStore } from '../store/useMasteryStore';
 
 export default function Header() {
   const [theme, setTheme] = useState('light');
-  const { userName, userId, setUser, setMobileSyncOpen, streak, completedModules, unlockedAchievements, setPremiumModalOpen, isSidebarExpanded, setSidebarExpanded, isReadingModeActive } = useMasteryStore();
+  const { userName, userId, setUser, setMobileSyncOpen, streak, completedModules, unlockedAchievements, setPremiumModalOpen, isSidebarExpanded, setSidebarExpanded, isReadingModeActive, dailyTargetMinutes, learningGoals, updateLearningProfile } = useMasteryStore();
   const [showEditModal, setShowEditModal] = useState(false);
   const [newName, setNewName] = useState('');
+  const [editTarget, setEditTarget] = useState(20);
+  const [editGoals, setEditGoals] = useState<string[]>([]);
   const [copiedId, setCopiedId] = useState(false);
   const [timeStr, setTimeStr] = useState('');
   const [sessionSecs, setSessionSecs] = useState(0);
@@ -57,6 +59,8 @@ export default function Header() {
 
   const handleOpenEdit = () => {
     setNewName(userName);
+    setEditTarget(dailyTargetMinutes);
+    setEditGoals(learningGoals);
     setShowEditModal(true);
   };
 
@@ -64,6 +68,10 @@ export default function Header() {
     e.preventDefault();
     if (newName.trim()) {
       await setUser(newName.trim(), userId);
+      await updateLearningProfile({
+        dailyTargetMinutes: editTarget,
+        learningGoals: editGoals
+      });
       setShowEditModal(false);
     }
   };
@@ -135,12 +143,12 @@ export default function Header() {
           {userId && (
             <div 
               onClick={handleOpenEdit}
-              className="flex items-center gap-3 px-3.5 py-1.5 rounded-xl border border-[var(--glass-border)] bg-[var(--sidebar-bg)] hover:bg-[var(--border-color)] cursor-pointer transition-all duration-200"
+              className="flex items-center gap-3 md:px-3.5 md:py-1.5 p-1.5 rounded-xl border border-transparent md:border-[var(--glass-border)] bg-transparent md:bg-[var(--sidebar-bg)] hover:bg-[var(--border-color)] cursor-pointer transition-all duration-200"
             >
               <div className="w-8 h-8 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 flex-shrink-0">
                 <User className="w-4 h-4 text-cyan-400" />
               </div>
-              <div className="flex flex-col text-left">
+              <div className="hidden md:flex flex-col text-left">
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-black text-[var(--text-main)] leading-tight">
                     {userName || 'Jagadeesh'}
@@ -181,7 +189,7 @@ export default function Header() {
       {/* Edit Profile Modal */}
       {showEditModal && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-md">
-          <div className="relative w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-slate-900/80 p-6 shadow-2xl backdrop-blur-xl">
+          <div className="relative w-full max-w-lg overflow-hidden rounded-2xl border border-white/10 bg-slate-900/80 p-6 shadow-2xl backdrop-blur-xl max-h-[90vh] overflow-y-auto">
             <button 
               onClick={() => setShowEditModal(false)}
               className="absolute top-4 right-4 p-1.5 rounded-lg hover:bg-white/10 text-slate-400 hover:text-white cursor-pointer border-none bg-transparent"
@@ -194,7 +202,7 @@ export default function Header() {
               Profile Settings
             </h3>
 
-            <form onSubmit={handleSaveProfile} className="space-y-4">
+            <form onSubmit={handleSaveProfile} className="space-y-5">
               <div>
                 <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">
                   Update Candidate Name
@@ -206,6 +214,69 @@ export default function Header() {
                   onChange={(e) => setNewName(e.target.value)}
                   className="w-full px-4 py-2.5 rounded-xl border border-white/10 bg-slate-950/40 text-white focus:outline-none focus:border-cyan-500 transition-colors text-sm"
                 />
+              </div>
+
+              {/* Daily Target Duration Chips */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">
+                  Daily Study Target
+                </label>
+                <div className="flex flex-wrap gap-2">
+                  {[15, 30, 45, 60, 90].map((t) => (
+                    <button
+                      type="button"
+                      key={t}
+                      onClick={() => setEditTarget(t)}
+                      className={`px-3 py-1.5 rounded-xl border text-[11px] font-black uppercase tracking-wider transition-all cursor-pointer ${
+                        editTarget === t
+                          ? 'bg-cyan-500/10 border-cyan-500 text-white shadow-[0_0_12px_rgba(6,182,212,0.15)]'
+                          : 'bg-slate-950/40 border-white/5 text-slate-500 hover:border-slate-700 hover:text-slate-300'
+                      }`}
+                    >
+                      {t} min
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Learning Goals Selector */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-400 uppercase tracking-widest mb-1.5">
+                  Your Learning Goals
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { id: 'expert', label: 'Become Playwright Expert' },
+                    { id: 'sdet', label: 'Switch to SDET' },
+                    { id: 'api', label: 'Learn API Automation' },
+                    { id: 'interview', label: 'Crack Interviews' },
+                    { id: 'framework', label: 'Build Framework' },
+                    { id: 'ts', label: 'Learn TypeScript' },
+                    { id: 'enterprise', label: 'Enterprise Testing' },
+                    { id: 'cicd', label: 'CI/CD Automation' }
+                  ].map((goal) => {
+                    const selected = editGoals.includes(goal.id);
+                    return (
+                      <button
+                        type="button"
+                        key={goal.id}
+                        onClick={() => {
+                          setEditGoals(prev => 
+                            prev.includes(goal.id) ? prev.filter(g => g !== goal.id) : [...prev, goal.id]
+                          );
+                        }}
+                        className={`p-2.5 rounded-xl border text-left text-[10px] font-bold transition-all cursor-pointer flex items-center justify-between ${
+                          selected
+                            ? 'bg-cyan-500/10 border-cyan-500 text-white'
+                            : 'bg-slate-950/40 border-white/5 text-slate-500 hover:border-slate-700 hover:text-slate-350'
+                        }`}
+                      >
+                        <span className="truncate pr-1">{goal.label}</span>
+                        {selected && <Check className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <div>

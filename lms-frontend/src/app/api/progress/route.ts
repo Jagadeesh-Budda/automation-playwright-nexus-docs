@@ -67,10 +67,35 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   try {
     const userId = request.headers.get('x-user-id') || DEFAULT_USER_ID;
+    const userName = request.headers.get('x-user-name') || "Student";
+    
+    // Ensure user exists
+    let user: any = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      user = await prisma.user.create({
+        data: {
+          id: userId,
+          email: `${userId}@example.com`,
+          name: userName,
+        }
+      }) as any;
+    }
+
     const progress = await prisma.userProgress.findMany({
       where: { user_id: userId }
     });
-    return NextResponse.json({ success: true, progress });
+
+    return NextResponse.json({ 
+      success: true, 
+      progress,
+      profile: {
+        name: user.name,
+        learningPreferences: user.learningPreferences,
+        lastActivityDate: user.lastActivityDate,
+        todayMinutes: user.todayMinutes,
+        totalMinutes: user.totalMinutes
+      }
+    });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }

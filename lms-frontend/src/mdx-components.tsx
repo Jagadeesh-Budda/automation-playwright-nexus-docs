@@ -129,9 +129,9 @@ const CustomH1 = ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElemen
     const prefix = match[1];
     const rest = match[2];
     return (
-      <div className="mb-10 pb-6 border-b border-slate-800/60">
-        <h1 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight flex flex-col md:flex-row md:items-center gap-4" {...props}>
-          <span className="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-700 dark:text-cyan-400 text-2xl md:text-3xl shrink-0 shadow-[0_0_20px_rgba(34,211,238,0.15)]">
+      <div className="mb-5 pb-3 md:mb-10 md:pb-6 border-b border-slate-800/60">
+        <h1 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight flex flex-col md:flex-row md:items-center gap-4 items-start" {...props}>
+          <span className="inline-flex items-center justify-center px-2.5 py-1 md:px-4 md:py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-700 dark:text-cyan-400 text-lg md:text-2xl shrink-0 shadow-[0_0_20px_rgba(34,211,238,0.15)]">
             {prefix.replace(':', '')}
           </span>
           <span className="bg-gradient-to-r from-slate-800 to-slate-500 dark:from-white dark:via-slate-200 dark:to-slate-400 bg-clip-text text-transparent">
@@ -144,7 +144,7 @@ const CustomH1 = ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElemen
   }
 
   return (
-    <div className="mb-10 pb-6 border-b border-slate-800/60">
+    <div className="mb-5 pb-3 md:mb-10 md:pb-6 border-b border-slate-800/60">
       <h1 className="text-2xl sm:text-3xl md:text-5xl font-black tracking-tight bg-gradient-to-r from-slate-800 to-slate-500 dark:from-white dark:to-slate-400 bg-clip-text text-transparent" {...props}>
         {children}
       </h1>

@@ -69,9 +69,21 @@ export default function SearchBar() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+
+  // Detect mobile viewports for responsive search input
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   const results = React.useMemo(() => {
     if (!query.trim()) return [];
     return fuse.search(query).map((r) => r.item).slice(0, 8);
@@ -143,7 +155,7 @@ export default function SearchBar() {
   const showDefault = isOpen && !query && recentSearches.length === 0;
 
   return (
-    <div className="search-container" style={{ position: "relative", width: "380px" }}>
+    <div className="search-container w-full max-w-[140px] sm:max-w-[260px] md:max-w-[380px]" style={{ position: "relative" }}>
       {/* Search Input */}
       <div style={{ position: "relative" }}>
         <Search
@@ -165,7 +177,7 @@ export default function SearchBar() {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => setIsOpen(true)}
           onKeyDown={handleKeyDown}
-          placeholder={`Search all ${searchIndexData.length} lessons…  Ctrl+K`}
+          placeholder={isMobile ? "Search..." : `Search all ${searchIndexData.length} lessons…  Ctrl+K`}
           style={{
             width: "100%",
             padding: "10px 40px 10px 38px",

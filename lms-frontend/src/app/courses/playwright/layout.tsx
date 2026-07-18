@@ -118,7 +118,7 @@ export default function PlaywrightCourseLayout({ children }: { children: React.R
   }
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 md:px-12 lg:px-16">
+    <div className="max-w-6xl mx-auto py-3 md:py-8 px-0 md:px-12 lg:px-16">
       <ChapterHeader moduleId={moduleId} />
       {children}
       <LessonFooter moduleId={moduleId} />

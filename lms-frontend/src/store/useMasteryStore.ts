@@ -23,6 +23,18 @@ interface MasteryState {
   
   isPremiumModalOpen: boolean;
   isReadingModeActive: boolean;
+
+  // Learning Profile & Preferences (v1.1.0 Phase 1)
+  skillLevel: string;
+  learningGoals: string[];
+  dailyTargetMinutes: number;
+  lastActivityDate: string;
+  todayMinutes: number;
+  totalMinutes: number;
+  recommendedStage: string;
+  recommendedModule: string;
+  updateLearningProfile: (profileData: { skillLevel?: string, learningGoals?: string[], dailyTargetMinutes?: number, recommendedStage?: string, recommendedModule?: string }) => Promise<void>;
+  updateTimeSpentToday: (minutes: number) => Promise<void>;
   
   setMobileSyncOpen: (open: boolean) => void;
   setPremiumModalOpen: (open: boolean) => void;
@@ -72,6 +84,16 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
   isReadingModeActive: false,
   claimedCertificates: {},
   selectedPath: 'all',
+
+  // Learning Profile Defaults
+  skillLevel: '',
+  learningGoals: [],
+  dailyTargetMinutes: 20,
+  lastActivityDate: '',
+  todayMinutes: 0,
+  totalMinutes: 0,
+  recommendedStage: '',
+  recommendedModule: '',
   
   telemetryLogs: [],
   streak: 0,
@@ -116,6 +138,12 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
     const storedLogs = JSON.parse(localStorage.getItem('asa_telemetry') || '[]');
     const storedStreakData = JSON.parse(localStorage.getItem('asa_streak') || '{"current":0,"best":0,"lastLogin":""}');
     const storedTime = parseInt(localStorage.getItem('asa_time_spent') || '0', 10);
+
+    // Load local learning preferences
+    const localPrefs = JSON.parse(localStorage.getItem('nexus_profile_preferences') || '{}');
+    const localActivityDate = localStorage.getItem('nexus_activity_date') || '';
+    const localTotalMinutes = parseInt(localStorage.getItem('nexus_total_minutes') || '0', 10);
+    let localTodayMinutes = parseInt(localStorage.getItem('nexus_today_minutes') || '0', 10);
     
     // Evaluate streak on load
     const today = new Date().toISOString().split('T')[0];
@@ -147,6 +175,13 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
       lastLogin: today
     }));
 
+    // Reset todayMinutes if activity date has changed
+    if (localActivityDate && localActivityDate !== today) {
+      localTodayMinutes = 0;
+      localStorage.setItem('nexus_today_minutes', '0');
+      localStorage.setItem('nexus_activity_date', today);
+    }
+
     set({ 
       userName: storedName, 
       userId: storedId,
@@ -156,7 +191,16 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
       timeSpentSeconds: storedTime,
       unlockedStageBadges: JSON.parse(localStorage.getItem('asa_stage_badges') || '[]'),
       claimedCertificates: claimedCerts,
-      selectedPath: storedPath
+      selectedPath: storedPath,
+
+      skillLevel: localPrefs.skillLevel || '',
+      learningGoals: localPrefs.learningGoals || [],
+      dailyTargetMinutes: localPrefs.dailyTargetMinutes || 20,
+      recommendedStage: localPrefs.recommendedStage || '',
+      recommendedModule: localPrefs.recommendedModule || '',
+      lastActivityDate: localActivityDate || today,
+      todayMinutes: localTodayMinutes,
+      totalMinutes: localTotalMinutes,
     });
     
     if (storedId) {
@@ -176,7 +220,6 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
       set({ loading: false });
       return;
     }
-    // DO NOT set({ loading: true }) here! It causes the entire layout to unmount during background syncs.
     try {
       const res = await fetch('/api/progress', {
         headers: {
@@ -196,7 +239,54 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
           progressMap[p.module_id] = p.score;
         });
 
-        set({ completedModules: completed, userProgress: progressMap });
+        // Set user profile preferences and statistics returned from DB
+        const todayDate = new Date().toISOString().split('T')[0];
+        let dbPrefs = data.profile?.learningPreferences;
+        if (typeof dbPrefs === 'string') {
+          dbPrefs = JSON.parse(dbPrefs);
+        }
+        dbPrefs = dbPrefs || {};
+
+        let dbTodayMinutes = data.profile?.todayMinutes || 0;
+        const dbTotalMinutes = data.profile?.totalMinutes || 0;
+        const dbLastActivityDate = data.profile?.lastActivityDate || '';
+
+        // Auto-Reset on new day check
+        if (dbLastActivityDate && dbLastActivityDate !== todayDate) {
+          dbTodayMinutes = 0;
+          // Sync reset to DB in background
+          fetch('/api/user/profile', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-user-id': userId
+            },
+            body: JSON.stringify({
+              lastActivityDate: todayDate,
+              todayMinutes: 0
+            })
+          }).catch(err => console.error('Failed to sync background date reset:', err));
+        }
+
+        set({ 
+          completedModules: completed, 
+          userProgress: progressMap,
+          skillLevel: dbPrefs.skillLevel || '',
+          learningGoals: dbPrefs.learningGoals || [],
+          dailyTargetMinutes: dbPrefs.dailyTargetMinutes || 20,
+          recommendedStage: dbPrefs.recommendedStage || '',
+          recommendedModule: dbPrefs.recommendedModule || '',
+          lastActivityDate: dbLastActivityDate || todayDate,
+          todayMinutes: dbTodayMinutes,
+          totalMinutes: dbTotalMinutes
+        });
+        
+        // Cache to localStorage
+        localStorage.setItem('nexus_profile_preferences', JSON.stringify(dbPrefs));
+        localStorage.setItem('nexus_activity_date', dbLastActivityDate || todayDate);
+        localStorage.setItem('nexus_today_minutes', dbTodayMinutes.toString());
+        localStorage.setItem('nexus_total_minutes', dbTotalMinutes.toString());
+
         get().evaluateAchievementsAndStreak();
       }
     } catch (err) {
@@ -417,10 +507,88 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
     }
   },
 
+  updateLearningProfile: async (profileData) => {
+    const { userId, skillLevel, learningGoals, dailyTargetMinutes, recommendedStage, recommendedModule } = get();
+
+    const updatedPreferences = {
+      skillLevel: profileData.skillLevel !== undefined ? profileData.skillLevel : skillLevel,
+      learningGoals: profileData.learningGoals !== undefined ? profileData.learningGoals : learningGoals,
+      dailyTargetMinutes: profileData.dailyTargetMinutes !== undefined ? profileData.dailyTargetMinutes : dailyTargetMinutes,
+      recommendedStage: profileData.recommendedStage !== undefined ? profileData.recommendedStage : recommendedStage,
+      recommendedModule: profileData.recommendedModule !== undefined ? profileData.recommendedModule : recommendedModule,
+    };
+
+    set({
+      skillLevel: updatedPreferences.skillLevel,
+      learningGoals: updatedPreferences.learningGoals,
+      dailyTargetMinutes: updatedPreferences.dailyTargetMinutes,
+      recommendedStage: updatedPreferences.recommendedStage,
+      recommendedModule: updatedPreferences.recommendedModule,
+    });
+    localStorage.setItem('nexus_profile_preferences', JSON.stringify(updatedPreferences));
+
+    if (!userId) return;
+
+    try {
+      await fetch('/api/user/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': userId
+        },
+        body: JSON.stringify({
+          learningPreferences: updatedPreferences
+        })
+      });
+    } catch (err) {
+      console.error('Failed to sync learning profile with database:', err);
+    }
+  },
+
+  updateTimeSpentToday: async (minutes) => {
+    const { userId, todayMinutes, totalMinutes } = get();
+    const todayDate = new Date().toISOString().split('T')[0];
+    const newTodayMinutes = todayMinutes + minutes;
+    const newTotalMinutes = totalMinutes + minutes;
+
+    set({
+      lastActivityDate: todayDate,
+      todayMinutes: newTodayMinutes,
+      totalMinutes: newTotalMinutes
+    });
+    localStorage.setItem('nexus_activity_date', todayDate);
+    localStorage.setItem('nexus_today_minutes', newTodayMinutes.toString());
+    localStorage.setItem('nexus_total_minutes', newTotalMinutes.toString());
+
+    if (!userId) return;
+
+    try {
+      await fetch('/api/user/profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': userId
+        },
+        body: JSON.stringify({
+          lastActivityDate: todayDate,
+          todayMinutes: newTodayMinutes,
+          totalMinutes: newTotalMinutes
+        })
+      });
+    } catch (err) {
+      console.error('Failed to sync study time with database:', err);
+    }
+  },
+
   incrementTimeSpent: (seconds) => {
     const newTime = get().timeSpentSeconds + seconds;
     set({ timeSpentSeconds: newTime });
     localStorage.setItem('asa_time_spent', newTime.toString());
+    
+    // When timeSpentSeconds hits a multiple of 60, increment active minutes
+    if (newTime > 0 && newTime % 60 === 0) {
+      get().updateTimeSpentToday(1);
+    }
   },
 
   markAllAsRead: () => {

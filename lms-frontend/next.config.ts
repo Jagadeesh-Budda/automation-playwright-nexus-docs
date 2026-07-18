@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
   },
   // Prevent Prisma from being bundled incorrectly on Vercel
   serverExternalPackages: ["@prisma/client", "prisma"],
+  allowedDevOrigins: ["192.168.1.7:3000", "192.168.1.7", "localhost:3000"]
 };
 
 const withMDX = createMDX({

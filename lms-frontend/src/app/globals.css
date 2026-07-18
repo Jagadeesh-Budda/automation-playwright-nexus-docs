@@ -431,6 +431,22 @@ aside::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
 }
 
+/* Mobile Prose Full Width Override */
+@media (max-width: 767px) {
+  .prose {
+    max-width: 100% !important;
+  }
+  .prose p, 
+  .prose ul, 
+  .prose ol, 
+  .prose li, 
+  .prose h1, 
+  .prose h2, 
+  .prose h3 {
+    max-width: 100% !important;
+  }
+}
+
 /* Hover Premium Float & Glowing CTA Animations (Sprint 3.5) */
 .hover-premium-float {
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
