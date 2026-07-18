@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import modulesData from '../data/metadata.json';
 import { STAGES } from '../data/stageConfig';
+import { RecommendationEngine, PrerequisiteStatus } from '../lib/recommendationEngine';
 
 /** Remove all code_verified_* flags from localStorage (called on sync/reset) */
 function clearCodeVerifiedFlags() {
@@ -23,6 +24,8 @@ interface MasteryState {
   
   isPremiumModalOpen: boolean;
   isReadingModeActive: boolean;
+
+  checkPrerequisiteStatus: (moduleId: string) => PrerequisiteStatus;
 
   // Learning Profile & Preferences (v1.1.0 Phase 1)
   skillLevel: string;
@@ -327,32 +330,23 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
   },
 
   isModuleLocked: (moduleId) => {
-    if (process.env.NODE_ENV === 'development') {
-      return false; // Under development server, no lock!
-    }
-    const { completedModules } = get();
-    const currentIndex = modulesData.findIndex(m => m.id === moduleId);
-    if (currentIndex <= 0) return false; // First module is never locked
+    return false; // Under v1.1.0 Phase 2, we never hard-lock lessons to allow full exploration!
+  },
 
-    // Check if any previous module is incomplete (score < 70)
-    for (let i = 0; i < currentIndex; i++) {
-      const prevModule = modulesData[i];
-      if (!completedModules.includes(prevModule.id)) {
-        return true; // Locked because a previous module is not completed yet
-      }
-    }
-    return false;
+  checkPrerequisiteStatus: (moduleId: string) => {
+    const { completedModules, selectedPath } = get();
+    return RecommendationEngine.checkPrerequisites(moduleId, completedModules, selectedPath);
   },
 
   getFirstIncompleteModule: () => {
-    const { completedModules } = get();
-    const firstIncomplete = modulesData.find(m => !completedModules.includes(m.id));
-    if (!firstIncomplete) return null;
+    const { completedModules, userProgress, selectedPath } = get();
+    const nextLesson = RecommendationEngine.getNextLesson(completedModules, userProgress, selectedPath);
+    if (!nextLesson) return null;
 
     return {
-      id: firstIncomplete.id,
-      title: firstIncomplete.title,
-      slug: firstIncomplete.slug || firstIncomplete.id
+      id: nextLesson.id,
+      title: nextLesson.title,
+      slug: nextLesson.slug || nextLesson.id
     };
   },
 

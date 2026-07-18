@@ -12,6 +12,7 @@ import SkillTreeModal from '../components/dashboard/SkillTree/SkillTreeModal';
 import MilestoneCelebration from '../components/dashboard/Milestone/MilestoneCelebration';
 import LearningProfileWidget from '../components/dashboard/Profile/LearningProfileWidget';
 import OnboardingWizard from '../components/dashboard/Profile/OnboardingWizard';
+import PathTimeline from '../components/dashboard/Timeline/PathTimeline';
 
 import { useMasteryStore } from '../store/useMasteryStore';
 import { 
@@ -84,6 +85,9 @@ export default function DashboardHome() {
 
       {/* Learning Profile Overview Widget (v1.1.0 Phase 1) */}
       <LearningProfileWidget onEditProfile={() => setShowOnboarding(true)} />
+
+      {/* Learning Path Timeline Progress (v1.1.0 Phase 2) */}
+      <PathTimeline />
 
       {/* 📱 MOBILE TABS SELECTOR (Visible on mobile only) */}
       <div className="flex md:hidden bg-slate-950/60 border border-white/5 p-1 rounded-xl gap-1">
@@ -268,6 +272,8 @@ export default function DashboardHome() {
         {/* Tab 1: Learn/Study */}
         {activeTab === 'learn' && (
           <div className="flex flex-col gap-5 w-full">
+            <LearningProfileWidget onEditProfile={() => setShowOnboarding(true)} />
+            <PathTimeline />
             {isFirstTimeUser ? (
               <div className="rounded-2xl border border-slate-850 bg-slate-950/20 p-5 flex flex-col gap-4 relative overflow-hidden shadow-2xl">
                 <div className="absolute -left-20 -top-20 h-60 w-60 rounded-full bg-blue-500/5 blur-[100px] pointer-events-none" />

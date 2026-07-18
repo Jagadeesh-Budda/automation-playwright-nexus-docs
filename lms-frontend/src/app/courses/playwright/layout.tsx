@@ -6,6 +6,7 @@ import { useMasteryStore } from '../../../store/useMasteryStore';
 import modulesData from '../../../data/metadata.json';
 import ChapterHeader from '../../../components/ChapterHeader';
 import LessonFooter from '../../../components/LessonFooter';
+import PrerequisiteBanner from '../../../components/PrerequisiteBanner';
 
 export default function PlaywrightCourseLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -120,6 +121,7 @@ export default function PlaywrightCourseLayout({ children }: { children: React.R
   return (
     <div className="max-w-6xl mx-auto py-3 md:py-8 px-0 md:px-12 lg:px-16">
       <ChapterHeader moduleId={moduleId} />
+      <PrerequisiteBanner moduleId={moduleId} />
       {children}
       <LessonFooter moduleId={moduleId} />
     </div>

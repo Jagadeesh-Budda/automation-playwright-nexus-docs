@@ -6,6 +6,9 @@ test.describe('Onboarding Wizard Flow E2E', () => {
     await page.goto('http://localhost:3000/');
     await page.evaluate(() => {
       localStorage.clear();
+      const randomId = 'test_user_' + Math.random().toString(36).substring(2, 9);
+      localStorage.setItem('asa_user_name', 'Test Student');
+      localStorage.setItem('asa_user_id', randomId);
     });
     // Reload to ensure state initializes cleanly
     await page.reload();
@@ -44,7 +47,7 @@ test.describe('Onboarding Wizard Flow E2E', () => {
 
     // 8. Verify Onboarding modal is closed and Learning Profile Widget is visible
     await expect(page.getByText('Welcome to Nexus Academy')).not.toBeVisible();
-    await expect(page.getByText('Learning Profile')).toBeVisible();
-    await expect(page.getByText('0m / 30m')).toBeVisible();
+    await expect(page.getByText('Learning Profile').first()).toBeVisible();
+    await expect(page.getByText('0m / 30m').first()).toBeVisible();
   });
 });

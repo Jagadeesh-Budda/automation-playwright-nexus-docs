@@ -5,6 +5,7 @@ import modulesData from '../data/metadata.json';
 import { loadModule } from '../utils/moduleLoader';
 import { ShieldCheck, Lock, CheckCircle2, XCircle, ArrowRight, RotateCcw, Info, Trophy, Zap } from 'lucide-react';
 import { useMasteryStore } from '../store/useMasteryStore';
+import { RecommendationEngine } from '../lib/recommendationEngine';
 
 interface QuizProps {
   moduleId: string;
@@ -409,25 +410,68 @@ export default function Quiz({ moduleId }: QuizProps) {
               )}
             </div>
           ) : (
-            <div className="p-8 rounded-2xl border border-red-500/30 bg-[#7f1d1d]/20 shadow-lg text-center">
-              <h4 className="font-black text-2xl text-red-500 m-0 mb-4">
-                Assessment Failed
-              </h4>
-              <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-lg mb-6">
-                <p className="text-red-400 font-semibold flex items-center gap-2 justify-center">
-                  <XCircle className="w-5 h-5" /> Score is below 80%. Please review and try again.
-                </p>
-                <p className="text-red-400/70 text-sm mt-1">
-                  (Required to pass: {Math.ceil((score?.total || 0) * 0.8)})
-                </p>
+            <div className="p-8 rounded-2xl border border-red-500/30 bg-[#7f1d1d]/20 shadow-lg text-center space-y-6">
+              <div>
+                <h4 className="font-black text-2xl text-red-500 m-0 mb-4">
+                  Assessment Failed
+                </h4>
+                <div className="bg-red-500/10 border border-red-500/20 p-4 rounded-lg">
+                  <p className="text-red-400 font-semibold flex items-center gap-2 justify-center m-0">
+                    <XCircle className="w-5 h-5" /> Score is below 80%. Please review and try again.
+                  </p>
+                  <p className="text-red-400/70 text-sm mt-1 mb-0">
+                    (Required to pass: {Math.ceil((score?.total || 0) * 0.8)})
+                  </p>
+                </div>
               </div>
+
+              {/* Adaptive Recommendation Refresher Box (v1.1.0 Phase 2) */}
+              {(() => {
+                const refresher = RecommendationEngine.getQuizRefresher(moduleId, score?.earned || 0);
+                return (
+                  <div className="text-left bg-slate-950/50 border border-white/5 rounded-xl p-5 space-y-4">
+                    <div className="flex items-center justify-between border-b border-white/5 pb-2">
+                      <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Weak Concepts Detected</span>
+                      <span className="text-[9px] font-black bg-cyan-500/10 text-cyan-400 px-2 py-0.5 rounded-full uppercase">
+                        Requires ~{refresher.suggestedRevisionTime} revision
+                      </span>
+                    </div>
+                    
+                    <ul className="space-y-1.5 m-0 pl-4 text-xs font-semibold text-slate-300">
+                      {refresher.weakConcepts.map((concept, idx) => (
+                        <li key={idx} className="list-disc leading-relaxed">
+                          {concept}
+                        </li>
+                      ))}
+                    </ul>
+
+                    {refresher.relatedLessons.length > 0 && (
+                      <div className="pt-3 border-t border-white/5 space-y-2">
+                        <span className="text-[9px] font-black text-slate-500 uppercase tracking-widest block">Suggested Concept Lessons</span>
+                        <div className="flex flex-col gap-2">
+                          {refresher.relatedLessons.map(lesson => (
+                            <Link 
+                              key={lesson.id}
+                              href={`/courses/playwright/${lesson.slug}`}
+                              className="text-xs font-extrabold text-cyan-400 hover:text-cyan-300 no-underline hover:underline truncate"
+                            >
+                              {lesson.title}
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
+
               <button 
                 onClick={() => {
                   setIsSubmitted(false);
                   setScore(null);
                   setAnswers({});
                 }}
-                className="inline-flex items-center justify-center gap-2 px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition-all border-none cursor-pointer shadow-md"
+                className="w-full inline-flex items-center justify-center gap-2 px-8 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition-all border-none cursor-pointer shadow-md"
               >
                 <RotateCcw className="w-5 h-5" />
                 Retry Assessment
