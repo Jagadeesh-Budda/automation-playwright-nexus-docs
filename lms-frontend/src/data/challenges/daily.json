@@ -1,0 +1,119 @@
+[
+  {
+    "id": "locator-001",
+    "type": "selector-builder",
+    "difficulty": "Easy",
+    "category": "Locators",
+    "question": "Write a CSS selector that matches a <button> containing a class 'submit-btn' and data-testid 'submit-action'.",
+    "answer": "button.submit-btn[data-testid='submit-action']",
+    "xpReward": 20
+  },
+  {
+    "id": "quiz-001",
+    "type": "quiz",
+    "difficulty": "Easy",
+    "category": "Assertions",
+    "question": "Which of the following assertions in Playwright is auto-retrying?",
+    "options": [
+      "expect(await page.title()).toBe('Home')",
+      "expect(page).toHaveTitle('Home')",
+      "assert.equal(title, 'Home')",
+      "expect(title).toEqual('Home')"
+    ],
+    "answer": "expect(page).toHaveTitle('Home')",
+    "xpReward": 20
+  },
+  {
+    "id": "fill-blank-001",
+    "type": "fill-blank",
+    "difficulty": "Medium",
+    "category": "Fixtures",
+    "question": "Complete the first argument to declare a custom fixture: test.extend({ myFixture: async ({ ____ }, use) => { ... } })",
+    "answer": "page",
+    "xpReward": 40
+  },
+  {
+    "id": "debug-001",
+    "type": "debugging",
+    "difficulty": "Medium",
+    "category": "Debugging",
+    "question": "Identify the issue in this locator call: const btn = page.locator('button').first(); await btn.click(); btn.hover();",
+    "options": [
+      "locator needs await for click",
+      "hover is missing await",
+      "first() is not a function",
+      "btn should be declared with let"
+    ],
+    "answer": "hover is missing await",
+    "xpReward": 40
+  },
+  {
+    "id": "scenario-001",
+    "type": "scenario",
+    "difficulty": "Hard",
+    "category": "Best Practices",
+    "question": "Your test handles a heavy third-party iframe that loads dynamically. Which approach is the most stable to verify elements inside it?",
+    "options": [
+      "await page.waitForTimeout(5000)",
+      "await page.frameLocator('iframe-selector').locator('element-selector').waitFor()",
+      "await page.mainFrame().childFrames()[0].click('element-selector')",
+      "Reload the page repeatedly until the frame loads"
+    ],
+    "answer": "await page.frameLocator('iframe-selector').locator('element-selector').waitFor()",
+    "xpReward": 70
+  },
+  {
+    "id": "dom-pred-001",
+    "type": "dom-prediction",
+    "difficulty": "Hard",
+    "category": "DOM Prediction",
+    "question": "Given HTML: <div class='card'><span class='badge'>New</span><h2 class='title'>Playwright API</h2></div>. What is the innerText of the title header?",
+    "answer": "Playwright API",
+    "xpReward": 70
+  },
+  {
+    "id": "api-001",
+    "type": "quiz",
+    "difficulty": "Expert",
+    "category": "API Testing",
+    "question": "Which header must be set to authenticate requests in Playwright's request context if using Bearer token authentication?",
+    "options": [
+      "Authentication: Bearer <token>",
+      "Authorization: Bearer <token>",
+      "Auth-Token: <token>",
+      "x-auth-bearer: <token>"
+    ],
+    "answer": "Authorization: Bearer <token>",
+    "xpReward": 120
+  },
+  {
+    "id": "git-001",
+    "type": "quiz",
+    "difficulty": "Expert",
+    "category": "Git Workflow",
+    "question": "How do you run only the modified Playwright tests in your branch compared to main using git in CI?",
+    "options": [
+      "npx playwright test --only-changed",
+      "npx playwright test $(git diff --name-only main...HEAD | grep '\\.spec\\.')",
+      "npx playwright test --git-compare",
+      "Playwright does not support running only changed files"
+    ],
+    "answer": "npx playwright test $(git diff --name-only main...HEAD | grep '\\.spec\\.')",
+    "xpReward": 120
+  },
+  {
+    "id": "master-001",
+    "type": "scenario",
+    "difficulty": "Master",
+    "category": "Framework Design",
+    "question": "To implement global parallel setup (e.g. seeding db once) in a Playwright project, where should the setup logic be placed?",
+    "options": [
+      "Inside beforeAll block in root layout",
+      "Inside globalSetup script registered in playwright.config.ts",
+      "Inside a separate test run beforehand in package.json",
+      "Inside the custom fixture initialization"
+    ],
+    "answer": "Inside globalSetup script registered in playwright.config.ts",
+    "xpReward": 200
+  }
+]

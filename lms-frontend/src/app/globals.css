@@ -485,3 +485,14 @@ aside::-webkit-scrollbar-thumb:hover {
   margin: 24px 0;
 }
 
+/* WCAG AA High Contrast Keyboard Focus Rings */
+.focus-ring:focus-visible {
+  outline: 2.5px solid var(--accent) !important;
+  outline-offset: 3px !important;
+  box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.25) !important;
+  border-color: var(--accent) !important;
+}
+input.focus-ring:focus-visible {
+  outline-offset: 0px !important;
+}
+

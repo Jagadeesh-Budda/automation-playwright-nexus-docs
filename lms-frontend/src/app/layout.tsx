@@ -5,6 +5,7 @@ import Header from "../components/Header";
 import AppInitializer from "../components/AppInitializer";
 import PageWrapper from "../components/PageWrapper";
 import MainWrapper from "../components/MainWrapper";
+import ShortcutHandler from "../components/ShortcutHandler";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body className={inter.className}>
         <AppInitializer>
+          <ShortcutHandler />
           <Sidebar />
           <MainWrapper>
             <Header />

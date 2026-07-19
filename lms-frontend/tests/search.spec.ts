@@ -75,15 +75,19 @@ test.describe('Curriculum Search Validation Suite', () => {
     const sampleModules = shuffledModules.slice(0, 5);
     
     // Test: Empty state (click without typing)
-    const searchInput = page.getByPlaceholder(/Search all \d+ lessons/i);
-    await searchInput.click();
+    // Click the trigger in the header to open the Command Palette modal
+    await page.locator('text=Search resources...').click();
     
-    // Wait for dropdown to appear
-    const dropdown = page.locator('.search-container > div').nth(1); // The dropdown div
+    // Locate the search input inside the modal
+    const searchInput = page.getByPlaceholder('Search lessons, quizzes, Playwright APIs, exercises...');
+    await expect(searchInput).toBeVisible();
+    
+    // The modal overlay container
+    const dropdown = page.locator('div.fixed');
     await expect(dropdown).toBeVisible();
     
-    // Verify default state text "Start typing to search across all"
-    const startTypingText = page.getByText(/Start typing to search across all/i);
+    // Verify default state contains text "Quick Actions"
+    const startTypingText = page.getByText(/Quick Actions/i);
     await expect(startTypingText).toBeVisible();
 
     reportEntries.push({
@@ -97,7 +101,7 @@ test.describe('Curriculum Search Validation Suite', () => {
     // Test: Nonexistent search term
     const invalidQuery = "asdfasdfasdfxyz123";
     await searchInput.fill(invalidQuery);
-    const noResultsText = page.getByText(`No lessons found for`);
+    const noResultsText = page.getByText(`No matching resources found for`);
     await expect(noResultsText).toBeVisible();
 
     reportEntries.push({

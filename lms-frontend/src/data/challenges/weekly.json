@@ -1,0 +1,34 @@
+[
+  {
+    "id": "weekly-001",
+    "title": "Module Accelerator",
+    "description": "Complete 5 lessons on your learning path this week.",
+    "type": "lessons",
+    "target": 5,
+    "xpReward": 150
+  },
+  {
+    "id": "weekly-002",
+    "title": "Quiz Master",
+    "description": "Score 90%+ in 3 lesson quizzes this week.",
+    "type": "quizzes",
+    "target": 3,
+    "xpReward": 150
+  },
+  {
+    "id": "weekly-003",
+    "title": "Consistency Champion",
+    "description": "Maintain a 5-day study streak this week.",
+    "type": "streak",
+    "target": 5,
+    "xpReward": 200
+  },
+  {
+    "id": "weekly-004",
+    "title": "Revision Legend",
+    "description": "Review and complete 3 bookmarks/favorites in the Revision Center.",
+    "type": "revision",
+    "target": 3,
+    "xpReward": 150
+  }
+]

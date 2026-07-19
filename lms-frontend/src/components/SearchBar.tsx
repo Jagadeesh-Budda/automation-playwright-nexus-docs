@@ -1,9 +1,10 @@
 "use client";
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from "next/navigation";
-import { Search, X, Clock, BookOpen, ChevronRight } from "lucide-react";
+import { Search, X, Clock, BookOpen, ChevronRight, Bookmark, Heart, Star, Sparkles, Filter, Settings, Award, Compass, RefreshCw, Trophy } from "lucide-react";
 import Fuse from "fuse.js";
 import searchIndexData from "../data/search-index.json";
+import { useMasteryStore } from "../store/useMasteryStore";
 
 interface SearchEntry {
   id: string;
@@ -26,7 +27,7 @@ const fuse = new Fuse(searchIndexData as SearchEntry[], {
     { name: "content", weight: 1 },
     { name: "snippet", weight: 1 },
   ],
-  threshold: 0.35,
+  threshold: 0.4,
   includeMatches: true,
   minMatchCharLength: 2,
 });
@@ -39,375 +40,343 @@ const TYPE_COLORS: Record<string, string> = {
   Architecture: "#8b5cf6",
 };
 
-const POPULAR_LESSONS = [
-  { title: "JS/TS Variables & Scope", url: "/courses/playwright/01-js-ts-variables" },
-  { title: "Writing Your First Playwright Test", url: "/courses/playwright/10-first-test" },
-  { title: "What are Page Object Models (POMs)", url: "/courses/playwright/24-what-are-poms" },
-  { title: "Github Actions & CI/CD Pipelines", url: "/courses/playwright/98-github-actions" },
-  { title: "Capstone Project Architecture Brief", url: "/courses/playwright/94-capstone-brief" }
-];
-
-const RECENT_KEY = "lms_recent_searches";
-
-function getRecent(): string[] {
-  if (typeof window === "undefined") return [];
-  try {
-    return JSON.parse(localStorage.getItem(RECENT_KEY) || "[]");
-  } catch {
-    return [];
-  }
-}
-
-function saveRecent(query: string) {
-  const recents = getRecent().filter((r) => r !== query);
-  recents.unshift(query);
-  localStorage.setItem(RECENT_KEY, JSON.stringify(recents.slice(0, 5)));
-}
-
 export default function SearchBar() {
   const [query, setQuery] = useState("");
-  const [isOpen, setIsOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'All' | 'Lessons' | 'Exercises' | 'Quizzes' | 'Challenges' | 'Interview' | 'API'>('All');
   const [activeIndex, setActiveIndex] = useState(0);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
-  const [isMobile, setIsMobile] = useState(false);
+  const {
+    isCommandPaletteOpen,
+    setCommandPaletteOpen,
+    recentResources,
+    favoritedResources,
+    bookmarkedResources,
+    getFirstIncompleteModule,
+    isReadingModeActive,
+    setReadingModeActive
+  } = useMasteryStore();
+
   const inputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Detect mobile viewports for responsive search input
+  // Focus input on command palette open
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const results = React.useMemo(() => {
-    if (!query.trim()) return [];
-    return fuse.search(query).map((r) => r.item).slice(0, 8);
-  }, [query]);
-
-  // Update recents when dropdown opens
-  useEffect(() => {
-    if (isOpen) {
-      setRecentSearches(getRecent());
-    }
-  }, [isOpen]);
-
-  // Global keyboard shortcut: Ctrl+K or / to open search
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if ((e.ctrlKey && e.key === "k") || (e.key === "/" && document.activeElement?.tagName !== "INPUT")) {
-        e.preventDefault();
+    if (isCommandPaletteOpen) {
+      setTimeout(() => {
         inputRef.current?.focus();
-        setIsOpen(true);
-      }
-      if (e.key === "Escape") {
-        setIsOpen(false);
-        inputRef.current?.blur();
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, []);
+      }, 50);
+    }
+  }, [isCommandPaletteOpen]);
 
-  // Click outside to close
+  // Click outside or ESC key to close
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node) &&
-        !inputRef.current?.contains(e.target as Node)
-      ) {
-        setIsOpen(false);
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setCommandPaletteOpen(false);
       }
     };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [setCommandPaletteOpen]);
 
-  const navigate = (url: string, title: string) => {
-    saveRecent(title);
-    setQuery("");
-    setIsOpen(false);
-    router.push(url);
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      setCommandPaletteOpen(false);
+    }
   };
 
+  const navigate = (url: string) => {
+    setQuery("");
+    setCommandPaletteOpen(false);
+    router.push(url.startsWith('/') ? url : `/${url}`);
+  };
+
+  // Perform search & filter
+  const results = useMemo(() => {
+    let filtered = searchIndexData as SearchEntry[];
+
+    // 1. Search Query
+    if (query.trim()) {
+      filtered = fuse.search(query).map((r) => r.item);
+    }
+
+    // 2. Category Filter
+    if (activeTab !== 'All') {
+      filtered = filtered.filter(item => {
+        const titleLower = item.title.toLowerCase();
+        const contentLower = item.content.toLowerCase();
+        const keywordsLower = item.keywords.toLowerCase();
+
+        switch (activeTab) {
+          case 'Lessons':
+            return item.type === 'Concept' || titleLower.includes('lesson') || titleLower.includes('chapter');
+          case 'Exercises':
+            return item.type === 'Code' || item.type === 'Execution' || titleLower.includes('exercise') || titleLower.includes('sandbox');
+          case 'Quizzes':
+            return titleLower.includes('quiz') || contentLower.includes('quiz') || keywordsLower.includes('quiz');
+          case 'Challenges':
+            return titleLower.includes('challenge') || item.group.toLowerCase().includes('challenge') || titleLower.includes('capstone');
+          case 'Interview':
+            return titleLower.includes('interview') || item.group.toLowerCase().includes('interview') || contentLower.includes('career');
+          case 'API':
+            const apiWords = ['locator', 'expect', 'page.', 'fixture', 'pom', 'page object', 'goto', 'waitfor'];
+            return apiWords.some(w => titleLower.includes(w) || contentLower.includes(w) || keywordsLower.includes(w));
+          default:
+            return true;
+        }
+      });
+    }
+
+    // 3. Search Ranking
+    if (query.trim()) {
+      const q = query.toLowerCase().trim();
+      return [...filtered].sort((a, b) => {
+        const aRecent = recentResources.some(r => r.id === a.id);
+        const bRecent = recentResources.some(r => r.id === b.id);
+        if (aRecent && !bRecent) return -1;
+        if (!aRecent && bRecent) return 1;
+
+        const aFav = favoritedResources.includes(a.id);
+        const bFav = favoritedResources.includes(b.id);
+        if (aFav && !bFav) return -1;
+        if (!aFav && bFav) return 1;
+
+        const aExact = a.title.toLowerCase() === q;
+        const bExact = b.title.toLowerCase() === q;
+        if (aExact && !bExact) return -1;
+        if (!aExact && bExact) return 1;
+
+        const aStart = a.title.toLowerCase().startsWith(q);
+        const bStart = b.title.toLowerCase().startsWith(q);
+        if (aStart && !bStart) return -1;
+        if (!aStart && bStart) return 1;
+
+        return 0;
+      }).slice(0, 10);
+    }
+
+    return filtered.slice(0, 8);
+  }, [query, activeTab, recentResources, favoritedResources]);
+
+  // Reset active index on filter change
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [query, activeTab]);
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isOpen) return;
-    const items = results.length > 0 ? results : [];
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setActiveIndex((i) => Math.min(i + 1, items.length - 1));
+      setActiveIndex((i) => Math.min(i + 1, results.length - 1));
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       setActiveIndex((i) => Math.max(i - 1, 0));
-    } else if (e.key === "Enter" && items[activeIndex]) {
-      navigate(items[activeIndex].url, items[activeIndex].title);
+    } else if (e.key === "Enter" && results[activeIndex]) {
+      e.preventDefault();
+      navigate(results[activeIndex].url);
     }
   };
 
-  const showRecents = isOpen && !query && recentSearches.length > 0;
-  const showResults = isOpen && query && results.length > 0;
-  const showEmpty = isOpen && query && results.length === 0;
-  const showDefault = isOpen && !query && recentSearches.length === 0;
+  // Playwright Syntax Highlighter
+  const highlightText = (text: string) => {
+    if (!text) return "";
+    const terms = ['locator', 'expect', 'fixture', 'page\\.', 'POM', 'Page Object Model', 'goto'];
+    let formatted = text;
+    terms.forEach(term => {
+      const regex = new RegExp(`(${term})`, 'gi');
+      formatted = formatted.replace(regex, '<span class="px-1 py-0.5 mx-0.5 rounded bg-cyan-500/10 text-cyan-400 font-mono text-[11px] border border-cyan-500/20 font-bold">$1</span>');
+    });
+    return <span dangerouslySetInnerHTML={{ __html: formatted }} />;
+  };
+
+  // Quick Actions List
+  const quickActions = [
+    { label: 'Resume Learning', icon: <Compass className="w-4 h-4 text-cyan-400" />, action: () => {
+        const next = getFirstIncompleteModule();
+        if (next) navigate(`/courses/playwright/${next.slug}`);
+      }
+    },
+    { label: 'Start Revision', icon: <RefreshCw className="w-4 h-4 text-emerald-400" />, action: () => navigate('/revision-center') },
+    { label: 'Random Quiz', icon: <Trophy className="w-4 h-4 text-amber-400" />, action: () => navigate('/courses/playwright/01-js-ts-variables') },
+    { label: 'Open Dashboard', icon: <Star className="w-4 h-4 text-indigo-400" />, action: () => navigate('/') },
+    { label: 'Bookmarks', icon: <Bookmark className="w-4 h-4 text-pink-400" />, action: () => navigate('/#bookmarks') },
+    { label: 'Reading Mode', icon: <BookOpen className="w-4 h-4 text-purple-400" />, action: () => {
+        setReadingModeActive(!isReadingModeActive);
+        setCommandPaletteOpen(false);
+      }
+    },
+  ];
 
   return (
-    <div className="search-container w-full max-w-[140px] sm:max-w-[260px] md:max-w-[380px]" style={{ position: "relative" }}>
-      {/* Search Input */}
-      <div style={{ position: "relative" }}>
-        <Search
-          style={{
-            position: "absolute",
-            left: "12px",
-            top: "50%",
-            transform: "translateY(-50%)",
-            width: "16px",
-            height: "16px",
-            color: "var(--text-muted)",
-            pointerEvents: "none",
-          }}
-        />
-        <input
-          ref={inputRef}
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          onFocus={() => setIsOpen(true)}
-          onKeyDown={handleKeyDown}
-          placeholder={isMobile ? "Search..." : `Search all ${searchIndexData.length} lessons…  Ctrl+K`}
-          style={{
-            width: "100%",
-            padding: "10px 40px 10px 38px",
-            borderRadius: "10px",
-            border: "1.5px solid var(--border-color)",
-            background: "var(--sidebar-bg)",
-            color: "var(--text-main)",
-            fontSize: "0.875rem",
-            outline: "none",
-            transition: "border-color 0.2s, box-shadow 0.2s",
-            boxSizing: "border-box",
-          }}
-          onMouseEnter={(e) =>
-            ((e.target as HTMLInputElement).style.borderColor = "var(--accent)")
-          }
-          onMouseLeave={(e) => {
-            if (document.activeElement !== e.target)
-              (e.target as HTMLInputElement).style.borderColor = "var(--border-color)";
-          }}
-          onFocusCapture={(e) => (e.target.style.borderColor = "var(--accent)")}
-          onBlurCapture={(e) => (e.target.style.borderColor = "var(--border-color)")}
-        />
-        {query && (
-          <button
-            onClick={() => { setQuery(""); inputRef.current?.focus(); }}
-            style={{
-              position: "absolute",
-              right: "10px",
-              top: "50%",
-              transform: "translateY(-50%)",
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              color: "var(--text-muted)",
-              padding: "2px",
-              display: "flex",
-              alignItems: "center",
-            }}
-          >
-            <X style={{ width: "14px", height: "14px" }} />
-          </button>
-        )}
-      </div>
+    <>
+      {/* Mini Search Trigger Bar (In Header) */}
+      <button 
+        onClick={() => setCommandPaletteOpen(true)}
+        className="flex items-center gap-2 px-3 py-2 rounded-xl border border-[var(--border-color)] bg-[var(--sidebar-bg)] hover:border-cyan-500/40 text-[var(--text-muted)] cursor-pointer transition-all w-full max-w-[260px] md:max-w-[320px] select-none focus-ring text-left"
+        aria-haspopup="dialog"
+        aria-expanded={isCommandPaletteOpen}
+        aria-label="Open Command Palette"
+      >
+        <Search className="w-4 h-4 flex-shrink-0" aria-hidden="true" />
+        <span className="text-xs md:text-sm flex-grow text-left">Search resources... (Ctrl+K)</span>
+        <kbd className="hidden sm:inline-block px-1.5 py-0.5 rounded bg-slate-800 border border-slate-700 text-[10px] font-mono text-slate-300">Ctrl+K</kbd>
+      </button>
 
-      {/* Dropdown */}
-      {isOpen && (
-        <div
-          ref={dropdownRef}
-          style={{
-            position: "absolute",
-            top: "calc(100% + 8px)",
-            left: 0,
-            right: 0,
-            background: "var(--bg-color)",
-            border: "1.5px solid var(--border-color)",
-            borderRadius: "12px",
-            boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
-            zIndex: 9999,
-            overflow: "hidden",
-            maxHeight: "480px",
-            overflowY: "auto",
-          }}
+      {/* Command Palette Modal */}
+      {isCommandPaletteOpen && (
+        <div 
+          onClick={handleBackdropClick}
+          className="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-[99999] flex items-start justify-center pt-[10vh] px-4 animate-fade-in"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Command Palette"
         >
-          {/* Recent Searches */}
-          {showRecents && (
-            <div>
-              <div style={{ padding: "10px 16px 6px", fontSize: "0.7rem", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                Recent Searches
-              </div>
-              {recentSearches.map((r) => (
-                <button
-                  key={r}
-                  onClick={() => setQuery(r)}
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
-                    padding: "10px 16px",
-                    background: "none",
-                    border: "none",
-                    color: "var(--text-main)",
-                    cursor: "pointer",
-                    fontSize: "0.875rem",
-                    textAlign: "left",
-                    transition: "background 0.15s",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "var(--sidebar-bg)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
+          <div 
+            ref={dropdownRef}
+            className="w-full max-w-3xl bg-[#0b0f19] border border-slate-800 rounded-2xl overflow-hidden shadow-2xl flex flex-col max-h-[75vh]"
+          >
+            {/* Search Input Area */}
+            <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-900 relative">
+              <Search className="w-5 h-5 text-cyan-400 flex-shrink-0" aria-hidden="true" />
+              <input
+                ref={inputRef}
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Search lessons, quizzes, Playwright APIs, exercises..."
+                className="bg-transparent border-none outline-none text-white text-base flex-grow w-full placeholder-slate-500 font-sans focus-ring px-2"
+                aria-autocomplete="list"
+                aria-controls="search-results-list"
+              />
+              {query && (
+                <button 
+                  onClick={() => setQuery("")}
+                  className="p-1 hover:bg-slate-900 rounded-lg text-slate-400 hover:text-white border-none bg-transparent cursor-pointer focus-ring"
+                  aria-label="Clear search query"
                 >
-                  <Clock style={{ width: "14px", height: "14px", color: "var(--text-muted)", flexShrink: 0 }} />
-                  {r}
+                  <X className="w-4 h-4" aria-hidden="true" />
+                </button>
+              )}
+              <kbd className="px-1.5 py-0.5 rounded bg-slate-900 border border-slate-800 text-[10px] font-mono text-slate-400">ESC to close</kbd>
+            </div>
+
+            {/* Filter Tabs */}
+            <div className="flex items-center gap-1.5 px-4 py-2 bg-slate-950/60 border-b border-slate-900 overflow-x-auto scrollbar-none">
+              <Filter className="w-3.5 h-3.5 text-slate-500 mr-2 flex-shrink-0" aria-hidden="true" />
+              {(['All', 'Lessons', 'Exercises', 'Quizzes', 'Challenges', 'Interview', 'API'] as const).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold transition-all border-none cursor-pointer flex-shrink-0 focus-ring ${
+                    activeTab === tab 
+                      ? 'bg-gradient-to-r from-cyan-500/20 to-blue-600/20 border border-cyan-500/30 text-cyan-400' 
+                      : 'bg-transparent text-slate-400 hover:text-slate-200'
+                  }`}
+                  aria-label={`Filter by ${tab}`}
+                >
+                  {tab}
                 </button>
               ))}
             </div>
-          )}
 
-          {/* Popular Lessons (Sprint 3) */}
-          {isOpen && !query && (
-            <div>
-              <div style={{ padding: "10px 16px 6px", fontSize: "0.7rem", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em", borderTop: recentSearches.length > 0 ? "1px solid var(--border-color)" : "none" }}>
-                🔥 Popular Lessons
-              </div>
-              {POPULAR_LESSONS.map((p) => (
-                <button
-                  key={p.url}
-                  onClick={() => navigate(p.url, p.title)}
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "10px",
-                    padding: "10px 16px",
-                    background: "none",
-                    border: "none",
-                    color: "var(--text-main)",
-                    cursor: "pointer",
-                    fontSize: "0.875rem",
-                    textAlign: "left",
-                    transition: "background 0.15s",
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.background = "var(--sidebar-bg)")}
-                  onMouseLeave={(e) => (e.currentTarget.style.background = "none")}
-                >
-                  <BookOpen style={{ width: "14px", height: "14px", color: "var(--accent)", flexShrink: 0 }} />
-                  {p.title}
-                </button>
-              ))}
-              
-              <div style={{ padding: "16px", textAlign: "center", color: "var(--text-muted)", borderTop: "1px solid var(--border-color)" }}>
-                <div style={{ fontSize: "0.75rem", opacity: 0.6 }}>
-                  Press <kbd style={{ padding: "1px 5px", borderRadius: "4px", border: "1px solid var(--border-color)", fontSize: "0.7rem" }}>↑</kbd>{" "}
-                  <kbd style={{ padding: "1px 5px", borderRadius: "4px", border: "1px solid var(--border-color)", fontSize: "0.7rem" }}>↓</kbd> to navigate,{" "}
-                  <kbd style={{ padding: "1px 5px", borderRadius: "4px", border: "1px solid var(--border-color)", fontSize: "0.7rem" }}>↵</kbd> to open
+            {/* Content Drawer */}
+            <div className="flex-grow overflow-y-auto p-4 space-y-4">
+              {/* Quick Actions Panel (shown only when query is empty) */}
+              {!query && (
+                <div>
+                  <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 px-2">Quick Actions</div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {quickActions.map((action, i) => (
+                      <button
+                        key={i}
+                        onClick={action.action}
+                        className="flex items-center gap-3 p-3 rounded-xl border border-slate-900 bg-slate-950/30 hover:border-slate-800 hover:bg-slate-900/50 transition-all text-left text-xs font-bold text-slate-300 cursor-pointer focus-ring"
+                        role="button"
+                        aria-label={action.label}
+                      >
+                        {action.icon}
+                        <span>{action.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Search Results / Lists */}
+              <div>
+                <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2 px-2">
+                  {query ? 'Search Results' : 'Recently Visited & Popular Resources'}
+                </div>
+                <div className="space-y-1" id="search-results-list" role="listbox">
+                  {results.map((result, i) => {
+                    const isFav = favoritedResources.includes(result.id);
+                    const isBkm = bookmarkedResources.includes(result.id);
+                    
+                    return (
+                      <button
+                        key={result.id}
+                        onClick={() => navigate(result.url)}
+                        className={`flex items-center justify-between p-3 rounded-xl transition-all cursor-pointer w-full border-none bg-transparent text-left focus-ring ${
+                          i === activeIndex ? 'bg-slate-900 border border-slate-800' : 'bg-transparent border border-transparent'
+                        }`}
+                        onMouseEnter={() => setActiveIndex(i)}
+                        role="option"
+                        aria-selected={i === activeIndex}
+                        aria-label={`Result: ${result.title}. Type: ${result.type}`}
+                      >
+                        <div className="flex items-start gap-3 min-w-0 flex-grow">
+                          <span
+                            style={{
+                              display: "inline-block",
+                              padding: "2px 8px",
+                              borderRadius: "6px",
+                              fontSize: "0.65rem",
+                              fontWeight: 700,
+                              background: (TYPE_COLORS[result.type] || "#6366f1") + "22",
+                              color: TYPE_COLORS[result.type] || "#6366f1",
+                              marginTop: "2px",
+                              minWidth: "60px",
+                              textAlign: "center"
+                            }}
+                          >
+                            {result.type}
+                          </span>
+                          <div className="min-w-0">
+                            <div className="text-sm font-bold text-slate-200 flex items-center gap-2">
+                              {highlightText(result.title)}
+                              {isFav && <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 flex-shrink-0" aria-label="Favorited" />}
+                              {isBkm && <Bookmark className="w-3.5 h-3.5 text-pink-400 fill-pink-400 flex-shrink-0" aria-label="Bookmarked" />}
+                            </div>
+                            <div className="text-xs text-slate-400 mt-1 line-clamp-1">
+                              {highlightText(result.snippet || result.outcome)}
+                            </div>
+                          </div>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-slate-600 flex-shrink-0" aria-hidden="true" />
+                      </button>
+                    );
+                  })}
+                  {results.length === 0 && (
+                    <div className="text-center py-8 text-slate-500 text-xs">
+                      No matching resources found for "{query}".
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
-          )}
 
-          {/* Search Results */}
-          {showResults && (
-            <div>
-              <div style={{ padding: "10px 16px 6px", fontSize: "0.7rem", fontWeight: 600, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-                {results.length} result{results.length !== 1 ? "s" : ""} for &ldquo;{query}&rdquo;
+            {/* Footer */}
+            <div className="px-5 py-3 border-t border-slate-900 bg-slate-950/80 flex items-center justify-between text-[10px] text-slate-500 font-mono">
+              <div className="flex items-center gap-4">
+                <span>{searchIndexData.length} indexed items</span>
+                <span>↑↓ to navigate</span>
+                <span>Enter to select</span>
               </div>
-              {results.map((result, i) => (
-                <button
-                  key={result.id}
-                  onClick={() => navigate(result.url, result.title)}
-                  style={{
-                    width: "100%",
-                    display: "flex",
-                    alignItems: "flex-start",
-                    gap: "12px",
-                    padding: "12px 16px",
-                    background: i === activeIndex ? "var(--sidebar-bg)" : "none",
-                    border: "none",
-                    color: "var(--text-main)",
-                    cursor: "pointer",
-                    textAlign: "left",
-                    transition: "background 0.15s",
-                    borderBottom: i < results.length - 1 ? "1px solid var(--border-color)" : "none",
-                  }}
-                  onMouseEnter={() => setActiveIndex(i)}
-                >
-                  {/* Type badge */}
-                  <span
-                    style={{
-                      display: "inline-block",
-                      padding: "2px 8px",
-                      borderRadius: "6px",
-                      fontSize: "0.65rem",
-                      fontWeight: 700,
-                      letterSpacing: "0.05em",
-                      background: (TYPE_COLORS[result.type] || "#6366f1") + "22",
-                      color: TYPE_COLORS[result.type] || "#6366f1",
-                      flexShrink: 0,
-                      marginTop: "2px",
-                      minWidth: "60px",
-                      textAlign: "center",
-                    }}
-                  >
-                    {result.type}
-                  </span>
-
-                  {/* Content */}
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontWeight: 600, fontSize: "0.875rem", lineHeight: 1.3 }}>
-                      {result.title}
-                    </div>
-                    <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", marginTop: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                      {result.snippet || result.outcome}
-                    </div>
-                    <div style={{ fontSize: "0.65rem", color: "var(--text-muted)", marginTop: "3px", opacity: 0.7 }}>
-                      {result.group} · {result.time}
-                    </div>
-                  </div>
-
-                  <ChevronRight style={{ width: "14px", height: "14px", color: "var(--text-muted)", flexShrink: 0, marginTop: "4px" }} />
-                </button>
-              ))}
+              <div>Command Palette v1.1</div>
             </div>
-          )}
-
-          {/* No results */}
-          {showEmpty && (
-            <div style={{ padding: "28px 16px", textAlign: "center", color: "var(--text-muted)", fontSize: "0.875rem" }}>
-              <Search style={{ width: "28px", height: "28px", margin: "0 auto 8px", opacity: 0.3 }} />
-              <div>No lessons found for &ldquo;<strong>{query}</strong>&rdquo;</div>
-              <div style={{ marginTop: "4px", fontSize: "0.75rem" }}>Try: locators, fixtures, assertions, e-sign, api...</div>
-            </div>
-          )}
-
-          {/* Footer */}
-          {showResults && (
-            <div style={{
-              padding: "8px 16px",
-              borderTop: "1px solid var(--border-color)",
-              display: "flex",
-              justifyContent: "space-between",
-              fontSize: "0.7rem",
-              color: "var(--text-muted)",
-              background: "var(--sidebar-bg)",
-            }}>
-              <span>{searchIndexData.length} lessons indexed</span>
-              <span>Powered by Fuse.js</span>
-            </div>
-          )}
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

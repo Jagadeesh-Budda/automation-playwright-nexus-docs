@@ -13,6 +13,8 @@ import MilestoneCelebration from '../components/dashboard/Milestone/MilestoneCel
 import LearningProfileWidget from '../components/dashboard/Profile/LearningProfileWidget';
 import OnboardingWizard from '../components/dashboard/Profile/OnboardingWizard';
 import PathTimeline from '../components/dashboard/Timeline/PathTimeline';
+import ProductivityWidgets from '../components/dashboard/ProductivityWidgets';
+import ChallengeWidget from '../components/dashboard/ChallengeWidget';
 
 import { useMasteryStore } from '../store/useMasteryStore';
 import { 
@@ -88,6 +90,12 @@ export default function DashboardHome() {
 
       {/* Learning Path Timeline Progress (v1.1.0 Phase 2) */}
       <PathTimeline />
+
+      {/* Phase 5 Productivity Widgets (Continue Learning, Streaks, Snippets, Resource Hub) */}
+      <ProductivityWidgets />
+
+      {/* Phase 6.1 Daily & Weekly Challenges widget */}
+      <ChallengeWidget />
 
       {/* 📱 MOBILE TABS SELECTOR (Visible on mobile only) */}
       <div className="flex md:hidden bg-slate-950/60 border border-white/5 p-1 rounded-xl gap-1">

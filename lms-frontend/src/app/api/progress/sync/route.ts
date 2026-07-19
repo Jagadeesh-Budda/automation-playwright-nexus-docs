@@ -15,13 +15,20 @@ export async function POST(request: Request) {
     // 1. Ensure user exists
     let user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
-      user = await prisma.user.create({
-        data: {
-          id: userId,
-          email: `${userId}@example.com`,
-          name: userName || "Test Student",
+      try {
+        user = await prisma.user.create({
+          data: {
+            id: userId,
+            email: `${userId}@example.com`,
+            name: userName || "Test Student",
+          }
+        });
+      } catch (error: any) {
+        if (error?.code !== 'P2002') {
+          throw error;
         }
-      });
+        user = await prisma.user.findUnique({ where: { id: userId } });
+      }
     } else if (userName && user.name !== userName) {
       // Keep name synchronized if it changed
       await prisma.user.update({

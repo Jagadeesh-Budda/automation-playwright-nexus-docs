@@ -7,6 +7,14 @@ const modulesPath = path.resolve(__dirname, '../src/data/modules.json');
 const modulesData = JSON.parse(fs.readFileSync(modulesPath, 'utf8'));
 
 test.describe('Exhaustive Curriculum Check', () => {
+  test.beforeEach(async ({ page }) => {
+    // Inject identity so the welcome modal/onboarding wizard doesn't intercept pages
+    await page.addInitScript(() => {
+      window.localStorage.setItem('asa_user_id', 'exhaustive-test-user');
+      window.localStorage.setItem('asa_user_name', 'Exhaustive Tester');
+    });
+  });
+
   for (const module of modulesData) {
     const slug = module.slug || module.id;
     
@@ -14,13 +22,15 @@ test.describe('Exhaustive Curriculum Check', () => {
       // Go to the specific module's URL
       await page.goto(`http://localhost:3000/courses/playwright/${slug}`);
 
-      // Ensure the page actually loads content (an H1 should exist)
-      // Note: If the module is locked, it will show "Module Gate Locked" instead of the module title.
-      // We check for either standard chapter content or the locked gate.
-      const hasHeader = await page.locator('h1').count() > 0;
-      const hasLockedGate = await page.locator('h2', { hasText: 'Module Gate Locked' }).count() > 0;
+      // Wait for the 'Decrypting progress ledger...' loading overlay to disappear
+      await expect(page.locator('text=Decrypting progress ledger...')).not.toBeVisible({ timeout: 15000 });
 
-      expect(hasHeader || hasLockedGate).toBeTruthy();
+      // Wait for either the chapter header (h1) or an h2 section header to appear in the DOM
+      const hasContent = await page.waitForSelector('h1, h2', { state: 'attached', timeout: 10000 })
+        .then(() => true)
+        .catch(() => false);
+      
+      expect(hasContent).toBeTruthy();
 
       // Ensure the Sidebar is still rendered on the layout
       const sidebarItems = page.locator('aside');

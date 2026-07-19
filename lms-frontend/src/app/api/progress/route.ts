@@ -17,13 +17,20 @@ export async function POST(request: Request) {
     // Ensure user exists
     let user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
-      user = await prisma.user.create({
-        data: {
-          id: userId,
-          email: `${userId}@example.com`,
-          name: userName,
+      try {
+        user = await prisma.user.create({
+          data: {
+            id: userId,
+            email: `${userId}@example.com`,
+            name: userName,
+          }
+        });
+      } catch (error: any) {
+        if (error?.code !== 'P2002') {
+          throw error;
         }
-      });
+        user = await prisma.user.findUnique({ where: { id: userId } });
+      }
     }
 
     // Upsert the progress
@@ -72,13 +79,20 @@ export async function GET(request: Request) {
     // Ensure user exists
     let user: any = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) {
-      user = await prisma.user.create({
-        data: {
-          id: userId,
-          email: `${userId}@example.com`,
-          name: userName,
+      try {
+        user = await prisma.user.create({
+          data: {
+            id: userId,
+            email: `${userId}@example.com`,
+            name: userName,
+          }
+        }) as any;
+      } catch (error: any) {
+        if (error?.code !== 'P2002') {
+          throw error;
         }
-      }) as any;
+        user = await prisma.user.findUnique({ where: { id: userId } }) as any;
+      }
     }
 
     const progress = await prisma.userProgress.findMany({

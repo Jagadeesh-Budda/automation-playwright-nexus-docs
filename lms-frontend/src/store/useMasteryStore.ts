@@ -2,6 +2,31 @@ import { create } from 'zustand';
 import modulesData from '../data/metadata.json';
 import { STAGES } from '../data/stageConfig';
 import { RecommendationEngine, PrerequisiteStatus } from '../lib/recommendationEngine';
+import dailyChallengesData from '../data/challenges/daily.json';
+import weeklyChallengesData from '../data/challenges/weekly.json';
+
+export interface ChallengeAttempt {
+  id: string;
+  type: "daily" | "weekly";
+  difficulty: string;
+  attempts: number;
+  passed: boolean;
+  xpEarned: number;
+  timeTaken: number;
+  completedAt: string;
+}
+
+export interface ActiveChallengeMeta {
+  id: string;
+  assignedAt: string;
+  expiresAt: string;
+}
+
+export interface WeeklyProgressMeta {
+  challengeId: string;
+  current: number;
+  target: number;
+}
 
 /** Remove all code_verified_* flags from localStorage (called on sync/reset) */
 function clearCodeVerifiedFlags() {
@@ -43,6 +68,7 @@ interface MasteryState {
   setPremiumModalOpen: (open: boolean) => void;
   setSidebarExpanded: (expanded: boolean) => void;
   setReadingModeActive: (active: boolean) => void;
+  setCommandPaletteOpen: (open: boolean) => void;
   setSelectedPath: (path: 'all' | 'foundations' | 'enterprise' | 'regulated') => void;
   setClaimedCertificate: (path: string) => void;
   setUser: (name: string, id: string) => Promise<void>;
@@ -73,6 +99,34 @@ interface MasteryState {
   getCurrentStage: () => { key: string; title: string; goal: string; emoji: string; milestone: { challengeLessonId: string; badgeName: string; capabilities: string[]; badgeEmoji: string; }; groups: string[] };
   getCompletedStages: () => string[];
   getPathStats: (path: string) => { totalModules: number; completedModules: number; remainingModules: number; completionPercentage: number; estimatedMinutes: number; };
+
+  // Phase 5 Productivity State & Actions
+  isCommandPaletteOpen: boolean;
+  recentResources: { id: string; title: string; type: string; url: string; group: string; timestamp: number }[];
+  bookmarkedResources: string[];
+  favoritedResources: string[];
+  copiedSnippets: { text: string; originUrl: string; timestamp: number }[];
+  weeklyMinutes: number;
+  monthlyMinutes: number;
+
+  addRecentResource: (resource: { id: string; title: string; type: string; url: string; group: string }) => void;
+  toggleBookmark: (id: string) => void;
+  toggleFavorite: (id: string) => void;
+  addCopiedSnippet: (text: string, originUrl: string) => void;
+  clearCopiedSnippets: () => void;
+
+  // Phase 6.1 State & Actions
+  activeDailyChallenge: ActiveChallengeMeta | null;
+  activeWeeklyChallenge: ActiveChallengeMeta | null;
+  challengeHistory: ChallengeAttempt[];
+  weeklyProgress: WeeklyProgressMeta | null;
+  challengeStreak: number;
+  loginStreak: number;
+  lessonStreak: number;
+  challengeDifficultyLevel: "Easy" | "Medium" | "Hard" | "Expert" | "Master";
+
+  submitChallengeAttempt: (challengeId: string, passed: boolean, timeTaken: number, answer?: string) => void;
+  initChallengeState: () => void;
 }
 
 export const useMasteryStore = create<MasteryState>((set, get) => ({
@@ -87,6 +141,7 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
   isReadingModeActive: false,
   claimedCertificates: {},
   selectedPath: 'all',
+  isCommandPaletteOpen: false,
 
   // Learning Profile Defaults
   skillLevel: '',
@@ -108,10 +163,29 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
   unlockedStageBadges: [],
   showMilestoneCelebration: null,
 
+  // Phase 5 defaults
+  recentResources: [],
+  bookmarkedResources: [],
+  favoritedResources: [],
+  copiedSnippets: [],
+  weeklyMinutes: 0,
+  monthlyMinutes: 0,
+
+  // Phase 6.1 defaults
+  activeDailyChallenge: null,
+  activeWeeklyChallenge: null,
+  challengeHistory: [],
+  weeklyProgress: null,
+  challengeStreak: 0,
+  loginStreak: 0,
+  lessonStreak: 0,
+  challengeDifficultyLevel: "Easy",
+
   setMobileSyncOpen: (open) => set({ isMobileSyncOpen: open }),
   setPremiumModalOpen: (open) => set({ isPremiumModalOpen: open }),
   setSidebarExpanded: (expanded) => set({ isSidebarExpanded: expanded }),
   setReadingModeActive: (active) => set({ isReadingModeActive: active }),
+  setCommandPaletteOpen: (open) => set({ isCommandPaletteOpen: open }),
   setSelectedPath: (path) => {
     set({ selectedPath: path });
     localStorage.setItem('asa_selected_path', path);
@@ -185,6 +259,36 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
       localStorage.setItem('nexus_activity_date', today);
     }
 
+    const currentWeekStart = (() => {
+      const d = new Date();
+      const day = d.getDay();
+      const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+      return new Date(d.setDate(diff)).toISOString().split('T')[0];
+    })();
+    const currentMonthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
+
+    const lastWeekStart = localStorage.getItem('asa_last_week_start') || '';
+    const lastMonthStart = localStorage.getItem('asa_last_month_start') || '';
+
+    let localWeeklyMinutes = parseInt(localStorage.getItem('asa_weekly_minutes') || '0', 10);
+    let localMonthlyMinutes = parseInt(localStorage.getItem('asa_monthly_minutes') || '0', 10);
+
+    if (lastWeekStart !== currentWeekStart) {
+      localWeeklyMinutes = 0;
+      localStorage.setItem('asa_weekly_minutes', '0');
+      localStorage.setItem('asa_last_week_start', currentWeekStart);
+    }
+    if (lastMonthStart !== currentMonthStart) {
+      localMonthlyMinutes = 0;
+      localStorage.setItem('asa_monthly_minutes', '0');
+      localStorage.setItem('asa_last_month_start', currentMonthStart);
+    }
+
+    const localRecentResources = JSON.parse(localStorage.getItem('asa_recent_resources') || '[]');
+    const localBookmarkedResources = JSON.parse(localStorage.getItem('asa_bookmarked_resources') || '[]');
+    const localFavoritedResources = JSON.parse(localStorage.getItem('asa_favorited_resources') || '[]');
+    const localCopiedSnippets = JSON.parse(localStorage.getItem('asa_copied_snippets') || '[]');
+
     set({ 
       userName: storedName, 
       userId: storedId,
@@ -204,8 +308,27 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
       lastActivityDate: localActivityDate || today,
       todayMinutes: localTodayMinutes,
       totalMinutes: localTotalMinutes,
+
+      recentResources: localRecentResources,
+      bookmarkedResources: localBookmarkedResources,
+      favoritedResources: localFavoritedResources,
+      copiedSnippets: localCopiedSnippets,
+      weeklyMinutes: localWeeklyMinutes,
+      monthlyMinutes: localMonthlyMinutes,
+
+      activeDailyChallenge: JSON.parse(localStorage.getItem('asa_active_daily_challenge') || 'null'),
+      activeWeeklyChallenge: JSON.parse(localStorage.getItem('asa_active_weekly_challenge') || 'null'),
+      challengeHistory: JSON.parse(localStorage.getItem('asa_challenge_history') || '[]'),
+      weeklyProgress: JSON.parse(localStorage.getItem('asa_weekly_progress') || 'null'),
+      challengeStreak: parseInt(localStorage.getItem('asa_challenge_streak') || '0', 10),
+      loginStreak: parseInt(localStorage.getItem('asa_login_streak') || '0', 10),
+      lessonStreak: parseInt(localStorage.getItem('asa_lesson_streak') || '0', 10),
+      challengeDifficultyLevel: (localStorage.getItem('asa_challenge_difficulty_level') || 'Easy') as any,
     });
     
+    // Deterministically initialize/refresh challenges
+    get().initChallengeState();
+
     if (storedId) {
       await get().fetchProgress();
     } else {
@@ -540,19 +663,25 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
   },
 
   updateTimeSpentToday: async (minutes) => {
-    const { userId, todayMinutes, totalMinutes } = get();
+    const { userId, todayMinutes, totalMinutes, weeklyMinutes, monthlyMinutes } = get();
     const todayDate = new Date().toISOString().split('T')[0];
     const newTodayMinutes = todayMinutes + minutes;
     const newTotalMinutes = totalMinutes + minutes;
+    const newWeeklyMinutes = weeklyMinutes + minutes;
+    const newMonthlyMinutes = monthlyMinutes + minutes;
 
     set({
       lastActivityDate: todayDate,
       todayMinutes: newTodayMinutes,
-      totalMinutes: newTotalMinutes
+      totalMinutes: newTotalMinutes,
+      weeklyMinutes: newWeeklyMinutes,
+      monthlyMinutes: newMonthlyMinutes,
     });
     localStorage.setItem('nexus_activity_date', todayDate);
     localStorage.setItem('nexus_today_minutes', newTodayMinutes.toString());
     localStorage.setItem('nexus_total_minutes', newTotalMinutes.toString());
+    localStorage.setItem('asa_weekly_minutes', newWeeklyMinutes.toString());
+    localStorage.setItem('asa_monthly_minutes', newMonthlyMinutes.toString());
 
     if (!userId) return;
 
@@ -587,5 +716,246 @@ export const useMasteryStore = create<MasteryState>((set, get) => ({
 
   markAllAsRead: () => {
     set({ unreadCount: 0 });
+  },
+
+  addRecentResource: (resource) => {
+    const { recentResources } = get();
+    const timestamp = Date.now();
+    // Filter out previous occurrences of this resource ID
+    const filtered = recentResources.filter(r => r.id !== resource.id);
+    const updated = [{ ...resource, timestamp }, ...filtered].slice(0, 8); // Keep up to 8 recent resources
+    set({ recentResources: updated });
+    localStorage.setItem('asa_recent_resources', JSON.stringify(updated));
+  },
+
+  toggleBookmark: (id) => {
+    const { bookmarkedResources } = get();
+    const updated = bookmarkedResources.includes(id)
+      ? bookmarkedResources.filter(b => b !== id)
+      : [...bookmarkedResources, id];
+    set({ bookmarkedResources: updated });
+    localStorage.setItem('asa_bookmarked_resources', JSON.stringify(updated));
+  },
+
+  toggleFavorite: (id) => {
+    const { favoritedResources } = get();
+    const updated = favoritedResources.includes(id)
+      ? favoritedResources.filter(f => f !== id)
+      : [...favoritedResources, id];
+    set({ favoritedResources: updated });
+    localStorage.setItem('asa_favorited_resources', JSON.stringify(updated));
+  },
+
+  addCopiedSnippet: (text, originUrl) => {
+    const { copiedSnippets } = get();
+    const timestamp = Date.now();
+    const filtered = copiedSnippets.filter(s => s.text !== text);
+    const updated = [{ text, originUrl, timestamp }, ...filtered].slice(0, 10); // Keep last 10 copied snippets
+    set({ copiedSnippets: updated });
+    localStorage.setItem('asa_copied_snippets', JSON.stringify(updated));
+  },
+
+  clearCopiedSnippets: () => {
+    set({ copiedSnippets: [] });
+    localStorage.setItem('asa_copied_snippets', '[]');
+  },
+
+  initChallengeState: () => {
+    if (typeof window === 'undefined') return;
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+
+    const {
+      activeDailyChallenge,
+      activeWeeklyChallenge,
+      challengeHistory,
+      challengeDifficultyLevel
+    } = get();
+
+    // 1. Check/Reset Daily Challenge
+    let dailyChallengeChanged = false;
+    let newDailyChallenge = activeDailyChallenge;
+
+    if (!activeDailyChallenge || new Date(activeDailyChallenge.expiresAt) <= now) {
+      // Midnight of today
+      const expiresAt = new Date();
+      expiresAt.setHours(23, 59, 59, 999);
+
+      // Determine eligible difficulties
+      const difficulties = ["Easy"];
+      if (challengeDifficultyLevel === "Medium" || challengeDifficultyLevel === "Hard" || challengeDifficultyLevel === "Expert" || challengeDifficultyLevel === "Master") difficulties.push("Medium");
+      if (challengeDifficultyLevel === "Hard" || challengeDifficultyLevel === "Expert" || challengeDifficultyLevel === "Master") difficulties.push("Hard");
+      if (challengeDifficultyLevel === "Expert" || challengeDifficultyLevel === "Master") difficulties.push("Expert");
+      if (challengeDifficultyLevel === "Master") difficulties.push("Master");
+
+      // Filter daily challenges pool
+      let pool = dailyChallengesData.filter((c: any) => difficulties.includes(c.difficulty));
+      
+      // Filter out completed ones
+      const completedIds = challengeHistory.filter(h => h.passed && h.type === 'daily').map(h => h.id);
+      let eligiblePool = pool.filter((c: any) => !completedIds.includes(c.id));
+
+      if (eligiblePool.length === 0) {
+        eligiblePool = pool; // fallback/reset pool if all completed
+      }
+
+      if (eligiblePool.length > 0) {
+        const daySeed = now.getFullYear() * 10000 + (now.getMonth() + 1) * 100 + now.getDate();
+        const selected = eligiblePool[daySeed % eligiblePool.length];
+        newDailyChallenge = {
+          id: selected.id,
+          assignedAt: now.toISOString(),
+          expiresAt: expiresAt.toISOString()
+        };
+        dailyChallengeChanged = true;
+      }
+    }
+
+    // 2. Check/Reset Weekly Challenge
+    let weeklyChallengeChanged = false;
+    let newWeeklyChallenge = activeWeeklyChallenge;
+
+    if (!activeWeeklyChallenge || new Date(activeWeeklyChallenge.expiresAt) <= now) {
+      // Find Sunday midnight
+      const expiresAt = new Date();
+      const day = expiresAt.getDay();
+      const diff = expiresAt.getDate() + (7 - day) % 7; // sunday
+      expiresAt.setDate(diff);
+      expiresAt.setHours(23, 59, 59, 999);
+
+      const weekSeed = now.getFullYear() * 100 + Math.floor(now.getDate() / 7);
+      const selected = weeklyChallengesData[weekSeed % weeklyChallengesData.length];
+      
+      newWeeklyChallenge = {
+        id: selected.id,
+        assignedAt: now.toISOString(),
+        expiresAt: expiresAt.toISOString()
+      };
+      weeklyChallengeChanged = true;
+    }
+
+    if (dailyChallengeChanged) {
+      set({ activeDailyChallenge: newDailyChallenge });
+      localStorage.setItem('asa_active_daily_challenge', JSON.stringify(newDailyChallenge));
+    }
+    if (weeklyChallengeChanged) {
+      set({ activeWeeklyChallenge: newWeeklyChallenge });
+      localStorage.setItem('asa_active_weekly_challenge', JSON.stringify(newWeeklyChallenge));
+      
+      // Reset weekly progress too
+      const weeklyMeta = weeklyChallengesData.find(w => w.id === newWeeklyChallenge?.id);
+      const newProgress = weeklyMeta ? { challengeId: weeklyMeta.id, current: 0, target: weeklyMeta.target } : null;
+      set({ weeklyProgress: newProgress });
+      localStorage.setItem('asa_weekly_progress', JSON.stringify(newProgress));
+    }
+  },
+
+  submitChallengeAttempt: (challengeId, passed, timeTaken, answer) => {
+    const {
+      activeDailyChallenge,
+      activeWeeklyChallenge,
+      challengeHistory,
+      weeklyProgress,
+      challengeStreak,
+      challengeDifficultyLevel
+    } = get();
+
+    const isDaily = activeDailyChallenge?.id === challengeId;
+    const isWeekly = activeWeeklyChallenge?.id === challengeId;
+    const type = isDaily ? 'daily' : 'weekly';
+
+    const nowStr = new Date().toISOString();
+    
+    // Find the challenge from definition pool
+    const challengeDef: any = isDaily 
+      ? dailyChallengesData.find((c: any) => c.id === challengeId)
+      : weeklyChallengesData.find((w: any) => w.id === challengeId);
+
+    if (!challengeDef) return;
+
+    // Check if already completed today
+    const alreadyPassed = challengeHistory.some(h => h.id === challengeId && h.passed);
+    if (alreadyPassed) {
+      get().addTelemetryLog('WARNING', `Challenge "${challengeDef.id}" already completed today.`);
+      return;
+    }
+
+    // Update history entry
+    const existingIndex = challengeHistory.findIndex(h => h.id === challengeId);
+    let attempts = 1;
+    let xpEarned = 0;
+
+    if (existingIndex !== -1) {
+      attempts = challengeHistory[existingIndex].attempts + 1;
+    }
+
+    if (passed) {
+      xpEarned = challengeDef.xpReward;
+    }
+
+    const newHistoryEntry: ChallengeAttempt = {
+      id: challengeId,
+      type: type as any,
+      difficulty: challengeDef.difficulty || 'Medium',
+      attempts,
+      passed,
+      xpEarned,
+      timeTaken,
+      completedAt: nowStr
+    };
+
+    let updatedHistory = [...challengeHistory];
+    if (existingIndex !== -1) {
+      updatedHistory[existingIndex] = newHistoryEntry;
+    } else {
+      updatedHistory.push(newHistoryEntry);
+    }
+
+    set({ challengeHistory: updatedHistory });
+    localStorage.setItem('asa_challenge_history', JSON.stringify(updatedHistory));
+
+    // Handle rewards
+    if (passed) {
+      // Award XP
+      const currentXP = parseInt(localStorage.getItem('asa_time_spent') || '0', 10);
+      const newXP = currentXP + xpEarned;
+      set({ timeSpentSeconds: newXP });
+      localStorage.setItem('asa_time_spent', newXP.toString());
+
+      // Update streaks
+      let newStreak = challengeStreak;
+      if (isDaily) {
+        newStreak = challengeStreak + 1;
+        set({ challengeStreak: newStreak });
+        localStorage.setItem('asa_challenge_streak', newStreak.toString());
+      }
+
+      // Check difficulty scaling rules
+      const DIFFICULTY_RULES = { Easy: 5, Medium: 8, Hard: 10, Expert: 12 };
+      let newDifficulty = challengeDifficultyLevel;
+      const passedCount = updatedHistory.filter(h => h.passed && h.difficulty === challengeDifficultyLevel).length;
+
+      if (challengeDifficultyLevel === "Easy" && passedCount >= DIFFICULTY_RULES.Easy) {
+        newDifficulty = "Medium";
+      } else if (challengeDifficultyLevel === "Medium" && passedCount >= DIFFICULTY_RULES.Medium) {
+        newDifficulty = "Hard";
+      } else if (challengeDifficultyLevel === "Hard" && passedCount >= DIFFICULTY_RULES.Hard) {
+        newDifficulty = "Expert";
+      } else if (challengeDifficultyLevel === "Expert" && passedCount >= DIFFICULTY_RULES.Expert) {
+        newDifficulty = "Master";
+      }
+
+      if (newDifficulty !== challengeDifficultyLevel) {
+        set({ challengeDifficultyLevel: newDifficulty });
+        localStorage.setItem('asa_challenge_difficulty_level', newDifficulty);
+        get().addTelemetryLog('SUCCESS', `New Difficulty Unlocked: ${newDifficulty}!`);
+      }
+
+      get().addTelemetryLog('SUCCESS', `Completed Challenge: +${xpEarned} XP! Streak: x${newStreak}`);
+    } else {
+      get().addTelemetryLog('WARNING', `Failed challenge attempt for: ${challengeDef.id}`);
+    }
   }
+  
+  // End of store
 }));
